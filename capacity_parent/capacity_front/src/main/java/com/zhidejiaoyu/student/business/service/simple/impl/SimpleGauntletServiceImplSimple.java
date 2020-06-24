@@ -310,32 +310,28 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
      * countByStudentId
      *
      * @param type
-     * @param challengeType
      * @param pageNum
      * @param rows
      * @param session
      * @return
      */
     @Override
-    public ServerResponse<Object> getChallenge(Integer type, Integer challengeType, Integer pageNum, Integer rows, HttpSession session) {
+    public ServerResponse<Object> getChallenge(Integer type, Integer pageNum, Integer rows, HttpSession session) {
         Long studentId = getStudentId(session);
         Map<String, Object> returnMap = new HashMap<>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.add(Calendar.HOUR_OF_DAY, -24);
-        Date time = calendar.getTime();
-        SimpleDateFormat simple = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String format = simple.format(time);
         int start = (pageNum - 1) * rows;
         //根据type的不同来区分是查询我发出的挑战还是挑战我的数据
-        List<Gauntlet> gauntlets = gauntletMapper.selGauntletByTypeAndChallengeType(type, challengeType, start, rows, studentId, format);
+        List<Gauntlet> gauntlets = gauntletMapper.selGauntletByTypeAndChallengeType(type, start, rows, studentId);
         //获取要查询的挑战数量
-        Integer count = gauntletMapper.getCount(type, challengeType, studentId, format);
+        Integer count = gauntletMapper.getCount(type, studentId);
         returnMap.put("page", pageNum);
         returnMap.put("rows", rows);
         List<Map<String, Object>> list = new ArrayList<>();
         returnMap.put("total", count % rows > 0 ? count / rows + 1 : count / rows);
-        getGauntlet(list, gauntlets, type);
+        getGauntlet(list, gauntlets, type, studentId);
         returnMap.put("data", list);
         return ServerResponse.createBySuccess(returnMap);
     }
@@ -801,18 +797,9 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
      * @param gauntlets
      * @param type
      */
-    private void getGauntlet(List<Map<String, Object>> returnList, List<Gauntlet> gauntlets, Integer type) {
+    private void getGauntlet(List<Map<String, Object>> returnList, List<Gauntlet> gauntlets, Integer type, Long studentId) {
 
         for (Gauntlet gauntlet : gauntlets) {
-            if (gauntlet.getChallengeStatus() == 4) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(gauntlet.getCreateTime());
-                calendar.add(Calendar.HOUR_OF_DAY, 24);
-                Date time = calendar.getTime();
-                if (time.getTime() < System.currentTimeMillis()) {
-                    continue;
-                }
-            }
             Map<String, Object> map = new HashMap<>();
             Student student = simpleStudentMapper.selectByPrimaryKey(gauntlet.getChallengerStudentId());
             Student students = simpleStudentMapper.selectByPrimaryKey(gauntlet.getBeChallengerStudentId());
@@ -822,13 +809,29 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
             map.put("gauntletId", gauntlet.getId());
             map.put("game", gauntlet.getChallengeName());
             map.put("createTime", gauntlet.getCreateTime());
-            String str = gauntlet.getChallengerMsg();
-            String[] split = str.split("，");
-            map.put("challengerMsg", split);
             if (type == 1) {
                 map.put("type", gauntlet.getChallengeStatus());
-            } else {
+                StudentExpansion expansion = simpleStudentExpansionMapper.selectByStudentId(student.getId());
+                map.put("pkNum",expansion.getStudyPower());
+                map.put("sourcePower",expansion.getSourcePower());
+            } else if (type == 2) {
                 map.put("type", gauntlet.getBeChallengerStatus());
+                StudentExpansion expansion = simpleStudentExpansionMapper.selectByStudentId(students.getId());
+                map.put("pkNum",expansion.getStudyPower());
+                map.put("sourcePower",expansion.getSourcePower());
+            } else if (type == 3) {
+                if (student.getId().equals(studentId)) {
+                    StudentExpansion expansion = simpleStudentExpansionMapper.selectByStudentId(student.getId());
+                    map.put("pkNum",expansion.getStudyPower());
+                    map.put("sourcePower",expansion.getSourcePower());
+                    map.put("type", gauntlet.getChallengeStatus());
+                }
+                if (students.getId().equals(studentId)) {
+                    StudentExpansion expansion = simpleStudentExpansionMapper.selectByStudentId(students.getId());
+                    map.put("pkNum",expansion.getStudyPower());
+                    map.put("sourcePower",expansion.getSourcePower());
+                    map.put("type", gauntlet.getBeChallengerStatus());
+                }
             }
             returnList.add(map);
         }
