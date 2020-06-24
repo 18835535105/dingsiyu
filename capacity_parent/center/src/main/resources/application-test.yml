@@ -23,8 +23,8 @@ logging:
   config: classpath:log4j2-test.xml
 
 ip: 123.56.142.84
-#ip: 192.168.0.2
 
+studyUrl: http://dev.center.duizhang100.cn
 # 公众号配置信息
 gongzhonghao:
   appId: wx876660e0c4b48729

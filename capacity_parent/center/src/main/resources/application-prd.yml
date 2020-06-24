@@ -30,6 +30,7 @@ logging:
   config: classpath:log4j2-prd.xml
 
 # 公众号配置信息
+studyUrl: http://center.duizhang100.cn
 gongzhonghao:
   appId: wx876660e0c4b48729
   secret: 99c6d530ec67582061c731b43e6a2448
