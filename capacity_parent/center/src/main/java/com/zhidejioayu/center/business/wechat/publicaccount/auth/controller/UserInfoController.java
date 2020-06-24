@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author: wuchenxi
@@ -31,7 +33,7 @@ public class UserInfoController {
      * @return
      */
     @GetMapping("/getUserInfo")
-    public ServerResponse<String> getUserInfo() {
+    public void getUserInfo(HttpServletResponse response) throws IOException {
         String code = HttpUtil.getHttpServletRequest().getParameter("code");
         ServerResponse<Object> userInfo = publicAccountService.getUserInfo(code);
         UserInfoVO userInfoVO = (UserInfoVO) userInfo.getData();
@@ -40,6 +42,7 @@ public class UserInfoController {
                 "&headimgurl=" + userInfoVO.getHeadimgurl() +
                 "&nickname=" + userInfoVO.getNickname() +
                 "&blank=blank";
-        return ServerResponse.createBySuccessMessage(url);
+        response.sendRedirect(url);
+//        return ServerResponse.createBySuccessMessage(url);
     }
 }
