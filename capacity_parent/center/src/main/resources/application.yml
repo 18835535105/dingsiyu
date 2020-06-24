@@ -49,6 +49,7 @@ server:
   servlet:
     session:
       timeout: 30m
+    context-path: /center
 
 mybatis:
   type-aliases-package: com.zhidejiaoyu.common.pojo
@@ -58,6 +59,5 @@ pagehelper:
   reasonable: true
   support-methods-arguments: true
   params: count=countSql
-
 
 
