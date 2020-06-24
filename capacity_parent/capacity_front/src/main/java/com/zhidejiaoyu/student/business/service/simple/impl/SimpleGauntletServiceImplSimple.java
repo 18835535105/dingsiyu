@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.service.simple.impl;
 
+import com.aliyun.oss.internal.OSSUtils;
 import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
@@ -864,9 +865,9 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
             Student students = simpleStudentMapper.selectByPrimaryKey(gauntlet.getBeChallengerStudentId());
             map.put("originator", student.getNickname());
             map.put("challenged", students.getNickname());
-            map.put("courseId", gauntlet.getCourseId());
+            map.put("originatorImgUrl", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
+            map.put("challengedImgUrl", GetOssFile.getPublicObjectUrl(students.getHeadUrl()));
             map.put("gauntletId", gauntlet.getId());
-            map.put("game", gauntlet.getChallengeName());
             map.put("createTime", gauntlet.getCreateTime());
             if (type == 1) {
                 map.put("type", gauntlet.getChallengeStatus());

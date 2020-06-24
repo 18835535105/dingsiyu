@@ -327,5 +327,5 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
      * @param studentId
      * @return
      */
-    GauntletRankVo selectGauntletRankVoByStudentId(@Param("studentIds") Long studentId);
+    GauntletRankVo selectGauntletRankVoByStudentId(@Param("studentId") Long studentId);
 }

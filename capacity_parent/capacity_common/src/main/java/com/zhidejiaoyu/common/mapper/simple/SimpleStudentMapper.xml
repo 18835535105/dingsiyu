@@ -1131,11 +1131,8 @@
         from student stu
         left join student_expansion exp
         on stu.id=exp.student_id
-        where stu.id in (
-        <foreach collection="studentIds" separator="," item="studentId">
-            #{studentId}
-        </foreach>
-        )
+        where stu.id = #{studentId}
+
     </select>
 
 
