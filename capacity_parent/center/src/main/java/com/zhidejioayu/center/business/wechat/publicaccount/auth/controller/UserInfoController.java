@@ -43,6 +43,5 @@ public class UserInfoController {
                 "&nickname=" + userInfoVO.getNickname() +
                 "&blank=blank";
         response.sendRedirect(url);
-//        return ServerResponse.createBySuccessMessage(url);
     }
 }
