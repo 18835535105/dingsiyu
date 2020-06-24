@@ -116,14 +116,13 @@ public class SimpleGauntletController {
      * 查看发起的挑战 和被挑战的次数
      *
      * @param type          1,发起的挑战  2,被挑战
-     * @param challengeType 0，全部   1，胜  2，失败 3，等待 4，超时  5，平局
      * @param pageNum       页数
      * @param rows          每页显示个数
      * @return
      */
     @RequestMapping("/getChallenge")
-    public ServerResponse<Object> getChallenge(Integer type, Integer challengeType, Integer pageNum, Integer rows, HttpSession session) {
-        return gauntletService.getChallenge(type, challengeType, pageNum, rows, session);
+    public ServerResponse<Object> getChallenge(Integer type,  Integer pageNum, Integer rows, HttpSession session) {
+        return gauntletService.getChallenge(type,  pageNum, rows, session);
     }
 
 

@@ -28,7 +28,7 @@ public interface SimpleIGauntletServiceSimple extends SimpleBaseService<Gauntlet
 
     ServerResponse<Object> getCourse(HttpSession session);
 
-    ServerResponse<Object> getChallenge(Integer type, Integer challengeType, Integer pageNum, Integer rows, HttpSession session);
+    ServerResponse<Object> getChallenge(Integer type, Integer pageNum, Integer rows, HttpSession session);
 
     void getStudy();
 
