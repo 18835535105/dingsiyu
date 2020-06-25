@@ -12,11 +12,19 @@
         <result column="audio_status" property="audioStatus"/>
         <result column="pk_explain" property="pkExplain"/>
         <result column="test_gold_add" property="testGoldAdd"/>
+        <result column="pk_explain" property="pkExplain"/>
+        <result column="better_three_time" property="betterThreeTime"/>
+        <result column="guide" property="guide"/>
+        <result column="medal_no" property="medalNo"/>
+        <result column="source_power" property="sourcePower"/>
+        <result column="ranking" property="ranking"/>
+        <result column="cash_coupon" property="cashCoupon"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, student_id, study_power , level ,is_look, audio_status, test_gold_add, pk_explain
+        id, student_id, study_power , `level` ,is_look, audio_status, test_gold_add, pk_explain, better_three_time,
+        `phase`,guide,medal_no, source_power,ranking, cash_coupon
     </sql>
 
     <select id="isHave" parameterType="long" resultMap="BaseResultMap">
@@ -37,9 +45,11 @@
     <select id="getMaxStudyTwenty" parameterType="map" resultType="map">
         select
         stu.id studentId,stu.nickname name,stuex.study_power study,
-        (select count(id) from gauntlet gaunt where gaunt.challenger_student_id = stu.id and challenge_status=1) mePkOthers,
-        (select count(id) from gauntlet gaunt where gaunt.be_challenger_student_id = stu.id and be_challenger_status=1) othersPkMe
-        from  student stu
+        (select count(id) from gauntlet gaunt where gaunt.challenger_student_id = stu.id and challenge_status=1)
+        mePkOthers,
+        (select count(id) from gauntlet gaunt where gaunt.be_challenger_student_id = stu.id and be_challenger_status=1)
+        othersPkMe
+        from student stu
         left join student_expansion stuex on stu.id=stuex.student_id
         where stu.status &lt;> 3 and stu.head_url is not null
         <if test="type == 1">
@@ -71,6 +81,41 @@
 
     <select id="selectAll" resultMap="BaseResultMap">
         select <include refid="Base_Column_List"></include> from student_expansion
+    </select>
+
+    <select id="selectSourcePowerSortByStudentIds" parameterType="map" resultType="long">
+        select
+        student_id
+        from student_expansion
+        where student_id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+        <if test="sort==1">
+            order by source_power desc
+        </if>
+        <if test="sort==2">
+            order by source_power asc
+        </if>
+        limit #{start},#{end}
+    </select>
+    <select id="selectPkNumSortByStudentIds" parameterType="map" resultType="long">
+        select
+        student_id
+        from student_expansion
+        where student_id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+        <if test="sort==1">
+            order by study_power desc
+        </if>
+        <if test="sort==2">
+            order by study_power asc
+        </if>
+        limit #{start},#{end}
     </select>
 
 </mapper>

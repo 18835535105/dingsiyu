@@ -25,6 +25,7 @@ import com.zhidejiaoyu.student.business.service.simple.SimplePersonalCentreServi
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.annotation.Obsolete;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -950,7 +951,8 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         return totalPages;
     }
 
-    private String getLevelStr(Integer myGold, List<Map<String, Object>> levels) {
+    @Override
+    public String getLevelStr(Integer myGold, List<Map<String, Object>> levels) {
         String level = "";
         if (myGold >= 50) {
             int myrecord = 0;

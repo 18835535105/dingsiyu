@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper.simple;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zhidejiaoyu.common.vo.GauntletRankVo;
 import com.zhidejiaoyu.common.vo.simple.StudentGauntletVo;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExample;
@@ -318,4 +319,22 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
      * @return
      */
     int countHasLoginLogStudentsBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
+
+    List<Long> selectMaxSourceByClassId(@Param("classId") Long classId, @Param("teacherId") Long teacherId, @Param("start") Long start, @Param("end") Long end);
+
+    /**
+     * 查询GauntletRankVo数据
+     *
+     * @param studentId
+     * @return
+     */
+    GauntletRankVo selectGauntletRankVoByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * 查看全部学生有多少个，
+     *
+     * @param schoolAdminId 有值为校区查询 无值为全服查询
+     * @return
+     */
+    List<Long> selectStudentIdByAdminIdOrAll(Integer schoolAdminId);
 }

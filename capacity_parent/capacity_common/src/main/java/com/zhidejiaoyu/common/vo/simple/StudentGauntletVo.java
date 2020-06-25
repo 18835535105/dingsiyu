@@ -83,7 +83,6 @@ public class StudentGauntletVo {
      */
     @Data
     @Builder
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Info {
         /**
@@ -103,6 +102,10 @@ public class StudentGauntletVo {
          */
         private shipName missileInfo;
         /**
+         * 导弹信息
+         */
+        private shipName hero;
+        /**
          * 各项最大值
          */
         private BaseValue baseValue;
@@ -115,7 +118,6 @@ public class StudentGauntletVo {
      */
     @Data
     @Builder
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class BaseValue {
         /**
@@ -154,7 +156,6 @@ public class StudentGauntletVo {
      */
     @Data
     @Builder
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class shipName {
         private String name;

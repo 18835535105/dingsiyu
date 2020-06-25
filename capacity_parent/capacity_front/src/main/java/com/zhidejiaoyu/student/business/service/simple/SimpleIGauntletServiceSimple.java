@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.service.simple;
 
 
+import com.zhidejiaoyu.common.vo.gauntlet.GauntletSortVo;
 import com.zhidejiaoyu.common.vo.simple.StudentGauntletVo;
 import com.zhidejiaoyu.common.pojo.Gauntlet;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -18,7 +19,7 @@ import java.util.Map;
  */
 public interface SimpleIGauntletServiceSimple extends SimpleBaseService<Gauntlet> {
 
-    ServerResponse<Map<String,Object>> getStudentByType(HttpSession session, Integer type, Integer page, Integer row, String account);
+    ServerResponse<Map<String,Object>> getStudentByType(HttpSession session, Integer type, Integer page, Integer row, String account, GauntletSortVo vo);
 
     ServerResponse<StudentGauntletVo> getStudyInteger(HttpSession session);
 
@@ -47,4 +48,6 @@ public interface SimpleIGauntletServiceSimple extends SimpleBaseService<Gauntlet
     ServerResponse<Object> closePkExplain(HttpSession session);
 
     ServerResponse<Object> getHeroList(HttpSession session, Integer type);
+
+    ServerResponse<Object> getRank(HttpSession session,Integer type);
 }

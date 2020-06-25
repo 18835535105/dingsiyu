@@ -817,7 +817,8 @@
     <select id="selectStudentList" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from student where status &lt;> 3 and role between 1 and 2 and account_time is not null order by system_gold + offline_gold desc
+        from student where status &lt;> 3 and role between 1 and 2 and account_time is not null order by system_gold +
+        offline_gold desc
     </select>
     <select id="selectStudentSchoolAdminMap" resultType="java.util.Map" parameterType="map">
         select s.id studentId, t.school_admin_id schoolAdminId
@@ -846,7 +847,7 @@
         where stu.id = #{studentId};
     </select>
     <select id="selStudentNumberById" parameterType="map" resultType="java.lang.Integer">
-        select count(DISTINCT  stu.id) from student stu
+        select count(DISTINCT stu.id) from student stu
         <if test="model==2">
             join teacher tea on (tea.teacher_id=stu.teacher_id or tea.school_admin_id = stu.teacher_id)
         </if>
@@ -891,7 +892,7 @@
         <if test="model == 2 ">
             join teacher tea on (tea.teacher_id=stu.teacher_id or stu.teacher_id =tea.school_admin_id)
         </if>
-        where stu.status &lt;> 3  and stu.account_time is not null
+        where stu.status &lt;> 3 and stu.account_time is not null
         <if test="model==1">
 
             <if test="classId!=null and classId!=''">
@@ -914,7 +915,7 @@
                 <if test="teacherIds != null and teacherIds.size>0">
                     or stu.teacher_id in (
                     <foreach collection="teacherIds" item="teacherId" separator=",">
-                      #{teacherId}
+                        #{teacherId}
                     </foreach>
                     )
                 </if>
@@ -981,7 +982,7 @@
         <if test="model == 2 ">
             join teacher tea on (tea.teacher_id=stu.teacher_id or stu.teacher_id =tea.school_admin_id)
         </if>
-        where stu.status &lt;> 3  and stu.account_time is not null
+        where stu.status &lt;> 3 and stu.account_time is not null
         <if test="model==1">
             <if test="classId!=null and classId!=''">
                 and stu.class_id=#{classId}
@@ -1016,7 +1017,8 @@
     <select id="selSchoolAdminId" parameterType="map" resultType="integer">
         select tea.school_admin_id from teacher tea join student stu on tea.teacher_id=stu.teacher_id where stu.id=#{studentId} and stu.status &lt;>3
     </select>
-    <select id="getClassOrSchoolStudents" parameterType="map" resultType="com.zhidejiaoyu.common.vo.simple.StudentGauntletVo">
+    <select id="getClassOrSchoolStudents" parameterType="map"
+            resultType="com.zhidejiaoyu.common.vo.simple.StudentGauntletVo">
         select stu.id id,stu.nickname name ,stu.head_url headUrl, expan.study_power study,stu.account account
         from student stu
         left join student_expansion expan on stu.id=expan.student_id
@@ -1056,7 +1058,7 @@
     </select>
 
     <select id="selNumberById" parameterType="map" resultType="java.lang.Integer">
-        select count(DISTINCT  stu.id) from student stu
+        select count(DISTINCT stu.id) from student stu
         <if test="model==2">
             join teacher tea on (tea.teacher_id=stu.teacher_id or tea.school_admin_id = stu.teacher_id)
         </if>
@@ -1096,7 +1098,57 @@
         select count(s.id)
         from student s
         where s.account_time is not null
-          and s.teacher_id in (select teacher_id from teacher where school_admin_id = #{schoolAdminId})
+        and s.teacher_id in (select teacher_id from teacher where school_admin_id = #{schoolAdminId})
     </select>
+    <select id="selectMaxSourceByClassId" resultType="long" parameterType="map">
+        select stu.id
+        from student stu
+        join student_expansion exp
+        on stu.id=exp.student_id
+        where
+        <if test="classId!=null">
+            stu.class_id =#{classId}
+        </if>
+        <if test="classId==null">
+            stu.teacher_id =#{teacherId}
+        </if>
+        order by exp.source_power
+        <if test="start!=null">
+            limit #{start},#{end}
+        </if>
+    </select>
+
+    <select id="selectGauntletRankVoByStudentId" parameterType="map"
+            resultType="com.zhidejiaoyu.common.vo.GauntletRankVo">
+        select
+        stu.student_name studentName ,
+        stu.system_gold+stu.offline_gold gold,
+        exp.study_power pkNum,
+        exp.source_power sourcePower,
+        stu.province province,
+        stu.head_url headUrl,
+        stu.city city,
+        stu.area area
+        from student stu
+        left join student_expansion exp
+        on stu.id=exp.student_id
+        where stu.id = #{studentId}
+
+    </select>
+    <select id="selectStudentIdByAdminIdOrAll" parameterType="map" resultType="long">
+        select
+        id
+        from student
+        where
+        account_time > now()
+        <if test="schoolAdminId!=null">
+            and
+            (teacher_id in
+            (select teacher_id from teacher where school_admin_id= 295)
+            or teacher_id =295
+            )
+        </if>
+    </select>
+
 
 </mapper>
