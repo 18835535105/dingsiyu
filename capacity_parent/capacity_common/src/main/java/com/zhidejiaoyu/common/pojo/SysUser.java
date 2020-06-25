@@ -36,6 +36,8 @@ public class SysUser extends Model<SysUser> {
      */
     private String openid;
 
+    private String uuid;
+
     /**
      * 头像
      */

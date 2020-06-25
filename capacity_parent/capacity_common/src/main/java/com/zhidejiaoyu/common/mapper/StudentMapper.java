@@ -351,4 +351,12 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     List<Student> selectNotDelete();
+
+    /**
+     * 通过uuid查询学生信息
+     *
+     * @param uuid
+     * @return
+     */
+    Student selectByUuid(@Param("uuid") String uuid);
 }

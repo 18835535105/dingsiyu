@@ -10,7 +10,7 @@ spring:
       password: zdjy
     # 服务器1
     server1:
-      url: jdbc:mysql://39.102.48.73:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      url: jdbc:mysql://123.56.142.84:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       username: zdjy
       password: zdjy
   redis:

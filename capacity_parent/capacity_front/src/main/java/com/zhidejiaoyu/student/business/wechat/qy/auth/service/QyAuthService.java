@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.wechat.qy.auth.service;
 
 import com.zhidejiaoyu.common.pojo.SysUser;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.qy.auth.dto.LoginDTO;
 
 /**
@@ -23,5 +24,5 @@ public interface QyAuthService {
      *
      * @param loginDTO
      */
-    void login(LoginDTO loginDTO);
+    ServerResponse<Object> login(LoginDTO loginDTO);
 }

@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.pojo.SysUser;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.qy.auth.dto.LoginDTO;
 import com.zhidejiaoyu.student.business.wechat.qy.auth.service.QyAuthService;
 import com.zhidejiaoyu.student.business.wechat.qy.auth.vo.UserIdToOpenidVO;
@@ -85,7 +86,7 @@ public class QyAuthServiceImpl implements QyAuthService {
     }
 
     @Override
-    public void login(LoginDTO loginDTO) {
+    public ServerResponse<Object> login(LoginDTO loginDTO) {
         SysUser sysUser = sysUserMapper.selectByAccount(StringUtil.trim(loginDTO.getAccount()));
         if (sysUser == null) {
             throw new ServiceException(ServiceExceptionEnum.NAME_OR_PASSWORD_ERROR);
@@ -109,6 +110,7 @@ public class QyAuthServiceImpl implements QyAuthService {
 
         sysUser.setOpenid(loginDTO.getOpenId());
         sysUserMapper.updateById(sysUser);
+        return ServerResponse.createBySuccess(sysUser.getUuid());
     }
 
     /**

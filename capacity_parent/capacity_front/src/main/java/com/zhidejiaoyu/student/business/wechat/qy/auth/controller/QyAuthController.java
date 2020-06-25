@@ -63,8 +63,7 @@ public class QyAuthController {
     @ResponseBody
     @PostMapping("/login")
     public ServerResponse<Object> login(@Valid LoginDTO loginDTO, BindingResult result) {
-        qyAuthService.login(loginDTO);
-        return ServerResponse.createBySuccess();
+        return qyAuthService.login(loginDTO);
     }
 
 }

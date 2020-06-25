@@ -1,9 +1,12 @@
 package com.zhidejiaoyu.student.business.wechat.qy.fly.controller;
 
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
+import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
+import com.zhidejiaoyu.student.business.service.StudentInfoService;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.service.QyFlyService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +34,9 @@ public class QyFlyController {
 
     @Resource
     private CurrentDayOfStudyService currentDayOfStudyService;
+
+    @Resource
+    private StudentInfoService studentInfoService;
 
     /**
      * 上传飞行记录
@@ -87,11 +93,15 @@ public class QyFlyController {
     }
 
     @GetMapping("/getCurrentDayOfStudy")
-    public ServerResponse<Object> getCurrentDayOfStudy(Long studentId) {
-        if (studentId == null) {
-            return ServerResponse.createByError(400, "studentId can't be null!");
+    public ServerResponse<Object> getCurrentDayOfStudy(String studentUuid) {
+        if (studentUuid == null) {
+            return ServerResponse.createByError(400, "studentUuid can't be null!");
         }
-        return currentDayOfStudyService.getCurrentDayOfStudy(studentId);
+        Student student = studentInfoService.getByUuid(studentUuid);
+        if (student == null) {
+            throw new ServiceException(400, "未查询到uuid为" + studentUuid + "的学生信息！");
+        }
+        return currentDayOfStudyService.getCurrentDayOfStudy(student.getId());
     }
 
 }

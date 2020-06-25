@@ -29,4 +29,12 @@
         where account = #{account}
         limit 1
     </select>
+    <select id="selectTeacherInfoByOpenid" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from business_user_info
+        where openid = #{openid}
+        and (account like 'xg%' or account like 'js%')
+        limit 1
+    </select>
 </mapper>

@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejioayu.center.business.wechat.common.AccessTokenVO;
 import com.zhidejioayu.center.business.wechat.publicaccount.constant.ApiConstant;
+import com.zhidejioayu.center.business.wechat.qy.constant.QyApiConstant;
 import com.zhidejioayu.center.business.wechat.smallapp.constant.SmallAppApiConstant;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -82,7 +83,7 @@ public class AccessTokenUtil {
      *
      * @return
      */
-    /*public static String getQyAccessToken() {
+    public static String getQyAccessToken() {
         String key = RedisKeysConst.QY_WECHAT_ACCESS_TOKEN;
         String accessToken = getAccessTokenFromRedis(key);
         if (accessToken == null) {
@@ -95,7 +96,7 @@ public class AccessTokenUtil {
             return token;
         }
         return accessToken;
-    }*/
+    }
 
     private static void saveAccessTokenToRedis(String accessToken, String key) {
         redisTemplate.opsForValue().set(key, accessToken);

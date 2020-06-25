@@ -4,7 +4,9 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.center.WeChatMapper;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.center.WeChat;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.PrizeConfigService;
@@ -132,11 +134,11 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         List<Map<String, Integer>> prizeList = new ArrayList<>();
         Map<String, Integer> integer = new HashMap<>();
         prizeConfigs.forEach(prize -> {
-            Double dou = (prize.getChance() * 100);
-            int addInt = dou.intValue();
+            double dou = (prize.getChance() * 100);
+            int addInt = (int) dou;
             Integer anInt = integer.get("int");
-            Integer minInt;
-            Integer maxInt;
+            int minInt;
+            int maxInt;
             if (anInt == null) {
                 minInt = 0;
                 maxInt = addInt;

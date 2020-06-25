@@ -21,4 +21,6 @@ public class SearchStudentVO implements Serializable {
 
     private Long studentId;
 
+    private String uuid;
+
 }

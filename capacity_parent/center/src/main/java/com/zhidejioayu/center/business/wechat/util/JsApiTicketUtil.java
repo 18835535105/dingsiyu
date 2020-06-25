@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejioayu.center.business.wechat.publicaccount.constant.ApiConstant;
+import com.zhidejioayu.center.business.wechat.qy.constant.QyApiConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -60,7 +61,7 @@ public class JsApiTicketUtil {
      *
      * @return
      */
-   /* public static String getQyJsApiTicket() {
+    public static String getQyJsApiTicket() {
         String key = RedisKeysConst.QY_JS_API_TICKET;
         Object o = redisTemplate.opsForValue().get(key);
         if (o == null) {
@@ -69,7 +70,7 @@ public class JsApiTicketUtil {
         }
 
         return String.valueOf(o);
-    }*/
+    }
 
     private static String getTicket(String key, String url) {
         String response = restTemplate.getForObject(url, String.class);

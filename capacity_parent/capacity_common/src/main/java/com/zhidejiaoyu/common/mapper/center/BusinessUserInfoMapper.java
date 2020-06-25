@@ -26,4 +26,12 @@ public interface BusinessUserInfoMapper extends BaseMapper<BusinessUserInfo> {
      * @return
      */
     BusinessUserInfo selectByAccount(@Param("account") String account);
+
+    /**
+     * 通过openid查询校管或者教师信息
+     *
+     * @param openId
+     * @return
+     */
+    BusinessUserInfo selectTeacherInfoByOpenid(@Param("openId") String openId);
 }

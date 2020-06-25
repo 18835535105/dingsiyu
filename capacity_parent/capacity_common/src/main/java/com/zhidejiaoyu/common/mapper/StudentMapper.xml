@@ -939,5 +939,12 @@ s.uuid,
         <include refid="more_table_List"/>
         from student s where s.status &lt;> 3
     </select>
+    <select id="selectByUuid" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from student
+        where `uuid` = #{uuid}
+        limit 1
+    </select>
 
 </mapper>

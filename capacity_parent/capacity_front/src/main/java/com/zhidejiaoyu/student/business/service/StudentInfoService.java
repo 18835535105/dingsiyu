@@ -16,7 +16,7 @@ import java.util.Map;
  * @author wuchenxi
  * @date 2018年5月8日
  */
-public interface StudentInfoService extends BaseService<Student>{
+public interface StudentInfoService extends BaseService<Student> {
 
     /**
      * 学生完善个人信息，保存学生信息
@@ -38,7 +38,7 @@ public interface StudentInfoService extends BaseService<Student>{
     ServerResponse<String> worship(HttpSession session, Long userId);
 
     /**
-     *  学生退出学习页面，记录本次在学习页面学习时长
+     * 学生退出学习页面，记录本次在学习页面学习时长
      *
      * @param session
      */
@@ -47,8 +47,8 @@ public interface StudentInfoService extends BaseService<Student>{
     /**
      * 验证原密码是否正确
      *
-     * @param nowPassword   当前密码
-     * @param oldPassword   原密码
+     * @param nowPassword 当前密码
+     * @param oldPassword 原密码
      * @return
      */
     ServerResponse<String> judgeOldPassword(String nowPassword, String oldPassword);
@@ -57,7 +57,7 @@ public interface StudentInfoService extends BaseService<Student>{
      * 获取学生的等级信息
      *
      * @param session
-     * @param stuId 为空时查看当前学生的等级信息；不为空时查看选中的学生的等级信息
+     * @param stuId    为空时查看当前学生的等级信息；不为空时查看选中的学生的等级信息
      * @param pageNum
      * @param pageSize
      * @return
@@ -106,4 +106,12 @@ public interface StudentInfoService extends BaseService<Student>{
      * @return
      */
     ServerResponse<Map<String, Object>> getWorship(HttpSession session, Integer type, Integer pageNum, Integer pageSize);
+
+    /**
+     * 根据uuid查询学生信息
+     *
+     * @param uuid
+     * @return
+     */
+    Student getByUuid(String uuid);
 }

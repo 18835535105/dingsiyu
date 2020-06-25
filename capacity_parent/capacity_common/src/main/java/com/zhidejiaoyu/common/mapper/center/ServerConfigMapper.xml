@@ -25,5 +25,33 @@
         and bui.account like 'dz%'
         limit 1
     </select>
+    <select id="selectByAccount" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from server_config sc,
+        business_user_info bui
+        where sc.id = bui.server_config_id
+        and bui.account = #{account}
+        limit 1
+    </select>
+    <select id="selectTeacherServerByOpenId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from server_config sc,
+        business_user_info bui
+        where sc.id = bui.server_config_id
+        and bui.openid = #{openid}
+        and (bui.account like 'js%' or bui.account like 'xg%')
+        limit 1
+    </select>
+    <select id="selectByUUID" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from server_config sc,
+        business_user_info bui
+        where sc.id = bui.server_config_id
+        and bui.user_uuid = #{uuid}
+        limit 1
+    </select>
 
 </mapper>
