@@ -41,15 +41,14 @@ spring:
       connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=1000
       # 合并多个DruidDataSource的监控数据
       use-global-data-source-stat: true
-
+  main:
+    allow-bean-definition-overriding: true
 server:
+  servlet:
+    context-path: /center
   tomcat:
     uri-encoding: utf-8
     connection-timeout: 30m
-  servlet:
-    session:
-      timeout: 30m
-    context-path: /center
 
 mybatis:
   type-aliases-package: com.zhidejiaoyu.common.pojo
@@ -85,3 +84,4 @@ youdao:
   md5Key: OsGxRcsnty1MGvnGEOPPRGM8DK2dAAka
   from: EN
   to: zh-CHS
+

@@ -12,7 +12,7 @@ import javax.annotation.Resource;
  * @author: wuchenxi
  * @date: 2020/6/28 16:30:30
  */
-@RestController
+@RestController("centerUserInfoController")
 @RequestMapping("/userInfo")
 public class UserInfoController {
 

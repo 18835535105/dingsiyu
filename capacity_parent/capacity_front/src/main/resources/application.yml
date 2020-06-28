@@ -39,7 +39,8 @@ spring:
       connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=1000
       # 合并多个DruidDataSource的监控数据
       use-global-data-source-stat: true
-
+  main:
+    allow-bean-definition-overriding: true
   # 邮箱服务器地址
   mail:
     host: smtp.163.com

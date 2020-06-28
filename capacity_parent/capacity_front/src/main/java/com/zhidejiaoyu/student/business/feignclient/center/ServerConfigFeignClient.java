@@ -19,5 +19,5 @@ public interface ServerConfigFeignClient {
      * @return
      */
     @GetMapping("/getByServerNo/{serverNo}")
-    public ServerConfig getByServerNo(@PathVariable String serverNo);
+    ServerConfig getByServerNo(@PathVariable String serverNo);
 }

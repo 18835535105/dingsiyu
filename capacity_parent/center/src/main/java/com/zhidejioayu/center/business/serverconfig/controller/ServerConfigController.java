@@ -3,6 +3,7 @@ package com.zhidejioayu.center.business.serverconfig.controller;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejioayu.center.business.serverconfig.service.ServerConfigService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,8 +28,8 @@ public class ServerConfigController {
      * @param serverNo
      * @return
      */
-    @GetMapping("/getByServerNo")
-    public ServerConfig getByServerNo(String serverNo) {
+    @GetMapping("/getByServerNo/{serverNo}")
+    public ServerConfig getByServerNo(@PathVariable String serverNo) {
         return serverConfigService.getByServerNo(serverNo);
     }
 }
