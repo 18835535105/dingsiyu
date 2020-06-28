@@ -36,9 +36,9 @@ public class GauntletController {
      */
     @RequestMapping("/getStudentByType")
     public ServerResponse<Map<String, Object>> getStudentByType(HttpSession session, @RequestParam(defaultValue = "1") Integer type,
-                                                                @RequestParam(defaultValue = "1") Integer page, Integer rows,
+                                                                @RequestParam(defaultValue = "1") Integer pageNum, Integer rows,
                                                                 String account, GauntletSortVo vo) {
-        return gauntletService.getStudentByType(session, type, page, rows, account, vo);
+        return gauntletService.getStudentByType(session, type, pageNum, rows, account, vo);
     }
 
 
