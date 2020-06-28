@@ -2,8 +2,10 @@ package com.zhidejiaoyu.student.utils;
 
 import com.zhidejiaoyu.BaseTest;
 import com.zhidejiaoyu.common.utils.learn.GoodVoiceUtil;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 
 /**
  * @author wuchenxi
@@ -20,4 +22,9 @@ public class GoodVoiceUtilTest extends BaseTest {
         goodVoiceUtil.getWordEvaluationRecord("hello", null);
     }
 
+    @Test
+    public void getTime(){
+
+
+    }
 }

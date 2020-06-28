@@ -18,7 +18,7 @@ public interface WeekHistoryPlanMapper extends BaseMapper<WeekHistoryPlan> {
 
     List<WeekHistoryPlan> selectAllByTime(@Param("time") String times);
 
-    WeekHistoryPlan selectByTimeAndStudentId(@Param("date") String date,@Param("studentId") long studentId);
+    WeekHistoryPlan selectByTimeAndStudentId(@Param("date") String date,  @Param("studentId") long studentId);
 
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIds);
 
