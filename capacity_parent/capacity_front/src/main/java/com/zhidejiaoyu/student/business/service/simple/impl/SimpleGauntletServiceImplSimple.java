@@ -112,7 +112,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         //更改过时挑战
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
         long startIndex = (page - 1) * rows;
-        long endIndex = startIndex + rows;
+        long endIndex = rows;
         Map<String, Object> returnMap = new HashMap<>();
         returnMap.put("page", page);
         returnMap.put("rows", rows);
@@ -684,7 +684,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         Student student = getStudent(session);
         List<Long> studentIds = null;
         int pageNum = PageUtil.getPageNum();
-        int pageSize = PageUtil.getPageSize();
+        Integer pageSize = PageUtil.getPageSize();
         long startIndex = (pageNum - 1) * pageSize;
         long endIndex = startIndex + pageSize;
         Map<String, Object> map = new HashMap<>();
@@ -693,7 +693,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         if (type.equals(1)) {
             List<Long> longs = simpleStudentMapper.selectMaxSourceByClassId(student.getClassId(), student.getTeacherId(), null, null);
-            studentIds = simpleStudentMapper.selectMaxSourceByClassId(student.getClassId(), student.getTeacherId(), startIndex, endIndex);
+            studentIds = simpleStudentMapper.selectMaxSourceByClassId(student.getClassId(), student.getTeacherId(), startIndex, pageSize.longValue());
             map.put("total", longs.size() % pageSize > 0 ? longs.size() / pageSize + 1 : longs.size() / pageSize);
         } else if (type.equals(2)) {
             // 校区排行（全部学生）
@@ -1138,6 +1138,8 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         Long studentId = studentGauntletVo.getId();
         // 学生装备的飞船及装备信息
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
+        StudentGauntletVo.shipName shipName = getShipName(equipments, 1);
+        studentGauntletVo.setIsPk(shipName.getName() == null ? false : true);
         IndexVO.BaseValue baseValue = shipIndexService.getBaseValue(equipments);
         StudentGauntletVo.Info build = StudentGauntletVo.Info.builder()
                 .baseValue(StudentGauntletVo.BaseValue.builder()
@@ -1147,7 +1149,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
                         .move(baseValue.getMove())
                         .source(baseValue.getSource())
                         .sourceAttack(baseValue.getSourceAttack()).build())
-                .shipInfo(getShipName(equipments, 1))
+                .shipInfo(shipName)
                 .armorInfo(getShipName(equipments, 4))
                 .missileInfo(getShipName(equipments, 3))
                 .weaponsInfo(getShipName(equipments, 2))

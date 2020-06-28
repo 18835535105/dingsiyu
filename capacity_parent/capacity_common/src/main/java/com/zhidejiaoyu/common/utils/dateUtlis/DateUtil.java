@@ -2,14 +2,13 @@ package com.zhidejiaoyu.common.utils.dateUtlis;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDate;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -586,10 +585,9 @@ public class DateUtil implements Serializable {
      * @return String
      **/
     public static Date getWeekStart() {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.WEEK_OF_MONTH, 0);
-        cal.set(Calendar.DAY_OF_WEEK, 2);
-        return cal.getTime();
+        LocalDate now = LocalDate.now();
+        now.withDayOfWeek(DateTimeConstants.MONDAY);
+        return now.toDate();
     }
 
     /**
@@ -598,10 +596,9 @@ public class DateUtil implements Serializable {
      * @return String
      **/
     public static Date getWeekEnd() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_WEEK, cal.getActualMaximum(Calendar.DAY_OF_WEEK));
-        cal.add(Calendar.DAY_OF_WEEK, 1);
-        return cal.getTime();
+        LocalDate now = LocalDate.now();
+        now.withDayOfWeek(DateTimeConstants.SUNDAY);
+        return now.toDate();
     }
 
     private DateUtil() {
