@@ -37,4 +37,12 @@ public interface ServerConfigMapper extends BaseMapper<ServerConfig> {
      * @return
      */
     ServerConfig selectByUUID(@Param("uuid") String uuid);
+
+    /**
+     * 根据serverNo查询服务器信息
+     *
+     * @param serverNo
+     * @return
+     */
+    ServerConfig selectByServerNo(String serverNo);
 }

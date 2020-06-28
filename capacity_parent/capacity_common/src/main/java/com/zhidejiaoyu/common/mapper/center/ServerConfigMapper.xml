@@ -53,5 +53,12 @@
         and bui.user_uuid = #{uuid}
         limit 1
     </select>
+    <select id="selectByServerNo" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from server_config
+        where server_no = #{serverNo}
+        limit 1
+    </select>
 
 </mapper>

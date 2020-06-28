@@ -20,8 +20,16 @@ spring:
     host: ${ip}
     port: 6380
     password: zdjy
+  application:
+    name: center
+  cloud:
+    nacos:
+      discovery:
+        server-addr: nacos.duizhang100.cn:8848
+        namespace: a8dd697b-5d6d-4844-bcc7-54a7732644e8
 server:
   port: 9000
+
 
 logging:
   level:

@@ -34,4 +34,12 @@ public interface BusinessUserInfoMapper extends BaseMapper<BusinessUserInfo> {
      * @return
      */
     BusinessUserInfo selectTeacherInfoByOpenid(@Param("openId") String openId);
+
+    /**
+     * 根据用户uuid查询用户信息
+     *
+     * @param uuid
+     * @return
+     */
+    BusinessUserInfo selectByUserUuid(@Param("uuid") String uuid);
 }

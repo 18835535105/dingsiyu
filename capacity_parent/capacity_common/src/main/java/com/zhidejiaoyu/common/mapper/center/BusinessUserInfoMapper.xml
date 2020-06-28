@@ -37,4 +37,10 @@
         and (account like 'xg%' or account like 'js%')
         limit 1
     </select>
+    <select id="selectByUserUuid" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"/>
+        from business_user_info
+        where user_uuid = #{uuid} limit 1
+    </select>
 </mapper>

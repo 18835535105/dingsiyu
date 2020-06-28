@@ -7,12 +7,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="center" />
         <module name="capacity_common" />
         <module name="aliyun-oss" />
         <module name="aliyun-translate" />
         <module name="capacity_front" />
+        <module name="course" />
         <module name="aliyun-vod" />
+        <module name="center" />
         <module name="aliyun-common" />
       </profile>
     </annotationProcessing>
@@ -27,6 +28,7 @@
       <module name="capacity_parent" target="1.8" />
       <module name="center" target="1.8" />
       <module name="common" target="1.8" />
+      <module name="course" target="1.8" />
       <module name="guns-admin" target="1.8" />
       <module name="guns-core" target="1.8" />
       <module name="guns-generator" target="1.8" />
@@ -42,6 +44,7 @@
       <module name="capacity_common" options="-parameters" />
       <module name="capacity_front" options="-parameters" />
       <module name="center" options="-parameters" />
+      <module name="course" options="-parameters" />
     </option>
   </component>
 </project>

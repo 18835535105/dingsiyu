@@ -9,5 +9,11 @@ import com.zhidejiaoyu.common.pojo.center.ServerConfig;
  */
 public interface ServerConfigService extends IService<ServerConfig> {
 
-
+    /**
+     * 根据serverNo查询服务器信息
+     *
+     * @param serverNo
+     * @return
+     */
+    ServerConfig getByServerNo(String serverNo);
 }

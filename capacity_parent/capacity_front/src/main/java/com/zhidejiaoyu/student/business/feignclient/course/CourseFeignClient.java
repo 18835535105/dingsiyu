@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.FeignClient.course;
+package com.zhidejiaoyu.student.business.feignclient.course;
 
 import com.zhidejiaoyu.common.pojo.CourseNew;
 import org.springframework.cloud.openfeign.FeignClient;
