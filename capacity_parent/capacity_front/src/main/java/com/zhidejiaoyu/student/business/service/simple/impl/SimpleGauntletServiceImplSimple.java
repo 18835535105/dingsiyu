@@ -1138,6 +1138,8 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         Long studentId = studentGauntletVo.getId();
         // 学生装备的飞船及装备信息
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
+        StudentGauntletVo.shipName shipName = getShipName(equipments, 1);
+        studentGauntletVo.setIsPk(shipName.getName() == null ? false : true);
         IndexVO.BaseValue baseValue = shipIndexService.getBaseValue(equipments);
         StudentGauntletVo.Info build = StudentGauntletVo.Info.builder()
                 .baseValue(StudentGauntletVo.BaseValue.builder()
@@ -1147,7 +1149,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
                         .move(baseValue.getMove())
                         .source(baseValue.getSource())
                         .sourceAttack(baseValue.getSourceAttack()).build())
-                .shipInfo(getShipName(equipments, 1))
+                .shipInfo(shipName)
                 .armorInfo(getShipName(equipments, 4))
                 .missileInfo(getShipName(equipments, 3))
                 .weaponsInfo(getShipName(equipments, 2))

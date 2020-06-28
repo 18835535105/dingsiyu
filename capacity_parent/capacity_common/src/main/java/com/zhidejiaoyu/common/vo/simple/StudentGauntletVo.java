@@ -3,7 +3,6 @@ package com.zhidejiaoyu.common.vo.simple;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 public class StudentGauntletVo {
@@ -76,7 +75,10 @@ public class StudentGauntletVo {
      * 飞船信息
      */
     private Info shipInfo;
-
+    /**
+     * 判断是否能pk
+     */
+    private Boolean isPk;
 
     /**
      * 各个数据信息
