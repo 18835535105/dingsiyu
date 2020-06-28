@@ -1133,7 +1133,7 @@
         left join student_expansion exp
         on stu.id=exp.student_id
         where stu.id = #{studentId}
-
+        group by stu.id
     </select>
     <select id="selectStudentIdByAdminIdOrAll" parameterType="map" resultType="long">
         select
