@@ -23,4 +23,9 @@ public class SearchStudentVO implements Serializable {
 
     private String uuid;
 
+    /**
+     * 判断教师是否可以提交该学生记录
+     */
+    private Boolean canSubmit;
+
 }

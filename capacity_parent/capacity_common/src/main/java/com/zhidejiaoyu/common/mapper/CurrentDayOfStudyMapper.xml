@@ -39,5 +39,25 @@
         and qr_code_num = #{num}
         limit 1
     </select>
+    <select id="countByStudentIdAndDate" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from current_day_of_study
+        where student_id = #{studentId}
+          and to_days(create_time) = to_days(#{date})
+    </select>
+    <select id="countByStudentIdsAndDate" resultType="java.util.Map" parameterType="map">
+        select student_id studentId, count(id) count
+        from current_day_of_study
+        where student_id in (
+        <foreach collection="studentIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+        <if test="date != null">
+            and TO_DAYS(create_time) = TO_DAYS(#{date})
+        </if>
+        group by student_id
+
+    </select>
 
 </mapper>

@@ -19,12 +19,15 @@ import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.service.QyFlyService;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.vo.SearchStudentVO;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
@@ -44,16 +47,25 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
     @Resource
     private ExecutorService executorService;
 
+    @Resource
+    private CurrentDayOfStudyMapper currentDayOfStudyMapper;
+
     @Override
     public ServerResponse<Object> uploadFlyRecord(MultipartFile file, Long studentId, Integer num) {
 
-        String dir = FileConstant.STUDENT_FLY_RECORD + DateUtil.formatYYYYMMDD(new Date()) + "/";
+        Date date = new Date();
+        int count = currentDayOfStudyMapper.countByStudentIdAndDate(studentId, date);
+        if (count > 0) {
+            return ServerResponse.createByError(400, "学生当天信息已经上传，不能再次上传！");
+        }
+
+        String dir = FileConstant.STUDENT_FLY_RECORD + DateUtil.formatYYYYMMDD(date) + "/";
 
         executorService.execute(() -> {
             String upload = OssUpload.upload(file, dir, IdUtil.getId());
 
             this.save(CurrentDayOfStudy.builder()
-                    .createTime(new Date())
+                    .createTime(date)
                     .imgUrl(upload)
                     .qrCodeNum(num)
                     .studentId(studentId)
@@ -72,10 +84,18 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
         List<Student> students = studentMapper.selectByTeacherIdOrSchoolAdminId(sysUser.getId(), dto);
         PageInfo<Student> pageInfo = new PageInfo<>(students);
 
+        // 查询学生当天是否已经上传了飞行记录
+        Map<Long, Map<Long, Long>> map = new HashMap<>(16);
+        if (CollectionUtils.isNotEmpty(students)) {
+            map = currentDayOfStudyMapper.countByStudentIdsAndDate(students.stream().map(Student::getId).collect(Collectors.toList()), new Date());
+        }
+
+        Map<Long, Map<Long, Long>> finalMap = map;
         List<SearchStudentVO> collect = students.stream().map(student -> SearchStudentVO.builder()
                 .studentId(student.getId())
                 .uuid(student.getUuid())
                 .studentName(student.getStudentName())
+                .canSubmit(finalMap.get(student.getId()) == null || finalMap.get(student.getId()).get("count") == 0)
                 .build()).collect(Collectors.toList());
 
         PageVo<SearchStudentVO> page = PageUtil.packagePage(collect, pageInfo.getTotal());
