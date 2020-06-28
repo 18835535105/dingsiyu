@@ -684,7 +684,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         Student student = getStudent(session);
         List<Long> studentIds = null;
         int pageNum = PageUtil.getPageNum();
-        int pageSize = PageUtil.getPageSize();
+        Integer pageSize = PageUtil.getPageSize();
         long startIndex = (pageNum - 1) * pageSize;
         long endIndex = startIndex + pageSize;
         Map<String, Object> map = new HashMap<>();
@@ -693,7 +693,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         if (type.equals(1)) {
             List<Long> longs = simpleStudentMapper.selectMaxSourceByClassId(student.getClassId(), student.getTeacherId(), null, null);
-            studentIds = simpleStudentMapper.selectMaxSourceByClassId(student.getClassId(), student.getTeacherId(), startIndex, endIndex);
+            studentIds = simpleStudentMapper.selectMaxSourceByClassId(student.getClassId(), student.getTeacherId(), startIndex, pageSize.longValue());
             map.put("total", longs.size() % pageSize > 0 ? longs.size() / pageSize + 1 : longs.size() / pageSize);
         } else if (type.equals(2)) {
             // 校区排行（全部学生）
