@@ -10,6 +10,26 @@ spring:
     host: ${ip}
     port: 6380
     password: zdjy
+  cloud:
+    nacos:
+      discovery:
+        server-addr: nacos.duizhang100.cn:8848
+        namespace: a8dd697b-5d6d-4844-bcc7-54a7732644e8
+  application:
+    name: server1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+feign:
+  client:
+    config:
+      # 通过 default 进行全局配置
+      default:
+        loggerLevel: full
 
 server:
   port: 8083
@@ -18,7 +38,6 @@ ip: 123.56.142.84
 #ip: 192.168.0.2
 studyUrl: https://dev.shell.yydz100.com
 adminDomin: http://dev.admin.yydz100.com/dept
-
 logging:
   level:
     com:

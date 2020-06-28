@@ -23,6 +23,7 @@
         <module>aliyun-common</module>
         <module>aliyun-translate</module>
         <module>center</module>
+        <module>course</module>
     </modules>
 
 
@@ -55,6 +56,8 @@
 
         <!--springboot核心-->
         <spring-boot-starter.version>2.2.2.RELEASE</spring-boot-starter.version>
+        <spring-cloud-alibaba-dependencies.version>2.2.1.RELEASE</spring-cloud-alibaba-dependencies.version>
+        <spring-cloud-dependencies.version>Hoxton.RELEASE</spring-cloud-dependencies.version>
 
         <!--mysql-->
         <mysql-connector-java.version>8.0.13</mysql-connector-java.version>
@@ -95,6 +98,22 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
 
             <dependency>
                 <groupId>com.aliyun.oss</groupId>

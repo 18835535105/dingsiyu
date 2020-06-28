@@ -3,9 +3,16 @@
 spring:
   profiles: test
   datasource:
-    url: jdbc:mysql://${ip}:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: zdjy
-    password: zdjy
+    # 开发服务器
+    primary:
+      url: jdbc:mysql://123.56.142.84:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: zdjy
+      password: zdjy
+    # 服务器1
+    server1:
+      url: jdbc:mysql://123.56.142.84:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: zdjy
+      password: zdjy
   redis:
     host: ${ip}
     port: 6380
@@ -16,32 +23,15 @@ spring:
         server-addr: nacos.duizhang100.cn:8848
         namespace: a8dd697b-5d6d-4844-bcc7-54a7732644e8
   application:
-    name: server1
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-
-feign:
-  client:
-    config:
-      # 通过 default 进行全局配置
-      default:
-        loggerLevel: full
-
+    name: course
+server:
+  port: 9000
 logging:
   config: classpath:log4j2-test.xml
 
 ip: 123.56.142.84
-#ip: 192.168.0.2
-studyUrl: https://test.shell.yydz100.com
-adminDomin: http://test.admin.yydz100.com/dept
 
-quartz:
-  port: 8083
-
+studyUrl: http://dev.center.duizhang100.cn
 # 公众号配置信息
 gongzhonghao:
   appId: wx876660e0c4b48729
@@ -60,3 +50,4 @@ qywx:
     login: ${studyUrl}/qy/login
     # 授权后重定向的回调链接地址
     redirect_uri: ${studyUrl}/ec/qy/authgetUserInfo
+
