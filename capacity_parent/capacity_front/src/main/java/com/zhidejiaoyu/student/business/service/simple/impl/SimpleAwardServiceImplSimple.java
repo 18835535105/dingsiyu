@@ -89,7 +89,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<List<AwardVo>> getAwareInfo(HttpSession session, Integer type) {
+    public ServerResponse<Map<String, Object>> getAwareInfo(HttpSession session, Integer type) {
         Student student = super.getStudent(session);
         List<AwardVo> awardVos = new ArrayList<>();
         switch (type) {
@@ -106,8 +106,9 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 break;
             default:
         }
-        sortAwardVos(awardVos);
-        return ServerResponse.createBySuccess(awardVos);
+        Map<String, Object> map = new HashMap<>();
+        sortAwardVos(awardVos, map);
+        return ServerResponse.createBySuccess(map);
     }
 
 
@@ -392,7 +393,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
      *
      * @param awardVos
      */
-    private void sortAwardVos(List<AwardVo> awardVos) {
+    private void sortAwardVos(List<AwardVo> awardVos, Map<String, Object> map) {
         // 可领取奖励集合
         List<AwardVo> canGet = new ArrayList<>();
         // 已领取奖励集合
@@ -411,11 +412,13 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 }
             }
         });
-
+        map.put("received", got.size());
+        map.put("all", got.size() + canGet.size() + noGet.size());
         awardVos.clear();
         awardVos.addAll(canGet);
         awardVos.addAll(got);
         awardVos.addAll(noGet);
+        map.put("list", awardVos);
     }
 
     /**
@@ -466,7 +469,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                     }
                     // 保存领取奖励日志
                     try {
-                        GoldLogUtil.saveStudyGoldLog(student.getId(), awardType ,awardGold);
+                        GoldLogUtil.saveStudyGoldLog(student.getId(), awardType, awardGold);
                         getLevel(session);
                     } catch (Exception e) {
                         log.error("id为[{}]的学生在领取[{}]中[{}]奖励时保存日志出错！", student.getId(), awardType, awardContent, e);

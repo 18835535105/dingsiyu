@@ -12,6 +12,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 任务奖励controller
@@ -35,7 +36,7 @@ public class SimpleSimpleAwardController {
      * @return
      */
     @GetMapping("/getAwareInfo")
-    public ServerResponse<List<AwardVo>> getAwardInfo(HttpSession session, @Min(0) @Max(3) @RequestParam(defaultValue = "1") Integer type) {
+    public ServerResponse<Map<String, Object>> getAwardInfo(HttpSession session, @Min(0) @Max(3) @RequestParam(defaultValue = "1") Integer type) {
         return simpleAwardService.getAwareInfo(session, type);
     }
 
