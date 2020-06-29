@@ -37,7 +37,7 @@ public class UserInfoController {
      * @return
      */
     @PostMapping("/updateUserInfo")
-    public Boolean updateUserInfo(BusinessUserInfo businessUserInfo) {
+    public Boolean updateUserInfo(@RequestBody BusinessUserInfo businessUserInfo) {
         return userInfoService.updateById(businessUserInfo);
     }
 
@@ -48,7 +48,7 @@ public class UserInfoController {
      * @return
      */
     @PostMapping("/saveUserInfo")
-    public Boolean saveUserInfo(BusinessUserInfo businessUserInfo) {
+    public Boolean saveUserInfo(@RequestBody BusinessUserInfo businessUserInfo) {
         return userInfoService.save(businessUserInfo);
     }
 }

@@ -3,9 +3,9 @@ package com.zhidejiaoyu.student.business.feignclient.center;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 修改用户信息相关接口请求（教师、学生）
@@ -22,8 +22,8 @@ public interface UserInfoFeignClient {
      * @param uuid
      * @return
      */
-    @GetMapping("/getUserInfoByUserUuid/{uuid}")
-    BusinessUserInfo getUserInfoByUserUuid(@PathVariable String uuid);
+    @GetMapping("/getUserInfoByUserUuid")
+    BusinessUserInfo getUserInfoByUserUuid(@RequestParam String uuid);
 
     /**
      * 修改用户信息

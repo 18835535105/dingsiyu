@@ -3,8 +3,7 @@ package com.zhidejiaoyu.common.pojo.center;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,6 +13,9 @@ import java.util.Date;
  * @author
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class BusinessUserInfo extends Model<BusinessUserInfo> implements Serializable {
 
