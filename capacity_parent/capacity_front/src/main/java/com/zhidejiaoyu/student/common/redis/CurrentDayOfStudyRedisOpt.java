@@ -4,12 +4,12 @@ package com.zhidejiaoyu.student.common.redis;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.SentenceMapper;
 import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
-import com.zhidejiaoyu.common.mapper.UnitNewMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -28,13 +28,7 @@ public class CurrentDayOfStudyRedisOpt {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
     @Resource
-    private VocabularyMapper vocabularyMapper;
-    @Resource
-    private SentenceMapper sentenceMapper;
-    @Resource
-    private SyntaxTopicMapper syntaxTopicMapper;
-    @Resource
-    private UnitNewMapper unitNewMapper;
+    private CourseFeignClient courseFeignClient;
 
 
     /**
@@ -64,7 +58,7 @@ public class CurrentDayOfStudyRedisOpt {
     }
 
     public void saveStudyModel(Long studentId, String studyModel, Long unitId) {
-        UnitNew unitNew = unitNewMapper.selectById(unitId);
+        UnitNew unitNew = courseFeignClient.getUnitNewById(unitId);
         studyModel += "-" + unitNew.getJointName();
         Object o = redisTemplate.opsForHash().get(RedisKeysConst.STUDY_MODEL + studentId, 1);
         if (o == null) {
@@ -139,19 +133,19 @@ public class CurrentDayOfStudyRedisOpt {
                 Integer integer = Integer.getInteger(o.toString());
                 if (integer != null && integer > 3) {
                     if (type.equals(1)) {
-                        Vocabulary vocabulary = vocabularyMapper.selectById(integer);
+                        Vocabulary vocabulary = courseFeignClient.selectVocabularyById(integer.longValue());
                         if (vocabulary != null) {
                             stringBuilder.append(vocabulary.getWord()).append("##");
                         }
                     }
                     if (type.equals(2)) {
-                        Sentence sentence = sentenceMapper.selectById(integer);
+                        Sentence sentence = courseFeignClient.selectSentenceById(integer.longValue());
                         if (sentence != null) {
                             stringBuilder.append(sentence.getCentreExample().replace("#", " ").replace("$", "")).append("##");
                         }
                     }
                     if (type.equals(3)) {
-                        SyntaxTopic syntaxTopic = syntaxTopicMapper.selectById(integer);
+                        SyntaxTopic syntaxTopic = courseFeignClient.selectSyntaxTopicById(integer.longValue());
                         if (syntaxTopic != null) {
                             stringBuilder.append(syntaxTopic.getTopic() + ":" + syntaxTopic.getAnswer()).append("##");
                         }
