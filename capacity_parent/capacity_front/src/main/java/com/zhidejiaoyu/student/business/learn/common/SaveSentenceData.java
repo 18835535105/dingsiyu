@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.common.CurrentDayOfStudyUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,8 @@ public class SaveSentenceData {
     private TestResultUtil testResultUtil;
     @Resource
     private CommonMethod commonMethod;
+    @Resource
+    private CourseFeignClient courseFeignClient;
 
     private static final String SENTENCE = "SENTENCE";
     @Resource
@@ -88,7 +91,8 @@ public class SaveSentenceData {
         }
         // 查看当前单元下记忆追踪中有无达到黄金记忆点的例句
         //获取单词id
-        StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNews.getGroup());
+        List<Long> sentenceIds = courseFeignClient.getSentenceIdsByUnitIdAndGroup(unitId, learnNews.getGroup());
+        StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, sentenceIds);
         // 有到达黄金记忆点的例句优先复习
         if (studyCapacity != null) {
             // 返回达到黄金记忆点的例句信息

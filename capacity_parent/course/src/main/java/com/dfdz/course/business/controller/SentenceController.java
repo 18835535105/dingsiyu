@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/course/sentence")
@@ -33,5 +34,18 @@ public class SentenceController {
     public String getSentenceChinsesByUnitIdAndSentenceId(@PathVariable Long unitId,@PathVariable Long sentenceId){
          return sentenceService.selectSentenceChineseByUnitIdAndSentenceId(unitId, sentenceId);
     }
+
+    /**
+     * 根据unitId和group查询句型id
+     *
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @GetMapping("/sentence/getSentenceIdsByUnitIdAndGroup/{unitId}/{group}")
+    public List<Long> getSentenceIdsByUnitIdAndGroup(@PathVariable Long unitId,@PathVariable Integer group){
+        return sentenceService.getSentenceIdsByUnitIdAndGroup(unitId,group);
+    }
+
 
 }

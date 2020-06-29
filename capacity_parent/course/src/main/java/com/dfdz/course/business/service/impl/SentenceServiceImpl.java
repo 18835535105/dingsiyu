@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.pojo.Sentence;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 public class SentenceServiceImpl extends ServiceImpl<SentenceMapper, Sentence> implements SentenceService {
@@ -18,5 +19,10 @@ public class SentenceServiceImpl extends ServiceImpl<SentenceMapper, Sentence> i
     @Override
     public String selectSentenceChineseByUnitIdAndSentenceId(Long unitId, Long sentenceId) {
         return unitSentenceNewMapper.selectSentenceChineseByUnitIdAndSentenceId(unitId, sentenceId);
+    }
+
+    @Override
+    public List<Long> getSentenceIdsByUnitIdAndGroup(Long unitId, Integer group) {
+        return unitSentenceNewMapper.selectSentenceIdByUnitIdAndGroup(unitId,group);
     }
 }

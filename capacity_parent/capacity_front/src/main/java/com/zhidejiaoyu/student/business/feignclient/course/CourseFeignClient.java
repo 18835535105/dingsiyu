@@ -118,7 +118,17 @@ public interface CourseFeignClient {
      * @return
      */
     @GetMapping("/sentence/getSentenceChinsesByUnitIdAndSentenceId/{unitId}/{sentenceId}")
-    public String getSentenceChinsesByUnitIdAndSentenceId(@PathVariable Long unitId, @PathVariable Long sentenceId);
+    String getSentenceChinsesByUnitIdAndSentenceId(@PathVariable Long unitId, @PathVariable Long sentenceId);
+
+    /**
+     * 根据unitId和group查询句型id
+     *
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @GetMapping("/sentence/getSentenceIdsByUnitIdAndGroup/{unitId}/{group}")
+    List<Long> getSentenceIdsByUnitIdAndGroup(@PathVariable Long unitId, @PathVariable Integer group);
 
     /**
      * 语法获取数据
@@ -153,4 +163,6 @@ public interface CourseFeignClient {
      */
     @GetMapping("/teks/getTwentyTeks")
     List<TeksNew> getTwentyTeks();
+
+
 }
