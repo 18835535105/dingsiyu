@@ -107,10 +107,4 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
             throw new ServiceException(500, "微信小程序授权出错");
         }
     }
-
-
-    public void updateOpenId(Student student, String openId) {
-        student.setOpenid(openId);
-        studentMapper.updateById(student);
-    }
 }

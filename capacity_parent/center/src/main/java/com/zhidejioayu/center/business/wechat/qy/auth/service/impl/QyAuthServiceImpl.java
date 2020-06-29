@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejioayu.center.business.wechat.feignclient.qy.BaseQyFeignClient;
 import com.zhidejioayu.center.business.wechat.qy.auth.dto.LoginDTO;
 import com.zhidejioayu.center.business.wechat.qy.auth.service.QyAuthService;
 import com.zhidejioayu.center.business.wechat.qy.auth.vo.UserIdToOpenidVO;
@@ -47,6 +48,9 @@ public class QyAuthServiceImpl implements QyAuthService {
 
     @Resource
     private ServerConfigMapper serverConfigMapper;
+
+    @Resource
+    private Map<String, BaseQyFeignClient> qyServerFeignClient;
 
     @Override
     public SysUser getUserInfo() {
@@ -95,8 +99,8 @@ public class QyAuthServiceImpl implements QyAuthService {
             throw new ServiceException(ServiceExceptionEnum.NAME_OR_PASSWORD_ERROR);
         }
 
-        String s = restTemplate.postForObject(serverConfig.getSchoolServerUrl() + "/ec/wechat/qy/auth/login", loginDTO, String.class);
-        return JSONObject.parseObject(s, ServerResponse.class);
+        BaseQyFeignClient baseQyFeignClient = qyServerFeignClient.get(serverConfig.getServerName());
+        return baseQyFeignClient.login(loginDTO);
     }
 
     /**
