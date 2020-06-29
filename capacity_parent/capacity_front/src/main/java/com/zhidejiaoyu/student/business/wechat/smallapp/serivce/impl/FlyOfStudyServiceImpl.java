@@ -101,7 +101,6 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
                 .totalGold(currentDayOfStudy.getGold())
                 .totalOnlineTime(currentDayOfStudy.getOnlineTime())
                 .totalValidTime(currentDayOfStudy.getValidTime())
-                .imgUrl(GetOssFile.getPublicObjectUrl(currentDayOfStudy.getImgUrl()))
                 .build());
     }
 

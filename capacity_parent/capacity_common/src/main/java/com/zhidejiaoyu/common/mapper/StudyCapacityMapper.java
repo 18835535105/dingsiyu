@@ -83,7 +83,7 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
                                      @Param("dateTime") String dateTime,
                                      @Param("type") Integer type,
                                      @Param("group") Integer group,
-                                     @Param("wordeIds") List<Long> wordIds);
+                                     @Param("wordIds") List<Long> wordIds);
 
     /**
      * 一键学习跳转接点时删除当前单元group的记忆追踪数据，防止删除学习数据后匹配不到学习记录
