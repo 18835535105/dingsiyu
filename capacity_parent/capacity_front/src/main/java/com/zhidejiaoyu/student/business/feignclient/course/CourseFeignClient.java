@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: wuchenxi
@@ -88,14 +89,26 @@ public interface CourseFeignClient {
      * @param group
      * @return
      */
-    @GetMapping("/vocabulary/selectOneWordNotInIdsNew/{wordIds}/unitId/group")
+    @GetMapping("/vocabulary/selectOneWordNotInIdsNew/{wordIds}/{unitId}/{group}")
     Vocabulary getOneWordNotInIdsNew(@PathVariable List<Long> wordIds, @PathVariable Long unitId, @PathVariable Integer group);
 
     /**
      * 获取单元中带有图片的单词数量
      */
-    @GetMapping("/countWordPictureByUnitId")
-    Integer countWordPictureByUnitId(Long unitId, Integer group);
+    @GetMapping("/vocabulary/countWordPictureByUnitId/{unitId}/{group}")
+    Integer countWordPictureByUnitId(@PathVariable Long unitId, @PathVariable Integer group);
+
+    /**
+     * 获取单词图鉴下一个学习的数据
+     *
+     * @param unitId
+     * @param longs
+     * @param type
+     * @param group
+     * @return
+     */
+    @GetMapping("/vocabulary/getStudyNewMap/{unitId}/{longs}/{type}/{group}")
+    Map<String, Object> getStudyNewMap(Long unitId, List<Long> longs, Integer type, Integer group);
 
 
     /**

@@ -173,7 +173,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         //获取当前单词模块已经学习过的wordId
         List<Long> longs = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, studentId, studyModel, 1);
         // 获取新词
-        correct = learnNewMapper.selectStudyMap(studentId, unitId, longs, type, model, group);
+        correct =courseFeignClient.getStudyNewMap(unitId, longs, type, group);
         return correct;
     }
 

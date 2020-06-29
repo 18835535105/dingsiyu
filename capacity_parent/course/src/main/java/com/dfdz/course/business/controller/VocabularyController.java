@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/course/vocabulary")
@@ -43,6 +44,7 @@ public class VocabularyController {
 
     /**
      * 根据UnitId和group获取单元wordIds
+     *
      * @param unitId
      * @param group
      * @return
@@ -54,6 +56,7 @@ public class VocabularyController {
 
     /**
      * 根据单元id和wordId获取单词中文
+     *
      * @param unitId
      * @param wordId
      * @return
@@ -65,23 +68,32 @@ public class VocabularyController {
 
     /**
      * 获取下一个学习的单元单词
+     *
      * @param wordIds
      * @param unitId
      * @param group
      * @return
      */
     @GetMapping("/vocabulary/selectOneWordNotInIdsNew/{wordIds}/unitId/group")
-    public Vocabulary getOneWordNotInIdsNew(@PathVariable List<Long> wordIds, @PathVariable Long unitId, @PathVariable Integer group){
-        return vocabularyService. getOneWordNotInIdsNew( wordIds, unitId, group);
-    }
-    /**
-     *  获取单元中带有图片的单词数量
-     */
-    @GetMapping("/countWordPictureByUnitId")
-    public Integer countWordPictureByUnitId(Long unitId, Integer group){
-        return vocabularyService.countWordPictureByUnitId(unitId,group);
+    public Vocabulary getOneWordNotInIdsNew(@PathVariable List<Long> wordIds, @PathVariable Long unitId, @PathVariable Integer group) {
+        return vocabularyService.getOneWordNotInIdsNew(wordIds, unitId, group);
     }
 
+    /**
+     * 获取单元中带有图片的单词数量
+     */
+    @GetMapping("/countWordPictureByUnitId/{unitId}/{group}")
+    public Integer countWordPictureByUnitId(@PathVariable Long unitId, @PathVariable Integer group) {
+        return vocabularyService.countWordPictureByUnitId(unitId, group);
+    }
+
+    /**
+     * 获取新学习单词图鉴数据
+     */
+    @GetMapping("/getStudyNewMap/{unitId}/{longs}/{type}/{group}")
+    public Map<String, Object> getStudyNewMap(Long unitId, List<Long> wordIds, Integer type, Integer group) {
+        return vocabularyService.selectStudyMap(unitId, wordIds, type, group);
+    }
 
 
 }

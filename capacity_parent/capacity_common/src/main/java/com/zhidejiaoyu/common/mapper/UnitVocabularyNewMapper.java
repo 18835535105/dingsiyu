@@ -156,4 +156,15 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
 
     List<Long> selectWordIdByUnitIdAndGroup(@Param("untiId") Long unitId,@Param("group") Integer group);
 
+    /**
+     * 获取接下来要学的词信息
+     *
+     * @param unitId
+     * @param wodIds
+     * @return
+     */
+    Map<String, Object> selectStudyMap(@Param("unitId") Long unitId,
+                                       @Param("wordIds") List<Long> wodIds,
+                                       @Param("type") Integer type,
+                                       @Param("group") Integer group);
 }

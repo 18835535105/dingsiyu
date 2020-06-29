@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabulary> implements VocabularyService {
@@ -18,6 +19,8 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
 
     @Resource
     private VocabularyMapper vocabularyMapper;
+
+
 
     @Override
     public Integer countLearnVocabularyByUnitIdAndGroup(Long unitId,Integer group){
@@ -42,6 +45,12 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
     @Override
     public Integer countWordPictureByUnitId(Long unitId, Integer group) {
         return unitVocabularyNewMapper.countWordPictureByUnitId(unitId, group);
+    }
+
+    @Override
+    public Map<String, Object> selectStudyMap(Long unitId, List<Long> wordIds, Integer type, Integer group) {
+
+        return unitVocabularyNewMapper.selectStudyMap(unitId,wordIds,type,group);
     }
 
 
