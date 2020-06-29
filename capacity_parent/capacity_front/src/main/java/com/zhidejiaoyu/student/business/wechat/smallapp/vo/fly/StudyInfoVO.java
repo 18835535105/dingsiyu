@@ -40,11 +40,6 @@ public class StudyInfoVO implements Serializable {
     private Integer totalValidTime;
 
     /**
-     * 教师上传的图片路径
-     */
-    private String imgUrl;
-
-    /**
      * 学习内容， 模块-单元
      */
     private String[] contents;
