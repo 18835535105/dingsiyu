@@ -224,26 +224,28 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * @param student
      */
     private void saveUserInfoToCenterServer(Student student) {
-        BusinessUserInfo businessUserInfo = userInfoFeignClient.getUserInfoByUserUuid(student.getUuid());
-        if (businessUserInfo == null) {
-            ServerConfig serverConfig = serverConfigFeignClient.getByServerNo(ServerNoConstant.SERVER_NO);
-            if (serverConfig == null) {
-                log.error("server_config未配置server_no={}的服务器信息！请联系管理员！", ServerNoConstant.SERVER_NO);
-                throw new ServiceException("服务器配置异常，请联系管理员！");
-            }
-
-            businessUserInfo = new BusinessUserInfo();
-            businessUserInfo.setAccount(student.getAccount());
-            businessUserInfo.setCreateTime(new Date());
-            businessUserInfo.setId(IdUtil.getId());
-            businessUserInfo.setOpenid(student.getOpenid());
-            businessUserInfo.setPassword(student.getPassword());
-            businessUserInfo.setServerConfigId(serverConfig.getId());
-            businessUserInfo.setUpdateTime(new Date());
-            businessUserInfo.setUserUuid(student.getUuid());
-
-            userInfoFeignClient.saveUserInfo(businessUserInfo);
+        Boolean exist = userInfoFeignClient.isExist(student.getUuid());
+        if (exist) {
+            return;
         }
+
+        ServerConfig serverConfig = serverConfigFeignClient.getByServerNo(ServerNoConstant.SERVER_NO);
+        if (serverConfig == null) {
+            log.error("server_config未配置server_no={}的服务器信息！请联系管理员！", ServerNoConstant.SERVER_NO);
+            throw new ServiceException("服务器配置异常，请联系管理员！");
+        }
+
+        BusinessUserInfo businessUserInfo = new BusinessUserInfo();
+        businessUserInfo.setAccount(student.getAccount());
+        businessUserInfo.setCreateTime(new Date());
+        businessUserInfo.setId(IdUtil.getId());
+        businessUserInfo.setOpenid(student.getOpenid());
+        businessUserInfo.setPassword(student.getPassword());
+        businessUserInfo.setServerConfigId(serverConfig.getId());
+        businessUserInfo.setUpdateTime(new Date());
+        businessUserInfo.setUserUuid(student.getUuid());
+
+        userInfoFeignClient.saveUserInfo(businessUserInfo);
     }
 
     private void getStudentEqument(Student stu) {

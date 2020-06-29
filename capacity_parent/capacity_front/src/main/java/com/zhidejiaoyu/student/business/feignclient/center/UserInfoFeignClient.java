@@ -42,4 +42,16 @@ public interface UserInfoFeignClient {
      */
     @PostMapping("/saveUserInfo")
     Boolean saveUserInfo(@RequestBody BusinessUserInfo businessUserInfo);
+
+    /**
+     * 判断用户信息是否存在
+     *
+     * @param uuid
+     * @return <ul>
+     * <li>true:已在服务器中存在</li>
+     * <li>false：在服务器中不存在</li>
+     * </ul>
+     */
+    @GetMapping("/isExist")
+    Boolean isExist(@RequestParam String uuid);
 }

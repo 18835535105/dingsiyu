@@ -239,4 +239,12 @@ public interface RedisKeysConst {
      * value:错误次数
      */
     String STUDY_MODEL = "STUDY_MODEL:" + ServerNoConstant.SERVER_NO + ":";
+
+    /**
+     * 当前账号是否已经存在于中台服务器
+     * String类型
+     * key：EXIST_IN_CENTER_SERVER:用户uuid
+     * field：用户uuid
+     */
+    String EXIST_IN_CENTER_SERVER = "EXIST_IN_CENTER_SERVER:";
 }
