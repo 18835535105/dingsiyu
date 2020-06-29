@@ -348,7 +348,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                     .id(courseId)
                     .grade(grade)
                     .label(label)
-                    .status(1)
+                    .status(-1)
                     .build();
 
             this.packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew);
@@ -376,7 +376,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
         // 单元总个数
         long totalUnitCount;
-        if (Objects.equals(courseNew.getStatus(), 1)) {
+        if (Objects.equals(courseNew.getStatus(), -1)) {
             // 语法
             totalUnitCount = Long.parseLong(unitCountInCourse.get(courseId).get(courseId).toString()) * 2;
         } else {
