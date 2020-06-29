@@ -20,18 +20,14 @@ spring:
   application:
     name: server1
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-
 feign:
   client:
     config:
       # 通过 default 进行全局配置
       default:
         loggerLevel: error
+        connectTimeout: 5000
+        readTimeout: 5000
 
 server:
   port: 9082

@@ -68,7 +68,19 @@ spring:
 mail:
   fromMail:
     addr: duofenduizhang@163.com
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+feign:
+  client:
+    config:
+      # 通过 default 进行全局配置
+      default:
+        loggerLevel: full
+        connectTimeout: 5000
+        readTimeout: 5000
 server:
   tomcat:
     uri-encoding: utf-8
