@@ -11,7 +11,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.Ordered;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
@@ -23,7 +22,7 @@ import java.lang.reflect.Method;
  */
 @Slf4j
 @Aspect
-@Component
+//@Component
 public class MultiSourceExAop implements Ordered {
 
     @Pointcut(value = "@annotation(com.zhidejioayu.center.mutidatasource.annotion.DataSource)")

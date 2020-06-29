@@ -5,16 +5,9 @@ spring:
     multipart:
       file-size-threshold: 15MB
   datasource:
-    # 第一版系统服务器
-    primary:
-      url: jdbc:mysql://39.106.181.151:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-      username: zdjy
-      password: zdjy
-    # 服务器1
-    server1:
-      url: jdbc:mysql://39.102.48.73:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-      username: zdjy
-      password: zdjy
+    url: jdbc:mysql://39.106.181.151:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: zdjy
+    password: zhide8800
   redis:
     host: ${ip}
     port: 6379

@@ -19,7 +19,7 @@ import java.util.Map;
  * @author: wuchenxi
  * @date: 2020/6/19 13:54:54
  */
-@Configuration
+//@Configuration
 public class MutilDataSourceConfig {
 
     @Bean
