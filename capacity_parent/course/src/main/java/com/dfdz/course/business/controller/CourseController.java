@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author: wuchenxi
@@ -18,15 +19,9 @@ public class CourseController {
     private CourseService courseService;
     @Resource
     private UnitService unitService;
-    @Resource
-    private VocabularyService vocabularyService;
-    @Resource
-    private SentenceService sentenceService;
-    @Resource
-    private SyntaxTopicService syntaxTopicService;
 
     /**
-     * 根据courseId获取courseNew数据
+     * 根据courseId获取课程数据
      *
      * @param id
      * @return
@@ -37,7 +32,7 @@ public class CourseController {
     }
 
     /**
-     * 根据id获取unitNew数据
+     * 根据id获取单元数据
      *
      * @param id
      * @return
@@ -47,36 +42,11 @@ public class CourseController {
         return unitService.getById(id);
     }
 
-    /**
-     * 根据vocabularyId获取Vocabulary信息
-     *
-     * @param id
-     * @return
-     */
-    @GetMapping("/getVocabularyById/{id}")
-    public Vocabulary selectVocabularyById(@PathVariable Long id) {
-        return vocabularyService.getById(id);
-    }
 
-    /**
-     * 根据sentenceId获取Sentence信息
-     *
-     * @param id
-     * @return
-     */
-    @GetMapping("/getSentenceById/{id}")
-    public Sentence selectSentenceById(@PathVariable Long id) {
-        return sentenceService.getById(id);
-    }
 
-    /**
-     * 根据sentenceId获取Sentence信息
-     *
-     * @param id
-     * @return
-     */
-    @GetMapping("/selectSyntaxTopicById/{id}")
-    public SyntaxTopic selectSyntaxTopicById(@PathVariable Long id) {
-        return syntaxTopicService.getById(id);
-    }
+
+
+
+
+
 }

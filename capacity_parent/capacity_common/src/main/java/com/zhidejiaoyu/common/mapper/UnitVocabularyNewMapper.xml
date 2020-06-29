@@ -116,4 +116,14 @@
         FROM unit_vocabulary_new
         WHERE unit_id = #{unitId}
     </select>
+    <select id="selectWordIdByUnitIdAndGroup" resultType="long" parameterType="map">
+        select
+		word_id
+		from unit_vocabulary_new unit
+		join vocabulary voc
+		on unit.vocabulary_id = voc.id
+		where unit.unit_id =#{unitId}
+		and unit.group =#{group}
+		and voc.delStatus=1
+    </select>
 </mapper>

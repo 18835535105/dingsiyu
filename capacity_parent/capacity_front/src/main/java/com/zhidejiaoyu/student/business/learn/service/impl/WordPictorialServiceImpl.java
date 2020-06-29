@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.WordPictorialVo;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.learn.vo.GetVo;
@@ -54,6 +55,8 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
     private LearnExtendMapper learnExtendMapper;
     @Resource
     private WordMemoryDifficulty wordMemoryDifficulty;
+    @Resource
+    private CourseFeignClient courseFeignClient;
 
     private Integer model = 1;
     private Integer type = 1;
@@ -71,7 +74,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         //获取当前单元下的learnId
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard,1);
         //获取是否有可以学习的单词信息
-        int wordCount = unitVocabularyNewMapper.countWordPictureByUnitId(unitId, learnNew.getGroup());
+        int wordCount = courseFeignClient.countWordPictureByUnitId(unitId, learnNew.getGroup());
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词图鉴信息！", unitId);
             return ServerResponse.createByErrorMessage("The unit no pictures");

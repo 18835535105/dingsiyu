@@ -16,6 +16,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.WordCompletionStudyVo;
 import com.zhidejiaoyu.common.vo.WordWriteStudyVo;
 import com.zhidejiaoyu.common.vo.study.MemoryStudyVo;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.learn.vo.GetVo;
 import com.zhidejiaoyu.student.business.service.ErrorLearnLogService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -80,6 +81,9 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     @Resource
     private ErrorLearnLogService errorLearnLogService;
 
+    @Resource
+    private CourseFeignClient courseFeignClient;
+
     private final Integer modelType = 1;
 
     @Resource
@@ -103,7 +107,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
-        Integer wordCount = unitVocabularyNewMapper.countByUnitIdAndGroup(unitId, learnNews.getGroup());
+        Integer wordCount = courseFeignClient.countLearnVocabularyByUnitIdAndGroup(unitId, learnNews.getGroup());
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词信息！", unitId);
             return ServerResponse.createByErrorMessage("当前单元下没有单词！");
@@ -112,7 +116,8 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             return super.toUnitTest();
         }
         //获取单词id
-        StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNews.getGroup());
+        List<Long> wordIdByUnitIdAndGroup = courseFeignClient.getWordIdByUnitIdAndGroup(unitId, learnNews.getGroup());
+        StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, learnNews.getGroup(), wordIdByUnitIdAndGroup);
 
         if (studyCapacity != null) {
             // 返回达到黄金记忆点的单词信息
@@ -460,7 +465,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
             Vocabulary currentStudyWord = getVocabulary(unitId, student, group, studyModel);
             // 查询单词释义
-            String wordChinese = unitVocabularyNewMapper.selectWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
+            String wordChinese = courseFeignClient.getWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
             if (type.equals(3)) {
                 MemoryStudyVo memoryStudyVo = getMemoryStudyVo(currentStudyWord.getWord(), currentStudyWord.getSyllable(),
                         plan.longValue(), firstStudy, wordCount.longValue(), 0,
@@ -489,7 +494,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     public Vocabulary getVocabulary(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
         List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel, modelType);
-        return vocabularyMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
+        return courseFeignClient.getOneWordNotInIdsNew(wordIds, unitId, group);
     }
 
     /**

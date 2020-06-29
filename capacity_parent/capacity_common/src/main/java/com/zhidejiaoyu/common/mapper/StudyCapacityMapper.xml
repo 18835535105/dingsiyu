@@ -111,22 +111,18 @@
     <select id="selectLearnHistory" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="sc_base_sql"></include>
-        from vocabulary a
-        INNER JOIN study_capacity sc
-        on a.id = sc.word_id
-        inner join unit_vocabulary_new voNew
-        on voNew.vocabulary_id=a.id
-        inner join learn_new leaNew
-        on leaNew.unit_id=voNew.unit_id
+        from  study_capacity sc
         where
         sc.unit_id = #{unitId}
         and sc.student_id = #{studentId}
-        and voNew.group=#{group}
         and sc.push &lt; #{dateTime}
-        and leaNew.easy_or_hard=#{easyOrHard}
         and sc.memory_strength &lt; 1
         and sc.type=#{type}
-        and a.delStatus = 1
+        and sc.word_id in (
+        <foreach collection="wordIds" separator="," item="wordId">
+            #{wordId}
+        </foreach>
+        )
         ORDER BY sc.push
         LIMIT 0,1
     </select>

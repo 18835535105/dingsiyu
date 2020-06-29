@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.DictationVo;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.learn.vo.GetVo;
@@ -21,6 +22,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service(value = "dictationService")
@@ -43,6 +45,8 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
     @Resource
     private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
     @Resource
+    private CourseFeignClient courseFeignClient;
+    @Resource
     private RedisOpt redisOpt;
     private Integer type = 4;
     private Integer easyOrHard = 2;
@@ -64,7 +68,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
-        Integer wordCount = unitVocabularyNewMapper.countByUnitIdAndGroup(unitId, learnNews.getGroup());
+        Integer wordCount = courseFeignClient.countLearnVocabularyByUnitIdAndGroup(unitId, learnNews.getGroup());
         DictationVo vo = new DictationVo();
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词信息！", unitId);
@@ -74,7 +78,8 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
             return super.toUnitTest();
         }
         //获取单词id
-        StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNews.getGroup());
+        List<Long> wordIdByUnitIdAndGroup = courseFeignClient.getWordIdByUnitIdAndGroup(unitId, learnNews.getGroup());
+        StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, wordIdByUnitIdAndGroup);
         // 1. 查询智能听写记忆追踪中是否有需要复习的单词
         Vocabulary vocabulary;
         // 2. 如果记忆追踪中没有需要复习的, 去单词表中取出一个单词,条件是(learn表中单词id不存在的)
