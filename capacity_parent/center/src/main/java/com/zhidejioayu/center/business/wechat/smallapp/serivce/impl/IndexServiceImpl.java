@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.mapper.center.ServerConfigMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejioayu.center.business.util.UserInfoUtil;
 import com.zhidejioayu.center.business.wechat.feignclient.smallapp.BaseSmallAppFeignClient;
 import com.zhidejioayu.center.business.wechat.feignclient.util.FeignClientUtil;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeDTO;
@@ -53,11 +54,7 @@ public class IndexServiceImpl extends ServiceImpl<StudentMapper, Student> implem
     }
 
     public ServerConfig getServerConfig(String openId) {
-        ServerConfig serverConfig = serverConfigMapper.selectStudentServerByOpenid(openId);
-        if (serverConfig == null) {
-            throw new ServiceException(400, "中台服务器为查询到openid=" + openId + "的学生或者校管信息！");
-        }
-        return serverConfig;
+        return UserInfoUtil.getServerInfoByStudentOpenid(openId);
     }
 
     @Override

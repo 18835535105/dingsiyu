@@ -98,5 +98,24 @@ public interface BaseSmallAppFeignClient {
      */
     @GetMapping("/smallApp/index/myState")
     ServerResponse<Object> myState(@RequestParam String openId);
+
+    /**
+     * 获取飞行测试题目
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/smallApp/test/getTest")
+    Object getTest(@RequestParam String openId);
+
+    /**
+     * 保存飞行测试记录
+     *
+     * @param point
+     * @param openId
+     * @return
+     */
+    @PostMapping("/smallApp/test/saveTest")
+    Object saveTest(@RequestParam Integer point, @RequestParam String openId);
 }
 
