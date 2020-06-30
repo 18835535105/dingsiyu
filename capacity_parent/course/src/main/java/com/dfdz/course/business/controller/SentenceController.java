@@ -42,7 +42,7 @@ public class SentenceController {
      * @param group
      * @return
      */
-    @GetMapping("/sentence/getSentenceIdsByUnitIdAndGroup/{unitId}/{group}")
+    @GetMapping("/getSentenceIdsByUnitIdAndGroup/{unitId}/{group}")
     public List<Long> getSentenceIdsByUnitIdAndGroup(@PathVariable Long unitId,@PathVariable Integer group){
         return sentenceService.getSentenceIdsByUnitIdAndGroup(unitId,group);
     }
