@@ -86,7 +86,7 @@ public class FlyOfStudyController {
         checkParam(openId, num);
         return flyOfStudyService.getStudentInfo(openId, num);
     }
-    https://www.kdocs.cn/p/71758018596?from=docs&source=docsWeb
+
     @GetMapping("/v1/getStudentInfo")
     public ServerResponse<Object> getStudentInfoV1(@RequestParam String studentUuid, @RequestParam Integer num) {
         Student student = studentInfoService.getByUuid(studentUuid);
