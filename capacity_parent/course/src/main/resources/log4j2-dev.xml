@@ -11,7 +11,7 @@
                   value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%-5level} [%t] %highlight{%C.%M(%L)}: %msg%n"/>
         <!-- 日志输出到文件的路径和文件名 根据项目情况更改 value 值 -->
         <property name="LOG_FILE_PATH" value="log"/>
-        <property name="LOG_FILE_NAME" value="student-capacity-info.log"/>
+        <property name="LOG_FILE_NAME" value="course.log"/>
     </Properties>
     <!-- 定义 appenders -->
     <appenders>
