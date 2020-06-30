@@ -8,4 +8,5 @@ import com.zhidejiaoyu.common.pojo.CourseNew;
  * @date: 2020/6/28 15:09:09
  */
 public interface CourseService extends IService<CourseNew> {
+    CourseNew getCourseById(String id);
 }

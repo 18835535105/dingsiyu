@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -69,13 +71,18 @@ public class VocabularyController {
     /**
      * 获取下一个学习的单元单词
      *
-     * @param wordIds
+     * @param wordId
      * @param unitId
      * @param group
      * @return
      */
-    @GetMapping("/vocabulary/selectOneWordNotInIdsNew/{wordIds}/unitId/group")
-    public Vocabulary getOneWordNotInIdsNew(@PathVariable List<Long> wordIds, @PathVariable Long unitId, @PathVariable Integer group) {
+    @GetMapping("/selectOneWordNotInIdsNew")
+    public Vocabulary getOneWordNotInIdsNew(Long[] wordId, Long unitId, Integer group) {
+        List<Long> wordIds = new ArrayList<>();
+        if (wordId != null && wordId.length > 0) {
+            wordIds = Arrays.asList(wordId);
+        }
+
         return vocabularyService.getOneWordNotInIdsNew(wordIds, unitId, group);
     }
 
@@ -91,7 +98,11 @@ public class VocabularyController {
      * 获取新学习单词图鉴数据
      */
     @GetMapping("/getStudyNewMap")
-    public Map<String, Object> getStudyNewMap(Long unitId, List<Long> wordIds, Integer type, Integer group) {
+    public Map<String, Object> getStudyNewMap(Long unitId, Long[] wordId, Integer type, Integer group) {
+        List<Long> wordIds = new ArrayList<>();
+        if (wordId != null && wordId.length > 0) {
+            wordIds = Arrays.asList(wordId);
+        }
         return vocabularyService.selectStudyMap(unitId, wordIds, type, group);
     }
 

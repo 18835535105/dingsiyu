@@ -154,7 +154,7 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
     @MapKey("id")
     Map<Long, Map<Long, String>> selectWordChineseMapByUnitId(@Param("unitId") Long unitId);
 
-    List<Long> selectWordIdByUnitIdAndGroup(@Param("untiId") Long unitId,@Param("group") Integer group);
+    List<Long> selectWordIdByUnitIdAndGroup(@Param("unitId") Long unitId,@Param("group") Integer group);
 
     /**
      * 获取接下来要学的词信息

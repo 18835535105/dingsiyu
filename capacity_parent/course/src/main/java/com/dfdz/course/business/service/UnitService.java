@@ -6,4 +6,5 @@ import com.zhidejiaoyu.common.pojo.Vocabulary;
 
 public interface UnitService extends IService<UnitNew> {
 
+    UnitNew getUnitById(Long id);
 }

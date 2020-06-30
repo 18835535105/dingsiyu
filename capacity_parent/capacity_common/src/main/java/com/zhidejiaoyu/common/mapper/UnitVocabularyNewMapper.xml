@@ -131,7 +131,7 @@
     </select>
     <select id="selectWordIdByUnitIdAndGroup" resultType="long" parameterType="map">
         select
-		word_id
+		distinct voc.id
 		from unit_vocabulary_new unit
 		join vocabulary voc
 		on unit.vocabulary_id = voc.id

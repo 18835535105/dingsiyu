@@ -88,8 +88,9 @@ public interface CourseFeignClient {
      * @param group
      * @return
      */
-    @GetMapping("/vocabulary/selectOneWordNotInIdsNew/{wordIds}/{unitId}/{group}")
-    Vocabulary getOneWordNotInIdsNew(@PathVariable List<Long> wordIds, @PathVariable Long unitId, @PathVariable Integer group);
+    @RequestMapping(value = "/vocabulary/selectOneWordNotInIdsNew", method = RequestMethod.GET)
+    Vocabulary getOneWordNotInIdsNew(@RequestParam("wordId") Long[] wordIds, @RequestParam("unitId") @PathVariable Long unitId,
+                                     @RequestParam("group") @PathVariable Integer group);
 
     /**
      * 获取单元中带有图片的单词数量
@@ -101,13 +102,13 @@ public interface CourseFeignClient {
      * 获取单词图鉴下一个学习的数据
      *
      * @param unitId
-     * @param longs
+     * @param wordId
      * @param type
      * @param group
      * @return
      */
     @RequestMapping(value = "/vocabulary/getStudyNewMap", method = RequestMethod.GET)
-    Map<String, Object> getStudyNewMap(@RequestParam("unitId") Long unitId, @RequestParam("longs") List<Long> longs,
+    Map<String, Object> getStudyNewMap(@RequestParam("unitId") Long unitId, @RequestParam("wordId") Long[] wordId,
                                        @RequestParam("type") Integer type, @RequestParam("group") Integer group);
 
 

@@ -28,7 +28,7 @@ public class CourseController {
      */
     @GetMapping("/getById/{id}")
     public CourseNew getById(@PathVariable String id) {
-        return courseService.getById(id);
+        return courseService.getCourseById(id);
     }
 
     /**
@@ -39,7 +39,7 @@ public class CourseController {
      */
     @GetMapping("/getUnitNewById/{id}")
     public UnitNew getUnitNewById(@PathVariable Long id) {
-        return unitService.getById(id);
+        return unitService.getUnitById(id);
     }
 
 
