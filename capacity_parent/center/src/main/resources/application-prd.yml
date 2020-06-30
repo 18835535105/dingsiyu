@@ -32,7 +32,7 @@ feign:
     max-connections: 200
     max-connections-per-route: 50
 server:
-  port: 9100
+  port: 900
   tomcat:
     max-connections: 512
     threads:

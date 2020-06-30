@@ -19,7 +19,7 @@ spring:
   application:
     name: course
 server:
-  port: 9100
+  port: 9050
 logging:
   config: classpath:log4j2-test.xml
 
