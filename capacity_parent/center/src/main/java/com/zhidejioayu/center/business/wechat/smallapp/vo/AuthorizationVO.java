@@ -22,4 +22,9 @@ public class AuthorizationVO implements Serializable {
     private String sessionKey;
 
     private String openId;
+
+    /**
+     * 用户uuid，
+     */
+    private String uuid;
 }

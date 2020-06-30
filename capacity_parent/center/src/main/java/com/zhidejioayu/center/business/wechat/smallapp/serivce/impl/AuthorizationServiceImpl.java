@@ -1,7 +1,6 @@
 package com.zhidejioayu.center.business.wechat.smallapp.serivce.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
@@ -10,7 +9,10 @@ import com.zhidejiaoyu.common.mapper.center.ServerConfigMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejioayu.center.business.wechat.feignclient.smallapp.BaseSmallAppFeignClient;
+import com.zhidejioayu.center.business.wechat.feignclient.util.FeignClientUtil;
 import com.zhidejioayu.center.business.wechat.smallapp.constant.SmallAppApiConstant;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.AuthorizationDTO;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.BindAccountDTO;
@@ -20,11 +22,13 @@ import com.zhidejioayu.center.business.wechat.smallapp.vo.AuthorizationVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 /**
  * @author: wuchenxi
@@ -33,9 +37,6 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @Service
 public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student> implements AuthorizationService {
-
-    @Resource
-    private StudentMapper studentMapper;
 
     @Resource
     private RestTemplate restTemplate;
@@ -47,17 +48,22 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
     private ServerConfigMapper serverConfigMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> bind(BindAccountDTO dto) {
 
-        String currentOpenid = dto.getOpenId();
-        ServerConfig serverConfig = serverConfigMapper.selectStudentServerByOpenid(currentOpenid);
+        ServerConfig serverConfig = serverConfigMapper.selectByAccount(dto.getAccount());
 
-        if (serverConfig != null) {
-            String s = restTemplate.postForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/authorization/bind", dto, String.class);
-            return JSONObject.parseObject(s, ServerResponse.class);
+        BaseSmallAppFeignClient smallAppFeignClient = FeignClientUtil.getSmallAppFeignClient(serverConfig.getServerName());
+        ServerResponse<Object> response = smallAppFeignClient.bind(dto);
+
+        if (Objects.equals(response.getStatus(), ResponseCode.SUCCESS.getCode())) {
+            BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectByAccount(dto.getAccount());
+            String openid = businessUserInfo.getOpenid() + "," + dto.getOpenId();
+            businessUserInfo.setOpenid(openid);
+            businessUserInfoMapper.updateById(businessUserInfo);
         }
 
-        throw new ServiceException(400, "中台服务器为查询到openid=" + currentOpenid + "的学生或者校管信息！");
+        return response;
     }
 
     @Override
@@ -72,20 +78,18 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
             throw new ServiceException(500, AuthorizationEnum.getMsg(authorizationDTO.getErrcode()));
         }
 
-        AuthorizationVO authorizationVo = AuthorizationVO.builder()
+        AuthorizationVO.AuthorizationVOBuilder authorizationVoBuilder = AuthorizationVO.builder()
                 .openId(authorizationDTO.getOpenid())
-                .sessionKey(authorizationDTO.getSession_key())
-                .build();
-
+                .sessionKey(authorizationDTO.getSession_key());
         // 验证小程序是否已经绑定队长账号
         String openid = authorizationDTO.getOpenid();
         BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectStudentInfoByOpenId(openid);
         if (businessUserInfo == null) {
             // 当前用户还未绑定队长账号
-            return ServerResponse.createBySuccess(501, authorizationVo);
+            return ServerResponse.createBySuccess(501, authorizationVoBuilder.build());
         }
-
-        return ServerResponse.createBySuccess(authorizationVo);
+        authorizationVoBuilder.uuid(businessUserInfo.getUserUuid());
+        return ServerResponse.createBySuccess(authorizationVoBuilder.build());
     }
 
     /**

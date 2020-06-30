@@ -5,12 +5,10 @@ import com.zhidejiaoyu.student.business.wechat.smallapp.dto.BindAccountDTO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.AuthorizationService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.IndexService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 /**
  * 授权与绑定接口
@@ -63,7 +61,7 @@ public class AuthorizationController {
      * @return
      */
     @PostMapping("/bind")
-    public ServerResponse<Object> bind(@Valid BindAccountDTO dto, BindingResult result) {
+    public ServerResponse<Object> bind(@RequestBody BindAccountDTO dto) {
         return authorizationService.bind(dto);
     }
 
