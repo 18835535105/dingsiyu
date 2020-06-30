@@ -2,10 +2,13 @@ package com.zhidejiaoyu.student.business.wechat.smallapp.controller;
 
 import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.service.StudentInfoService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.FlyOfStudyService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -22,6 +25,9 @@ public class FlyOfStudyController {
 
     @Resource
     private FlyOfStudyService flyOfStudyService;
+
+    @Resource
+    private StudentInfoService studentInfoService;
 
     /**
      * 通过扫码获取学生学习信息
@@ -42,6 +48,23 @@ public class FlyOfStudyController {
         return flyOfStudyService.getStudyInfo(openId, num);
     }
 
+    /**
+     * 通过扫码获取学生学习信息
+     *
+     * @param studentUuid
+     * @param num         二维码序号 <ul>
+     *                    <li>-1：查询学生总的学习情况信息</li>
+     *                    <li>其他：查询指定序号的学习信息</li>
+     *                    </ul>
+     * @return
+     */
+    @GetMapping("/v1/getStudyInfo")
+    public ServerResponse<Object> getStudyInfoByUuid(@RequestParam String studentUuid, @RequestParam Integer num) {
+        Student student = studentInfoService.getByUuid(studentUuid);
+        return this.getStudyInfo(student.getOpenid(), num);
+    }
+
+
     private void checkParam(String openId, Integer num) {
         if (StringUtil.isEmpty(openId)) {
             throw new ServiceException("openId can't be null!");
@@ -55,13 +78,19 @@ public class FlyOfStudyController {
      * 获取学生指定二维码对应的照片信息
      *
      * @param openId
-     * @param num   查询指定序号对应的日期拍摄的照片
+     * @param num    查询指定序号对应的日期拍摄的照片
      * @return
      */
     @GetMapping("/getStudentInfo")
     public ServerResponse<Object> getStudentInfo(String openId, Integer num) {
         checkParam(openId, num);
         return flyOfStudyService.getStudentInfo(openId, num);
+    }
+    https://www.kdocs.cn/p/71758018596?from=docs&source=docsWeb
+    @GetMapping("/v1/getStudentInfo")
+    public ServerResponse<Object> getStudentInfoV1(@RequestParam String studentUuid, @RequestParam Integer num) {
+        Student student = studentInfoService.getByUuid(studentUuid);
+        return this.getStudentInfo(student.getOpenid(), num);
     }
 
 }

@@ -26,7 +26,7 @@ public class FlyOfStudyController {
     /**
      * 通过扫码获取学生学习信息
      *
-     * @param openId
+     * @param studentUuid
      * @param num    二维码序号 <ul>
      *               <li>-1：查询学生总的学习情况信息</li>
      *               <li>其他：查询指定序号的学习信息</li>
@@ -34,17 +34,17 @@ public class FlyOfStudyController {
      * @return
      */
     @GetMapping("/getStudyInfo")
-    public ServerResponse<Object> getStudyInfo(String openId, Integer num) {
-        checkParam(openId, num);
+    public ServerResponse<Object> getStudyInfo(String studentUuid, Integer num) {
+        checkParam(studentUuid, num);
         if (num == -1) {
-            return flyOfStudyService.getTotalStudyInfo(openId);
+            return flyOfStudyService.getTotalStudyInfo(studentUuid);
         }
-        return flyOfStudyService.getStudyInfo(openId, num);
+        return flyOfStudyService.getStudyInfo(studentUuid, num);
     }
 
-    private void checkParam(String openId, Integer num) {
-        if (StringUtil.isEmpty(openId)) {
-            throw new ServiceException("openId can't be null!");
+    private void checkParam(String studentUuid, Integer num) {
+        if (StringUtil.isEmpty(studentUuid)) {
+            throw new ServiceException("studentUuid can't be null!");
         }
         if (num == null) {
             throw new ServiceException("num can't be null!");
@@ -54,14 +54,14 @@ public class FlyOfStudyController {
     /**
      * 获取学生指定二维码对应的照片信息
      *
-     * @param openId
+     * @param studentUuid
      * @param num   查询指定序号对应的日期拍摄的照片
      * @return
      */
     @GetMapping("/getStudentInfo")
-    public ServerResponse<Object> getStudentInfo(String openId, Integer num) {
-        checkParam(openId, num);
-        return flyOfStudyService.getStudentInfo(openId, num);
+    public ServerResponse<Object> getStudentInfo(String studentUuid, Integer num) {
+        checkParam(studentUuid, num);
+        return flyOfStudyService.getStudentInfo(studentUuid, num);
     }
 
 }
