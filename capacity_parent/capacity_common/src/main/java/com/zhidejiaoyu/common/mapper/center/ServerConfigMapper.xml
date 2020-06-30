@@ -21,7 +21,7 @@
         from server_config sc,
         business_user_info bui
         where sc.id = bui.server_config_id
-        and bui.openid = #{openid}
+        and bui.openid like concat('%', #{openid},'%')
         and bui.account like 'dz%'
         limit 1
     </select>

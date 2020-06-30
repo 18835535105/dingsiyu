@@ -8,6 +8,8 @@ import com.zhidejiaoyu.common.mapper.center.ServerConfigMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejioayu.center.business.wechat.feignclient.smallapp.BaseSmallAppFeignClient;
+import com.zhidejioayu.center.business.wechat.feignclient.util.FeignClientUtil;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeDTO;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.IndexService;
 import org.springframework.stereotype.Service;
@@ -81,11 +83,9 @@ public class IndexServiceImpl extends ServiceImpl<StudentMapper, Student> implem
 
     @Override
     public ServerResponse<Object> cardInfo(String openId) {
-
         ServerConfig serverConfig = getServerConfig(openId);
-
-        String s = restTemplate.getForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/index/cardInfo?openId=" + openId, String.class);
-        return JSONObject.parseObject(s, ServerResponse.class);
+        BaseSmallAppFeignClient smallAppFeignClient = FeignClientUtil.getSmallAppFeignClient(serverConfig.getServerName());
+        return smallAppFeignClient.cardInfo(openId);
     }
 
 }

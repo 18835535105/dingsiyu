@@ -41,4 +41,14 @@ public interface BaseSmallAppFeignClient {
      */
     @GetMapping("/smallApp/fly/v1/getStudentInfo")
     ServerResponse<Object> getStudentInfo(@RequestParam String studentUuid, @RequestParam Integer num);
+
+    /**
+     * 打卡信息
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/smallApp/index/cardInfo")
+    ServerResponse<Object> cardInfo(@RequestParam String openId);
 }
+

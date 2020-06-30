@@ -10,10 +10,7 @@ import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.IndexService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -56,7 +53,7 @@ public class IndexController extends BaseController {
      * @return
      */
     @GetMapping("/cardInfo")
-    public ServerResponse<Object> cardInfo(String openId) {
+    public ServerResponse<Object> cardInfo(@RequestParam String openId) {
         if (StringUtils.isEmpty(openId)) {
             throw new ServiceException("openId can't be null");
         }
