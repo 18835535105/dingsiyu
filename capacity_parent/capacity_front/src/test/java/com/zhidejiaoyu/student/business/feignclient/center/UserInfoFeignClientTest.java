@@ -45,7 +45,7 @@ public class UserInfoFeignClientTest {
                 .createTime(new Date())
                 .openid("1123")
                 .password("123")
-                .serverConfigId("server_012")
+                .serverConfigId("server_0123")
                 .updateTime(new Date())
                 .userUuid(IdUtil.getId())
                 .id(IdUtil.getId())

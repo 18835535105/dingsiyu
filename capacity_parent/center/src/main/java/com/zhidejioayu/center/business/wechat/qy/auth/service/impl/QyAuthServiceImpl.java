@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.wechat.qy.LoginVO;
 import com.zhidejioayu.center.business.wechat.feignclient.qy.BaseQyFeignClient;
 import com.zhidejioayu.center.business.wechat.qy.auth.dto.LoginDTO;
 import com.zhidejioayu.center.business.wechat.qy.auth.service.QyAuthService;
@@ -20,6 +21,7 @@ import com.zhidejioayu.center.business.wechat.qy.auth.vo.UserInfoVO;
 import com.zhidejioayu.center.business.wechat.qy.constant.QyApiConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -28,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -92,7 +95,8 @@ public class QyAuthServiceImpl implements QyAuthService {
     }
 
     @Override
-    public ServerResponse<Object> login(LoginDTO loginDTO) {
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse<LoginVO> login(LoginDTO loginDTO) {
 
         ServerConfig serverConfig = serverConfigMapper.selectByAccount(StringUtil.trim(loginDTO.getAccount()));
         if (serverConfig == null) {
@@ -100,7 +104,38 @@ public class QyAuthServiceImpl implements QyAuthService {
         }
 
         BaseQyFeignClient baseQyFeignClient = qyServerFeignClient.get(serverConfig.getServerName());
-        return baseQyFeignClient.login(loginDTO);
+
+        SysUser sysUser = baseQyFeignClient.getUserByAccount(loginDTO.getAccount());
+
+        if (sysUser.getId() == null) {
+            throw new ServiceException(ServiceExceptionEnum.NAME_OR_PASSWORD_ERROR);
+        }
+
+        // 如果账号已绑定过企业微信，不可再次被绑定
+        if (StringUtil.isNotEmpty(sysUser.getOpenid())) {
+            throw new ServiceException("该账号已有人绑定，请联系技术中心同事！");
+        }
+
+        if (!Objects.equals(StringUtil.trim(loginDTO.getPassword()), StringUtil.trim(sysUser.getPassword()))) {
+            throw new ServiceException(ServiceExceptionEnum.NAME_OR_PASSWORD_ERROR);
+        }
+
+        sysUser.setOpenid(loginDTO.getOpenId());
+        boolean success = baseQyFeignClient.updateSysUser(sysUser);
+        if (!success) {
+            log.error("更新学管信息失败！");
+            throw new ServiceException("登录失败，请稍后重试！");
+        }
+
+        BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectByAccount(loginDTO.getAccount());
+        businessUserInfo.setOpenid(loginDTO.getOpenId());
+        businessUserInfo.setUpdateTime(new Date());
+        businessUserInfoMapper.updateById(businessUserInfo);
+
+        LoginVO loginVO = new LoginVO();
+        loginVO.setUuid(sysUser.getUuid());
+        loginVO.setOpenid(loginDTO.getOpenId());
+        return ServerResponse.createBySuccess(loginVO);
     }
 
     /**

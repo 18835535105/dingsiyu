@@ -49,14 +49,6 @@ server:
   tomcat:
     uri-encoding: utf-8
     connection-timeout: 30m
-feign:
-  client:
-    config:
-      # 通过 default 进行全局配置
-      default:
-        loggerLevel: full
-        connectTimeout: 5000
-        readTimeout: 5000
 
 mybatis:
   type-aliases-package: com.zhidejiaoyu.common.pojo

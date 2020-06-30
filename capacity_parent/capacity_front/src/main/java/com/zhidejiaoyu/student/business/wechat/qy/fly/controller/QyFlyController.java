@@ -8,10 +8,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
 import com.zhidejiaoyu.student.business.service.StudentInfoService;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.service.QyFlyService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -78,22 +75,35 @@ public class QyFlyController {
     }
 
     /**
+     * 校验学生今天智慧飞行记录是否已经上传
+     *
+     * @param studentUuid
+     * @return <ul>
+     * <li>true:未上传</li>
+     * <li>false:已上传</li>
+     * </ul>
+     */
+    @GetMapping("/checkUpload")
+    public boolean checkUpload(@RequestParam String studentUuid) {
+        return qyFlyService.checkUpload(studentUuid);
+    }
+
+    /**
      * 获取当前教师下的所有学生
      *
-     * @param openId 教师openId
-     * @param dto    查询条件
+     * @param dto 查询条件
      * @return
      */
     @GetMapping("/getStudents")
-    public ServerResponse<Object> getStudents(String openId, SearchStudentDTO dto) {
-        if (StringUtil.isEmpty(openId)) {
-            return ServerResponse.createByError(400, "openId can't be null!");
+    public ServerResponse<Object> getStudents(SearchStudentDTO dto) {
+        if (StringUtil.isEmpty(dto.getTeacherUuid())) {
+            return ServerResponse.createByError(400, "teacherUuid can't be null!");
         }
-        return qyFlyService.getStudents(openId, dto);
+        return qyFlyService.getStudents(dto);
     }
 
     @GetMapping("/getCurrentDayOfStudy")
-    public ServerResponse<Object> getCurrentDayOfStudy(String studentUuid) {
+    public ServerResponse<Object> getCurrentDayOfStudy(@RequestParam String studentUuid) {
         if (studentUuid == null) {
             return ServerResponse.createByError(400, "studentUuid can't be null!");
         }

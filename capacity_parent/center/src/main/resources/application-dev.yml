@@ -20,12 +20,32 @@ spring:
 server:
   port: 9000
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+feign:
+  client:
+    config:
+      # 通过 default 进行全局配置
+      default:
+        loggerLevel: full
+        connectTimeout: 5000
+        readTimeout: 5000
+  httpclient:
+    enabled: true
+    max-connections: 200
+    max-connections-per-route: 50
 
 logging:
   level:
     com:
       zhidejiaoyu:
         center: debug
+        business:
+          wechat:
+            feignclient: debug
         common:
           mapper: debug
   config: classpath:log4j2-dev.xml

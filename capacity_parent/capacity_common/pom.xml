@@ -29,6 +29,11 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+
 		<!-- 腾讯语音评测 -->
 		<dependency>
 			<groupId>com.tencentcloudapi</groupId>
@@ -176,6 +181,10 @@
 		<dependency>
 			<groupId>com.alibaba.csp</groupId>
 			<artifactId>spring-boot-starter-ahas-sentinel-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign.form</groupId>
+			<artifactId>feign-form-spring</artifactId>
 		</dependency>
 
 	</dependencies>

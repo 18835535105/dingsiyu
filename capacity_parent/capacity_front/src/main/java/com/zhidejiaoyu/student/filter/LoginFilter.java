@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.pojo.Student;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -72,8 +73,12 @@ public class LoginFilter implements Filter {
         }
 
         String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
-
-        if (URL_MAP.containsKey(url) || checkIgnoreInclude(url)) {
+        // 如果是feign请求直接放行
+        String feignFlag = httpServletRequest.getHeader("feign");
+        if (log.isDebugEnabled()) {
+            log.debug("feignFlag={}", feignFlag);
+        }
+        if (URL_MAP.containsKey(url) || checkIgnoreInclude(url) || StringUtils.isNotEmpty(feignFlag)) {
             // 不拦截登录和退出接口
             doFilter(chain, httpServletRequest, httpServletResponse, url);
 

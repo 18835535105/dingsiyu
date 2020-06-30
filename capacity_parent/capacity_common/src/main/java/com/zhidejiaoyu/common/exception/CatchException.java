@@ -1,8 +1,7 @@
-package com.zhidejioayu.center.business.exception;
+package com.zhidejiaoyu.common.exception;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.exception.Enum.ServiceExceptionEnum;
-import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
@@ -83,7 +82,7 @@ public class CatchException {
             Student student = (Student) studentObject;
             log.error("学生[{} - {} - {}],请求 URL=[{}],操作出现系统异常,param=[{}]", student.getId(), student.getAccount(), student.getStudentName(), url, param, e);
         } else {
-            log.error("学生操作出现系统异常,param=[{}], URL=[{}]", param, url, e);
+            log.error("操作出现系统异常,param=[{}], URL=[{}]", param, url, e);
         }
     }
 

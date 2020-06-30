@@ -15,9 +15,7 @@ import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapper, CurrentDayOfStudy> implements CurrentDayOfStudyService {
@@ -79,7 +77,9 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         }
         String[] split = errorInfo.split("##");
         if (split.length > 0) {
-            return Arrays.asList(split);
+            List<String> strings = Arrays.asList(split);
+            Set<String> set = new HashSet<>(strings);
+            return new ArrayList<>(set);
         }
         return null;
     }
