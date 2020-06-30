@@ -21,7 +21,6 @@ import com.zhidejioayu.center.business.wechat.smallapp.util.CreateWxQrCodeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -37,9 +36,6 @@ import java.net.URLEncoder;
 @Slf4j
 @Service("smallProgramTestService")
 public class SmallProgramTestServiceImpl extends ServiceImpl<StudentMapper, Student> implements SmallProgramTestService {
-
-    @Resource
-    private RestTemplate restTemplate;
 
     @Resource
     private WeChatMapper weChatMapper;

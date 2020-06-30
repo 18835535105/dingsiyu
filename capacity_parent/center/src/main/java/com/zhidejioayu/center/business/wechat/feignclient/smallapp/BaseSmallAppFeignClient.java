@@ -2,7 +2,9 @@ package com.zhidejioayu.center.business.wechat.feignclient.smallapp;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.BindAccountDTO;
+import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeConfigDTO;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeDTO;
+import com.zhidejioayu.center.business.wechat.smallapp.vo.ReturnAdminVo;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -117,5 +119,23 @@ public interface BaseSmallAppFeignClient {
      */
     @PostMapping("/smallApp/test/saveTest")
     Object saveTest(@RequestParam Integer point, @RequestParam String openId);
+
+    /**
+     * 为我加油数据
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/smallApp/prizeConfig/getAdmin")
+    ServerResponse<ReturnAdminVo> getAdmin(@RequestParam String openId);
+
+    /**
+     * 抽奖页面数据
+     *
+     * @param dto
+     * @return
+     */
+    @GetMapping("/smallApp/prizeConfig/getPrizeConfig")
+    Object getPrizeConfig(@SpringQueryMap PrizeConfigDTO dto);
 }
 

@@ -1,8 +1,11 @@
 package com.zhidejiaoyu.student.business.wechat.smallapp.controller;
 
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.controller.BaseController;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.PrizeConfigService;
+import com.zhidejiaoyu.student.business.wechat.smallapp.vo.ReturnAdminVo;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -21,13 +24,13 @@ public class PrizeConfigController extends BaseController {
     private PrizeConfigService prizeConfigService;
 
     @RequestMapping("/getPrizeConfig")
-    public Object getPrize(String openId, Long adminId, Long studentId,String weChatimgUrl,String weChatName) {
-        return prizeConfigService.getPrizeConfig(openId, adminId, studentId,weChatimgUrl,weChatName);
+    public Object getPrize(String openId, Long adminId, Long studentId, String weChatimgUrl, String weChatName) {
+        return prizeConfigService.getPrizeConfig(openId, adminId, studentId, weChatimgUrl, weChatName);
     }
 
 
     @RequestMapping("/getAdmin")
-    public Object getAdmin(String openId) {
+    public ServerResponse<ReturnAdminVo> getAdmin(@RequestParam String openId) {
         return prizeConfigService.getAdmin(openId);
     }
 

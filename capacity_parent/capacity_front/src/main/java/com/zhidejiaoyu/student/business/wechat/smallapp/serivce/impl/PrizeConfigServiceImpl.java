@@ -86,16 +86,16 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         JoinSchool joinSchool = joinSchoolMapper.selectByUserId(adminId.intValue());
         returnMap.put("adress", joinSchool == null ? "北京市海淀区上地国际创业园" : joinSchool.getAddress());
         SysUser sysUser = sysUserMapper.selectById(adminId);
-        StringBuilder sb = new StringBuilder().append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）").append("-");
+        StringBuilder sb = new StringBuilder().append(sysUser.getPhone()).append("（").append(sysUser.getName(), 0, 1).append("老师）").append("-");
         SysUser teacherUser = sysUserMapper.selectById(student.getTeacherId());
         if (teacherUser.getAccount().contains("js")) {
-            sb.append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）");
+            sb.append(sysUser.getPhone()).append("（").append(sysUser.getName(), 0, 1).append("老师）");
         }
         Teacher teacher = teacherMapper.selectTeacherBySchoolAdminId(adminId.intValue());
         returnMap.put("adminPhone", sb.toString());
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId.intValue());
         if (shareConfig != null) {
-            returnMap.put("background", shareConfig.getImgUrl());
+            returnMap.put("background",GetOssFile.getPublicObjectUrl(shareConfig.getImgUrl()));
         } else {
             returnMap.put("background", null);
         }
@@ -105,7 +105,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     }
 
     @Override
-    public Object getAdmin(String openId) {
+    public ServerResponse<ReturnAdminVo> getAdmin(String openId) {
         Student student = studentMapper.selectByOpenId(openId);
         Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenreAndStudyModel(student.getId(), GenreConstant.SMALLAPP_GENRE, StudyModelConstant.SMALLAPP_STUDY_MODEL);
