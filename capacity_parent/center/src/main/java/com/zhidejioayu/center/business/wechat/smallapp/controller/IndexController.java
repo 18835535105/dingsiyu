@@ -30,10 +30,6 @@ public class IndexController {
     @Resource
     private IndexService smallAppIndexService;
 
-
-//    @Resource
-//    private ShipIndexService shipIndexService;
-
     /**
      * 首页数据
      *
@@ -105,9 +101,7 @@ public class IndexController {
         if (StringUtils.isEmpty(openId)) {
             throw new ServiceException("openId can't be null");
         }
-//        IndexVO.MyState radar = shipIndexService.getBaseState(openId);
-//        return ServerResponse.createBySuccess(radar);
-        return null;
+        return smallAppIndexService.myState(openId);
     }
 
     /**

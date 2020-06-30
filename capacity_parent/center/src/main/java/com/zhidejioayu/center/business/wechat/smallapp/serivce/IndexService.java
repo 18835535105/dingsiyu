@@ -54,4 +54,11 @@ public interface IndexService extends IService<Student> {
      */
     ServerResponse<Object> cardInfo(String openId);
 
+    /**
+     * 飞行状态
+     *
+     * @param openId
+     * @return
+     */
+    ServerResponse<Object> myState(String openId);
 }
