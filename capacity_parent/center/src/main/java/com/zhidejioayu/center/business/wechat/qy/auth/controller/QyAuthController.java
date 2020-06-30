@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.pojo.SysUser;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.wechat.qy.LoginVO;
 import com.zhidejioayu.center.business.wechat.qy.auth.dto.LoginDTO;
 import com.zhidejioayu.center.business.wechat.qy.auth.service.QyAuthService;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -35,9 +35,6 @@ public class QyAuthController {
 
     @Resource
     private QyAuthService qyAuthService;
-
-    @Resource
-    private RestTemplate restTemplate;
 
     /**
      * 网页授权获取用户信息
@@ -66,7 +63,7 @@ public class QyAuthController {
      */
     @ResponseBody
     @PostMapping("/login")
-    public ServerResponse<Object> login(@Valid LoginDTO loginDTO, BindingResult result) {
+    public ServerResponse<LoginVO> login(@Valid LoginDTO loginDTO, BindingResult result) {
         return qyAuthService.login(loginDTO);
     }
 

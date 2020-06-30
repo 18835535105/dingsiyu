@@ -25,9 +25,16 @@ public interface QyFlyService extends IService<CurrentDayOfStudy> {
     /**
      * 获取当前教师下的所有学生
      *
-     * @param openId    教师openId
      * @param dto 查询条件
      * @return
      */
-    ServerResponse<Object> getStudents(String openId, SearchStudentDTO dto);
+    ServerResponse<Object> getStudents(SearchStudentDTO dto);
+
+    /**
+     * 校验学生今天智慧飞行记录是否已经上传
+     *
+     * @param studentUuid
+     * @return
+     */
+    boolean checkUpload(String studentUuid);
 }

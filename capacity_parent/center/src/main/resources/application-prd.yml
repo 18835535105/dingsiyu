@@ -27,7 +27,10 @@ feign:
         loggerLevel: error
         connectTimeout: 5000
         readTimeout: 5000
-
+  httpclient:
+    enabled: true
+    max-connections: 200
+    max-connections-per-route: 50
 server:
   port: 9000
   tomcat:

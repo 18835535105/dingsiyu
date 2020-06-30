@@ -2,6 +2,7 @@ package com.zhidejioayu.center.business.wechat.qy.auth.service;
 
 import com.zhidejiaoyu.common.pojo.SysUser;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.wechat.qy.LoginVO;
 import com.zhidejioayu.center.business.wechat.qy.auth.dto.LoginDTO;
 
 /**
@@ -23,6 +24,7 @@ public interface QyAuthService {
      * 用户登录
      *
      * @param loginDTO
+     * @return
      */
-    ServerResponse<Object> login(LoginDTO loginDTO);
+    ServerResponse<LoginVO> login(LoginDTO loginDTO);
 }

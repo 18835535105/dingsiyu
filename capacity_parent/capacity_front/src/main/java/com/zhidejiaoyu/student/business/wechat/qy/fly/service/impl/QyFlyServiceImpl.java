@@ -76,9 +76,9 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
     }
 
     @Override
-    public ServerResponse<Object> getStudents(String openId, SearchStudentDTO dto) {
+    public ServerResponse<Object> getStudents(SearchStudentDTO dto) {
 
-        SysUser sysUser = sysUserMapper.selectByOpenId(openId);
+        SysUser sysUser = sysUserMapper.selectByUuid(dto.getTeacherUuid());
 
         PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
         List<Student> students = studentMapper.selectByTeacherIdOrSchoolAdminId(sysUser.getId(), dto);
@@ -100,5 +100,12 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
 
         PageVo<SearchStudentVO> page = PageUtil.packagePage(collect, pageInfo.getTotal());
         return ServerResponse.createBySuccess(page);
+    }
+
+    @Override
+    public boolean checkUpload(String studentUuid) {
+        Student student = studentMapper.selectByUuid(studentUuid);
+        int count = currentDayOfStudyMapper.countByStudentIdAndDate(student.getId(), new Date());
+        return count == 0;
     }
 }
