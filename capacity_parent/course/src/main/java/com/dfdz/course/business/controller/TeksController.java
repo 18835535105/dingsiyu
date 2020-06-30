@@ -11,7 +11,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @RestController
-@RequestMapping("/course/teks")
+@RequestMapping("/course/centerTeks")
 public class TeksController {
 
     @Resource

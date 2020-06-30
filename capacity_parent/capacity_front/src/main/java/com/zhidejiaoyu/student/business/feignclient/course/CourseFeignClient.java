@@ -2,8 +2,7 @@ package com.zhidejiaoyu.student.business.feignclient.course;
 
 import com.zhidejiaoyu.common.pojo.*;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -107,12 +106,13 @@ public interface CourseFeignClient {
      * @param group
      * @return
      */
-    @GetMapping("/vocabulary/getStudyNewMap/{unitId}/{longs}/{type}/{group}")
-    Map<String, Object> getStudyNewMap(Long unitId, List<Long> longs, Integer type, Integer group);
+    @RequestMapping(value = "/vocabulary/getStudyNewMap", method = RequestMethod.GET)
+    Map<String, Object> getStudyNewMap(@RequestParam("unitId") Long unitId, @RequestParam("longs") List<Long> longs,
+                                       @RequestParam("type") Integer type, @RequestParam("group") Integer group);
 
 
     /**
-     * 获取句型数据
+     * 获取句型数据`
      */
     /**
      * 根据id获取句型数据
@@ -166,7 +166,7 @@ public interface CourseFeignClient {
      * @param group
      * @return
      */
-    @GetMapping("/teks/selTeksByUnitIdAndGroup/{unitId}/{group}")
+    @GetMapping("/centerTeks/selTeksByUnitIdAndGroup/{unitId}/{group}")
     List<TeksNew> selTeksByUnitIdAndGroup(@PathVariable Long unitId, @PathVariable Integer group);
 
     /**
@@ -174,7 +174,7 @@ public interface CourseFeignClient {
      *
      * @return
      */
-    @GetMapping("/teks/getTwentyTeks")
+    @GetMapping("/centerTeks/getTwentyTeks")
     List<TeksNew> getTwentyTeks();
 
 

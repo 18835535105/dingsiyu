@@ -90,7 +90,7 @@ public class VocabularyController {
     /**
      * 获取新学习单词图鉴数据
      */
-    @GetMapping("/getStudyNewMap/{unitId}/{longs}/{type}/{group}")
+    @GetMapping("/getStudyNewMap")
     public Map<String, Object> getStudyNewMap(Long unitId, List<Long> wordIds, Integer type, Integer group) {
         return vocabularyService.selectStudyMap(unitId, wordIds, type, group);
     }
