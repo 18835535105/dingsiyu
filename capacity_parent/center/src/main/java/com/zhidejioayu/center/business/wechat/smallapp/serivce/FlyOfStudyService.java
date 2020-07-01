@@ -13,19 +13,19 @@ public interface FlyOfStudyService extends IService<CurrentDayOfStudy> {
     /**
      * 通过扫码获取学生总学习信息
      *
-     * @param studentUuid
+     * @param openId
      * @return
      */
-    ServerResponse<Object> getTotalStudyInfo(String studentUuid);
+    ServerResponse<Object> getTotalStudyInfo(String openId);
 
     /**
      * 通过扫码获取学生指定学习序号的学习信息
      *
-     * @param studentUuid
+     * @param openId
      * @param num    学习序号
      * @return
      */
-    ServerResponse<Object> getStudyInfo(String studentUuid, Integer num);
+    ServerResponse<Object> getStudyInfo(String openId, Integer num);
 
     /**
      * 获取学生指定二维码对应的照片信息
@@ -34,5 +34,5 @@ public interface FlyOfStudyService extends IService<CurrentDayOfStudy> {
      * @param num   查询指定序号对应的日期拍摄的照片
      * @return
      */
-    ServerResponse<Object> getStudentInfo(String studentUuid, Integer num);
+    ServerResponse<Object> getStudentInfo(String openId, Integer num);
 }

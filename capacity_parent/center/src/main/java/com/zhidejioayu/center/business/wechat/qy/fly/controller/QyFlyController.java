@@ -4,9 +4,9 @@ import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejioayu.center.business.util.UserInfoUtil;
 import com.zhidejioayu.center.business.wechat.feignclient.qy.BaseQyFeignClient;
 import com.zhidejioayu.center.business.wechat.qy.fly.service.QyFlyService;
-import com.zhidejioayu.center.business.wechat.util.CenterUserInfoUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,16 +40,16 @@ public class QyFlyController {
      * 上传飞行记录
      *
      * @param file
-     * @param studentUuid
+     * @param openId
      * @param num         作业本中二维码序号
      * @return
      */
     @PostMapping("/uploadFlyRecord")
-    public ServerResponse<Object> uploadFlyRecord(MultipartFile file, String studentUuid, Integer num, Long studentId) {
+    public ServerResponse<Object> uploadFlyRecord(MultipartFile file, String openId, Integer num, Long studentId) {
         if (file == null) {
             return ServerResponse.createByError(400, "上传的图片不能为空！");
         }
-        if (StringUtil.isEmpty(studentUuid)) {
+        if (StringUtil.isEmpty(openId)) {
             return ServerResponse.createByError(400, "studentUuid can't be null!");
         }
         if (studentId == null) {
@@ -74,7 +74,7 @@ public class QyFlyController {
             return ServerResponse.createByError(400, "上传的文件不是图片类型，请重新上传！");
         }
 
-        return qyFlyService.uploadFlyRecord(file, studentUuid, num, studentId);
+        return qyFlyService.uploadFlyRecord(file, openId, num, studentId);
     }
 
     /**
@@ -85,24 +85,29 @@ public class QyFlyController {
      */
     @GetMapping("/getStudents")
     public ServerResponse<Object> getStudents(SearchStudentDTO dto) {
-        String uuid = dto.getTeacherUuid();
+        String openId = dto.getOpenId();
 
-        if (StringUtil.isEmpty(uuid)) {
-            return ServerResponse.createByError(400, "studentUuid can't be null!");
+        if (StringUtil.isEmpty(openId)) {
+            return ServerResponse.createByError(400, "openId can't be null!");
         }
 
-        ServerConfig serverConfig = CenterUserInfoUtil.getByUuid(uuid);
-        BaseQyFeignClient baseQyFeignClient = qyServerFeignClient.get(serverConfig.getServerName());
+        BaseQyFeignClient baseQyFeignClient = getBaseQyFeignClient(openId);
+
         return baseQyFeignClient.getStudents(dto);
     }
 
+    public BaseQyFeignClient getBaseQyFeignClient(String openId) {
+        ServerConfig serverConfig =  UserInfoUtil.getServerInfoByTeacherOpenid(openId);
+        return qyServerFeignClient.get(serverConfig.getServerName());
+    }
+
     @GetMapping("/getCurrentDayOfStudy")
-    public ServerResponse<Object> getCurrentDayOfStudy(String studentUuid) {
-        if (studentUuid == null) {
-            return ServerResponse.createByError(400, "studentUUID can't be null!");
+    public ServerResponse<Object> getCurrentDayOfStudy(String openId) {
+        if (StringUtil.isEmpty(openId)) {
+            return ServerResponse.createByError(400, "openId can't be null!");
         }
 
-        return qyFlyService.getCurrentDayOfStudy(studentUuid);
+        return qyFlyService.getCurrentDayOfStudy(openId);
     }
 
 }

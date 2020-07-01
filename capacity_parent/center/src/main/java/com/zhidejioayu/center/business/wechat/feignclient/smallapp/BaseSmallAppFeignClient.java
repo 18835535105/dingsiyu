@@ -29,22 +29,22 @@ public interface BaseSmallAppFeignClient {
     /**
      * 通过扫码获取学生总学习信息
      *
-     * @param studentUuid
+     * @param openId
      * @param num         二维码序号
      * @return
      */
-    @GetMapping("/smallApp/fly/v1/getStudyInfo")
-    ServerResponse<Object> getTotalStudyInfo(@RequestParam String studentUuid, @RequestParam Integer num);
+    @GetMapping("/smallApp/fly/getStudyInfo")
+    ServerResponse<Object> getTotalStudyInfo(@RequestParam String openId, @RequestParam Integer num);
 
     /**
      * 获取学生上传你的图片信息
      *
-     * @param studentUuid
+     * @param openId
      * @param num         二维码序号
      * @return
      */
-    @GetMapping("/smallApp/fly/v1/getStudentInfo")
-    ServerResponse<Object> getStudentInfo(@RequestParam String studentUuid, @RequestParam Integer num);
+    @GetMapping("/smallApp/fly/getStudentInfo")
+    ServerResponse<Object> getStudentInfo(@RequestParam String openId, @RequestParam Integer num);
 
     /**
      * 打卡信息

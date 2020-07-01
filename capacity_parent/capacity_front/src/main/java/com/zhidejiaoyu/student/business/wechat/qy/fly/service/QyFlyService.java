@@ -36,5 +36,5 @@ public interface QyFlyService extends IService<CurrentDayOfStudy> {
      * @param studentUuid
      * @return
      */
-    boolean checkUpload(String studentUuid);
+    boolean checkUpload(String openId);
 }

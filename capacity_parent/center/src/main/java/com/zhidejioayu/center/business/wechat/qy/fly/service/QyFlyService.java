@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface QyFlyService extends IService<CurrentDayOfStudy> {
 
-    ServerResponse<Object> getCurrentDayOfStudy(String studentUuid);
+    ServerResponse<Object> getCurrentDayOfStudy(String openId);
 
     /**
      * 上传学生智慧飞行记录

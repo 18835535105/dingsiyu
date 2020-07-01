@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.business.wechat.qy.fly.controller;
 
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
-import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -77,15 +76,15 @@ public class QyFlyController {
     /**
      * 校验学生今天智慧飞行记录是否已经上传
      *
-     * @param studentUuid
+     * @param openId
      * @return <ul>
      * <li>true:未上传</li>
      * <li>false:已上传</li>
      * </ul>
      */
     @GetMapping("/checkUpload")
-    public boolean checkUpload(@RequestParam String studentUuid) {
-        return qyFlyService.checkUpload(studentUuid);
+    public boolean checkUpload(@RequestParam String openId) {
+        return qyFlyService.checkUpload(openId);
     }
 
     /**
@@ -96,21 +95,18 @@ public class QyFlyController {
      */
     @GetMapping("/getStudents")
     public ServerResponse<Object> getStudents(SearchStudentDTO dto) {
-        if (StringUtil.isEmpty(dto.getTeacherUuid())) {
-            return ServerResponse.createByError(400, "teacherUuid can't be null!");
+        if (StringUtil.isEmpty(dto.getOpenId())) {
+            return ServerResponse.createByError(400, "openId can't be null!");
         }
         return qyFlyService.getStudents(dto);
     }
 
     @GetMapping("/getCurrentDayOfStudy")
-    public ServerResponse<Object> getCurrentDayOfStudy(@RequestParam String studentUuid) {
-        if (studentUuid == null) {
-            return ServerResponse.createByError(400, "studentUuid can't be null!");
+    public ServerResponse<Object> getCurrentDayOfStudy(@RequestParam String openId) {
+        if (StringUtil.isEmpty(openId)) {
+            return ServerResponse.createByError(400, "openId can't be null!");
         }
-        Student student = studentInfoService.getByUuid(studentUuid);
-        if (student == null) {
-            throw new ServiceException(400, "未查询到uuid为" + studentUuid + "的学生信息！");
-        }
+        Student student = studentInfoService.getByOpenId(openId);
         return currentDayOfStudyService.getCurrentDayOfStudy(student.getId());
     }
 

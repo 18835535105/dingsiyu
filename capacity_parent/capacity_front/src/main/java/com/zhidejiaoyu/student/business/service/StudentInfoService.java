@@ -114,4 +114,12 @@ public interface StudentInfoService extends BaseService<Student> {
      * @return
      */
     Student getByUuid(String uuid);
+
+    /**
+     * 根据openId查询学生信息
+     *
+     * @param openId
+     * @return
+     */
+    Student getByOpenId(String openId);
 }

@@ -40,4 +40,46 @@ public class UserInfoUtil {
         }
         return serverConfig;
     }
+
+    /**
+     * 通过学管openid查询所属服务器信息
+     *
+     * @param openid
+     * @return
+     */
+    public static ServerConfig getServerInfoByTeacherOpenid(String openid) {
+        ServerConfig serverConfig = serverConfigMapperStatic.selectTeacherServerByOpenId(openid);
+        if (serverConfig == null) {
+            throw new ServiceException(400, "中台服务器为查询到openid=" + openid + "的学生或者校管信息！");
+        }
+        return serverConfig;
+    }
+
+    /**
+     * 通过openid获取校长或者教师服务器信息
+     *
+     * @param openid
+     * @return
+     */
+    public static ServerConfig getTeacherServerConfigByOpenid(String openid) {
+        ServerConfig serverConfig = serverConfigMapperStatic.selectTeacherServerByOpenId(openid);
+        if (serverConfig == null) {
+            throw new ServiceException(400, "中台服务器为查询到openid=" + openid + "的教师或者校管信息！");
+        }
+        return serverConfig;
+    }
+
+    /**
+     * 根据用户uuid查询用户所在服务器信息
+     *
+     * @param uuid
+     * @return
+     */
+    public static ServerConfig getByUuid(String uuid) {
+        ServerConfig serverConfig = serverConfigMapperStatic.selectByUUID(uuid);
+        if (serverConfig == null) {
+            throw new ServiceException(400, "中台服务器为查询到uuid=" + uuid + "的用户信息！");
+        }
+        return serverConfig;
+    }
 }
