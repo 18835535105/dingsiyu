@@ -20,7 +20,7 @@ spring:
         namespace: d622563f-9907-43e3-9d00-349c6468678e
 
 server:
-  port: 9000
+  port: 9100
 
 management:
   endpoints:
