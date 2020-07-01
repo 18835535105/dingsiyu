@@ -1,14 +1,13 @@
 package com.zhidejiaoyu.student.business.currentDayOfStudy.service.impl;
 
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
-import com.zhidejiaoyu.common.mapper.CurrentDayOfStudyMapper;
-import com.zhidejiaoyu.common.mapper.DurationMapper;
-import com.zhidejiaoyu.common.mapper.GoldLogMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.vo.CurrentDayOfStudyVo;
+import com.zhidejiaoyu.common.vo.currentdayofstudy.CurrentDayOfStudyVo;
+import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
@@ -28,6 +27,12 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
 
     @Resource
     private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
+
+    @Resource
+    private LearnHistoryMapper learnHistoryMapper;
+
+    @Resource
+    private TestRecordMapper testRecordMapper;
 
     @Override
     public ServerResponse<Object> getCurrentDayOfStudy() {
@@ -69,6 +74,22 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         String errorSyntax = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SYNTAX, studentId, 3);
         vo.setSyntax(getReturnList(errorSyntax));
         return ServerResponse.createBySuccess(vo);
+    }
+
+    @Override
+    public ServerResponse<Object> getTodayInfo() {
+        Long studentId = super.getStudentId();
+        Long onlineTime = durationMapper.countTotalOnlineTimeByStudentId(studentId);
+
+        int groupCount = learnHistoryMapper.countByStudentIdToDay(studentId);
+        int testCount = testRecordMapper.countGoldTestByStudentIdToday(studentId);
+
+        int mileage = groupCount + testCount * 3;
+
+        StudyTimeAndMileageVO studyTimeAndMileageVO = new StudyTimeAndMileageVO();
+        studyTimeAndMileageVO.setMileage(mileage);
+        studyTimeAndMileageVO.setTime(onlineTime);
+        return ServerResponse.createBySuccess(studyTimeAndMileageVO);
     }
 
     private List<String> getReturnList(String errorInfo) {

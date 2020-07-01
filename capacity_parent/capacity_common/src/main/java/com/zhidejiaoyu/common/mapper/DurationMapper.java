@@ -108,6 +108,15 @@ public interface DurationMapper extends BaseMapper<Duration> {
     @Select("select sum(online_time) from duration where student_id = #{student.id}")
     Long countTotalOnlineTime(@Param("student") Student student);
 
+    /**
+     * 获取学生总在线时长
+     *
+     * @param student
+     * @return
+     */
+    @Select("select sum(online_time) from duration where student_id = #{studentId}")
+    Long countTotalOnlineTimeByStudentId(@Param("studentId") Long studentId);
+
     List<SeniorityVo> planSeniority(@Param("grade") String grade, @Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version, @Param("classId") Long classId);
 
     @Select("select SUM(valid_time) AS valid_time FROM duration  WHERE student_id = #{stuId}  GROUP BY student_id")

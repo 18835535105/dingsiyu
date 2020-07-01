@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.vo;
+package com.zhidejiaoyu.common.vo.currentdayofstudy;
 
 import lombok.Data;
 

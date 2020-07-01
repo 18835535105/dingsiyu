@@ -17,4 +17,10 @@ public interface CurrentDayOfStudyService extends IService<CurrentDayOfStudy> {
      */
     ServerResponse<Object> getCurrentDayOfStudy(Long studentId);
 
+    /**
+     * 获取学生当天飞行时间及飞行历程信息
+     *
+     * @return
+     */
+    ServerResponse<Object> getTodayInfo();
 }
