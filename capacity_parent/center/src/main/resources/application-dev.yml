@@ -18,7 +18,7 @@ spring:
         server-addr: nacos.duizhang100.cn:8848
         namespace: a8dd697b-5d6d-4844-bcc7-54a7732644e8
 server:
-  port: 9000
+  port: 9100
 
 management:
   endpoints:
@@ -31,8 +31,8 @@ feign:
       # 通过 default 进行全局配置
       default:
         loggerLevel: full
-        connectTimeout: 5000
-        readTimeout: 5000
+        connectTimeout: 10000
+        readTimeout: 10000
   httpclient:
     enabled: true
     max-connections: 200

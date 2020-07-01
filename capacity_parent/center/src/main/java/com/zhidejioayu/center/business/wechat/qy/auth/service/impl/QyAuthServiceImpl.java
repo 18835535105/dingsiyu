@@ -120,6 +120,7 @@ public class QyAuthServiceImpl implements QyAuthService {
             throw new ServiceException(ServiceExceptionEnum.NAME_OR_PASSWORD_ERROR);
         }
 
+        sysUser.setPassword(null);
         sysUser.setOpenid(loginDTO.getOpenId());
         boolean success = baseQyFeignClient.updateSysUser(sysUser);
         if (!success) {

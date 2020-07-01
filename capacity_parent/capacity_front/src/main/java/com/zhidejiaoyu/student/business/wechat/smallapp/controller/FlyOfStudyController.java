@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.FlyOfStudyService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -34,7 +35,7 @@ public class FlyOfStudyController {
      * @return
      */
     @GetMapping("/getStudyInfo")
-    public ServerResponse<Object> getStudyInfo(String openId, Integer num) {
+    public ServerResponse<Object> getStudyInfo(@RequestParam String openId, @RequestParam Integer num) {
         checkParam(openId, num);
         if (num == -1) {
             return flyOfStudyService.getTotalStudyInfo(openId);
@@ -55,11 +56,11 @@ public class FlyOfStudyController {
      * 获取学生指定二维码对应的照片信息
      *
      * @param openId
-     * @param num   查询指定序号对应的日期拍摄的照片
+     * @param num    查询指定序号对应的日期拍摄的照片
      * @return
      */
     @GetMapping("/getStudentInfo")
-    public ServerResponse<Object> getStudentInfo(String openId, Integer num) {
+    public ServerResponse<Object> getStudentInfo(@RequestParam String openId, @RequestParam Integer num) {
         checkParam(openId, num);
         return flyOfStudyService.getStudentInfo(openId, num);
     }

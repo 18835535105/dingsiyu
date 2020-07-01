@@ -26,8 +26,8 @@ feign:
       # 通过 default 进行全局配置
       default:
         loggerLevel: error
-        connectTimeout: 5000
-        readTimeout: 5000
+        connectTimeout: 10000
+        readTimeout: 10000
 
 server:
   port: 9082

@@ -29,14 +29,14 @@ public interface BaseQyFeignClient {
     /**
      * 校验学生今天智慧飞行记录是否已经上传
      *
-     * @param studentUuid
+     * @param openId
      * @return <ul>
      * <li>true:未上传</li>
      * <li>false:已上传</li>
      * </ul>
      */
     @GetMapping("/qy/fly/checkUpload")
-    boolean checkUpload(@RequestParam String studentUuid);
+    boolean checkUpload(@RequestParam String openId);
 
     /**
      * 保存智慧飞行记录
@@ -77,9 +77,9 @@ public interface BaseQyFeignClient {
     /**
      * 获取新学生当天的智慧飞行记录
      *
-     * @param studentUuid
+     * @param openId
      * @return
      */
     @GetMapping("/qy/fly/getCurrentDayOfStudy")
-    ServerResponse<Object> getCurrentDayOfStudy(@RequestParam String studentUuid);
+    ServerResponse<Object> getCurrentDayOfStudy(@RequestParam String openId);
 }

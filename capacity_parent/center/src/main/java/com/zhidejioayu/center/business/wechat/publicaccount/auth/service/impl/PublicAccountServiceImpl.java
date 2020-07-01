@@ -12,7 +12,7 @@ import com.zhidejioayu.center.business.wechat.publicaccount.auth.service.PublicA
 import com.zhidejioayu.center.business.wechat.publicaccount.auth.vo.ConfigVO;
 import com.zhidejioayu.center.business.wechat.publicaccount.auth.vo.UserInfoVO;
 import com.zhidejioayu.center.business.wechat.publicaccount.constant.ApiConstant;
-import com.zhidejioayu.center.business.wechat.publicaccount.util.UserInfoUtil;
+import com.zhidejioayu.center.business.wechat.publicaccount.util.PublicAccountUserInfoUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +39,7 @@ public class PublicAccountServiceImpl implements PublicAccountService {
 
     @Override
     public ServerResponse<Object> getOpenId(String code) {
-        String publicAccountOpenId = UserInfoUtil.getPublicAccountOpenId(code);
+        String publicAccountOpenId = PublicAccountUserInfoUtil.getPublicAccountOpenId(code);
         return ServerResponse.createBySuccess(publicAccountOpenId);
     }
 
@@ -59,7 +59,7 @@ public class PublicAccountServiceImpl implements PublicAccountService {
 
     @Override
     public ServerResponse<Object> getUserInfo(String code) {
-        AccessTokenVO publicAccountAuthAccessTokenVO = UserInfoUtil.getPublicAccountAuthAccessTokenVO(code);
+        AccessTokenVO publicAccountAuthAccessTokenVO = PublicAccountUserInfoUtil.getPublicAccountAuthAccessTokenVO(code);
         String userInfoApiUrl = ApiConstant.getUserInfoApi(publicAccountAuthAccessTokenVO.getAccess_token(), publicAccountAuthAccessTokenVO.getOpenid());
         ResponseEntity<String> forEntity = restTemplate.getForEntity(userInfoApiUrl, String.class);
         UserInfoVO userInfoVO = JSON.parseObject(forEntity.getBody(), UserInfoVO.class);

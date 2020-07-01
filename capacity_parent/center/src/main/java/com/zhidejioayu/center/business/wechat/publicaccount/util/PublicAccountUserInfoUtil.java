@@ -19,7 +19,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Component
-public class UserInfoUtil {
+public class PublicAccountUserInfoUtil {
 
 
     private static RestTemplate restTemplate;

@@ -1,7 +1,9 @@
 package com.zhidejioayu.center.business.wechat.smallapp.controller;
 
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeConfigDTO;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.PrizeConfigService;
+import com.zhidejioayu.center.business.wechat.smallapp.vo.ReturnAdminVo;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +29,7 @@ public class PrizeConfigController {
 
 
     @RequestMapping("/getAdmin")
-    public Object getAdmin(String openId) {
+    public ServerResponse<ReturnAdminVo> getAdmin(String openId) {
         return prizeConfigService.getAdmin(openId);
     }
 
