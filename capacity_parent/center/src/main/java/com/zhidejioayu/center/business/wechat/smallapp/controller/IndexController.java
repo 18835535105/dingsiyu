@@ -1,16 +1,16 @@
 package com.zhidejioayu.center.business.wechat.smallapp.controller;
 
 import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejioayu.center.business.util.BaseFeignClientUtil;
+import com.zhidejioayu.center.business.wechat.feignclient.smallapp.BaseSmallAppFeignClient;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeDTO;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.IndexService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -88,6 +88,21 @@ public class IndexController {
             throw new ServiceException("openId can't be null");
         }
         return smallAppIndexService.record(openId);
+    }
+
+    /**
+     * 飞行记录学习总览
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/recordOverview")
+    public ServerResponse<Object> recordOverview(@RequestParam String openId) {
+        if (StringUtil.isEmpty(openId)) {
+            return ServerResponse.createByError(400, "openId can't be null!");
+        }
+        BaseSmallAppFeignClient baseSmallAppFeignClient = BaseFeignClientUtil.getBaseSmallAppFeignClient(openId);
+        return baseSmallAppFeignClient.recordOverview(openId);
     }
 
     /**

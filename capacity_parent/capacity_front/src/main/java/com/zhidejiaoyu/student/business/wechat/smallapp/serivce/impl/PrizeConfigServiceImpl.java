@@ -111,7 +111,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenreAndStudyModel(student.getId(), GenreConstant.SMALLAPP_GENRE, StudyModelConstant.SMALLAPP_STUDY_MODEL);
         String imgUrl = shareConfigMapper.selectImgByAdminId(adminId);
         WeChat weChat = weChatMapper.selectByOpenId(openId);
-        Long vaildTime = durationMapper.selectValidTimeByStudentId(student.getId());
+        Long vaildTime = durationMapper.selectTotalValidTimeByStudentId(student.getId());
         int wordCount = learnNewMapper.countLearnedWordCount(student.getId());
         ReturnAdminVo returnAdminVo = ReturnAdminVo.builder()
                 .adminId(adminId.longValue())

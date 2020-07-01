@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.vo.smallapp.studyinfo;
+package com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

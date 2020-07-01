@@ -43,7 +43,7 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
      * @return
      */
     @Select("SELECT count(id) FROM run_log WHERE type = 1 and operate_user_id = #{stuId}")
-    Integer selectLoginCountByStudentId(@Param("stuId") Long stuId);
+    Integer countLoginCountByStudentId(@Param("stuId") Long stuId);
 
     @Select("select log_content from run_log WHERE operate_user_id = #{studentId} AND date_format(create_time, '%Y-%m-%d') = #{formatYYYYMMDD} and type = 4")
     List<String> getStudentGold(@Param("formatYYYYMMDD") String formatYYYYMMDD, @Param("studentId") long studentId);

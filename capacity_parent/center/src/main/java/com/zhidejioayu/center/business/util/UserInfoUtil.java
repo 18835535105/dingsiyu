@@ -36,7 +36,7 @@ public class UserInfoUtil {
     public static ServerConfig getServerInfoByStudentOpenid(String openid) {
         ServerConfig serverConfig = serverConfigMapperStatic.selectStudentServerByOpenid(openid);
         if (serverConfig == null) {
-            throw new ServiceException(400, "中台服务器为查询到openid=" + openid + "的学生或者校管信息！");
+            throw new ServiceException(400, "中台服务器为查询到openid=" + openid + "的学生信息！");
         }
         return serverConfig;
     }
@@ -50,21 +50,7 @@ public class UserInfoUtil {
     public static ServerConfig getServerInfoByTeacherOpenid(String openid) {
         ServerConfig serverConfig = serverConfigMapperStatic.selectTeacherServerByOpenId(openid);
         if (serverConfig == null) {
-            throw new ServiceException(400, "中台服务器为查询到openid=" + openid + "的学生或者校管信息！");
-        }
-        return serverConfig;
-    }
-
-    /**
-     * 通过openid获取校长或者教师服务器信息
-     *
-     * @param openid
-     * @return
-     */
-    public static ServerConfig getTeacherServerConfigByOpenid(String openid) {
-        ServerConfig serverConfig = serverConfigMapperStatic.selectTeacherServerByOpenId(openid);
-        if (serverConfig == null) {
-            throw new ServiceException(400, "中台服务器为查询到openid=" + openid + "的教师或者校管信息！");
+            throw new ServiceException(400, "中台服务器为查询到openid=" + openid + "的学管信息！");
         }
         return serverConfig;
     }

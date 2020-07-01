@@ -114,8 +114,6 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
         Set<Object> keys = redisTemplate.opsForHash().keys(key);
         redisTemplate.opsForHash().delete(key, keys);
 
-        // 清空熟词表数据
-        knownWordsMapper.delete(null);
         log.info("初始化每周活动校区排行结束.");
     }
 

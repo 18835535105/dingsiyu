@@ -85,7 +85,7 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
         switch (id) {
             case 1:
                 // 完成熟词
-                return ServerResponse.createBySuccess(awardListVoBuilder.activityList(this.finishKnownWordsAward(weekActivity)).build());
+                return ServerResponse.createBySuccess(awardListVoBuilder.activityList(this.finishKnownWordsAward(weekActivity, weekActivityConfig)).build());
             case 2:
                 // 学习时长
                 return ServerResponse.createBySuccess(awardListVoBuilder.activityList(this.validTime(weekActivity, weekActivityConfig)).build());
@@ -355,9 +355,9 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
      * @param weekActivity
      * @return
      */
-    private List<AwardListVO.ActivityList> finishKnownWordsAward(WeekActivity weekActivity) {
+    private List<AwardListVO.ActivityList> finishKnownWordsAward(WeekActivity weekActivity, WeekActivityConfig weekActivityConfig) {
         Long studentId = super.getStudentId();
-        int count = knownWordsMapper.countByStudentId(studentId);
+        int count = knownWordsMapper.countByStudentIdThisWeek(studentId, weekActivityConfig.getActivityDateBegin(), weekActivityConfig.getActivityDateEnd());
         return weekActivityRedisOpt.getActivityList(studentId, count, weekActivity);
     }
 

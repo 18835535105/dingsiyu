@@ -83,6 +83,15 @@ public interface BaseSmallAppFeignClient {
     ServerResponse<Object> record(@RequestParam String openId);
 
     /**
+     * 飞行记录学习总览
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/smallApp/index/recordOverview")
+    ServerResponse<Object> recordOverview(@RequestParam String openId);
+
+    /**
      * 补签
      *
      * @param date

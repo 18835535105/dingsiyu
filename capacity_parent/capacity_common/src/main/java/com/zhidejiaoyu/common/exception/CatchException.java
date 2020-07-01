@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolationException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 /**
@@ -65,6 +66,20 @@ public class CatchException {
         HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
         packageLogMsg(e, httpServletRequest);
         return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), new ArrayList<>(e.getConstraintViolations()).get(0).getMessageTemplate());
+    }
+
+    /**
+     * 拦截请求超时异常
+     *
+     * @param e
+     * @param request
+     */
+    @ExceptionHandler(SocketTimeoutException.class)
+    @ResponseStatus(HttpStatus.REQUEST_TIMEOUT)
+    @ResponseBody
+    public ServerResponse<Object> requestTimeOutException(ServiceException e, HttpServletRequest request) {
+        packageLogMsg(e, request);
+        return ServerResponse.createByError(e.getCode(), "请求超时，请稍后重试！");
     }
 
     /**
