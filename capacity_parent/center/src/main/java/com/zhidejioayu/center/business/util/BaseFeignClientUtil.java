@@ -24,11 +24,11 @@ public class BaseFeignClientUtil {
     private Map<String, BaseSmallAppFeignClient> smallAppServerFeignClient;
 
     @Resource
-    private Map<String, BaseQyFeignClient> qyFeignClient;
+    private Map<String, BaseQyFeignClient> qyServerFeignClient;
 
     @PostConstruct
     public void init() {
-        qyFeignClientStatic = this.qyFeignClient;
+        qyFeignClientStatic = this.qyServerFeignClient;
         smallAppFeignClientStatic = this.smallAppServerFeignClient;
     }
 
