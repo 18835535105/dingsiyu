@@ -34,4 +34,18 @@
         where user_id = #{schoolAdminId} limit 1
     </select>
 
+    <select id="selectByLikeAddress" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from
+        join_school
+        where
+        audit_status!=3 and audit_status!=4
+        <if test="address!=null">
+            and address like concat('%',#{address},'%')
+        </if>
+
+
+    </select>
+
 </mapper>

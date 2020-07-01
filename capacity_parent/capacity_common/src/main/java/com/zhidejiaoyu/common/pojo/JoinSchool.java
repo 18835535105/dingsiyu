@@ -29,8 +29,7 @@ public class JoinSchool extends Model<JoinSchool> {
     /**
      * 主键
      */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private String id;
     /**
      * 学校名称
      */
@@ -86,7 +85,7 @@ public class JoinSchool extends Model<JoinSchool> {
      *关联管理员账号id
      */
     @TableField("user_id")
-    private Integer userId;
+    private String userId;
     /**
      * 省
      */
