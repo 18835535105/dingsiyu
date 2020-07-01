@@ -24,7 +24,7 @@ feign:
     config:
       # 通过 default 进行全局配置
       default:
-        loggerLevel: error
+#        logger-level: error
         connectTimeout: 10000
         readTimeout: 10000
   httpclient:
