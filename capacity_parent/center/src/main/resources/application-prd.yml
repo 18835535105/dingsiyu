@@ -6,7 +6,7 @@ spring:
       file-size-threshold: 15MB
   datasource:
     url: jdbc:mysql://39.106.181.151:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: zdjy
+    username: root
     password: zhide8800
   redis:
     host: ${ip}
