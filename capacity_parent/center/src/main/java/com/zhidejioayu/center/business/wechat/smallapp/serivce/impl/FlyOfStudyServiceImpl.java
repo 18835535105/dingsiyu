@@ -5,7 +5,7 @@ import com.zhidejiaoyu.common.mapper.CurrentDayOfStudyMapper;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejioayu.center.business.util.UserInfoUtil;
+import com.zhidejioayu.center.business.util.ServerConfigUtil;
 import com.zhidejioayu.center.business.wechat.feignclient.smallapp.BaseSmallAppFeignClient;
 import com.zhidejioayu.center.business.wechat.feignclient.util.FeignClientUtil;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.FlyOfStudyService;
@@ -25,7 +25,7 @@ public class FlyOfStudyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, 
     }
 
     public BaseSmallAppFeignClient getBaseSmallAppFeignClient(String openId) {
-        ServerConfig serverConfig = UserInfoUtil.getServerInfoByStudentOpenid(openId);
+        ServerConfig serverConfig = ServerConfigUtil.getServerInfoByStudentOpenid(openId);
         return FeignClientUtil.getSmallAppFeignClient(serverConfig.getServerName());
     }
 

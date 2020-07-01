@@ -94,6 +94,20 @@ public class IndexController extends BaseController {
     }
 
     /**
+     * 飞行记录学习总览
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/recordOverview")
+    public ServerResponse<Object> recordOverview(@RequestParam String openId) {
+        if (StringUtils.isEmpty(openId)) {
+            throw new ServiceException("openId can't be null");
+        }
+        return smallAppIndexService.recordOverview(openId);
+    }
+
+    /**
      * 飞行状态
      *
      * @param openId

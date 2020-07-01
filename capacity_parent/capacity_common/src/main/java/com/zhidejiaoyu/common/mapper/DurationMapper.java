@@ -2,8 +2,8 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.vo.SeniorityVo;
-import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
-import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DurationInfoVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DailyStateVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DurationInfoVO;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolDetail;
 import com.zhidejiaoyu.common.pojo.*;
 import org.apache.ibatis.annotations.Delete;
@@ -45,7 +45,7 @@ public interface DurationMapper extends BaseMapper<Duration> {
      * @return
      */
     @Select("select sum(valid_time) from duration where student_id = #{stuId}")
-    Long selectValidTimeByStudentId(@Param("stuId") Long stuId);
+    Long selectTotalValidTimeByStudentId(@Param("stuId") Long stuId);
 
     @Select("select SUM(valid_time) AS valid_time from duration where date_format(login_time, '%Y-%m-%d')>=#{weekStart} and date_format(login_time, '%Y-%m-%d')<=#{weekEnd} AND student_id = #{studentId}")
     Integer totalTime(@Param("weekStart") String weekStart, @Param("weekEnd") String weekEnd, @Param("studentId") Long studentId);
@@ -57,7 +57,7 @@ public interface DurationMapper extends BaseMapper<Duration> {
      * @return
      */
     @Select("SELECT SUM(online_time) FROM duration where student_id = #{stuId}")
-    Integer selectTotalOnlineByStudentId(@Param("stuId") Long stuId);
+    Long selectTotalOnlineByStudentId(@Param("stuId") Long stuId);
 
     /**
      * 获取学生指定时间段的有效时长（单位：秒）
@@ -97,7 +97,6 @@ public interface DurationMapper extends BaseMapper<Duration> {
      * @param student
      * @return map: key: validTime 有效时长，value：onlineTime 在线时长
      */
-    @MapKey("validTime")
     List<Map<String, Object>> selectValidTimeAndOnlineTime(@Param("student") Student student);
 
     /**
@@ -108,6 +107,24 @@ public interface DurationMapper extends BaseMapper<Duration> {
      */
     @Select("select sum(online_time) from duration where student_id = #{student.id}")
     Long countTotalOnlineTime(@Param("student") Student student);
+
+    /**
+     * 获取学生总在线时长
+     *
+     * @param studentId
+     * @return
+     */
+    @Select("select sum(online_time) from duration where student_id = #{studentId}")
+    Long countTotalOnlineTimeByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * 获取学生今天总在线时长
+     *
+     * @param studentId
+     * @return
+     */
+    @Select("select sum(online_time) from duration where student_id = #{studentId} and to_days(login_time) = to_days(now())")
+    Long countTodayOnlineTimeByStudentId(@Param("studentId") Long studentId);
 
     List<SeniorityVo> planSeniority(@Param("grade") String grade, @Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version, @Param("classId") Long classId);
 

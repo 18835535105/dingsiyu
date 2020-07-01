@@ -15,7 +15,8 @@ import com.zhidejiaoyu.common.utils.duration.DurationStudyModelUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DurationInfoVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DurationInfoVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.StudyOverviewVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.impl.ShipIndexServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.dto.PrizeDTO;
@@ -26,6 +27,7 @@ import com.zhidejiaoyu.student.business.wechat.smallapp.vo.index.AdsensesVO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.index.CardVO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.index.IndexVO;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
+import lombok.val;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -62,6 +64,9 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private RunLogMapper runLogMapper;
+
+    @Resource
+    private KnownWordsMapper knownWordsMapper;
 
     @Override
     public ServerResponse<Object> index(String openId) {
@@ -221,6 +226,35 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                         .collect(Collectors.toList()))
                 .canCard(canCard)
                 .msg(msg)
+                .build());
+    }
+
+    @Override
+    public ServerResponse<Object> recordOverview(String openId) {
+        val student = studentMapper.selectByOpenId(openId);
+        Long studentId = student.getId();
+
+        Long validTime = durationMapper.selectTotalValidTimeByStudentId(studentId);
+        if (validTime == null) {
+            validTime = 0L;
+        }
+
+        Long onlineTime = durationMapper.selectTotalOnlineByStudentId(studentId);
+        if (onlineTime == null) {
+            onlineTime = 0L;
+        }
+        if (validTime >= onlineTime) {
+            validTime = Math.round(onlineTime * 0.9);
+        }
+
+        Integer loginCount = runLogMapper.countLoginCountByStudentId(studentId);
+        Integer count = knownWordsMapper.countByStudentId(studentId);
+
+        return ServerResponse.createBySuccess(StudyOverviewVO.builder()
+                .studyCount(loginCount)
+                .totalOnlineTime(onlineTime)
+                .totalValidTime(validTime)
+                .wordCount(count)
                 .build());
     }
 

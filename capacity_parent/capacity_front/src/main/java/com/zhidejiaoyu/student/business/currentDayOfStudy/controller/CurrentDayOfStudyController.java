@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.currentDayOfStudy.controller;
 
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 import com.zhidejiaoyu.student.business.controller.BaseController;
 import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,17 @@ public class CurrentDayOfStudyController extends BaseController {
     @PostMapping("/save")
     public Boolean save(@RequestBody CurrentDayOfStudy currentDayOfStudy) {
         return currentDayOfStudyService.save(currentDayOfStudy);
+    }
+
+    /**
+     * 获取学生当天飞行时间及飞行历程信息
+     *
+     * @return
+     */
+    @GetMapping("/todayInfo")
+    public ServerResponse<Object> getTodayInfo() {
+        StudyTimeAndMileageVO todayInfo = currentDayOfStudyService.getTodayInfo();
+        return ServerResponse.createBySuccess(todayInfo);
     }
 }
 

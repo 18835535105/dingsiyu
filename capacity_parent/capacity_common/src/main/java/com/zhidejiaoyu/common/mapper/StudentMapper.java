@@ -3,7 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DailyStateVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;

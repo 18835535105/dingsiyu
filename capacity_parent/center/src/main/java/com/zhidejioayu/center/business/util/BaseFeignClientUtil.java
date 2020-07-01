@@ -2,6 +2,7 @@ package com.zhidejioayu.center.business.util;
 
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejioayu.center.business.wechat.feignclient.qy.BaseQyFeignClient;
+import com.zhidejioayu.center.business.wechat.feignclient.smallapp.BaseSmallAppFeignClient;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -15,14 +16,20 @@ import java.util.Map;
 @Component
 public class BaseFeignClientUtil {
 
-    private static Map<String, BaseQyFeignClient> qyServerFeignClientStatic;
+    private static Map<String, BaseQyFeignClient> qyFeignClientStatic;
+
+    private static Map<String, BaseSmallAppFeignClient> smallAppFeignClientStatic;
+
+    @Resource
+    private Map<String, BaseSmallAppFeignClient> smallAppServerFeignClient;
 
     @Resource
     private Map<String, BaseQyFeignClient> qyServerFeignClient;
 
     @PostConstruct
     public void init() {
-        qyServerFeignClientStatic = this.qyServerFeignClient;
+        qyFeignClientStatic = this.qyServerFeignClient;
+        smallAppFeignClientStatic = this.smallAppServerFeignClient;
     }
 
     /**
@@ -32,7 +39,18 @@ public class BaseFeignClientUtil {
      * @return
      */
     public static BaseQyFeignClient getBaseQyFeignClient(String openId) {
-       ServerConfig serverConfig = UserInfoUtil.getServerInfoByTeacherOpenid(openId);
-       return qyServerFeignClientStatic.get(serverConfig.getServerName());
+       ServerConfig serverConfig = ServerConfigUtil.getServerInfoByTeacherOpenid(openId);
+       return qyFeignClientStatic.get(serverConfig.getServerName());
+    }
+
+    /**
+     * 通过学生openId微信小程序指定服务的feignClient
+     *
+     * @param openId
+     * @return
+     */
+    public static BaseSmallAppFeignClient getBaseSmallAppFeignClient(String openId) {
+        ServerConfig serverConfig = ServerConfigUtil.getServerInfoByStudentOpenid(openId);
+        return smallAppFeignClientStatic.get(serverConfig.getServerName());
     }
 }

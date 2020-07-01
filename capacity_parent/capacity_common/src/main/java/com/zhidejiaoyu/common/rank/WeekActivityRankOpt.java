@@ -146,7 +146,7 @@ public class WeekActivityRankOpt extends BaseRankOpt {
         switch (weekActivityId) {
             case 1:
                 // 完成熟词
-                int count = knownWordsMapper.countByStudentId(studentId);
+                int count = knownWordsMapper.countByStudentIdThisWeek(studentId, weekActivityConfig.getActivityDateBegin(), weekActivityConfig.getActivityDateEnd());
                 score = count * 1.0;
                 break;
             case 2:

@@ -1,6 +1,7 @@
 package com.zhidejioayu.center.business.wechat.qy.fly.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zhidejiaoyu.common.dto.wechat.qy.fly.UploadFlyRecordDTO;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,16 +12,12 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface QyFlyService extends IService<CurrentDayOfStudy> {
 
-    ServerResponse<Object> getCurrentDayOfStudy(String openId);
-
     /**
      * 上传学生智慧飞行记录
      *
      * @param file
-     * @param studentUuid
-     * @param num
-     * @param studentId
+     * @param uploadFlyRecordDTO
      * @return
      */
-    ServerResponse<Object> uploadFlyRecord(MultipartFile file, String studentUuid, Integer num, Long studentId);
+    ServerResponse<Object> uploadFlyRecord(MultipartFile file, UploadFlyRecordDTO uploadFlyRecordDTO);
 }
