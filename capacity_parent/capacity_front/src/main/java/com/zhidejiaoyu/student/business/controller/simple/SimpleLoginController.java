@@ -103,14 +103,4 @@ public class SimpleLoginController {
         return map;
     }
 
-    /**
-     * 学生退出
-     *
-     * @param session
-     */
-    @PostMapping("/loginOut")
-    public void loginOut(HttpSession session) {
-        session.invalidate();
-    }
-
 }

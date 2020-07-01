@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.currentDayOfStudy.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 
 
 public interface CurrentDayOfStudyService extends IService<CurrentDayOfStudy> {
@@ -22,5 +23,5 @@ public interface CurrentDayOfStudyService extends IService<CurrentDayOfStudy> {
      *
      * @return
      */
-    ServerResponse<Object> getTodayInfo();
+    StudyTimeAndMileageVO getTodayInfo();
 }

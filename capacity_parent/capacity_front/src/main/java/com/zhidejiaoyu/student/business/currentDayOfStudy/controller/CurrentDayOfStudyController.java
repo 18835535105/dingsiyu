@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.currentDayOfStudy.controller;
 
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 import com.zhidejiaoyu.student.business.controller.BaseController;
 import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,8 @@ public class CurrentDayOfStudyController extends BaseController {
      */
     @GetMapping("/todayInfo")
     public ServerResponse<Object> getTodayInfo() {
-        return currentDayOfStudyService.getTodayInfo();
+        StudyTimeAndMileageVO todayInfo = currentDayOfStudyService.getTodayInfo();
+        return ServerResponse.createBySuccess(todayInfo);
     }
 }
 

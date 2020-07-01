@@ -66,12 +66,12 @@ public class ServerResponse<T> implements Serializable {
     /**
      * 自定义响应码及响应信息
      *
-     * @param code 响应码
+     * @param status 响应码
      * @param msg  响应信息
      * @return
      */
-    public static <T> ServerResponse<T> createBySuccess(int code, String msg) {
-        return new ServerResponse<>(code, msg);
+    public static <T> ServerResponse<T> createBySuccess(int status, String msg) {
+        return new ServerResponse<>(status, msg);
     }
 
     public static <T> ServerResponse<T> createByError(int code, String msg) {
@@ -105,8 +105,8 @@ public class ServerResponse<T> implements Serializable {
         return new ServerResponse<>(code.getCode(), code.getMsg());
     }
 
-    public static <T> ServerResponse<T> createBySuccess(int code, T data) {
-        return new ServerResponse<>(code, data);
+    public static <T> ServerResponse<T> createBySuccess(int status, T data) {
+        return new ServerResponse<>(status, data);
     }
 
     /**

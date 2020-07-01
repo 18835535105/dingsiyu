@@ -111,11 +111,20 @@ public interface DurationMapper extends BaseMapper<Duration> {
     /**
      * 获取学生总在线时长
      *
-     * @param student
+     * @param studentId
      * @return
      */
     @Select("select sum(online_time) from duration where student_id = #{studentId}")
     Long countTotalOnlineTimeByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * 获取学生今天总在线时长
+     *
+     * @param studentId
+     * @return
+     */
+    @Select("select sum(online_time) from duration where student_id = #{studentId} and to_days(login_time) = to_days(now())")
+    Long countTodayOnlineTimeByStudentId(@Param("studentId") Long studentId);
 
     List<SeniorityVo> planSeniority(@Param("grade") String grade, @Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version, @Param("classId") Long classId);
 

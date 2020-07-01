@@ -1,7 +1,9 @@
 package com.zhidejiaoyu.student.business.login.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 import com.zhidejiaoyu.student.business.controller.BaseController;
+import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
 import com.zhidejiaoyu.student.business.login.service.LoginService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,9 @@ public class LoginController extends BaseController {
 
     @Resource
     private LoginService newLoginService;
+
+    @Resource
+    private CurrentDayOfStudyService currentDayOfStudyService;
 
     /**
      * 登陆
@@ -73,8 +78,15 @@ public class LoginController extends BaseController {
      * @param session
      */
     @PostMapping("/loginOut")
-    public void loginOut(HttpSession session) {
+    public ServerResponse<Object> loginOut(HttpSession session) {
+        StudyTimeAndMileageVO todayInfo = currentDayOfStudyService.getTodayInfo();
+        if (todayInfo.getMileage() < 4 || todayInfo.getTime() / 60 < 45) {
+            // 小于4个里程或者在线时长小于45分钟不让退出
+            return ServerResponse.createByError(406, "飞行任务还没有完成，请集中注意力，继续飞行！");
+        }
+
         session.invalidate();
+        return ServerResponse.createBySuccess();
     }
 
     /**

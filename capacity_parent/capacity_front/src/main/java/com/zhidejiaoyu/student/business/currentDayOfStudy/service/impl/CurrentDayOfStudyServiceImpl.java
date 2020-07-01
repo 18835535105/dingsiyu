@@ -77,9 +77,9 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
     }
 
     @Override
-    public ServerResponse<Object> getTodayInfo() {
+    public StudyTimeAndMileageVO getTodayInfo() {
         Long studentId = super.getStudentId();
-        Long onlineTime = durationMapper.countTotalOnlineTimeByStudentId(studentId);
+        Long onlineTime =  durationMapper.countTodayOnlineTimeByStudentId(studentId);
 
         int groupCount = learnHistoryMapper.countByStudentIdToDay(studentId);
         int testCount = testRecordMapper.countGoldTestByStudentIdToday(studentId);
@@ -89,7 +89,7 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         StudyTimeAndMileageVO studyTimeAndMileageVO = new StudyTimeAndMileageVO();
         studyTimeAndMileageVO.setMileage(mileage);
         studyTimeAndMileageVO.setTime(onlineTime);
-        return ServerResponse.createBySuccess(studyTimeAndMileageVO);
+        return studyTimeAndMileageVO;
     }
 
     private List<String> getReturnList(String errorInfo) {
