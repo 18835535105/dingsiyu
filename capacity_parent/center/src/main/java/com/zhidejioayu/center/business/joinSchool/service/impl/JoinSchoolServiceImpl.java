@@ -1,16 +1,15 @@
 package com.zhidejioayu.center.business.joinSchool.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.mapper.JoinSchoolMapper;
 import com.zhidejiaoyu.common.pojo.JoinSchool;
 import com.zhidejiaoyu.common.utils.IdUtil;
-import com.zhidejiaoyu.common.vo.WebSocketMessage;
 import com.zhidejioayu.center.business.joinSchool.service.JoinSchoolService;
+import com.zhidejiaoyu.common.vo.joinSchool.JoinSchoolDto;
+import com.zhidejioayu.center.business.joinSchool.vo.JoinSchoolListVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -85,6 +84,77 @@ public class JoinSchoolServiceImpl extends ServiceImpl<JoinSchoolMapper, JoinSch
         map.put("insert", insert);
         map.put("id", joinSchool.getId());
         return map;
+    }
+
+    @Override
+    public JoinSchool selectById(String joinSchoolId) {
+        return joinSchoolMapper.selectById(joinSchoolId);
+    }
+
+    @Override
+    public Map<String, Object> selListJoinSchool(JoinSchoolDto joinSchoolDto) {
+        Integer startIndex = joinSchoolDto.getPageNum() * joinSchoolDto.getPageSize();
+        List<JoinSchool> countJoinSchool = joinSchoolMapper.selBySchool(joinSchoolDto, null, joinSchoolDto.getPageSize());
+        List<JoinSchool> joinSchools = joinSchoolMapper.selBySchool(joinSchoolDto, startIndex, joinSchoolDto.getPageSize());
+        List<JoinSchoolListVo> joinSchoolListVo = this.getJoinSchoolListVo(joinSchools);
+        Map<String, Object> map = new HashMap<>();
+        map.put("total", countJoinSchool.size());
+        map.put("page", countJoinSchool.size() % joinSchoolDto.getPageSize() > 0 ?
+                countJoinSchool.size() / joinSchoolDto.getPageSize() + 1 : countJoinSchool.size() / joinSchoolDto.getPageSize());
+        map.put("rows",joinSchoolListVo);
+        return map;
+    }
+
+    @Override
+    public Object updateJoinSchool(String uuid, String joinSchoolId) {
+        //添加修改条件
+        JoinSchoolDto joinSchoolDto = new JoinSchoolDto();
+        joinSchoolDto.setAuditStatus(1);
+        joinSchoolDto.setDateOfaudit(new Date());
+        joinSchoolDto.setId(joinSchoolId);
+        //进行加盟校修改
+        joinSchoolMapper.updSchoolStatus(joinSchoolDto);
+        joinSchoolDto.setUuid(uuid);
+        //搜索加盟校数量最大值
+        Integer maxReservation = joinSchoolMapper.selMaxjoiningNumber();
+        if (maxReservation == null || maxReservation == 0) {
+            maxReservation = 1034;
+        } else {
+            maxReservation = maxReservation + 1;
+        }
+        joinSchoolDto.setJoiningNumber(maxReservation);
+        joinSchoolDto.setReporting(2);
+        //修改加盟校数据
+        joinSchoolMapper.updSchoolStatusByUserId(joinSchoolDto);
+        return joinSchoolMapper.selectById(joinSchoolId);
+    }
+
+
+    private List<JoinSchoolListVo> getJoinSchoolListVo(List<JoinSchool> joinSchools) {
+        List<JoinSchoolListVo> joinSchoolListVos = new ArrayList<>();
+        for (JoinSchool joinSchool : joinSchools) {
+            JoinSchoolListVo joinSchoolListVo = new JoinSchoolListVo();
+            joinSchoolListVo.setId(joinSchool.getId().toString());
+            joinSchoolListVo.setAddress(joinSchool.getAddress());
+            joinSchoolListVo.setAuditStatus(joinSchool.getAuditStatus());
+            joinSchoolListVo.setPressidentName(joinSchool.getPessidentName());
+            joinSchoolListVo.setSchoolName(joinSchool.getSchoolName());
+            joinSchoolListVo.setPhone(joinSchool.getPhone());
+            joinSchoolListVo.setReporting(joinSchool.getReporting());
+            if (joinSchool.getAuditStatus() == 1) {
+                joinSchoolListVo.setAuditStatusToString("已签约");
+            } else if (joinSchool.getAuditStatus() == 2) {
+                joinSchoolListVo.setAuditStatusToString("未签约");
+            } else if (joinSchool.getAuditStatus() == 3) {
+                joinSchoolListVo.setAuditStatusToString("未通过");
+            } else if (joinSchool.getAuditStatus() == 4) {
+                joinSchoolListVo.setAuditStatusToString("已退约");
+            } else if (joinSchool.getAuditStatus() == 5) {
+                joinSchoolListVo.setAuditStatusToString("已删除");
+            }
+            joinSchoolListVos.add(joinSchoolListVo);
+        }
+        return joinSchoolListVos;
     }
 
 }

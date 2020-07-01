@@ -44,8 +44,43 @@
         <if test="address!=null">
             and address like concat('%',#{address},'%')
         </if>
-
-
+    </select>
+    <select id="selBySchool" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from join_school where 1=1 and reporting &lt;>5
+        <if test="school.pessidentName != null">
+            and pessident_name like concat('%',#{school.pessidentName},'%')
+        </if>
+        <if test="school.schoolName != null and school.schoolName != '全部'">
+            and school_name like concat('%',#{school.schoolName},'%')
+        </if>
+        <if test="school.auditStatus != null and school.auditStatus!= 0">
+            <if test="school.auditStatus == 1">
+                and audit_status = 1
+            </if>
+            <if test="school.auditStatus == 2">
+                and audit_status = 2
+            </if>
+            <if test="school.auditStatus == 3 ">
+                and audit_status = 3 or audit_status = 4
+            </if>
+        </if>
+        <if test="school.auditStatus == 0 or school.auditStatus == null">
+            order by date_of_joining desc
+        </if>
+        <if test="school.auditStatus == 1">
+            order by date_of_audit desc
+        </if>
+        <if test="school.auditStatus == 2">
+            order by date_of_joining desc
+        </if>
+        <if test="school.auditStatus == 3 ">
+            order by date_of_joining desc
+        </if>
+        <if test="start!=null">
+            limit #{start},#{size}
+        </if>
     </select>
 
 </mapper>
