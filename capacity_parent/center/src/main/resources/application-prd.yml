@@ -19,6 +19,13 @@ spring:
       discovery:
         server-addr: nacos.duizhang100.cn:8848
         namespace: 98b133ab-9b67-4919-adb4-e8a1c96db7cf
+  zipkin:
+    base-url: http://${ip}:9411/
+    discoveryClientEnabled: false
+  sleuth:
+    sampler:
+      # 抽样率，默认是0.1（10%）
+      probability: 0.1
 feign:
   client:
     config:
