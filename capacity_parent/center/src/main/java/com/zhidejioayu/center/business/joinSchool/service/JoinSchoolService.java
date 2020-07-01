@@ -2,6 +2,7 @@ package com.zhidejioayu.center.business.joinSchool.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zhidejiaoyu.common.pojo.JoinSchool;
+import com.zhidejiaoyu.common.vo.joinSchool.JoinSchoolDto;
 
 import java.util.Map;
 
@@ -14,5 +15,11 @@ public interface JoinSchoolService extends IService<JoinSchool> {
      * @param joinSchool
      * @return
      */
-    public Map<String,Object> addService(JoinSchool joinSchool);
+    Map<String,Object> addService(JoinSchool joinSchool);
+
+    JoinSchool selectById(String joinSchoolId);
+
+    Map<String,Object> selListJoinSchool(JoinSchoolDto joinSchoolDto);
+
+    Object updateJoinSchool(String uuid, String joinSchoolId);
 }

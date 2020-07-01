@@ -17,4 +17,6 @@ public interface UserInfoService extends IService<BusinessUserInfo> {
      * @return
      */
     BusinessUserInfo getUserInfoByUserUuid(String uuid);
+
+    void getUser(BusinessUserInfo businessUserInfo, String no);
 }

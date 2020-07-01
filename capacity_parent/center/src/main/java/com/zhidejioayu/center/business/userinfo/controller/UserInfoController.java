@@ -71,4 +71,10 @@ public class UserInfoController {
         userInfoRedisOpt.saveUserInfoToCenterServer(businessUserInfo.getUserUuid());
         return save;
     }
+
+    @GetMapping("/user")
+    public void getUser(BusinessUserInfo businessUserInfo, String no) {
+        userInfoService.getUser(businessUserInfo,no);
+        userInfoRedisOpt.saveUserInfoToCenterServer(businessUserInfo.getUserUuid());
+    }
 }
