@@ -20,7 +20,7 @@ public class FeignClientBean {
     private BaseQyFeignClient server1QyAuthFeignClient;
 
     @Resource
-    private BaseSmallAppFeignClient Server1SmallAppAuthFeignClient;
+    private BaseSmallAppFeignClient server1SmallAppAuthFeignClient;
 
     /**
      * 企业微信请求不同服务的feignClient
@@ -44,7 +44,7 @@ public class FeignClientBean {
     @Bean("smallAppServerFeignClient")
     public Map<String, BaseSmallAppFeignClient> smallAppServerFeignClient() {
         Map<String, BaseSmallAppFeignClient> map = new HashMap<>(16);
-        map.put("server1", Server1SmallAppAuthFeignClient);
+        map.put("server1", server1SmallAppAuthFeignClient);
         return map;
     }
 }

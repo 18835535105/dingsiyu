@@ -12,7 +12,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.pojo.center.WeChat;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejioayu.center.business.util.UserInfoUtil;
+import com.zhidejioayu.center.business.util.ServerConfigUtil;
 import com.zhidejioayu.center.business.wechat.feignclient.smallapp.BaseSmallAppFeignClient;
 import com.zhidejioayu.center.business.wechat.feignclient.util.FeignClientUtil;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.GetLimitQRCodeDTO;
@@ -101,7 +101,7 @@ public class SmallProgramTestServiceImpl extends ServiceImpl<StudentMapper, Stud
     }
 
     public ServerConfig getServerConfig(String openId) {
-       return UserInfoUtil.getServerInfoByStudentOpenid(openId);
+       return ServerConfigUtil.getServerInfoByStudentOpenid(openId);
     }
 
 

@@ -39,7 +39,7 @@ public class BaseFeignClientUtil {
      * @return
      */
     public static BaseQyFeignClient getBaseQyFeignClient(String openId) {
-       ServerConfig serverConfig = UserInfoUtil.getServerInfoByTeacherOpenid(openId);
+       ServerConfig serverConfig = ServerConfigUtil.getServerInfoByTeacherOpenid(openId);
        return qyFeignClientStatic.get(serverConfig.getServerName());
     }
 
@@ -50,7 +50,7 @@ public class BaseFeignClientUtil {
      * @return
      */
     public static BaseSmallAppFeignClient getBaseSmallAppFeignClient(String openId) {
-        ServerConfig serverConfig = UserInfoUtil.getServerInfoByStudentOpenid(openId);
+        ServerConfig serverConfig = ServerConfigUtil.getServerInfoByStudentOpenid(openId);
         return smallAppFeignClientStatic.get(serverConfig.getServerName());
     }
 }

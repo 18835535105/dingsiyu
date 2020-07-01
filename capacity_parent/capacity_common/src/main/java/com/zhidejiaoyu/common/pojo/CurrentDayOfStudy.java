@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -88,6 +89,28 @@ public class CurrentDayOfStudy implements Serializable {
      * 错误的考题，多个考题间用##隔开，只统计选择和填空的答错试题
      */
     private String test;
+
+    /**
+     * 老师对学生的评价
+     */
+    private String evaluate;
+
+    /**
+     * 学生表现（1-5颗星）
+     */
+    @TableField("`show`")
+    private Integer show;
+
+    /**
+     * 备注
+     */
+    @TableField("`comment`")
+    private String comment;
+
+    /**
+     * 座位号（在家填写0）
+     */
+    private Integer siteNo;
 
     /**
      * 创建时间

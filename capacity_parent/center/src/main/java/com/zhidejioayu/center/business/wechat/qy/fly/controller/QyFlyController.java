@@ -1,12 +1,16 @@
 package com.zhidejioayu.center.business.wechat.qy.fly.controller;
 
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
+import com.zhidejiaoyu.common.dto.wechat.qy.fly.UploadFlyRecordDTO;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejioayu.center.business.util.UserInfoUtil;
+import com.zhidejioayu.center.business.util.BaseFeignClientUtil;
+import com.zhidejioayu.center.business.util.ServerConfigUtil;
 import com.zhidejioayu.center.business.wechat.feignclient.qy.BaseQyFeignClient;
 import com.zhidejioayu.center.business.wechat.qy.fly.service.QyFlyService;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
+import javax.validation.Valid;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Map;
@@ -25,6 +30,7 @@ import java.util.Map;
  * @author: wuchenxi
  * @date: 2020/6/16 13:52:52
  */
+@Validated
 @RestController
 @RequestMapping("/wechat/qy/fly")
 public class QyFlyController {
@@ -40,23 +46,13 @@ public class QyFlyController {
      * 上传飞行记录
      *
      * @param file
-     * @param openId
-     * @param num         作业本中二维码序号
+     * @param uploadFlyRecordDTO
      * @return
      */
     @PostMapping("/uploadFlyRecord")
-    public ServerResponse<Object> uploadFlyRecord(MultipartFile file, String openId, Integer num, Long studentId) {
+    public ServerResponse<Object> uploadFlyRecord(MultipartFile file, @Valid UploadFlyRecordDTO uploadFlyRecordDTO, BindingResult result) {
         if (file == null) {
             return ServerResponse.createByError(400, "上传的图片不能为空！");
-        }
-        if (StringUtil.isEmpty(openId)) {
-            return ServerResponse.createByError(400, "studentUuid can't be null!");
-        }
-        if (studentId == null) {
-            return ServerResponse.createByError(400, "studentId can't be null!");
-        }
-        if (num == null) {
-            return ServerResponse.createByError(400, "二维码序号不能为空！");
         }
 
         // 文件大小M
@@ -74,7 +70,7 @@ public class QyFlyController {
             return ServerResponse.createByError(400, "上传的文件不是图片类型，请重新上传！");
         }
 
-        return qyFlyService.uploadFlyRecord(file, openId, num, studentId);
+        return qyFlyService.uploadFlyRecord(file, uploadFlyRecordDTO);
     }
 
     /**
@@ -97,7 +93,7 @@ public class QyFlyController {
     }
 
     public BaseQyFeignClient getBaseQyFeignClient(String openId) {
-        ServerConfig serverConfig =  UserInfoUtil.getServerInfoByTeacherOpenid(openId);
+        ServerConfig serverConfig = ServerConfigUtil.getServerInfoByTeacherOpenid(openId);
         return qyServerFeignClient.get(serverConfig.getServerName());
     }
 
@@ -107,7 +103,8 @@ public class QyFlyController {
             return ServerResponse.createByError(400, "openId can't be null!");
         }
 
-        return qyFlyService.getCurrentDayOfStudy(openId);
+        BaseQyFeignClient baseQyFeignClient = BaseFeignClientUtil.getBaseQyFeignClient(openId);
+        return baseQyFeignClient.getCurrentDayOfStudy(openId);
     }
 
 }

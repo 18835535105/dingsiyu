@@ -15,7 +15,7 @@ import javax.annotation.Resource;
  * @date: 2020/6/30 18:29:29
  */
 @Component
-public class UserInfoUtil {
+public class ServerConfigUtil {
 
     private static ServerConfigMapper serverConfigMapperStatic;
 
