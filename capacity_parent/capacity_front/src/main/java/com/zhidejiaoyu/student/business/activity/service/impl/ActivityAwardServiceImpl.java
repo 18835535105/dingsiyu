@@ -132,8 +132,13 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
     }
 
     public ServerResponse<Object> getServerRank(WeekActivityConfig weekActivityConfig, Student student) {
+        int pageNum = PageUtil.getPageNum();
+        int pageSize = PageUtil.getPageSize();
+        long startIndex = (pageNum - 1) * pageSize;
+        long endIndex = startIndex + pageSize;
+
         String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SERVER_RANK;
-        List<Long> studentIds = weekActivityRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, 0L, 30L);
+        List<Long> studentIds = weekActivityRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, 30);
 
         Map<Long, Map<Long, String>> studentIdMap = studentMapper.selectNicknameMapByStudentId(studentIds);
 
