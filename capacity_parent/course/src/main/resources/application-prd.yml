@@ -12,7 +12,6 @@ spring:
     host: ${ip}
     port: 6379
     password: zhide2018
-
   cloud:
     nacos:
       discovery:
