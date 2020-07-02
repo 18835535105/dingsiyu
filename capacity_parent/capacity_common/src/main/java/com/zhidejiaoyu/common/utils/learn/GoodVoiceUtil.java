@@ -144,7 +144,14 @@ public class GoodVoiceUtil {
     }
 
     private int getScore(JSONObject jsonObject) {
-        int score = Math.round(jsonObject.getFloat("PronAccuracy"));
+        Float suggestedScore = jsonObject.getFloat("SuggestedScore");
+        int score;
+        if (suggestedScore != null) {
+            score = Math.round(suggestedScore);
+        } else {
+            score = Math.round(jsonObject.getFloat("PronAccuracy"));
+        }
+
         return score == -1 ? 0 : score;
     }
 
