@@ -60,6 +60,7 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
         } else {
             vo.setGold(0);
         }
+        vo.setDeadline(DateUtil.formatYYYYMMDDHHMMSS(DateUtil.minTime(new Date())));
         return vo;
     }
 

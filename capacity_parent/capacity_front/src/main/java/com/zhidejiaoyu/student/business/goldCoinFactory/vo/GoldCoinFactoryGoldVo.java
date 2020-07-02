@@ -6,5 +6,6 @@ import lombok.Data;
 public class GoldCoinFactoryGoldVo {
     private Long time;
     private Integer gold;
+    private String deadline;
 }
 
