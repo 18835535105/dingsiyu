@@ -704,7 +704,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
             map.put("total", memberSize % pageSize > 0 ? memberSize / pageSize + 1 : memberSize / pageSize);
         } else {
 
-            String key = SourcePowerKeysConst.COUNTRY_RANK;
+            String key = SourcePowerKeysConst.SERVER_RANK;
             studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, null);
             long memberSize = sourcePowerRankOpt.getMemberSize(key);
             map.put("total", memberSize % pageSize > 0 ? memberSize / pageSize + 1 : memberSize / pageSize);
