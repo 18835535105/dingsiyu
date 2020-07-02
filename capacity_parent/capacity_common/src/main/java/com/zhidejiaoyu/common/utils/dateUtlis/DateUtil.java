@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -585,9 +586,13 @@ public class DateUtil implements Serializable {
      * @return String
      **/
     public static Date getWeekStart() {
-        LocalDate now = LocalDate.now();
-        now.withDayOfWeek(DateTimeConstants.MONDAY);
-        return now.toDate();
+        Date date = new Date();
+        Instant instant = date.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+        LocalDateTime monday = localDateTime.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY)).plusDays(1).withHour(0).withMinute(0).withSecond(0);
+        ZonedDateTime zdt = monday.atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
+        return Date.from(zdt.toInstant());
     }
 
     /**
@@ -596,9 +601,13 @@ public class DateUtil implements Serializable {
      * @return String
      **/
     public static Date getWeekEnd() {
-        LocalDate now = LocalDate.now();
-        now.withDayOfWeek(DateTimeConstants.SUNDAY);
-        return now.toDate();
+        Date date = new Date();
+        Instant instant = date.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+        LocalDateTime sunday = localDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).minusDays(1).withHour(23).withMinute(59).withSecond(59);
+        ZonedDateTime sdt = sunday.atZone(zoneId);
+        return Date.from(sdt.toInstant());
     }
 
     private DateUtil() {
