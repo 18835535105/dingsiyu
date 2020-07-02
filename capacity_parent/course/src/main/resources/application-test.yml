@@ -18,13 +18,13 @@ spring:
 
   application:
     name: course
-#  zipkin:
-#    base-url: http://${ip}:9411/
-#    discoveryClientEnabled: false
-#  sleuth:
-#    sampler:
-#      # 抽样率，默认是0.1（10%）
-#      probability: 1.0
+  zipkin:
+    base-url: http://${ip}:9411/
+    discoveryClientEnabled: false
+  sleuth:
+    sampler:
+      # 抽样率，默认是0.1（10%）
+      probability: 1.0
 
 server:
   port: 9050

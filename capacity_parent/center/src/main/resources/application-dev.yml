@@ -20,11 +20,6 @@ spring:
 server:
   port: 9100
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
 feign:
   client:
     config:

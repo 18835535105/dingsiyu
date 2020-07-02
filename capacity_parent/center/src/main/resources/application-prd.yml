@@ -67,3 +67,11 @@ qywx:
     # 授权后重定向的回调链接地址
     redirect_uri: ${studyUrl}/ec/qy/authgetUserInfo
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

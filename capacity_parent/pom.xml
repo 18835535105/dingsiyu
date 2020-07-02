@@ -24,6 +24,7 @@
         <module>aliyun-translate</module>
         <module>center</module>
         <module>course</module>
+        <module>spring-boot-admin</module>
     </modules>
 
 
