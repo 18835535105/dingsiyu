@@ -21,11 +21,12 @@
         <result column="area" property="area"/>
         <result column="user_id" property="userId"/>
         <result column="reporting" property="reporting"/>
+        <result column="grade" property="grade"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, school_name, date_of_joining, pessident_name, phone, longitude, latitude, joining_number, address, audit_status, reservation_number, date_of_audit, province, city, area,user_id,reporting
+        id, school_name, date_of_joining, pessident_name, phone, longitude, latitude, joining_number, address, audit_status, reservation_number, date_of_audit, province, city, area,user_id,reporting,grade
     </sql>
     <select id="selectByUserId" resultMap="BaseResultMap" parameterType="map">
         select

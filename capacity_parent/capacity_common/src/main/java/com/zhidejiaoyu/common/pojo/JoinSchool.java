@@ -109,6 +109,8 @@ public class JoinSchool extends Model<JoinSchool> {
      */
     private Integer reporting;
 
+    private Integer grade;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

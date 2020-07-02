@@ -1,8 +1,8 @@
 package com.zhidejioayu.center.business.joinSchool.controller;
 
 import com.zhidejiaoyu.common.pojo.JoinSchool;
-import com.zhidejioayu.center.business.joinSchool.service.JoinSchoolService;
 import com.zhidejiaoyu.common.vo.joinSchool.JoinSchoolDto;
+import com.zhidejioayu.center.business.joinSchool.service.JoinSchoolService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
