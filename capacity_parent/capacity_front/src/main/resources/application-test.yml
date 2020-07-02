@@ -18,7 +18,13 @@ spring:
 
   application:
     name: server1
-
+  zipkin:
+    base-url: http://${ip}:9411/
+    discoveryClientEnabled: false
+  sleuth:
+    sampler:
+      # 抽样率，默认是0.1（10%）
+      probability: 1.0
 logging:
   config: classpath:log4j2-test.xml
 

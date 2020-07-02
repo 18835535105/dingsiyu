@@ -19,13 +19,19 @@ spring:
         namespace: 98b133ab-9b67-4919-adb4-e8a1c96db7cf
   application:
     name: server1
-
+  zipkin:
+    base-url: http://${ip}:9411/
+    discoveryClientEnabled: false
+  sleuth:
+    sampler:
+      # 抽样率，默认是0.1（10%）
+      probability: 0.1
 feign:
   client:
     config:
       # 通过 default 进行全局配置
       default:
-        loggerLevel: error
+#        loggerLevel: error
         connectTimeout: 10000
         readTimeout: 10000
 
@@ -71,3 +77,11 @@ qywx:
     # 授权后重定向的回调链接地址
     redirect_uri: ${studyUrl}/ec/qy/authgetUserInfo
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

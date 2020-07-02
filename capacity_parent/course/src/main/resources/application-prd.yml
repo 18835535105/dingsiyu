@@ -5,14 +5,13 @@ spring:
     multipart:
       file-size-threshold: 15MB
   datasource:
-    url: jdbc:mysql://39.106.181.151:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: zdjy
-    password: zdjy
+    url: jdbc:mysql://localhost:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: zhide8800
   redis:
     host: ${ip}
     port: 6379
     password: zhide2018
-
   cloud:
     nacos:
       discovery:
@@ -20,6 +19,13 @@ spring:
         namespace: 98b133ab-9b67-4919-adb4-e8a1c96db7cf
   application:
     name: course
+  zipkin:
+    base-url: http://${ip}:9411/
+    discoveryClientEnabled: false
+  sleuth:
+    sampler:
+      # 抽样率，默认是0.1（10%）
+      probability: 0.1
 
 server:
   port: 9050
@@ -50,3 +56,11 @@ qywx:
     # 授权后重定向的回调链接地址
     redirect_uri: ${studyUrl}/ec/qy/authgetUserInfo
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

@@ -1,4 +1,4 @@
-
+ip: 123.56.142.84
 # 测试环境
 spring:
   profiles: test
@@ -18,15 +18,16 @@ spring:
       discovery:
         server-addr: nacos.duizhang100.cn:8848
         namespace: d622563f-9907-43e3-9d00-349c6468678e
-
+  zipkin:
+    base-url: http://${ip}:9411/
+    discoveryClientEnabled: false
+  sleuth:
+    sampler:
+      # 抽样率，默认是0.1（10%）
+      probability: 1.0
 server:
   port: 9100
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
 feign:
   client:
     config:
@@ -41,8 +42,6 @@ feign:
     max-connections-per-route: 50
 logging:
   config: classpath:log4j2-test.xml
-
-ip: 123.56.142.84
 
 studyUrl: http://dev.center.duizhang100.cn
 # 公众号配置信息
