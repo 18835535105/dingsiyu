@@ -41,7 +41,7 @@ public interface TeacherMapper extends BaseMapper<Teacher> {
      */
     Integer selectSchoolAdminIdByTeacherId(@Param("teacherId") Long teacherId);
 
-    @Select("select school_admin_id from teacher where teacher_id = #{id} or school_admin_id = #{id}")
+    @Select("select school_admin_id from teacher where teacher_id = #{id} or school_admin_id = #{id} limit 1")
     Integer getSchoolAdminById(Integer id);
 
     Teacher selectTeacherBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
