@@ -93,7 +93,7 @@ public class JoinSchoolServiceImpl extends ServiceImpl<JoinSchoolMapper, JoinSch
 
     @Override
     public Map<String, Object> selListJoinSchool(JoinSchoolDto joinSchoolDto) {
-        Integer startIndex = joinSchoolDto.getPageNum() * joinSchoolDto.getPageSize();
+        Integer startIndex = (joinSchoolDto.getPageNum() - 1) * joinSchoolDto.getPageSize();
         List<JoinSchool> countJoinSchool = joinSchoolMapper.selBySchool(joinSchoolDto, null, joinSchoolDto.getPageSize());
         List<JoinSchool> joinSchools = joinSchoolMapper.selBySchool(joinSchoolDto, startIndex, joinSchoolDto.getPageSize());
         List<JoinSchoolListVo> joinSchoolListVo = this.getJoinSchoolListVo(joinSchools);
@@ -101,7 +101,7 @@ public class JoinSchoolServiceImpl extends ServiceImpl<JoinSchoolMapper, JoinSch
         map.put("total", countJoinSchool.size());
         map.put("page", countJoinSchool.size() % joinSchoolDto.getPageSize() > 0 ?
                 countJoinSchool.size() / joinSchoolDto.getPageSize() + 1 : countJoinSchool.size() / joinSchoolDto.getPageSize());
-        map.put("rows",joinSchoolListVo);
+        map.put("rows", joinSchoolListVo);
         return map;
     }
 
