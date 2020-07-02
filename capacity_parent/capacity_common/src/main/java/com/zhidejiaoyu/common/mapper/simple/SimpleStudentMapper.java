@@ -336,5 +336,5 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
      * @param schoolAdminId 有值为校区查询 无值为全服查询
      * @return
      */
-    List<Long> selectStudentIdByAdminIdOrAll(Integer schoolAdminId);
+    List<Long> selectStudentIdByAdminIdOrAll(@Param("schoolAdminId") Integer schoolAdminId);
 }
