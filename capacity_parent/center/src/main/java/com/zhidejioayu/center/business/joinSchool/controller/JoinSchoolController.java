@@ -29,7 +29,7 @@ public class JoinSchoolController {
      * @param address 输入的地址
      * @return
      */
-    @RequestMapping(value = "/selSchoolByAddress")
+    @RequestMapping(value = "/selSchoolByAddress", produces = "application/json;charset=utf-8")
     @ResponseBody
     public Object selSchoolByAddress(String address) {
         return joinSchoolService.selSchoolByAddress(address);
@@ -41,7 +41,7 @@ public class JoinSchoolController {
      * @param joinSchool 输入的地址
      * @return
      */
-    @RequestMapping(value = "/add")
+    @RequestMapping(value = "/add", produces = "application/json;charset=utf-8")
     @ResponseBody
     public Object add(JoinSchool joinSchool) {
         return joinSchoolService.addService(joinSchool);
@@ -54,7 +54,7 @@ public class JoinSchoolController {
      * @param joinSchoolId 输入的地址
      * @return
      */
-    @RequestMapping(value = "/selectById")
+    @RequestMapping(value = "/selectById", produces = "application/json;charset=utf-8")
     @ResponseBody
     public JoinSchool selectById(String joinSchoolId) {
         return joinSchoolService.selectById(joinSchoolId);
@@ -63,7 +63,7 @@ public class JoinSchoolController {
     /**
      * 获取列表
      */
-    @GetMapping(value = "/list")
+    @GetMapping(value = "/list", produces = "application/json;charset=utf-8")
     @ResponseBody
     public Object list(JoinSchoolDto joinSchoolDto) {
         return joinSchoolService.selListJoinSchool(joinSchoolDto);
@@ -72,7 +72,7 @@ public class JoinSchoolController {
     /**
      * 修改joinSchool
      */
-    @GetMapping(value = "/updateJoinSchool")
+    @GetMapping(value = "/updateJoinSchool", produces = "application/json;charset=utf-8")
     @ResponseBody
     public Object updateJoinSchool(String uuid, String joinSchoolId) {
         return joinSchoolService.updateJoinSchool(uuid, joinSchoolId);
