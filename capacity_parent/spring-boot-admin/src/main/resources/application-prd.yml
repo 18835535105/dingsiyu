@@ -1,7 +1,0 @@
-spring:
-  profiles: dev
-  cloud:
-    nacos:
-      discovery:
-        server-addr: nacos.duizhang100.cn:8848
-        namespace: 98b133ab-9b67-4919-adb4-e8a1c96db7cf
