@@ -19,4 +19,9 @@ public interface SourcePowerKeysConst {
      * 校区排行
      */
     String SCHOOL_RANK = "SOURCE_POWER_SCHOOL_RANK:" + ServerNoConstant.SERVER_NO + ":";
+
+    /**
+     * 同服务器排行
+     */
+    String SERVER_RANK = "SOURCE_POWER_SERVER_RANK:" + ServerNoConstant.SERVER_NO;
 }
