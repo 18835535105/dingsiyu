@@ -304,53 +304,53 @@
     </update>
     <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Student">
         update student
-        set account = #{account,jdbcType=VARCHAR},
-            password = #{password,jdbcType=VARCHAR},
-            account_time = #{accountTime,jdbcType=TIMESTAMP},
-            province = #{province,jdbcType=VARCHAR},
-            city = #{city,jdbcType=VARCHAR},
-            area = #{area,jdbcType=VARCHAR},
-            school_name = #{schoolName,jdbcType=VARCHAR},
-            student_name = #{studentName,jdbcType=VARCHAR},
-            sex = #{sex,jdbcType=INTEGER},
-            nickname = #{nickname,jdbcType=VARCHAR},
-            birth_date = #{birthDate,jdbcType=DATE},
-            register_date = #{registerDate,jdbcType=TIMESTAMP},
-            grade = #{grade,jdbcType=VARCHAR},
-            squad = #{squad,jdbcType=VARCHAR},
-            wish = #{wish,jdbcType=VARCHAR},
-            phone = #{phone,jdbcType=VARCHAR},
-            patriarch_phone = #{patriarchPhone,jdbcType=VARCHAR},
-            mail = #{mail,jdbcType=VARCHAR},
-            status = #{status,jdbcType=INTEGER},
-            head_url = #{headUrl,jdbcType=VARCHAR},
-            head_name = #{headName,jdbcType=VARCHAR},
-            part_url = #{partUrl,jdbcType=VARCHAR},
-            pet_name = #{petName,jdbcType=VARCHAR},
-            address = #{address,jdbcType=VARCHAR},
-            qq = #{qq,jdbcType=VARCHAR},
-            practical_school = #{practicalSchool,jdbcType=VARCHAR},
-            referrer = #{referrer,jdbcType=VARCHAR},
-            offline_gold = #{offlineGold,jdbcType=DOUBLE},
-            system_gold = #{systemGold,jdbcType=DOUBLE},
-            school_gold_first_time = #{schoolGoldFirstTime,jdbcType=TIMESTAMP},
+        set account                 = #{account,jdbcType=VARCHAR},
+            password                = #{password,jdbcType=VARCHAR},
+            account_time            = #{accountTime,jdbcType=TIMESTAMP},
+            province                = #{province,jdbcType=VARCHAR},
+            city                    = #{city,jdbcType=VARCHAR},
+            area                    = #{area,jdbcType=VARCHAR},
+            school_name             = #{schoolName,jdbcType=VARCHAR},
+            student_name            = #{studentName,jdbcType=VARCHAR},
+            sex                     = #{sex,jdbcType=INTEGER},
+            nickname                = #{nickname,jdbcType=VARCHAR},
+            birth_date              = #{birthDate,jdbcType=DATE},
+            register_date           = #{registerDate,jdbcType=TIMESTAMP},
+            grade                   = #{grade,jdbcType=VARCHAR},
+            squad                   = #{squad,jdbcType=VARCHAR},
+            wish                    = #{wish,jdbcType=VARCHAR},
+            phone                   = #{phone,jdbcType=VARCHAR},
+            patriarch_phone         = #{patriarchPhone,jdbcType=VARCHAR},
+            mail                    = #{mail,jdbcType=VARCHAR},
+            status                  = #{status,jdbcType=INTEGER},
+            head_url                = #{headUrl,jdbcType=VARCHAR},
+            head_name               = #{headName,jdbcType=VARCHAR},
+            part_url                = #{partUrl,jdbcType=VARCHAR},
+            pet_name                = #{petName,jdbcType=VARCHAR},
+            address                 = #{address,jdbcType=VARCHAR},
+            qq                      = #{qq,jdbcType=VARCHAR},
+            practical_school        = #{practicalSchool,jdbcType=VARCHAR},
+            referrer                = #{referrer,jdbcType=VARCHAR},
+            offline_gold            = #{offlineGold,jdbcType=DOUBLE},
+            system_gold             = #{systemGold,jdbcType=DOUBLE},
+            school_gold_first_time  = #{schoolGoldFirstTime,jdbcType=TIMESTAMP},
             country_gold_first_time = #{countryGoldFirstTime,jdbcType=TIMESTAMP},
-            worship_first_time = #{worshipFirstTime,jdbcType=TIMESTAMP},
-            `rank` = #{rank,jdbcType=INTEGER},
-            update_time = #{updateTime,jdbcType=TIMESTAMP},
-            version = #{version,jdbcType=VARCHAR},
-            first_study_time = #{firstStudyTime,jdbcType=TIMESTAMP},
-            course_id = #{courseId,jdbcType=BIGINT},
-            unit_id = #{unitId,jdbcType=BIGINT},
-            course_name = #{courseName,jdbcType=VARCHAR},
-            unit_name = #{unitName,jdbcType=VARCHAR},
-            sentence_course_id = #{sentenceCourseId,jdbcType=BIGINT},
-            sentence_unit_id = #{sentenceUnitId,jdbcType=INTEGER},
-            sentence_course_name = #{sentenceCourseName,jdbcType=VARCHAR},
-            sentence_unit_name = #{sentenceUnitName,jdbcType=VARCHAR},
-            energy = #{energy,jdbcType=INTEGER},
-            diamond = #{diamond,jdbcType=INTEGER},
-            bonus_expires = #{bonusExpires,jdbcType=TIMESTAMP}
+            worship_first_time      = #{worshipFirstTime,jdbcType=TIMESTAMP},
+            `rank`                  = #{rank,jdbcType=INTEGER},
+            update_time             = #{updateTime,jdbcType=TIMESTAMP},
+            version                 = #{version,jdbcType=VARCHAR},
+            first_study_time        = #{firstStudyTime,jdbcType=TIMESTAMP},
+            course_id               = #{courseId,jdbcType=BIGINT},
+            unit_id                 = #{unitId,jdbcType=BIGINT},
+            course_name             = #{courseName,jdbcType=VARCHAR},
+            unit_name               = #{unitName,jdbcType=VARCHAR},
+            sentence_course_id      = #{sentenceCourseId,jdbcType=BIGINT},
+            sentence_unit_id        = #{sentenceUnitId,jdbcType=INTEGER},
+            sentence_course_name    = #{sentenceCourseName,jdbcType=VARCHAR},
+            sentence_unit_name      = #{sentenceUnitName,jdbcType=VARCHAR},
+            energy                  = #{energy,jdbcType=INTEGER},
+            diamond                 = #{diamond,jdbcType=INTEGER},
+            bonus_expires           = #{bonusExpires,jdbcType=TIMESTAMP}
         where id = #{id,jdbcType=BIGINT}
     </update>
 
@@ -388,8 +388,8 @@
             resultMap="BaseResultMap">
         select *
         from student
-        where account = #{account} and
-              password = #{password}
+        where account = #{account}
+          and password = #{password}
     </select>
 
     <sql id="ID_GRADE">
@@ -594,21 +594,25 @@
         GROUP BY s.id
     </select>
     <select id="selectxz" resultType="map">
-        select
-            t.sid           id,
-            count(t.sid) AS xz
-        from (select
-                  s.id                 sid,
-                  count(m.parent_name) tc,
-                  m.parent_name        p
-              from student s, award a, medal m
-              where a.medal_type = m.id and a.get_flag = 1 and s.id = a.student_id
+        select t.sid           id,
+               count(t.sid) AS xz
+        from (select s.id                 sid,
+                     count(m.parent_name) tc,
+                     m.parent_name        p
+              from student s,
+                   award a,
+                   medal m
+              where a.medal_type = m.id
+                and a.get_flag = 1
+                and s.id = a.student_id
               GROUP BY m.parent_name, s.id) t
         where t.tc % 5 = 0
     </select>
 
     <select id="getCourseIdAndUnitId" parameterType="map" resultType="map">
-    	select course_id, unit_id, sentence_course_id, sentence_unit_id from student where id = #{studentId}
+        select course_id, unit_id, sentence_course_id, sentence_unit_id
+        from student
+        where id = #{studentId}
     </select>
     <select id="selectHasStudyRecord" resultType="java.util.Map" parameterType="map">
         select s.account, s.student_name studentName from student s, learn l where l.student_id = s.id and l.student_id
@@ -676,17 +680,21 @@
     </select>
 
     <select id="getStudentAccountTime" resultType="map" parameterType="map">
-        select id, account, student_name, DATE_FORMAT(account_time,'%Y-%m-%d') AS account_time from student where id = #{studentId}
+        select id, account, student_name, DATE_FORMAT(account_time, '%Y-%m-%d') AS account_time
+        from student
+        where id = #{studentId}
     </select>
 
     <update id="updEnergyByAll">
-        update student set energy = 0 where (energy != 0 or energy != null)
+        update student
+        set energy = 0
+        where (energy != 0 or energy != null)
     </update>
 
     <select id="learnUnitsWordSum" parameterType="map" resultType="map">
         select a.unit_id AS id, count(a.id) AS sum
         from learn a
-        JOIN vocabulary b ON a.vocabulary_id = b.id
+                 JOIN vocabulary b ON a.vocabulary_id = b.id
         where a.student_id = #{studentId}
           and a.course_id = #{courseId}
           AND b.delStatus = 1
@@ -744,8 +752,11 @@
     <select id="selWorship" resultMap="BaseResultMap">
         select stu.*
         from student stu
-        join worship worship
-        on stu.id=worship.student_id_by_worship GROUP BY stu.id order by count(worship.id) desc limit 100
+                 join worship worship
+                      on stu.id = worship.student_id_by_worship
+        GROUP BY stu.id
+        order by count(worship.id) desc
+        limit 100
     </select>
 
     <sql id="Base_Column_Student_List">
@@ -1015,7 +1026,11 @@
         limit #{start},#{end}
     </select>
     <select id="selSchoolAdminId" parameterType="map" resultType="integer">
-        select tea.school_admin_id from teacher tea join student stu on tea.teacher_id=stu.teacher_id where stu.id=#{studentId} and stu.status &lt;>3
+        select tea.school_admin_id
+        from teacher tea
+                 join student stu on tea.teacher_id = stu.teacher_id
+        where stu.id = #{studentId}
+          and stu.status &lt;> 3
     </select>
     <select id="getClassOrSchoolStudents" parameterType="map"
             resultType="com.zhidejiaoyu.common.vo.simple.StudentGauntletVo">
@@ -1098,7 +1113,7 @@
         select count(s.id)
         from student s
         where s.account_time is not null
-        and s.teacher_id in (select teacher_id from teacher where school_admin_id = #{schoolAdminId})
+          and s.teacher_id in (select teacher_id from teacher where school_admin_id = #{schoolAdminId})
     </select>
     <select id="selectMaxSourceByClassId" resultType="long" parameterType="map">
         select stu.id
@@ -1120,18 +1135,17 @@
 
     <select id="selectGauntletRankVoByStudentId" parameterType="map"
             resultType="com.zhidejiaoyu.common.vo.GauntletRankVo">
-        select
-        stu.student_name studentName ,
-        stu.system_gold+stu.offline_gold gold,
-        exp.study_power pkNum,
-        exp.source_power sourcePower,
-        stu.province province,
-        stu.head_url headUrl,
-        stu.city city,
-        stu.area area
+        select stu.student_name                   studentName,
+               stu.system_gold + stu.offline_gold gold,
+               exp.study_power                    pkNum,
+               exp.source_power                   sourcePower,
+               stu.province                       province,
+               stu.head_url                       headUrl,
+               stu.city                           city,
+               stu.area                           area
         from student stu
-        left join student_expansion exp
-        on stu.id=exp.student_id
+                 left join student_expansion exp
+                           on stu.id = exp.student_id
         where stu.id = #{studentId}
         group by stu.id
     </select>
@@ -1144,8 +1158,8 @@
         <if test="schoolAdminId!=null">
             and
             (teacher_id in
-            (select teacher_id from teacher where school_admin_id= 295)
-            or teacher_id =295
+            (select teacher_id from teacher where school_admin_id= #{schoolAdminId})
+            or teacher_id =#{schoolAdminId}
             )
         </if>
     </select>
