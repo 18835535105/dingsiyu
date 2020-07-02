@@ -38,7 +38,7 @@ public class LoginFilter implements Filter {
      * 路径中如果包含该数组里的字段，放行
      */
     private static final String[] INCLUDE_URL_ARR = new String[]{"/druid", "/smallApp", "/translate", "/publicAccount",
-            "/clientValidity", "/qy"};
+            "/clientValidity", "/qy", "actuator"};
 
     static {
         URL_MAP = new HashMap<>(16);
