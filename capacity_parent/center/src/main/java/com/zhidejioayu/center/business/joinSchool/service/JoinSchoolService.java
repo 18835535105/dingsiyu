@@ -22,4 +22,6 @@ public interface JoinSchoolService extends IService<JoinSchool> {
     Map<String,Object> selListJoinSchool(JoinSchoolDto joinSchoolDto);
 
     Object updateJoinSchool(String uuid, String joinSchoolId);
+
+    JoinSchoolDto updateJoinSchoolState(String joinSchoolId);
 }

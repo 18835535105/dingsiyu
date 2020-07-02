@@ -77,4 +77,10 @@ public class JoinSchoolController {
     public Object updateJoinSchool(String uuid, String joinSchoolId) {
         return joinSchoolService.updateJoinSchool(uuid, joinSchoolId);
     }
+
+    @GetMapping(value = "/updateJoinSchoolState", produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public JoinSchoolDto updateJoinSchoolState(String joinSchoolId){
+        return joinSchoolService.updateJoinSchoolState(joinSchoolId);
+    }
 }

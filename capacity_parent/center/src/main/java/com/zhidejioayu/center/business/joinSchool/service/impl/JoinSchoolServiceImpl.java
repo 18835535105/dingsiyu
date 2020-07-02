@@ -129,6 +129,18 @@ public class JoinSchoolServiceImpl extends ServiceImpl<JoinSchoolMapper, JoinSch
         return joinSchoolMapper.selectById(joinSchoolId);
     }
 
+    @Override
+    public JoinSchoolDto updateJoinSchoolState(String joinSchoolId) {
+        JoinSchoolDto joinSchoolDto = new JoinSchoolDto();
+        joinSchoolDto.setId(joinSchoolId);
+        joinSchoolDto.setDateOfaudit(new Date());
+        joinSchoolDto.setAuditStatus(3);
+        joinSchoolDto.setReporting(4);
+        //进行修改数据操作
+        joinSchoolMapper.updSchoolStatus(joinSchoolDto);
+        return null;
+    }
+
 
     private List<JoinSchoolListVo> getJoinSchoolListVo(List<JoinSchool> joinSchools) {
         List<JoinSchoolListVo> joinSchoolListVos = new ArrayList<>();
