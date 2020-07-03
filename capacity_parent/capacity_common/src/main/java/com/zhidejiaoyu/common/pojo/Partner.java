@@ -17,7 +17,9 @@ import java.util.Date;
  *
  * @author zdjy
  * @since 2020-05-13
+ * @deprecated 放到中台数据库中
  */
+@Deprecated
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)

@@ -290,7 +290,7 @@
         where student_id = #{studentId}
           and date(login_time) &lt;= date(#{date})
     </select>
-    <select id="selectLearnDateAndOnlineTime" resultType="com.zhidejiaoyu.common.vo.smallapp.studyinfo.DurationInfoVO"
+    <select id="selectLearnDateAndOnlineTime" resultType="com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DurationInfoVO"
             parameterType="map">
         select sum(d.online_time)                  onlineTime,
                date_format(login_time, '%Y-%m-%d') learnDate
@@ -302,7 +302,7 @@
     </select>
 
     <select id="selectDailyStateVOLearnDateAndOnlineTime"
-            resultType="com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO">
+            resultType="com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DailyStateVO">
         select
         s.student_name studentName,
         d.student_id studentId,
@@ -331,7 +331,7 @@
         group by d.student_id
     </select>
 
-    <select id="selectDurationInfos" resultType="com.zhidejiaoyu.common.vo.smallapp.studyinfo.DurationInfoVO"
+    <select id="selectDurationInfos" resultType="com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DurationInfoVO"
             parameterType="map">
         select online_time onlineTime,
         date_format(login_time, '%Y-%m-%d') learnDate, study_model studyModel from duration
@@ -346,7 +346,7 @@
     </select>
 
     <select id="selectTodayDurationInfos"
-            resultType="com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO">
+            resultType="com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DailyStateVO">
         select online_time                         onlineTime,
                date_format(login_time, '%Y-%m-%d') learnDate,
                study_model                         studyModel
@@ -434,6 +434,7 @@
         </if>
         <if test="learningDetails.type == 5">
             /*语法模块*/
+            37,38,39
         </if>
         )
         and learning_model is not null

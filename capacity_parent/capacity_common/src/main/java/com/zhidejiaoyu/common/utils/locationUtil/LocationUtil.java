@@ -44,12 +44,12 @@ public class LocationUtil {
     /**
      * 通过坐标计算两地的距离
      *
-     * @param from  起点坐标
-     * @param to    终点坐标
-     * @return  两点距离 单位：米
+     * @param from 起点坐标
+     * @param to   终点坐标
+     * @return 两点距离 单位：米
      */
     public int getDistance(LongitudeAndLatitude from, LongitudeAndLatitude to) {
-        if (from == null || to == null) {
+        if (from == null || to == null || from.getLongitude() == null || to.getLongitude() == null || from.getLatitude() == null || to.getLatitude() == null) {
             return 0;
         }
         double dx, dy, dew;

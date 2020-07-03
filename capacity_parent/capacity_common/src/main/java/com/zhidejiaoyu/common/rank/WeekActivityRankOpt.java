@@ -56,13 +56,27 @@ public class WeekActivityRankOpt extends BaseRankOpt {
 
 
     /**
-     * 初始化每周活动排行数据
+     * 初始化每周活动校区排行数据
      *
      * @param schoolAdminId
      * @param studentIds
      */
-    public void init(Integer schoolAdminId, List<Long> studentIds) {
+    public void initSchoolRank(Integer schoolAdminId, List<Long> studentIds) {
         String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SCHOOL_RANK + schoolAdminId;
+        initRank(studentIds, key);
+    }
+
+    /**
+     * 初始化每周活动同服务器排行数据
+     *
+     * @param studentIds
+     */
+    public void initServerRank(List<Long> studentIds) {
+        String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SERVER_RANK;
+        initRank(studentIds, key);
+    }
+
+    public void initRank(List<Long> studentIds, String key) {
         if (CollectionUtils.isNotEmpty(studentIds)) {
             studentIds.parallelStream()
                     .forEach(studentId -> {
@@ -85,17 +99,32 @@ public class WeekActivityRankOpt extends BaseRankOpt {
     private void updateRank(Integer schoolAdminId, Long studentId, double score) {
         String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SCHOOL_RANK + schoolAdminId;
         redisTemplate.opsForZSet().add(key, studentId, score);
+
+        String key1 = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SERVER_RANK;
+        redisTemplate.opsForZSet().add(key1, studentId, score);
     }
 
     /**
-     * 查询学生活动完成进度
+     * 查询校区学生活动完成进度
      *
      * @param schoolAdminId
      * @param studentId
      * @return
      */
-    public double getActivityPlan(Integer schoolAdminId, Long studentId) {
+    public double getActivitySchoolPlan(Integer schoolAdminId, Long studentId) {
         String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SCHOOL_RANK + schoolAdminId;
+        Double score = redisTemplate.opsForZSet().score(key, studentId);
+        return score == null ? 0.0 : score;
+    }
+
+    /**
+     * 查询同服务器学生活动完成进度
+     *
+     * @param studentId
+     * @return
+     */
+    public double getActivityServerPlan(Long studentId) {
+        String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SERVER_RANK;
         Double score = redisTemplate.opsForZSet().score(key, studentId);
         return score == null ? 0.0 : score;
     }
@@ -117,7 +146,7 @@ public class WeekActivityRankOpt extends BaseRankOpt {
         switch (weekActivityId) {
             case 1:
                 // 完成熟词
-                int count = knownWordsMapper.countByStudentId(studentId);
+                int count = knownWordsMapper.countByStudentIdThisWeek(studentId, weekActivityConfig.getActivityDateBegin(), weekActivityConfig.getActivityDateEnd());
                 score = count * 1.0;
                 break;
             case 2:

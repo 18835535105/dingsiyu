@@ -452,7 +452,7 @@ public class RedisOpt {
         if (object != null) {
             return false;
         }
-        Integer count = runLogMapper.selectLoginCountByStudentId(studentId);
+        Integer count = runLogMapper.countLoginCountByStudentId(studentId);
         boolean flag = count == 0;
         redisTemplate.opsForHash().put(RedisKeysConst.FIRST_LOGIN, studentId, flag);
         redisTemplate.expire(RedisKeysConst.FIRST_LOGIN, 7, TimeUnit.DAYS);

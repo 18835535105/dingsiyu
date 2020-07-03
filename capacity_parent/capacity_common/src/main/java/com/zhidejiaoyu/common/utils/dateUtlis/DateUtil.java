@@ -2,14 +2,14 @@ package com.zhidejiaoyu.common.utils.dateUtlis;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDate;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -572,16 +572,27 @@ public class DateUtil implements Serializable {
     }
 
     /**
+     * 获取当前时间是当前周的第几天
+     *
+     * @return 从1开始，周一就是1，周日就是7
+     */
+    public static int getCurrentDayOfWeek() {
+        return new DateTime().dayOfWeek().get();
+    }
+
+    /**
      * 获取本周的第一天
      *
      * @return String
      **/
     public static Date getWeekStart() {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.WEEK_OF_MONTH, 0);
-        cal.set(Calendar.DAY_OF_WEEK, 2);
-        Date time = cal.getTime();
-        return time;
+        Date date = new Date();
+        Instant instant = date.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+        LocalDateTime monday = localDateTime.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY)).plusDays(1).withHour(0).withMinute(0).withSecond(0);
+        ZonedDateTime zdt = monday.atZone(zoneId);//Combines this date-time with a time-zone to create a  ZonedDateTime.
+        return Date.from(zdt.toInstant());
     }
 
     /**
@@ -590,10 +601,13 @@ public class DateUtil implements Serializable {
      * @return String
      **/
     public static Date getWeekEnd() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_WEEK, cal.getActualMaximum(Calendar.DAY_OF_WEEK));
-        cal.add(Calendar.DAY_OF_WEEK, 1);
-        return cal.getTime();
+        Date date = new Date();
+        Instant instant = date.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+        LocalDateTime sunday = localDateTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).minusDays(1).withHour(23).withMinute(59).withSecond(59);
+        ZonedDateTime sdt = sunday.atZone(zoneId);
+        return Date.from(sdt.toInstant());
     }
 
     private DateUtil() {

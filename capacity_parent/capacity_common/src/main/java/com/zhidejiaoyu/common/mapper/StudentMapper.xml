@@ -887,7 +887,7 @@ s.uuid,
             from student s where s.id = #{id}
         </foreach>
     </select>
-    <select id="selectByAccounts" resultType="com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO"
+    <select id="selectByAccounts" resultType="com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DailyStateVO"
             parameterType="map">
         select
         s.id studentId,
@@ -933,6 +933,18 @@ s.uuid,
             and (s.account like concat('%', #{dto.accountOrName}, '%') or s.student_name like concat('%',
             #{dto.accountOrName}, '%'))
         </if>) t group by t.id
+    </select>
+    <select id="selectNotDelete" resultMap="BaseResultMap">
+        select
+        <include refid="more_table_List"/>
+        from student s where s.status &lt;> 3
+    </select>
+    <select id="selectByUuid" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from student
+        where `uuid` = #{uuid}
+        limit 1
     </select>
 
 </mapper>

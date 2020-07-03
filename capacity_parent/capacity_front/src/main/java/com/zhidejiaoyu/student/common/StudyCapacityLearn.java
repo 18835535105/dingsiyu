@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.StudentRestudyUtil;
 import com.zhidejiaoyu.common.study.memorystrength.StudyMemoryStrength;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,13 +19,8 @@ import java.util.List;
 @Component
 public class StudyCapacityLearn {
 
-
-    @Autowired
-    private VocabularyMapper vocabularyMapper;
-
-
-    @Autowired
-    private UnitVocabularyMapper unitVocabularyMapper;
+    @Resource
+    private CourseFeignClient courseFeignClient;
 
     @Resource
     private StudyCapacityMapper studyCapacityMapper;
@@ -34,13 +30,6 @@ public class StudyCapacityLearn {
 
     @Resource
     private StudyMemoryStrength studyMemoryStrength;
-    @Resource
-    private SentenceMapper sentenceMapper;
-    @Resource
-    private UnitSentenceNewMapper unitSentenceNewMapper;
-
-    @Resource
-    private UnitVocabularyNewMapper unitVocabularyNewMapper;
 
     /**
      * 保存指定模块的单词学习记录和慧追踪信息
@@ -53,13 +42,13 @@ public class StudyCapacityLearn {
      */
     public StudyCapacity saveCapacityMemory(LearnNew learn, LearnExtend learnExtend, Student student, boolean isKnown, Integer studyModel) {
         if (studyModel < 7) {
-            Vocabulary vocabulary = vocabularyMapper.selectByPrimaryKey(learnExtend.getWordId());
+            Vocabulary vocabulary = courseFeignClient.selectVocabularyById(learnExtend.getWordId());
 //        if (studyModel != 1 && studyModel != 2 && studyModel != 3 && studyModel != 4 && studyModel != 5) {
 //            throw new RuntimeException("studyModel=" + studyModel + " 非法！");
 //        }
             // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
             StudyCapacity capacity = getCapacityInfo(learn, student, studyModel, vocabulary);
-            String wordChinese = unitVocabularyNewMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
+            String wordChinese = courseFeignClient.getWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
             // 封装记忆追踪信息
             if (wordChinese == null) {
                 wordChinese = vocabulary.getWordChinese();
@@ -67,10 +56,10 @@ public class StudyCapacityLearn {
             capacity = packageCapacityInfo(learn, learnExtend, student, isKnown, studyModel, vocabulary, capacity, wordChinese);
             return capacity;
         } else if (studyModel < 11) {
-            Sentence sentence = sentenceMapper.selectById(learnExtend.getWordId());
+            Sentence sentence = courseFeignClient.selectSentenceById(learnExtend.getWordId());
             // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
             StudyCapacity capacity = getCapacityInfo(learn, student, studyModel, sentence);
-            String chinese = unitSentenceNewMapper.selectSentenceChineseByUnitIdAndSentenceId(learn.getUnitId(), sentence.getId());
+            String chinese = courseFeignClient.getSentenceChinsesByUnitIdAndSentenceId(learn.getUnitId(), sentence.getId());
             capacity = packageCapacityInfo(learn, learnExtend, student, isKnown, studyModel, sentence, capacity, chinese);
             return capacity;
         }

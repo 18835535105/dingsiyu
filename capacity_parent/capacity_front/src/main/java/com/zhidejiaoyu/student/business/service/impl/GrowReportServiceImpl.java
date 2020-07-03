@@ -90,11 +90,11 @@ public class GrowReportServiceImpl implements GrowReportService {
         learnSuperviseVO.setDefeatRate((int) (BigDecimalUtil.div((studentTotalCount - studentCount) * 1.0, studentTotalCount, 2) * 100));
 
         // 在线总时长
-        Integer totalOnlineTime = durationMapper.selectTotalOnlineByStudentId(student.getId());
+        Long totalOnlineTime = durationMapper.selectTotalOnlineByStudentId(student.getId());
         learnSuperviseVO.setTotalOnlineTime((int) BigDecimalUtil.div(totalOnlineTime * 1.0, 3600, 0));
 
         // 学习总时长
-        Long totalValidTime = durationMapper.selectValidTimeByStudentId(student.getId());
+        Long totalValidTime = durationMapper.selectTotalValidTimeByStudentId(student.getId());
         learnSuperviseVO.setTotalValidTime((int) BigDecimalUtil.div(totalValidTime * 1.0, 3600, 0));
 
         // 学习效率

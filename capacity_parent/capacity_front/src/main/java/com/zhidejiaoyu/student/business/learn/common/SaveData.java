@@ -16,6 +16,8 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.WordCompletionStudyVo;
 import com.zhidejiaoyu.common.vo.WordWriteStudyVo;
 import com.zhidejiaoyu.common.vo.study.MemoryStudyVo;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.learn.vo.GetVo;
 import com.zhidejiaoyu.student.business.service.ErrorLearnLogService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.common.CurrentDayOfStudyUtil;
@@ -79,6 +81,9 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     @Resource
     private ErrorLearnLogService errorLearnLogService;
 
+    @Resource
+    private CourseFeignClient courseFeignClient;
+
     private final Integer modelType = 1;
 
     @Resource
@@ -102,7 +107,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
-        Integer wordCount = unitVocabularyNewMapper.countByUnitIdAndGroup(unitId, learnNews.getGroup());
+        Integer wordCount = courseFeignClient.countLearnVocabularyByUnitIdAndGroup(unitId, learnNews.getGroup());
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词信息！", unitId);
             return ServerResponse.createByErrorMessage("当前单元下没有单词！");
@@ -111,7 +116,8 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             return super.toUnitTest();
         }
         //获取单词id
-        StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNews.getGroup());
+        List<Long> wordIdByUnitIdAndGroup = courseFeignClient.getWordIdByUnitIdAndGroup(unitId, learnNews.getGroup());
+        StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, learnNews.getGroup(), wordIdByUnitIdAndGroup);
 
         if (studyCapacity != null) {
             // 返回达到黄金记忆点的单词信息
@@ -121,16 +127,14 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         return this.getNextMemoryWord(session, unitId, student, firstStudy, plan, wordCount, learnNews.getGroup(), type, studyModel);
     }
 
-    public boolean saveVocabularyModel(Student student, HttpSession session, Long unitId,
-                                       Long wordId, boolean isTrue, Integer plan,
-                                       Integer total, Long flowId, Integer easyOrHard, Integer type, String studyModel, Integer model) {
+    public boolean saveVocabularyModel(Student student, HttpSession session, GetVo getVo) {
 
         Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
         Long studentId = student.getId();
         judgeIsFirstStudy(session, student);
 
         //获取学生学习当前模块的learn_id
-        List<Long> learnIds = learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard, model);
+        List<Long> learnIds = learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(studentId, getVo.getUnitId(), getVo.getEasyOrHard(), getVo.getModel());
         //如果有多余的删除
         Long learnId = learnIds.get(0);
         if (learnIds.size() > 1) {
@@ -139,7 +143,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         }
 
         //获取learnExtend数据
-        List<LearnExtend> learnExtends = learnExtendMapper.selectByLearnIdsAndWordIdAndStudyModel(learnId, wordId, studyModel);
+        List<LearnExtend> learnExtends = learnExtendMapper.selectByLearnIdsAndWordIdAndStudyModel(learnId, getVo.getWordId(), getVo.getStudyModel());
         LearnExtend currentLearn = null;
         if (learnExtends.size() > 0) {
             currentLearn = learnExtends.get(0);
@@ -154,14 +158,13 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
 
         //查看慧默写  会听写  单词图鉴是否为上次学习 如果是 删除
         //          开始
-        boolean flag;
         //查看当前数据是否为以前学习过的数据
-        List<StudyCapacity> studyCapacities = studyCapacityMapper.selectByStudentIdAndUnitIdAndWordIdAndType(studentId, unitId, wordId, type);
+        List<StudyCapacity> studyCapacities = studyCapacityMapper.selectByStudentIdAndUnitIdAndWordIdAndType(studentId, getVo.getUnitId(), getVo.getWordId(), getVo.getType());
 
-        flag = studyCapacities.size() > 0 && studyCapacities.get(0).getPush().getTime() < System.currentTimeMillis();
+        boolean flag = studyCapacities.size() > 0 && studyCapacities.get(0).getPush().getTime() < System.currentTimeMillis();
 
         if (currentLearn == null && flag) {
-            studyCapacityMapper.deleteByStudentIdAndUnitIdAndVocabulary(studentId, unitId, wordId, type);
+            studyCapacityMapper.deleteByStudentIdAndUnitIdAndVocabulary(studentId, getVo.getUnitId(), getVo.getWordId(), getVo.getType());
             return true;
         }
         LearnExtend learnExtend = new LearnExtend();
@@ -178,73 +181,73 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
 
         }
         learnExtend.setLearnId(learnId);
-        learnExtend.setWordId(wordId);
+        learnExtend.setWordId(getVo.getWordId());
         // 保存学习记录
         // 第一次学习，如果答对记为熟词，答错记为生词
         LearnNew learnNew = learnNewMapper.selectById(learnId);
         if (currentLearn == null) {
             learnExtend.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
-            learnExtend.setStudyModel(studyModel);
+            learnExtend.setStudyModel(getVo.getStudyModel());
             learnExtend.setStudyCount(1);
             learnExtend.setUpdateTime(now);
-            StudyFlowNew currentStudyFlow = this.getCurrentStudyFlowById(flowId);
+            StudyFlowNew currentStudyFlow = this.getCurrentStudyFlowById(getVo.getFlowId());
             if (currentStudyFlow != null) {
                 learnExtend.setFlowName(currentStudyFlow.getFlowName());
             }
-            if (isTrue) {
+            if (getVo.isKnown()) {
                 // 如果认识该单词，记为熟词
                 learnExtend.setStatus(1);
                 learnExtend.setFirstIsKnow(1);
                 knownWordsMapper.insert(KnownWords.builder()
                         .createTime(new Date())
                         .studentId(studentId)
-                        .wordId(wordId)
+                        .wordId(getVo.getWordId())
                         .build());
                 weekActivityRankOpt.updateWeekActivitySchoolRank(student);
             } else {
                 learnExtend.setStatus(0);
                 learnExtend.setFirstIsKnow(0);
                 // 单词不认识将该单词记入记忆追踪中
-                studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, type);
-                long field = 0L;
-                if (model.equals(1)) {
-                    field = CurrentDayOfStudyUtil.getSessionCurrent(VOCABULARY);
+                studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, getVo.getType());
+                Long fieldId = 0L;
+                if (getVo.getModel().equals(1)) {
+                    fieldId = CurrentDayOfStudyUtil.getSessionCurrent(VOCABULARY);
                 }
-                if (model.equals(2)) {
-                    field = CurrentDayOfStudyUtil.getSessionCurrent(SENTENCE);
+                if (getVo.getModel().equals(2)) {
+                    fieldId = CurrentDayOfStudyUtil.getSessionCurrent(SENTENCE);
                 }
-                if (field == 0L) {
-                    if (model.equals(1)) {
-                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, wordId);
+                if (fieldId.equals(0L)) {
+                    if (getVo.getModel().equals(1)) {
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, getVo.getWordId());
                     }
-                    if (model.equals(2)) {
-                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, wordId);
+                    if (getVo.getModel().equals(2)) {
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, getVo.getWordId());
                     }
                 } else {
-                    if (model.equals(1)) {
-                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, field);
+                    if (getVo.getModel().equals(1)) {
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, fieldId);
                     }
-                    if (model.equals(2)) {
-                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, field);
+                    if (getVo.getModel().equals(2)) {
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, fieldId);
                     }
                 }
-                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtend.getWordId()}, null);
+                saveErrorLearnLog(getVo.getUnitId(), getVo.getType(), getVo.getEasyOrHard(), getVo.getStudyModel(), learnNew, new Long[]{learnExtend.getWordId()}, null);
             }
             int count = learnExtendMapper.insert(learnExtend);
             // 统计初出茅庐勋章
             executorService.execute(() -> medalAwardAsync.inexperienced(student));
-            if (count > 0 && total == (plan + 1)) {
+            if (count > 0 && getVo.getTotal() == (getVo.getPlan() + 1)) {
                 return true;
             }
             return count > 0;
         } else {
             learnExtend.setStudyCount(currentLearn.getStudyCount() + 1);
             StudyCapacity studyCapacity;
-            if (isTrue) {
-                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, true, type);
+            if (getVo.isKnown()) {
+                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, true, getVo.getType());
             } else {
-                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, type);
-                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtends.get(0).getWordId()}, null);
+                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, getVo.getType());
+                saveErrorLearnLog(getVo.getUnitId(), getVo.getType(), getVo.getEasyOrHard(), getVo.getStudyModel(), learnNew, new Long[]{learnExtends.get(0).getWordId()}, null);
             }
             // 计算记忆难度
             int memoryDifficult = wordMemoryDifficulty.getMemoryDifficulty(studyCapacity);
@@ -258,7 +261,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 knownWordsMapper.insert(KnownWords.builder()
                         .createTime(new Date())
                         .studentId(studentId)
-                        .wordId(wordId)
+                        .wordId(getVo.getWordId())
                         .build());
                 weekActivityRankOpt.updateWeekActivitySchoolRank(student);
             }
@@ -462,7 +465,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
             Vocabulary currentStudyWord = getVocabulary(unitId, student, group, studyModel);
             // 查询单词释义
-            String wordChinese = unitVocabularyNewMapper.selectWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
+            String wordChinese = courseFeignClient.getWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
             if (type.equals(3)) {
                 MemoryStudyVo memoryStudyVo = getMemoryStudyVo(currentStudyWord.getWord(), currentStudyWord.getSyllable(),
                         plan.longValue(), firstStudy, wordCount.longValue(), 0,
@@ -491,7 +494,9 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     public Vocabulary getVocabulary(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
         List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel, modelType);
-        return vocabularyMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
+        Long[] wordId=new Long[wordIds.size()];
+        wordIds.toArray(wordId);
+        return courseFeignClient.getOneWordNotInIdsNew(wordId, unitId, group);
     }
 
     /**

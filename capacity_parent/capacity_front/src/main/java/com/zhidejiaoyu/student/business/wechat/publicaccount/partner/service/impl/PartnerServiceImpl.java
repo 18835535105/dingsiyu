@@ -1,12 +1,12 @@
 package com.zhidejiaoyu.student.business.wechat.publicaccount.partner.service.impl;
 
-import com.zhidejiaoyu.common.mapper.PartnerMapper;
-import com.zhidejiaoyu.common.pojo.Partner;
+import com.zhidejiaoyu.common.mapper.center.PartnerMapper;
+import com.zhidejiaoyu.common.pojo.center.Partner;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.constant.PartnerConstant;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.service.PartnerService;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.dto.SavePartnerDTO;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.service.PartnerService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

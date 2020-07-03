@@ -32,4 +32,15 @@
         and unit.unit_id =#{unitId}
     </select>
 
+    <select id="selectSentenceIdByUnitIdAndGroup" parameterType="map" resultType="long">
+         select
+		sentence_id
+		from unit_sentence_new unit
+		join sentence sen
+		on unit.sentence_id = sen.id
+		where unit.unit_id =#{unitId}
+		and unit.group =#{group}
+    </select>
+
+
 </mapper>

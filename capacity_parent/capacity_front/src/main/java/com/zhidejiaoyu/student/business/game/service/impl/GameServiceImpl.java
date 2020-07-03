@@ -364,7 +364,6 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         int size = vocabularyVos.size();
         for (int i = 0; i < Math.min(size, BEFORE_LEARN_GAME_COUNT); i++) {
             VocabularyVO vocabularyVO = vocabularyVos.get(i);
-
             Collections.shuffle(tmpVocabularyVos);
             // 从剩余单词中随机取出三个作为错误选项
             List<AnswerVO> vos = tmpVocabularyVos.stream()
@@ -394,6 +393,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             Collections.shuffle(vos);
             SubjectVO subjectVO = SubjectVO.builder()
                     .select(vos)
+                    .readUrl(baiduSpeak.getLanguagePath(vocabularyVO.getWord()))
                     .topic(vocabularyVO.getWordChinese())
                     .build();
 

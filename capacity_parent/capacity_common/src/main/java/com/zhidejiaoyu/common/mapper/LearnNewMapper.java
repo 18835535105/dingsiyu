@@ -44,16 +44,13 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
     /**
      * 获取接下来要学的词信息
      *
-     * @param studentId
      * @param unitId
      * @param wodIds
      * @return
      */
-    Map<String, Object> selectStudyMap(@Param("studentId") Long studentId,
-                                       @Param("unitId") Long unitId,
+    Map<String, Object> selectStudyMap(@Param("unitId") Long unitId,
                                        @Param("wordIds") List<Long> wodIds,
                                        @Param("type") Integer type,
-                                       @Param("model") Integer model,
                                        @Param("group") Integer group);
 
 

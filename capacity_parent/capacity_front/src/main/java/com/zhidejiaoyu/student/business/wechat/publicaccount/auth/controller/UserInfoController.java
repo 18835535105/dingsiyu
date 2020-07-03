@@ -33,14 +33,15 @@ public class UserInfoController {
      * @return
      */
     @GetMapping("/getUserInfo")
-    public String getUserInfo() {
+    public ServerResponse<String> getUserInfo() {
         String code = HttpUtil.getHttpServletRequest().getParameter("code");
         ServerResponse<Object> userInfo = publicAccountService.getUserInfo(code);
         UserInfoVO userInfoVO = (UserInfoVO) userInfo.getData();
 
-        return "redirect:" + redirectUrl + "?openId=" + userInfoVO.getOpenid() +
+        String url = redirectUrl + "?openId=" + userInfoVO.getOpenid() +
                 "&headimgurl=" + userInfoVO.getHeadimgurl() +
                 "&nickname=" + userInfoVO.getNickname() +
                 "&blank=blank";
+        return ServerResponse.createBySuccessMessage(url);
     }
 }

@@ -19,7 +19,7 @@
     <select id="countByUnitId" resultType="java.lang.Integer" parameterType="map">
         select count(distinct st.knowledge_point_id)
         from syntax_topic st,
-             syntax_unit_topic sut
+             syntax_unit_topic_new sut
         where st.id = sut.topic_id
           and sut.unit_id = #{unitId}
     </select>
@@ -27,7 +27,7 @@
         select
         <include refid="more_table_sql"/>
         from syntax_topic st,
-        syntax_unit_topic sut,
+        syntax_unit_topic_new sut,
         knowledge_point kp
         where
         kp.id = st.knowledge_point_id

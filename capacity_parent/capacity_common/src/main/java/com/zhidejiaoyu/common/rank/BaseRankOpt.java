@@ -35,7 +35,7 @@ public class BaseRankOpt {
     }
 
     /**
-     * 按照 score 从高到低查询指定范围内的学生 id，最多取前100名
+     * 按照 score 从高到低查询指定范围内的学生 id
      *
      * @param key
      * @param start 起始索引
@@ -43,7 +43,7 @@ public class BaseRankOpt {
      * @return
      */
     public List<Long> getReverseRangeMembersBetweenStartAndEnd(String key, Long start, Long end) {
-        return this.getReverseRangeMembersBetweenStartAndEnd(key, start, end, 100);
+        return this.getReverseRangeMembersBetweenStartAndEnd(key, start, end, null);
     }
 
     /**
@@ -52,7 +52,7 @@ public class BaseRankOpt {
      * @param key
      * @param start   起始索引
      * @param end     结束索引
-     * @param showNum 排行需要展示的数据量，为空时表示展示所有
+     * @param showNum 排行最多可以展示的数据量，如果是100，则最多只能展示到第100名的数据，为空时表示展示所有
      * @return 学生id
      */
     public List<Long> getReverseRangeMembersBetweenStartAndEnd(String key, Long start, Long end, Integer showNum) {
@@ -67,7 +67,6 @@ public class BaseRankOpt {
             return new ArrayList<>();
         }
         return typedTuples.stream().map(typedTuple -> Long.valueOf(String.valueOf(typedTuple.getValue()))).collect(Collectors.toList());
-
     }
 
     /**

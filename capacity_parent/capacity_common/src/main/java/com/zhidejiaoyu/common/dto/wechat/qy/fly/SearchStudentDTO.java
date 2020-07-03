@@ -11,6 +11,8 @@ import lombok.Data;
 @Data
 public class SearchStudentDTO {
 
+    private String openId;
+
     /**
      * 根据账号或者姓名查询
      */

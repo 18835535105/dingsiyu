@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 任务奖励相关service
@@ -19,7 +20,7 @@ public interface SimpleAwardServiceSimple extends SimpleBaseService<Award> {
      * @param type    1：日奖励；2：任务奖励；3：勋章
      * @return
      */
-    ServerResponse<List<AwardVo>> getAwareInfo(HttpSession session, Integer type);
+    ServerResponse<Map<String, Object>> getAwareInfo(HttpSession session, Integer type);
 
     /**
      * 领取奖励

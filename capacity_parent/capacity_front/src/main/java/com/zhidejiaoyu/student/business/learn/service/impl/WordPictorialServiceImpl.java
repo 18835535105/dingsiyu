@@ -12,8 +12,10 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.WordPictorialVo;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
+import com.zhidejiaoyu.student.business.learn.vo.GetVo;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.ReviewServiceImpl;
 import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
@@ -53,6 +55,8 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
     private LearnExtendMapper learnExtendMapper;
     @Resource
     private WordMemoryDifficulty wordMemoryDifficulty;
+    @Resource
+    private CourseFeignClient courseFeignClient;
 
     private Integer model = 1;
     private Integer type = 1;
@@ -70,7 +74,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         //获取当前单元下的learnId
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard,1);
         //获取是否有可以学习的单词信息
-        int wordCount = unitVocabularyNewMapper.countWordPictureByUnitId(unitId, learnNew.getGroup());
+        int wordCount = courseFeignClient.countWordPictureByUnitId(unitId, learnNew.getGroup());
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词图鉴信息！", unitId);
             return ServerResponse.createByErrorMessage("The unit no pictures");
@@ -168,20 +172,22 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         Map<String, Object> correct;
         //获取当前单词模块已经学习过的wordId
         List<Long> longs = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, studentId, studyModel, 1);
+        Long[] wordId=new Long[longs.size()];
+        longs.toArray(wordId);
         // 获取新词
-        correct = learnNewMapper.selectStudyMap(studentId, unitId, longs, type, model, group);
+        correct =courseFeignClient.getStudyNewMap(unitId, wordId, type, group);
         return correct;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object saveStudy(HttpSession session,
-                            Long unitId, Long wordId, boolean isTrue,
-                            Integer plan, Integer total, Long courseId,
-                            Long flowId, Long[] errorId) {
+    public Object saveStudy(HttpSession session, GetVo getVo) {
         Student student = getStudent(session);
-        if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
-                flowId, easyOrHard, type, studyModel,modelType)) {
+        getVo.setEasyOrHard(easyOrHard);
+        getVo.setType(type);
+        getVo.setStudyModel(studyModel);
+        getVo.setModel(modelType);
+        if (saveData.saveVocabularyModel(student, session, getVo)) {
             return ServerResponse.createBySuccess();
         }
         return ServerResponse.createByErrorMessage("学习记录保存失败");

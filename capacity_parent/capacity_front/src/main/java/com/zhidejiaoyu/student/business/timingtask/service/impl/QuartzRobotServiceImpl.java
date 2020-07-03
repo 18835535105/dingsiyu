@@ -8,7 +8,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.UpLevelConfig;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DailyStateVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzRobotService;
 import org.joda.time.DateTime;

@@ -239,13 +239,14 @@ public class SimpleTestResultUtil implements Serializable {
                 wordChinese = chineseMap.get(vocabulary.getId()).get("wordChinese");
                 SimpleTestResultVO testResult = new SimpleTestResultVO();
                 testResult.setType(type[i]);
+                testResult.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
                 if ("英译汉".equals(type[i]) || "听力理解".equals(type[i])) {
                     testResult.setTitle(vocabulary.getWord());
                     testResult.setId(vocabulary.getId());
                     map2.put(wordChinese, true);
-                    if ("听力理解".equals(type[i])) {
+                    /*if ("听力理解".equals(type[i])) {
                         testResult.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
-                    }
+                    }*/
                     // 从其余题目中随机获取三道题目
                     for (int k = 0; k < (target.size() - 1 > 3 ? 3 : target.size() - 1); ) {
                         int random = (int) (Math.random() * target.size());

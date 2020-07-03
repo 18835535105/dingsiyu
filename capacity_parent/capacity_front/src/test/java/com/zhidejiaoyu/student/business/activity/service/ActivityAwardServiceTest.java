@@ -38,6 +38,6 @@ public class ActivityAwardServiceTest{
         List<Student> students = studentMapper.selectNotDeleteBySchoolAdminId(561);
         List<Long> studentIds = students.parallelStream().map(Student::getId).collect(Collectors.toList());
         redisTemplate.opsForZSet().remove(key, studentIds);
-        weekActivityRankOpt.init(561, studentIds);
+        weekActivityRankOpt.initSchoolRank(561, studentIds);
     }
 }

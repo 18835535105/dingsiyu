@@ -2,7 +2,10 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.KnownWords;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.Date;
 
 /**
  * <p>
@@ -15,11 +18,22 @@ import org.apache.ibatis.annotations.Select;
 public interface KnownWordsMapper extends BaseMapper<KnownWords> {
 
     /**
+     * 查询学生指定日期的熟词数
+     *
+     * @param studentId
+     * @param activityDateBegin
+     * @param activityDateEnd
+     * @return
+     */
+    @Select("select count(distinct word_id) from known_words where student_id = #{studentId} and to_days(now()) >= to_days(#{activityDateBegin}) and to_days(now()) <= to_days(#{activityDateEnd})")
+    int countByStudentIdThisWeek(@Param("studentId") Long studentId, @Param("activityDateBegin") Date activityDateBegin, @Param("activityDateEnd") Date activityDateEnd);
+
+    /**
      * 查询学生的熟词数
      *
      * @param studentId
      * @return
      */
-    @Select("select count(id) from known_words where student_id = #{studentId}")
-    int countByStudentId(Long studentId);
+    @Select("select count(distinct word_id) from known_words where student_id = #{studentId}")
+    Integer countByStudentId(@Param("studentId") Long studentId);
 }

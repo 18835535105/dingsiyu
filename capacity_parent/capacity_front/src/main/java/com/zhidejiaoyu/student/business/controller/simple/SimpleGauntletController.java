@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.controller.simple;
 
+import com.zhidejiaoyu.common.vo.gauntlet.GauntletSortVo;
 import com.zhidejiaoyu.common.vo.simple.StudentGauntletVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.simple.SimpleIGauntletServiceSimple;
@@ -36,8 +37,8 @@ public class SimpleGauntletController {
     @RequestMapping("/getStudentByType")
     public ServerResponse<Map<String, Object>> getStudentByType(HttpSession session, @RequestParam(defaultValue = "1") Integer type,
                                                                 @RequestParam(defaultValue = "1") Integer page, Integer rows,
-                                                                String account) {
-        return gauntletService.getStudentByType(session, type, page, rows, account);
+                                                                String account, GauntletSortVo vo) {
+        return gauntletService.getStudentByType(session, type, page, rows, account, vo);
     }
 
 
@@ -96,8 +97,8 @@ public class SimpleGauntletController {
      * @return
      */
     @RequestMapping("/getGame")
-    public ServerResponse<Object> getGame(Integer pageNum, Long courseId, String gameName, HttpSession session,int type) {
-        return gauntletService.getGame(pageNum, courseId, gameName, session,type);
+    public ServerResponse<Object> getGame(Integer pageNum, Long courseId, String gameName, HttpSession session, int type) {
+        return gauntletService.getGame(pageNum, courseId, gameName, session, type);
     }
 
     /**
@@ -115,15 +116,26 @@ public class SimpleGauntletController {
     /**
      * 查看发起的挑战 和被挑战的次数
      *
-     * @param type          1,发起的挑战  2,被挑战
-     * @param challengeType 0，全部   1，胜  2，失败 3，等待 4，超时  5，平局
-     * @param pageNum       页数
-     * @param rows          每页显示个数
+     * @param type    1,发起的挑战  2,被挑战
+     * @param pageNum 页数
+     * @param rows    每页显示个数
      * @return
      */
     @RequestMapping("/getChallenge")
-    public ServerResponse<Object> getChallenge(Integer type, Integer challengeType, Integer pageNum, Integer rows, HttpSession session) {
-        return gauntletService.getChallenge(type, challengeType, pageNum, rows, session);
+    public ServerResponse<Object> getChallenge(Integer type, Integer pageNum, Integer rows, HttpSession session) {
+        return gauntletService.getChallenge(type, pageNum, rows, session);
+    }
+
+    /**
+     * 查询pk排行榜，
+     *
+     * @param session
+     * @param type    1，本班  2，本校  3，本区
+     * @return
+     */
+    @RequestMapping("/getRank")
+    public ServerResponse<Object> getRank(HttpSession session, Integer type) {
+        return gauntletService.getRank(session, type);
     }
 
 

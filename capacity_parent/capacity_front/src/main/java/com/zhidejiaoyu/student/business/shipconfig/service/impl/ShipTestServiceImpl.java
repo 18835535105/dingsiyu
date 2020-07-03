@@ -501,6 +501,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             return ServerResponse.createByError(401, "今日挑战次数以超出");
         }
         Gauntlet gauntlet = new Gauntlet();
+        gauntlet.setChallengeStudy(expansion.getStudyPower());
         if (type.equals(1)) {
             gauntlet.setChallengeStatus(1);
             gauntlet.setBeChallengerStatus(2);
@@ -508,6 +509,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             if (beChallengedStudent.getStudyPower() > expansion.getStudyPower()) {
                 expansion.setStudyPower(expansion.getStudyPower() + 10);
             }
+            gauntlet.setBeChallengeStudy(beChallengedStudent.getStudyPower());
             // 更新每周活动pk胜利次数
             weekActivityRankOpt.updateWeekActivitySchoolRank(student);
         } else {

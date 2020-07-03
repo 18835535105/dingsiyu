@@ -17,6 +17,19 @@
         id, unit_id, vocabulary_id, classify, word_chinese, `group`, update_time
     </sql>
 
+    <sql id="getByType">
+        <if test="type==1">
+            v.id,
+            v.word,
+            uv.word_chinese,
+            v.recordpicurl,
+            v.small_picture_url smallPictureUrl,
+            v.middle_picture_url middlePictureUrl,
+            v.high_picture_url highPictureUrl,
+            v.sound_mark
+        </if>
+    </sql>
+
     <select id="selectInterferenceTerm" resultType="string" parameterType="map">
         select word_chinese
         from unit_vocabulary_new
@@ -115,5 +128,39 @@
                word_chinese  wordChinese
         FROM unit_vocabulary_new
         WHERE unit_id = #{unitId}
+    </select>
+    <select id="selectWordIdByUnitIdAndGroup" resultType="long" parameterType="map">
+        select
+		distinct voc.id
+		from unit_vocabulary_new unit
+		join vocabulary voc
+		on unit.vocabulary_id = voc.id
+		where unit.unit_id =#{unitId}
+		and unit.group =#{group}
+		and voc.delStatus=1
+    </select>
+
+
+    <select id="selectStudyMap" parameterType="map" resultType="map">
+        SELECT
+        <include refid="getByType"/>
+        FROM vocabulary v
+        join unit_vocabulary_new uv
+        on v.id = uv.vocabulary_id
+        WHERE uv.unit_id = #{unitId}
+        and uv.group=#{group}
+        <if test="type==1">
+            AND v.recordpicurl is not NULL
+        </if>
+        AND v.delStatus = 1
+        <if test="wordIds.size>0">
+            and v.id not in (
+            <foreach collection="wordIds" item="wordId" separator=",">
+                #{wordId}
+            </foreach>
+            )
+        </if>
+        order by v.id
+        LIMIT 1
     </select>
 </mapper>

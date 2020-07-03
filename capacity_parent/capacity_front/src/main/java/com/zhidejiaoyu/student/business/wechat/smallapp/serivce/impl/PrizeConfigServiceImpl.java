@@ -4,7 +4,9 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.center.WeChatMapper;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.center.WeChat;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.PrizeConfigService;
@@ -84,16 +86,16 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         JoinSchool joinSchool = joinSchoolMapper.selectByUserId(adminId.intValue());
         returnMap.put("adress", joinSchool == null ? "北京市海淀区上地国际创业园" : joinSchool.getAddress());
         SysUser sysUser = sysUserMapper.selectById(adminId);
-        StringBuilder sb = new StringBuilder().append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）").append("-");
+        StringBuilder sb = new StringBuilder().append(sysUser.getPhone()).append("（").append(sysUser.getName(), 0, 1).append("老师）").append("-");
         SysUser teacherUser = sysUserMapper.selectById(student.getTeacherId());
         if (teacherUser.getAccount().contains("js")) {
-            sb.append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）");
+            sb.append(sysUser.getPhone()).append("（").append(sysUser.getName(), 0, 1).append("老师）");
         }
         Teacher teacher = teacherMapper.selectTeacherBySchoolAdminId(adminId.intValue());
         returnMap.put("adminPhone", sb.toString());
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId.intValue());
         if (shareConfig != null) {
-            returnMap.put("background", shareConfig.getImgUrl());
+            returnMap.put("background",GetOssFile.getPublicObjectUrl(shareConfig.getImgUrl()));
         } else {
             returnMap.put("background", null);
         }
@@ -103,13 +105,13 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     }
 
     @Override
-    public Object getAdmin(String openId) {
+    public ServerResponse<ReturnAdminVo> getAdmin(String openId) {
         Student student = studentMapper.selectByOpenId(openId);
         Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenreAndStudyModel(student.getId(), GenreConstant.SMALLAPP_GENRE, StudyModelConstant.SMALLAPP_STUDY_MODEL);
         String imgUrl = shareConfigMapper.selectImgByAdminId(adminId);
         WeChat weChat = weChatMapper.selectByOpenId(openId);
-        Long vaildTime = durationMapper.selectValidTimeByStudentId(student.getId());
+        Long vaildTime = durationMapper.selectTotalValidTimeByStudentId(student.getId());
         int wordCount = learnNewMapper.countLearnedWordCount(student.getId());
         ReturnAdminVo returnAdminVo = ReturnAdminVo.builder()
                 .adminId(adminId.longValue())
@@ -132,11 +134,11 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         List<Map<String, Integer>> prizeList = new ArrayList<>();
         Map<String, Integer> integer = new HashMap<>();
         prizeConfigs.forEach(prize -> {
-            Double dou = (prize.getChance() * 100);
-            int addInt = dou.intValue();
+            double dou = (prize.getChance() * 100);
+            int addInt = (int) dou;
             Integer anInt = integer.get("int");
-            Integer minInt;
-            Integer maxInt;
+            int minInt;
+            int maxInt;
             if (anInt == null) {
                 minInt = 0;
                 maxInt = addInt;

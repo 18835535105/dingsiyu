@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.center.ServerConfigMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.center.ServerConfig">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="server_no" jdbcType="VARCHAR" property="serverNo"/>
+        <result column="server_name" jdbcType="VARCHAR" property="serverName"/>
+        <result column="server_ip" jdbcType="VARCHAR" property="serverIp"/>
+        <result column="student_server_url" jdbcType="VARCHAR" property="studentServerUrl"/>
+        <result column="school_server_url" jdbcType="VARCHAR" property="schoolServerUrl"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, server_no, `server_name`, server_ip, student_server_url, school_server_url
+    </sql>
+    <sql id="more_table_sql">
+        sc.id, sc.server_no, sc.`server_name`, sc.server_ip, sc.student_server_url, sc.school_server_url
+    </sql>
+    <select id="selectStudentServerByOpenid" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from server_config sc,
+        business_user_info bui
+        where sc.id = bui.server_config_id
+        and bui.openid like concat('%', #{openid},'%')
+        and bui.account like 'dz%'
+        limit 1
+    </select>
+    <select id="selectByAccount" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from server_config sc,
+        business_user_info bui
+        where sc.id = bui.server_config_id
+        and bui.account = #{account}
+        limit 1
+    </select>
+    <select id="selectTeacherServerByOpenId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from server_config sc,
+        business_user_info bui
+        where sc.id = bui.server_config_id
+        and bui.openid like concat('%', #{openid}, '%')
+        and (bui.account like 'js%' or bui.account like 'xg%')
+        limit 1
+    </select>
+    <select id="selectByUUID" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from server_config sc,
+        business_user_info bui
+        where sc.id = bui.server_config_id
+        and bui.user_uuid = #{uuid}
+        limit 1
+    </select>
+    <select id="selectByServerNo" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from server_config
+        where server_no = #{serverNo}
+        limit 1
+    </select>
+
+</mapper>

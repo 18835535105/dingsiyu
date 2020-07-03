@@ -381,6 +381,14 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         long startIndex = (pageNum - 1) * pageSize;
         long endIndex = startIndex + pageSize;
 
+        if (type == 1) {
+            // 全国排行（前50名）
+            String key = SourcePowerKeysConst.COUNTRY_RANK;
+            List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, 50);
+
+            return this.packageRankVO(key, studentIds, student);
+        }
+
         if (type == 2) {
             // 校区排行（全部学生）
             // 我在校区的排行
@@ -389,10 +397,11 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, null);
             return this.packageRankVO(key, studentIds, student);
         } else {
-            // 全国排行（前50名）
-            String key = SourcePowerKeysConst.COUNTRY_RANK;
-            List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, 50);
+            // 同服务器排行
+            // 我在校区的排行
+            String key = SourcePowerKeysConst.SERVER_RANK;
 
+            List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, 30);
             return this.packageRankVO(key, studentIds, student);
         }
     }

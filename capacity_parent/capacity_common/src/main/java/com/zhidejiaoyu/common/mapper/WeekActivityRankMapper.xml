@@ -10,6 +10,7 @@
         <result column="complate_count" property="complateCount" />
         <result column="create_time" property="createTime" />
         <result column="nick_name" property="nickName" />
+        <result column="type" property="type" />
     </resultMap>
 
 </mapper>

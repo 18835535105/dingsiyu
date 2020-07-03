@@ -1,0 +1,67 @@
+ip: 123.56.142.84
+# 开发环境
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://123.56.142.84:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: zdjy
+    password: zdjy
+  redis:
+    host: ${ip}
+    port: 6380
+    password: zdjy
+  application:
+    name: center
+  cloud:
+    nacos:
+      discovery:
+        server-addr: nacos.duizhang100.cn:8848
+        namespace: a8dd697b-5d6d-4844-bcc7-54a7732644e8
+server:
+  port: 9100
+
+feign:
+  client:
+    config:
+      # 通过 default 进行全局配置
+      default:
+        loggerLevel: full
+        connectTimeout: 10000
+        readTimeout: 10000
+  httpclient:
+    enabled: true
+    max-connections: 200
+    max-connections-per-route: 50
+
+logging:
+  level:
+    com:
+      zhidejiaoyu:
+        center: debug
+        business:
+          wechat:
+            feignclient: debug
+        common:
+          mapper: debug
+  config: classpath:log4j2-dev.xml
+
+studyUrl: http://dev.center.duizhang100.cn
+# 公众号配置信息
+gongzhonghao:
+  appId: wx991c0b0330281fd1
+  secret: e512f4eae621183834ba2376a63eaa8e
+  redirect:
+    # 微信授权结束后跳转到合伙人测试页面的路径
+    partner: ${studyUrl}/partner
+
+# 企业微信配置信息
+qywx:
+  appId: wwe6e0ef9e01f6d6aa
+  secret: pxf5D_K3F9jFPwRTksCRXERkar3rOdOLmyYfImmv11o
+  # 授权链接
+  authLink: https://open.weixin.qq.com/connect/oauth2/authorize?appid=${qywx.appId}&redirect_uri=${qywx.redirect.redirect_uri}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect
+  redirect:
+    # 企业微信登录地址
+    login: ${studyUrl}/qy/login
+    # 授权后重定向的回调链接地址
+    redirect_uri: ${studyUrl}/ec/qy/authgetUserInfo

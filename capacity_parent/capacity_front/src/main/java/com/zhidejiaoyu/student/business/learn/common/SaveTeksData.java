@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.service.TeksService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.TeksServiceImpl;
@@ -28,8 +29,6 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     @Resource
     private BaiduSpeak baiduSpeak;
     @Resource
-    private TeksNewMapper teksNewMapper;
-    @Resource
     private TeksService teksService;
     @Resource
     private TestRecordMapper testRecordMapper;
@@ -37,6 +36,8 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private SaveData saveData;
     @Resource
     private TeacherMapper teacherMapper;
+    @Resource
+    private CourseFeignClient courseFeignClient;
 
     private static final String TEKS = "TEKS";
 
@@ -62,14 +63,14 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     }
 
     private Object breakThroughTheText(Long unitId, Integer group) {
-        List<TeksNew> teks = teksNewMapper.selTeksByUnitIdAndGroup(unitId, group);
+        List<TeksNew> teks = courseFeignClient.selTeksByUnitIdAndGroup(unitId, group);
         return teksService.getTeks(teks);
     }
 
     private Object getTextTraining(Long unitId, Integer group, Long studentId) {
         Map<String, Object> map = new HashMap<>();
         //获取当前单元当前group数据
-        List<TeksNew> teks = teksNewMapper.selTeksByUnitIdAndGroup(unitId, group);
+        List<TeksNew> teks = courseFeignClient.selTeksByUnitIdAndGroup(unitId, group);
         map.put("chooseTeks", getChooseTeks(teks, unitId, studentId));
         map.put("writeTeks", getWriteTeks(teks));
         return ServerResponse.createBySuccess(map);
@@ -122,7 +123,7 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     }
 
     private Object getTeksAuditionData(Long unitId, Integer group) {
-        List<TeksNew> teks = teksNewMapper.selTeksByUnitIdAndGroup(unitId, group);
+        List<TeksNew> teks = courseFeignClient.selTeksByUnitIdAndGroup(unitId, group);
         if (teks.size() > 0) {
             List<TeksNew> resultTeks = new ArrayList<>();
             for (TeksNew teks1 : teks) {

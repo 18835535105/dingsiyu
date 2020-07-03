@@ -3,7 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DailyStateVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -344,4 +344,19 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     List<Student> selectByTeacherIdOrSchoolAdminId(@Param("userId") Integer userId, @Param("dto") SearchStudentDTO dto);
+
+    /**
+     * 查询未被删除的学生信息
+     *
+     * @return
+     */
+    List<Student> selectNotDelete();
+
+    /**
+     * 通过uuid查询学生信息
+     *
+     * @param uuid
+     * @return
+     */
+    Student selectByUuid(@Param("uuid") String uuid);
 }

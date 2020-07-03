@@ -12,6 +12,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 任务奖励controller
@@ -35,7 +36,7 @@ public class SimpleSimpleAwardController {
      * @return
      */
     @GetMapping("/getAwareInfo")
-    public ServerResponse<List<AwardVo>> getAwardInfo(HttpSession session, @Min(0) @Max(3) @RequestParam(defaultValue = "1") Integer type) {
+    public ServerResponse<Map<String, Object>> getAwardInfo(HttpSession session, @Min(0) @Max(3) @RequestParam(defaultValue = "1") Integer type) {
         return simpleAwardService.getAwareInfo(session, type);
     }
 
@@ -70,7 +71,7 @@ public class SimpleSimpleAwardController {
      * 将学生名次表中的数据修改为学生当前的名次
      *
      * @param session
-     * @param type  1：班级排行；2：学校排行；3：全国排行
+     * @param type  1：班级排行；2：学校排行；3：全国排行；4：同服务器排行
      * @return
      */
     @PostMapping("/updateRanking")

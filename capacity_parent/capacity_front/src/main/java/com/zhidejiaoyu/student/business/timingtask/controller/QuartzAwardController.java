@@ -5,6 +5,7 @@ import com.zhidejiaoyu.student.business.timingtask.service.QuartzAwardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
@@ -16,6 +17,7 @@ import javax.annotation.Resource;
  * @author: wuchenxi
  * @Date: 2019/11/25 16:54
  */
+@RestController
 @RequestMapping("/quartz/award")
 public class QuartzAwardController {
 

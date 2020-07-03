@@ -167,6 +167,9 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         // 从时长表中获取 类型+课程+单元+group 数据
         Date now = new Date();
         map.forEach((key, value) -> {
+            if (value == null) {
+                return;
+            }
             List<Map<String, Object>> durationList = durationMapper.selectByLearningDetails(value, beforeDaysDate);
             if (CollectionUtils.isNotEmpty(durationList)) {
                 for (Map<String, Object> stringObjectMap : durationList) {
@@ -199,7 +202,6 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         Long studentId;
         Integer learnType;
 
-        LearningDetails learningDetails = new LearningDetails();
         if (object instanceof LearnNew) {
             LearnNew learnNew = (LearnNew) object;
             courseId = learnNew.getCourseId();
@@ -216,6 +218,7 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
             learnType = this.getLearnHistoryType(learnHistory.getType());
         }
 
+        LearningDetails learningDetails = new LearningDetails();
         learningDetails.setCourseId(courseId);
         learningDetails.setUnitId(unitId);
         learningDetails.setGroup(group);

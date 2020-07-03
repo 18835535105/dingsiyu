@@ -41,16 +41,13 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
      * 查看显示数据
      *
      * @param type
-     * @param challengeType
      * @param start
      * @param end
      * @param studentId
-     * @param time
      * @return
      */
-    List<Gauntlet> selGauntletByTypeAndChallengeType(@Param("type") Integer type, @Param("challengeType") Integer challengeType,
-                                                     @Param("start") Integer start, @Param("end") Integer end, @Param("studentId") Long studentId,
-                                                     @Param("time") String time);
+    List<Gauntlet> selGauntletByTypeAndChallengeType(@Param("type") Integer type, @Param("start") Integer start,
+                                                     @Param("end") Integer end, @Param("studentId") Long studentId);
 
     /**
      * 查看挑战当前学生的挑战数量
@@ -66,12 +63,10 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
      * 查看全部挑战当前学生的数量
      *
      * @param type
-     * @param challengeType
      * @param studentId
-     * @param time
      * @return
      */
-    Integer getCount(@Param("type") Integer type, @Param("challengeType") Integer challengeType, @Param("studentId") Long studentId, @Param("time") String time);
+    Integer getCount(@Param("type") Integer type, @Param("studentId") Long studentId);
 
     Gauntlet getByStudentIdAndBeStudentId(@Param("studentId") Long studentId, @Param("beStudentId") Long beStudentId);
 
@@ -200,5 +195,10 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
      * @return
      */
     List<Map<String, Object>> countByStudentIdsAndStartDateAndEndDate(@Param("studentIds") List<Long> studentIds, @Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    Integer countByStudentIdAndStartDateAndEndDate(@Param("studentId") Long id, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    List<Long> selectSortByStudentId(@Param("studentIds") List<Long> studentIds, @Param("start") long startIndex,
+                                     @Param("end") long endIndex, @Param("sort") Integer sort);
 
 }

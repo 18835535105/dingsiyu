@@ -110,4 +110,13 @@ public interface SimplePersonalCentreServiceSimple extends SimpleBaseService<Cci
      * @return
      */
     ServerResponse needViewCount(HttpSession session);
+
+    /**
+     * 获取等级
+     *
+     * @param myGold
+     * @param levels
+     * @return
+     */
+    String getLevelStr(Integer myGold, List<Map<String, Object>> levels);
 }

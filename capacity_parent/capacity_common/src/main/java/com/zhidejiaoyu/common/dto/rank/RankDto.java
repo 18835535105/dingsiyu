@@ -32,6 +32,7 @@ public class RankDto {
      * 本班排行模块  model = 1
      * 本校模块 model = 2
      * 全国模块 model = 3
+     * 同服务器排行 model=4
      */
     private Integer model;
 

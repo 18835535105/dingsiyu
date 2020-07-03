@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.SmallProgramTestService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -20,12 +21,12 @@ public class AppletTestController {
 
 
     @RequestMapping("/getTest")
-    public Object getTest(HttpSession session, String openId) {
+    public Object getTest(HttpSession session, @RequestParam String openId) {
         return smallProgramTestService.getTest(session, openId);
     }
 
     @RequestMapping("/saveTest")
-    public Object saveTest(Integer point, HttpSession session, String openId) {
+    public Object saveTest(@RequestParam Integer point, HttpSession session, @RequestParam String openId) {
         return smallProgramTestService.saveTest(point, session, openId);
     }
 

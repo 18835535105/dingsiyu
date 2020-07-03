@@ -25,6 +25,7 @@ import com.zhidejiaoyu.student.business.service.simple.SimplePersonalCentreServi
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.annotation.Obsolete;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -736,12 +737,15 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     private Map<String, Object> getWorshipRank(Student student, RankDto rankDto) {
         // 缓存中相对应的 key 值
         String key;
-        if (rankDto.getModel() == 1) {
+        Integer model = rankDto.getModel();
+        if (model == 1) {
             key = RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId();
-        } else if (rankDto.getModel() == 2) {
+        } else if (model == 2) {
             key = RankKeysConst.SCHOOL_WORSHIP_RANK + TeacherInfoUtil.getSchoolAdminId(student);
-        } else {
+        } else if (model == 3) {
             key = RankKeysConst.COUNTRY_WORSHIP_RANK;
+        } else {
+            key = RankKeysConst.SERVER_WORSHIP_RANK;
         }
 
         return packageResultMap(student, rankDto, key);
@@ -757,12 +761,15 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     private Map<String, Object> getCcieRank(Student student, RankDto rankDto) {
         // 缓存中相对应的 key 值
         String key;
-        if (rankDto.getModel() == 1) {
+        Integer model = rankDto.getModel();
+        if (model == 1) {
             key = RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId();
-        } else if (rankDto.getModel() == 2) {
+        } else if (model == 2) {
             key = RankKeysConst.SCHOOL_CCIE_RANK + TeacherInfoUtil.getSchoolAdminId(student);
-        } else {
+        } else if (model == 3) {
             key = RankKeysConst.COUNTRY_CCIE_RANK;
+        } else {
+            key = RankKeysConst.SERVER_CCIE_RANK;
         }
 
         return packageResultMap(student, rankDto, key);
@@ -778,12 +785,15 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     private Map<String, Object> getMedalRank(Student student, RankDto rankDto) {
         // 缓存中相对应的 key 值
         String key;
-        if (rankDto.getModel() == 1) {
+        Integer model = rankDto.getModel();
+        if (model == 1) {
             key = RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId();
-        } else if (rankDto.getModel() == 2) {
+        } else if (model == 2) {
             key = RankKeysConst.SCHOOL_MEDAL_RANK + TeacherInfoUtil.getSchoolAdminId(student);
-        } else {
+        } else if (model == 3) {
             key = RankKeysConst.COUNTRY_MEDAL_RANK;
+        } else {
+            key = RankKeysConst.SERVER_MEDAL_RANK;
         }
 
         worshipMapper.updateState(student.getId());
@@ -801,12 +811,15 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     private Map<String, Object> getGoldRank(Student student, RankDto rankDto) {
         // 缓存中相对应的 key 值
         String key;
-        if (rankDto.getModel() == 1) {
+        Integer model = rankDto.getModel();
+        if (model == 1) {
             key = RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId();
-        } else if (rankDto.getModel() == 2) {
+        } else if (model == 2) {
             key = RankKeysConst.SCHOOL_GOLD_RANK + TeacherInfoUtil.getSchoolAdminId(student);
-        } else {
+        } else if (model == 3) {
             key = RankKeysConst.COUNTRY_GOLD_RANK;
+        } else {
+            key = RankKeysConst.SERVER_GOLD_RANK;
         }
 
         return packageResultMap(student, rankDto, key);
@@ -862,13 +875,12 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
         Integer page = rankDto.getPage();
         long startIndex = (long) page == 1 ? 0 : (page - 1) * rows;
-        List<Long> studentIds = rankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, startIndex + rows);
+        List<Long> studentIds = rankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, startIndex + rows, 100);
         if (studentIds.size() > 0) {
             studentIds.forEach(id -> {
                 Map<String, Object> dataMap = new HashMap<>(16);
                 Student student1 = simpleStudentMapper.selectById(id);
                 if (student1 == null) {
-                    rankOpt.deleteMember(key, id);
                     log.warn("未查询到 id 为[{}]的学生！", id);
                     return;
                 }
@@ -939,7 +951,8 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         return totalPages;
     }
 
-    private String getLevelStr(Integer myGold, List<Map<String, Object>> levels) {
+    @Override
+    public String getLevelStr(Integer myGold, List<Map<String, Object>> levels) {
         String level = "";
         if (myGold >= 50) {
             int myrecord = 0;

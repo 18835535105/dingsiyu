@@ -39,8 +39,8 @@
     <select id="selectByUnitIdAndStudentIdAndType" parameterType="map" resultType="long">
         select distinct extend.word_id
         from learn_extend extend
-        join learn_new learn on extend.learn_id = learn.id
-
+        join learn_new learn
+        on extend.learn_id = learn.id
         where learn.student_id = #{studentId}
           and learn.unit_id = #{unitId}
           and extend.study_model = #{type}
@@ -59,14 +59,12 @@
     <select id="countLearnWord" resultType="int" parameterType="map">
         select count(distinct extend.word_id)
         from learn_extend extend
-                 join learn_new ln
-                      on extend.learn_id = ln.id
-                 join unit_vocabulary_new unit
-                      on unit.unit_id = ln.unit_id
+            join learn_new ln
+            on extend.learn_id = ln.id
         where extend.learn_id = #{learnId}
-          and unit.unit_id = #{unitId}
-          and unit.group = #{group}
-          and extend.study_model = #{studyModel}
+            and ln.unit_id=#{unitId}
+			and ln.group = #{group}
+            and extend.study_model = #{studyModel}
     </select>
 
     <select id="selectLearnedByUnitId" parameterType="map" resultType="map">

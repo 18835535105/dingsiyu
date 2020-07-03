@@ -3,22 +3,25 @@ package com.zhidejiaoyu.student.business.login.service.impl;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
+import com.zhidejiaoyu.common.constant.ServerNoConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
+import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.rank.RankOpt;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.DurationUtil;
-import com.zhidejiaoyu.common.utils.MacIpUtil;
-import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
+import com.zhidejiaoyu.common.utils.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LocationUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LongitudeAndLatitude;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.feignclient.center.ServerConfigFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.center.UserInfoFeignClient;
 import com.zhidejiaoyu.student.business.login.service.LoginService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
@@ -94,6 +97,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Resource
     private SysUserMapper sysUserMapper;
 
+    @Resource
+    private UserInfoFeignClient userInfoFeignClient;
+
     /**
      * 账号关闭状态
      */
@@ -114,6 +120,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private WeekHistoryPlanMapper weekHistoryPlanMapper;
+
+    @Resource
+    private ServerConfigFeignClient serverConfigFeignClient;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -186,6 +195,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 addUnclock(stu);
                 getStudentEqument(stu);
                 this.isOtherLocation(stu, finalIp);
+                this.saveUserInfoToCenterServer(stu);
             });
             // 2.判断是否需要完善个人信息
             if (!StringUtils.isNotBlank(stu.getHeadUrl())) {
@@ -206,6 +216,36 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             return ServerResponse.createBySuccess("1", result);
         }
 
+    }
+
+    /**
+     * 保存学生信息到中台服务器
+     *
+     * @param student
+     */
+    private void saveUserInfoToCenterServer(Student student) {
+        Boolean exist = userInfoFeignClient.isExist(student.getUuid());
+        if (exist) {
+            return;
+        }
+
+        ServerConfig serverConfig = serverConfigFeignClient.getByServerNo(ServerNoConstant.SERVER_NO);
+        if (serverConfig == null) {
+            log.error("server_config未配置server_no={}的服务器信息！请联系管理员！", ServerNoConstant.SERVER_NO);
+            throw new ServiceException("服务器配置异常，请联系管理员！");
+        }
+
+        BusinessUserInfo businessUserInfo = new BusinessUserInfo();
+        businessUserInfo.setAccount(student.getAccount());
+        businessUserInfo.setCreateTime(new Date());
+        businessUserInfo.setId(IdUtil.getId());
+        businessUserInfo.setOpenid(student.getOpenid());
+        businessUserInfo.setPassword(student.getPassword());
+        businessUserInfo.setServerConfigId(serverConfig.getId());
+        businessUserInfo.setUpdateTime(new Date());
+        businessUserInfo.setUserUuid(student.getUuid());
+
+        userInfoFeignClient.saveUserInfo(businessUserInfo);
     }
 
     private void getStudentEqument(Student stu) {
@@ -507,6 +547,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         boolean flag = redisOpt.firstLogin(student.getId());
         if (flag) {
             student.setAccountTime(new Date(System.currentTimeMillis() + student.getRank() * 24 * 60 * 60 * 1000L));
+            student.setUuid(IdUtil.getId());
             studentMapper.updateById(student);
 
             executorService.execute(() -> {
@@ -518,6 +559,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
                 initStudentExpansion(student);
             });
+        } else if (StringUtil.isEmpty(student.getUuid())) {
+            student.setUuid(IdUtil.getId());
+            studentMapper.updateById(student);
         }
     }
 
@@ -592,18 +636,22 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         double goldCount = BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold());
         rankOpt.addOrUpdate(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), goldCount);
         rankOpt.addOrUpdate(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, student.getId(), goldCount);
+        rankOpt.addOrUpdate(RankKeysConst.SERVER_GOLD_RANK, student.getId(), goldCount);
         rankOpt.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), goldCount);
 
         rankOpt.addOrUpdate(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.SCHOOL_CCIE_RANK + schoolAdminId, student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.SERVER_CCIE_RANK, student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.COUNTRY_CCIE_RANK, student.getId(), 0.0);
 
         rankOpt.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.SCHOOL_MEDAL_RANK + schoolAdminId, student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.SERVER_MEDAL_RANK, student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId(), 0.0);
 
         rankOpt.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.SERVER_WORSHIP_RANK, student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId(), 0.0);
     }
 

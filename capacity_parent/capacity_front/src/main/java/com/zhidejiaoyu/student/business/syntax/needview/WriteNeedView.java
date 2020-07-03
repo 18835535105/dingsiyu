@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.business.syntax.needview;
 
-import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
 import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
@@ -9,6 +8,7 @@ import com.zhidejiaoyu.common.pojo.KnowledgePoint;
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.syntax.KnowledgePointVO;
 import com.zhidejiaoyu.common.vo.syntax.TopicVO;
@@ -73,8 +73,8 @@ public class WriteNeedView implements INeedView {
             return ServerResponse.createBySuccess(WriteSyntaxVO.builder()
                     .knowledgePoint(pointVO)
                     .topic(TopicVO.builder()
-                            .answer(answer)
-                            .title(syntaxTopic.getTopic())
+                            .answer(StringUtil.replaceSpecialSpaceToNormalSpace(answer))
+                            .title(StringUtil.replaceSpecialSpaceToNormalSpace(syntaxTopic.getTopic()))
                             .build())
                     .memoryDifficult(memoryDifficulty)
                     .memoryStrength(memoryStrength)

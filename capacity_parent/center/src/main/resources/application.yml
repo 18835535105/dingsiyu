@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: center
+  profiles:
+    active: dev
+  http:
+    encoding:
+      force: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Chongqing
+  main:
+    allow-bean-definition-overriding: true
+server:
+  servlet:
+    context-path: /center
+  tomcat:
+    uri-encoding: utf-8
+    connection-timeout: 30m
+
+mybatis:
+  type-aliases-package: com.zhidejiaoyu.common.pojo
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+
+baidu: https://fanyi.baidu.com/gettts?lan=en&spd=3&source=web&text=
+
+# ip location，IP定位，距离计算
+# 腾讯地图，接口地址：https://lbs.qq.com/webservice_v1/guide-gcoder.html
+tencent:
+  map:
+    key: UGPBZ-SVC6X-O3W43-TYLAQ-CVERH-OFF65
+    url: https://apis.map.qq.com/ws/geocoder/v1/
+  # 腾讯距离计算，接口地址：https://lbs.qq.com/webservice_v1/guide-distance.html
+  distance:
+    url: https://apis.map.qq.com/ws/distance/v1/
+  # 腾讯 ip 定位
+  location:
+    url: https://apis.map.qq.com/ws/location/v1/ip
+
+youdao:
+  # youdao voice create
+  create: https://dict.youdao.com/dictvoice?type=2&audio=
+  # 有道翻译
+  appKey: 22e4622be137dac9
+  youdaoUrl: https://openapi.youdao.com/api
+  md5Key: OsGxRcsnty1MGvnGEOPPRGM8DK2dAAka
+  from: EN
+  to: zh-CHS
+

@@ -7,6 +7,7 @@
         <id column="id" property="id"/>
         <result column="avatar" property="avatar"/>
         <result column="openid" property="openid"/>
+        <result column="uuid" property="uuid"/>
         <result column="account" property="account"/>
         <result column="password" property="password"/>
         <result column="salt" property="salt"/>
@@ -25,6 +26,18 @@
         select id, account, name, openid
         from sys_user
         where openid = #{openId}
+        limit 1
+    </select>
+    <select id="selectByAccount" resultMap="BaseResultMap" parameterType="map">
+        select *
+        from sys_user
+        where account = #{account}
+        limit 1
+    </select>
+    <select id="selectByUuid" resultMap="BaseResultMap">
+        select *
+        from sys_user
+        where uuid = #{uuid}
         limit 1
     </select>
 

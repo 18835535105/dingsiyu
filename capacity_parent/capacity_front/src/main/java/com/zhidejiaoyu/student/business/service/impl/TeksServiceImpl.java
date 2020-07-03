@@ -22,6 +22,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.sentence.CourseUnitVo;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TeksService;
 import com.zhidejiaoyu.student.business.test.service.TestService;
@@ -144,6 +145,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private LearnNewMapper learnNewMapper;
     @Resource
     private TestService testService;
+    @Resource
+    private CourseFeignClient courseFeignClient;
 
 
     @Override
@@ -1049,7 +1052,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<TeksNew> addTeks = null;
         //根据清楚后的语句小于4句时添加
         if (useTeks.size() < 4) {
-            addTeks = teksNewMapper.getTwentyTeks();
+            addTeks = courseFeignClient.getTwentyTeks();
         }
         return getReturnTestTeks(useTeks, addTeks);
     }

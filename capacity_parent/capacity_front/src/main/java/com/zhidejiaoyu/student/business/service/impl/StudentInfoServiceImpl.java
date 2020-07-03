@@ -598,6 +598,16 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         return ServerResponse.createBySuccess(map);
     }
 
+    @Override
+    public Student getByUuid(String uuid) {
+        return studentMapper.selectByUuid(uuid);
+    }
+
+    @Override
+    public Student getByOpenId(String openId) {
+        return studentMapper.selectByOpenId(openId);
+    }
+
     /**
      * 获取已经获取的勋章图片
      *

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.center.PartnerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.center.Partner">
+        <id column="id" property="id"/>
+        <result column="openId" property="openId"/>
+        <result column="nickname" property="nickname"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="total_sorce" property="totalSorce"/>
+        <result column="type" property="type"/>
+        <result column="economic_value" property="economicValue"/>
+        <result column="over_person" property="overPerson"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="countByOpenId" parameterType="map" resultType="integer">
+        select
+        count(id)
+        from partner
+        where openId=#{openId}
+    </select>
+
+
+    <delete id="deleteByOpenId" parameterType="map">
+        delete
+        from partner
+        where openId=#{openId}
+    </delete>
+
+</mapper>

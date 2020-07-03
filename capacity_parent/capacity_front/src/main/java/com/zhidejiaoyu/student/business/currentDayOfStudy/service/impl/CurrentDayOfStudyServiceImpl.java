@@ -1,24 +1,20 @@
 package com.zhidejiaoyu.student.business.currentDayOfStudy.service.impl;
 
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
-import com.zhidejiaoyu.common.mapper.CurrentDayOfStudyMapper;
-import com.zhidejiaoyu.common.mapper.DurationMapper;
-import com.zhidejiaoyu.common.mapper.GoldLogMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
-import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.vo.CurrentDayOfStudyVo;
+import com.zhidejiaoyu.common.vo.currentdayofstudy.CurrentDayOfStudyVo;
+import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapper, CurrentDayOfStudy> implements CurrentDayOfStudyService {
@@ -32,47 +28,79 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
     @Resource
     private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
 
+    @Resource
+    private LearnHistoryMapper learnHistoryMapper;
+
+    @Resource
+    private TestRecordMapper testRecordMapper;
+
     @Override
-    public Object getCurrentDayOfStudy(HttpSession session) {
+    public ServerResponse<Object> getCurrentDayOfStudy() {
+        return this.getCurrentDayOfStudy(super.getStudentId());
+    }
+
+    @Override
+    public ServerResponse<Object> getCurrentDayOfStudy(Long studentId) {
+
         CurrentDayOfStudyVo vo = new CurrentDayOfStudyVo();
-        Student student = getStudent(session);
-        String dateStr = DateUtil.formatYYYYMMDDHHMMSS(new Date());
         vo.setTime(DateUtil.formatYYYYMMDD(new Date()) + "日 飞行记录");
-        Integer gold = goldLogMapper.selectGoldByStudentIdAndDate(student.getId(), DateUtil.parseYYYYMMDDHHMMSS(dateStr), 1);
+        String dateStr = DateUtil.formatYYYYMMDDHHMMSS(new Date());
+        Integer gold = goldLogMapper.selectGoldByStudentIdAndDate(studentId, DateUtil.parseYYYYMMDDHHMMSS(dateStr), 1);
         if (gold != null && gold > 0) {
             vo.setGold(gold);
         } else {
             vo.setGold(0);
         }
-        Long validTime = durationMapper.selectValidTimeByStudentIdAndDate(student.getId(), dateStr);
+        Long validTime = durationMapper.selectValidTimeByStudentIdAndDate(studentId, dateStr);
         if (validTime != null && validTime > 0) {
             vo.setValidTime(validTime.intValue());
         } else {
             vo.setValidTime(0);
         }
-        Long onlineTime = durationMapper.selectByStudentIdAndDate(student.getId(), dateStr);
+        Long onlineTime = durationMapper.selectByStudentIdAndDate(studentId, dateStr);
         if (onlineTime != null && onlineTime > 0) {
             vo.setOnlineTime(onlineTime.intValue());
         } else {
             vo.setOnlineTime(0);
         }
-        String errorTest = currentDayOfStudyRedisOpt.getStudyModelAndTestStudyCurrent(RedisKeysConst.ERROR_TEST, student.getId());
+        String errorTest = currentDayOfStudyRedisOpt.getStudyModelAndTestStudyCurrent(RedisKeysConst.ERROR_TEST, studentId);
         vo.setTest(getReturnList(errorTest));
-        String errorStudyModel = currentDayOfStudyRedisOpt.getStudyModelAndTestStudyCurrent(RedisKeysConst.STUDY_MODEL, student.getId());
+        String errorStudyModel = currentDayOfStudyRedisOpt.getStudyModelAndTestStudyCurrent(RedisKeysConst.STUDY_MODEL, studentId);
         vo.setStudyModel(getReturnList(errorStudyModel));
-        String errorWord = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_WORD, student.getId(), 1);
+        String errorWord = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, 1);
         vo.setWord(getReturnList(errorWord));
-        String errorSentence = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SENTENCE, student.getId(), 2);
+        String errorSentence = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, 2);
         vo.setSentence(getReturnList(errorSentence));
-        String errorSyntax = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SYNTAX, student.getId(), 3);
+        String errorSyntax = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SYNTAX, studentId, 3);
         vo.setSyntax(getReturnList(errorSyntax));
         return ServerResponse.createBySuccess(vo);
     }
 
-    private List<String> getReturnList(String errorTest) {
-        String[] split = errorTest.split("##");
+    @Override
+    public StudyTimeAndMileageVO getTodayInfo() {
+        Long studentId = super.getStudentId();
+        Long onlineTime =  durationMapper.countTodayOnlineTimeByStudentId(studentId);
+
+        int groupCount = learnHistoryMapper.countByStudentIdToDay(studentId);
+        int testCount = testRecordMapper.countGoldTestByStudentIdToday(studentId);
+
+        int mileage = groupCount + testCount * 3;
+
+        StudyTimeAndMileageVO studyTimeAndMileageVO = new StudyTimeAndMileageVO();
+        studyTimeAndMileageVO.setMileage(mileage);
+        studyTimeAndMileageVO.setTime(onlineTime);
+        return studyTimeAndMileageVO;
+    }
+
+    private List<String> getReturnList(String errorInfo) {
+        if (StringUtil.isEmpty(errorInfo)) {
+            return null;
+        }
+        String[] split = errorInfo.split("##");
         if (split.length > 0) {
-            return Arrays.asList(split);
+            List<String> strings = Arrays.asList(split);
+            Set<String> set = new HashSet<>(strings);
+            return new ArrayList<>(set);
         }
         return null;
     }
