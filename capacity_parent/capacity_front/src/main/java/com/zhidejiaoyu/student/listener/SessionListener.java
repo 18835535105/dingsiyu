@@ -31,8 +31,8 @@ import java.util.concurrent.TimeUnit;
 @WebListener
 public class SessionListener implements HttpSessionListener {
 
-    @Value("${quartz.port}")
-    private String port;
+//    @Value("${quartz.port}")
+    private String port = "8083";
 
     @Autowired
     private LoginService loginService;
