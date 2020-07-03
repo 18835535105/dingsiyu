@@ -1,7 +1,7 @@
 
 # 预生产环境，业务人员测试使用
 spring:
-  profiles: prd-prd
+  profiles: pre-prd
   datasource:
     url: jdbc:mysql://${ip}:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: zdjy
