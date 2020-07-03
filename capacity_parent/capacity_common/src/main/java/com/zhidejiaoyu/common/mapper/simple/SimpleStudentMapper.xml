@@ -1121,6 +1121,7 @@
         join student_expansion exp
         on stu.id=exp.student_id
         where
+        exp.source_power!=null and exp.source_power>0
         <if test="classId!=null">
             stu.class_id =#{classId}
         </if>
