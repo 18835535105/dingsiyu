@@ -337,4 +337,6 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
      * @return
      */
     List<Long> selectStudentIdByAdminIdOrAll(@Param("schoolAdminId") Integer schoolAdminId);
+
+    List<Long> selectStudentIdByClassIdOrTeacherId(@Param("classId") Long classId,@Param("teacherId") Long teacherId);
 }

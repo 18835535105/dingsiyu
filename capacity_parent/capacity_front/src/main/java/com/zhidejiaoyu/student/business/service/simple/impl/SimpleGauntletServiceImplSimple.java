@@ -117,14 +117,18 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         returnMap.put("rows", rows);
         List<Long> studentIds;
         if (type == 2) {
-            // 校区排行（全部学生）
-            // 我在校区的排行
-            studentIds = simpleStudentMapper.selectStudentIdByAdminIdOrAll(schoolAdminId);
+
+
+            // 全国排行（前50名）
+            //studentIds = simpleStudentMapper.selectStudentIdByAdminIdOrAll(null);
+            //本班排行
+            studentIds = simpleStudentMapper.selectStudentIdByClassIdOrTeacherId(student.getClassId(),student.getTeacherId());
             returnMap.put("total", studentIds.size() % rows > 0 ? studentIds.size() / rows + 1 : studentIds.size() / rows);
             studentIds = getRankStudent(vo, studentIds, startIndex, rows);
         } else {
-            // 全国排行（前50名）
-            studentIds = simpleStudentMapper.selectStudentIdByAdminIdOrAll(null);
+            // 校区排行（全部学生）
+            studentIds = simpleStudentMapper.selectStudentIdByAdminIdOrAll(schoolAdminId);
+
             returnMap.put("total", studentIds.size() % rows > 0 ? studentIds.size() / rows + 1 : studentIds.size() / rows);
             studentIds = getRankStudent(vo, studentIds, startIndex, rows);
         }

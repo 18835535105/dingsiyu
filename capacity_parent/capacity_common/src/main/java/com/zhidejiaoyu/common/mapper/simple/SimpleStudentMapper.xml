@@ -1163,6 +1163,19 @@
             )
         </if>
     </select>
+    <select id="selectStudentIdByClassIdOrTeacherId" parameterType="map" resultType="long">
+        select
+        id
+        from student
+        where
+        account_time > now()
+        <if test="classId!=null">
+            and class_id=#{classId}
+        </if>
+        <if test="classId==null and teacherId!=null">
+            and teacher_id=#{teacherId}
+        </if>
+    </select>
 
 
 </mapper>
