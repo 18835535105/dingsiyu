@@ -31,11 +31,14 @@ public class UserInfoServiceImpl extends ServiceImpl<BusinessUserInfoMapper, Bus
 
     @Override
     public void getUser(BusinessUserInfo businessUserInfo, String no) {
-        ServerConfig serverConfig = serverConfigMapper.selectByServerNo(no);
-        businessUserInfo.setCreateTime(new Date());
-        businessUserInfo.setUpdateTime(new Date());
-        businessUserInfo.setServerConfigId(serverConfig.getId());
-        businessUserInfo.setId(IdUtil.getId());
-        businessUserInfoMapper.insert(businessUserInfo);
+        BusinessUserInfo info = businessUserInfoMapper.selectByUserUuid(businessUserInfo.getUserUuid());
+        if (info == null) {
+            ServerConfig serverConfig = serverConfigMapper.selectByServerNo(no);
+            businessUserInfo.setCreateTime(new Date());
+            businessUserInfo.setUpdateTime(new Date());
+            businessUserInfo.setServerConfigId(serverConfig.getId());
+            businessUserInfo.setId(IdUtil.getId());
+            businessUserInfoMapper.insert(businessUserInfo);
+        }
     }
 }
