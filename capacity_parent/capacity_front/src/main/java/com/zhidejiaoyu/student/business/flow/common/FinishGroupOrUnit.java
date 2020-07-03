@@ -160,10 +160,11 @@ public class FinishGroupOrUnit {
                         .easyOrHard(isEasy ? 1 : 2)
                         .lastUnit(true)
                         .studyFlowNew(studyFlowNew)
+                        .group(dto.getGroup())
                         .build(), unitNew);
             }
-        } else {
-
+        } else if (!dto.getStudyFlowNew().getModelName().contains("语法")) {
+            // 当前流程不是语法流程，可以学习当前单元的语法；如果当前流程是语法流程，说明当前单元的语法已经学习过，不再学习
             // 将当前单元的已学习记录状态置为已完成
             learnHistoryMapper.updateStateByStudentIdAndUnitId(dto.getStudent().getId(), dto.getUnitId(), 2);
 
@@ -184,6 +185,7 @@ public class FinishGroupOrUnit {
                     .easyOrHard(isEasy ? 1 : 2)
                     .lastUnit(isLastUnit)
                     .studyFlowNew(studyFlowNew)
+                    .group(dto.getGroup())
                     .build(), unitNew);
         }
         return null;
@@ -200,7 +202,7 @@ public class FinishGroupOrUnit {
                 .easyOrHard(dto.getEasyOrHard())
                 .unitId(syntaxUnitId)
                 .courseId(syntaxCourseId)
-                .build(), 1, 4);
+                .build(), dto.getGroup(), 4);
 
         initData.initStudentFlow(NodeDto.builder()
                 .nodeId(studyFlowNew.getId())
