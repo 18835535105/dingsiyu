@@ -201,5 +201,4 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
     List<Long> selectSortByStudentId(@Param("studentIds") List<Long> studentIds, @Param("start") long startIndex,
                                      @Param("end") long endIndex, @Param("sort") Integer sort);
 
-    List<Long> selectWinnerSortByStudentIds(List<Long> studentIds, long startIndex, long endIndex, Integer winner);
 }

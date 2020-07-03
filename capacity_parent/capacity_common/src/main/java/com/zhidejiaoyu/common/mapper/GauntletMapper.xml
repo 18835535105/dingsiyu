@@ -295,7 +295,7 @@
         group by challenger_student_id
     </select>
     <select id="selectSortByStudentId" resultType="long" parameterType="map">
-        select  challenger_student_id studentId from gauntlet
+        select challenger_student_id studentId from gauntlet
         where challenger_student_id in (
         <foreach collection="studentIds" item="studentId" separator=",">
             #{studentId}
@@ -308,6 +308,7 @@
         <if test="sort==2">
             order by count(id) asc
         </if>
+        limit #{start},#{end}
     </select>
 
 

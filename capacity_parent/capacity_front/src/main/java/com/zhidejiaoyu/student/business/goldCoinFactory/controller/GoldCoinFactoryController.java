@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.business.goldCoinFactory.controller;
 
-import com.zhidejiaoyu.common.dto.rank.RankDto;
 import com.zhidejiaoyu.student.business.controller.BaseController;
 import com.zhidejiaoyu.student.business.goldCoinFactory.service.GoldCoinFactoryService;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,12 +17,12 @@ public class GoldCoinFactoryController extends BaseController {
 
 
     @RequestMapping("/getList")
-    public Object getList(HttpSession session){
+    public Object getList(HttpSession session) {
         return goldCoinFactoryService.getList(session);
     }
 
     @RequestMapping("index")
-    public Object index(HttpSession session){
+    public Object index(HttpSession session) {
         return goldCoinFactoryService.getIndex(session);
     }
 

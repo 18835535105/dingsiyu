@@ -112,7 +112,6 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         //更改过时挑战
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
         long startIndex = (page - 1) * rows;
-        long endIndex = rows;
         Map<String, Object> returnMap = new HashMap<>();
         returnMap.put("page", page);
         returnMap.put("rows", rows);
@@ -122,12 +121,12 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
             // 我在校区的排行
             studentIds = simpleStudentMapper.selectStudentIdByAdminIdOrAll(schoolAdminId);
             returnMap.put("total", studentIds.size() % rows > 0 ? studentIds.size() / rows + 1 : studentIds.size() / rows);
-            studentIds = getRankStudent(vo, studentIds, startIndex, endIndex);
+            studentIds = getRankStudent(vo, studentIds, startIndex, rows);
         } else {
             // 全国排行（前50名）
             studentIds = simpleStudentMapper.selectStudentIdByAdminIdOrAll(null);
             returnMap.put("total", studentIds.size() % rows > 0 ? studentIds.size() / rows + 1 : studentIds.size() / rows);
-            studentIds = getRankStudent(vo, studentIds, startIndex, endIndex);
+            studentIds = getRankStudent(vo, studentIds, startIndex, rows);
         }
         List<StudentGauntletVo> classOrSchoolStudents = new ArrayList<>();
         getListStudentGauntletVo(classOrSchoolStudents, studentIds);
