@@ -1120,13 +1120,15 @@
         from student stu
         join student_expansion exp
         on stu.id=exp.student_id
-        where
-        <if test="classId!=null">
-            stu.class_id =#{classId}
-        </if>
-        <if test="classId==null">
-            stu.teacher_id =#{teacherId}
-        </if>
+        <where>
+            stu.account_time is not null
+            <if test="classId!=null">
+                and stu.class_id =#{classId}
+            </if>
+            <if test="classId==null">
+                and stu.teacher_id =#{teacherId}
+            </if>
+        </where>
         order by exp.source_power
         <if test="start!=null">
             limit #{start},#{end}
