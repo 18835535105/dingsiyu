@@ -13,7 +13,7 @@ import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.wechat.qy.LoginVO;
-import com.zhidejioayu.center.business.wechat.feignclient.qy.BaseQyFeignClient;
+import com.zhidejioayu.center.business.feignclient.qy.BaseQyFeignClient;
 import com.zhidejioayu.center.business.wechat.qy.auth.dto.LoginDTO;
 import com.zhidejioayu.center.business.wechat.qy.auth.service.QyAuthService;
 import com.zhidejioayu.center.business.wechat.qy.auth.vo.UserIdToOpenidVO;

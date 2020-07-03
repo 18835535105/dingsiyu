@@ -2,6 +2,8 @@ package com.zhidejiaoyu.common.vo.student.studentinfowithschool;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 校区下学生当天在线信息明细
  *
@@ -9,7 +11,7 @@ import lombok.Data;
  * @Date: 2019/11/5 14:21
  */
 @Data
-public class StudentInfoSchoolDetail {
+public class StudentInfoSchoolDetail implements Serializable {
 
     /**
      * 学校名

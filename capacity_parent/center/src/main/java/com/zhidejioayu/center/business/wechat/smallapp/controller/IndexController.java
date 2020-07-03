@@ -4,7 +4,7 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.util.BaseFeignClientUtil;
-import com.zhidejioayu.center.business.wechat.feignclient.smallapp.BaseSmallAppFeignClient;
+import com.zhidejioayu.center.business.feignclient.smallapp.BaseSmallAppFeignClient;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeDTO;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.IndexService;
 import org.apache.commons.lang.StringUtils;

@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 import com.zhidejiaoyu.common.pojo.ReceiveEmail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -14,6 +15,8 @@ import java.util.List;
  * @author zdjy
  * @since 2020-01-15
  */
+@Deprecated
+@Repository("ReceiveEmail01")
 public interface ReceiveEmailMapper extends BaseMapper<ReceiveEmail> {
 
     /**

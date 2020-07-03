@@ -22,6 +22,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@Deprecated
 public class ReceiveEmail extends Model<ReceiveEmail> {
 
     private static final long serialVersionUID = 1L;

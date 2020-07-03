@@ -10,12 +10,14 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 @Slf4j
+@EnableScheduling
 @EnableCaching
 @EnableFeignClients
-@ComponentScan(basePackages = {"com.zhidejiaoyu", "com.zhidejioayu.center"})
+@ComponentScan(basePackages = {"com.zhidejiaoyu", "com.zhidejioayu.center", "com.dfdz.mail"})
 @MapperScan(basePackages = {"com.zhidejiaoyu.common.mapper"})
 @EnableRedisHttpSession(redisNamespace = "spring:session:center")
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class})
@@ -24,6 +26,6 @@ public class CenterApplication {
     public static void main(String[] args) {
         SpringApplication.run(CenterApplication.class, args);
 
-        log.info("centerapplication is started!");
+        log.info("center application is started!");
     }
 }

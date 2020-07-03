@@ -7,7 +7,7 @@ import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.util.BaseFeignClientUtil;
 import com.zhidejioayu.center.business.util.ServerConfigUtil;
-import com.zhidejioayu.center.business.wechat.feignclient.qy.BaseQyFeignClient;
+import com.zhidejioayu.center.business.feignclient.qy.BaseQyFeignClient;
 import com.zhidejioayu.center.business.wechat.qy.fly.service.QyFlyService;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;

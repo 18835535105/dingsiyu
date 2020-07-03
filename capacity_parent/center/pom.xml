@@ -17,10 +17,11 @@
     </properties>
 
     <dependencies>
+
         <dependency>
-            <groupId>com.zdjy</groupId>
-            <artifactId>aliyun-oss</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>com.dfdz</groupId>
+            <artifactId>mail</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>

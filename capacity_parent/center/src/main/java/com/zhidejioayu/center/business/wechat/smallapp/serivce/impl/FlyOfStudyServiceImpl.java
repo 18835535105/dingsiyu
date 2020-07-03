@@ -6,8 +6,8 @@ import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.util.ServerConfigUtil;
-import com.zhidejioayu.center.business.wechat.feignclient.smallapp.BaseSmallAppFeignClient;
-import com.zhidejioayu.center.business.wechat.feignclient.util.FeignClientUtil;
+import com.zhidejioayu.center.business.feignclient.smallapp.BaseSmallAppFeignClient;
+import com.zhidejioayu.center.business.feignclient.util.FeignClientUtil;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.FlyOfStudyService;
 import org.springframework.stereotype.Service;
 

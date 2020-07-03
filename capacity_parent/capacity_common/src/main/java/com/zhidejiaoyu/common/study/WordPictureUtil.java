@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.common.study;
 
-import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.PictureUtil;
 import lombok.extern.slf4j.Slf4j;

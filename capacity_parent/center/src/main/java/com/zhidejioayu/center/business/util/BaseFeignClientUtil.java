@@ -1,8 +1,8 @@
 package com.zhidejioayu.center.business.util;
 
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
-import com.zhidejioayu.center.business.wechat.feignclient.qy.BaseQyFeignClient;
-import com.zhidejioayu.center.business.wechat.feignclient.smallapp.BaseSmallAppFeignClient;
+import com.zhidejioayu.center.business.feignclient.qy.BaseQyFeignClient;
+import com.zhidejioayu.center.business.feignclient.smallapp.BaseSmallAppFeignClient;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;

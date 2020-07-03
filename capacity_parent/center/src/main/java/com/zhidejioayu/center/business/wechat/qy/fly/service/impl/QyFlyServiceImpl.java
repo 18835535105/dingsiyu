@@ -11,7 +11,7 @@ import com.zhidejiaoyu.common.utils.IdUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.util.ServerConfigUtil;
-import com.zhidejioayu.center.business.wechat.feignclient.qy.BaseQyFeignClient;
+import com.zhidejioayu.center.business.feignclient.qy.BaseQyFeignClient;
 import com.zhidejioayu.center.business.wechat.qy.fly.service.QyFlyService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

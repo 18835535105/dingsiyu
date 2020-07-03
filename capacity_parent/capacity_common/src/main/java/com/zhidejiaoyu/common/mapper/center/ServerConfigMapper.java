@@ -3,6 +3,9 @@ package com.zhidejiaoyu.common.mapper.center;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 public interface ServerConfigMapper extends BaseMapper<ServerConfig> {
 
@@ -45,4 +48,12 @@ public interface ServerConfigMapper extends BaseMapper<ServerConfig> {
      * @return
      */
     ServerConfig selectByServerNo(String serverNo);
+
+    /**
+     * 查询所有服务器名称
+     *
+     * @return
+     */
+    @Select("select server_name from server_config")
+    List<String> selectAllServerName();
 }
