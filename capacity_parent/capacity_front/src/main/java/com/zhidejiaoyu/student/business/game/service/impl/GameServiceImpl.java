@@ -362,7 +362,6 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         List<VocabularyVO> tmpVocabularyVos = new ArrayList<>(vocabularyVos);
         Collections.shuffle(vocabularyVos);
         int size = vocabularyVos.size();
-        String readUrl=null;
         for (int i = 0; i < Math.min(size, BEFORE_LEARN_GAME_COUNT); i++) {
             VocabularyVO vocabularyVO = vocabularyVos.get(i);
             Collections.shuffle(tmpVocabularyVos);
