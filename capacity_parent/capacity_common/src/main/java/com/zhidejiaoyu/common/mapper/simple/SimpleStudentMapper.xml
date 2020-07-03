@@ -1154,7 +1154,7 @@
         id
         from student
         where
-        account_time > now()
+        account_time is not null and account_time > now()
         <if test="schoolAdminId!=null">
             and
             (teacher_id in
@@ -1168,7 +1168,7 @@
         id
         from student
         where
-        account_time > now()
+        account_time is not null and account_time > now()
         <if test="classId!=null">
             and class_id=#{classId}
         </if>
