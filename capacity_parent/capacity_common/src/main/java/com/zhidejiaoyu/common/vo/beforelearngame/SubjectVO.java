@@ -26,6 +26,11 @@ public class SubjectVO implements Serializable {
     private String topic;
 
     /**
+     * 读音
+     */
+    private String readUrl;
+
+    /**
      * 选项：单词
      */
     private List<AnswerVO> select;
