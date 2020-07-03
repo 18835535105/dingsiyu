@@ -685,18 +685,19 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
     @Override
     public ServerResponse<Object> getRank(HttpSession session, Integer type) {
         Student student = getStudent(session);
-        List<Long> studentIds = null;
+
         int pageNum = PageUtil.getPageNum();
-        Integer pageSize = PageUtil.getPageSize();
+        int pageSize = PageUtil.getPageSize();
         long startIndex = (pageNum - 1) * pageSize;
         long endIndex = startIndex + pageSize;
         Map<String, Object> map = new HashMap<>();
         map.put("page", pageNum);
         map.put("rows", pageSize);
         Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
+        List<Long> studentIds;
         if (type.equals(1)) {
             List<Long> longs = simpleStudentMapper.selectMaxSourceByClassId(student.getClassId(), student.getTeacherId(), null, null);
-            studentIds = simpleStudentMapper.selectMaxSourceByClassId(student.getClassId(), student.getTeacherId(), startIndex, pageSize.longValue());
+            studentIds = simpleStudentMapper.selectMaxSourceByClassId(student.getClassId(), student.getTeacherId(), startIndex, (long) pageSize);
             map.put("total", longs.size() % pageSize > 0 ? longs.size() / pageSize + 1 : longs.size() / pageSize);
         } else if (type.equals(2)) {
             // 校区排行（全部学生）
