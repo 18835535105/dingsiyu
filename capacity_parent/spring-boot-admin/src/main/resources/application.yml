@@ -1,6 +1,6 @@
 spring:
   application:
-    name: springb-boot-admin
+    name: spring-boot-admin
   cloud:
     nacos:
       discovery:
