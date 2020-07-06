@@ -26,7 +26,7 @@
 
     <sql id="base_sql">
         id,student_id,qr_code_num,img_url,gold,valid_time,online_time,study_model,word,sentence,`text`,syntax,test,create_time,
-    evaluate, `show`, `comment`, siteNo
+    evaluate, `show`, `comment`, site_no
     </sql>
 
     <select id="selectByDate" parameterType="map" resultMap="BaseResultMap">
