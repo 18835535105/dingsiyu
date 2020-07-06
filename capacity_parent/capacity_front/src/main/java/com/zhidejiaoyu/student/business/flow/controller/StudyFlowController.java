@@ -1,10 +1,10 @@
 package com.zhidejiaoyu.student.business.flow.controller;
 
 import com.zhidejiaoyu.common.constant.session.SessionConstant;
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.dto.NodeDto;
-import com.zhidejiaoyu.common.vo.flow.FlowVO;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +18,7 @@ import java.util.Objects;
  *
  * @author wuchenxi
  */
+@Slf4j
 @RestController
 @RequestMapping("/flow")
 public class StudyFlowController {
@@ -42,10 +43,14 @@ public class StudyFlowController {
         if (Objects.equals(dto.getType(), 1)) {
             // 一键排课流程
             session.setAttribute(SessionConstant.STUDY_FLAG, 1);
-            return flowService.getNode(dto, isTrueFlow, session);
+            ServerResponse<Object> node = flowService.getNode(dto, isTrueFlow, session);
+            log.info("getNode response={}", node.toString());
+            return node;
         }
         // 自由学习流程
         session.setAttribute(SessionConstant.STUDY_FLAG, 2);
-        return freeFlowService.getNode(dto, isTrueFlow, session);
+        ServerResponse<Object> node = freeFlowService.getNode(dto, isTrueFlow, session);
+        log.info("getNode response={}", node.toString());
+        return node;
     }
 }
