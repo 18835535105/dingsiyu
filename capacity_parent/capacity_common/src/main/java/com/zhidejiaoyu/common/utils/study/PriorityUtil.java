@@ -27,9 +27,9 @@ public class PriorityUtil {
     public static final int BASE_TIME_PRIORITY = 5;
 
     /**
-     * 困难基础值=基础优先级-30
+     * 困难基础值=基础优先级-10
      */
-    public static final int HARD_NUM = 30;
+    public static final int HARD_NUM = 10;
 
     /**
      * 金币试卷基础值=困难基础值-50

@@ -1126,10 +1126,10 @@
         and exp.source_power!=null
         and exp.source_power>0
         <if test="classId!=null">
-            stu.class_id =#{classId}
+           and stu.class_id =#{classId}
         </if>
         <if test="classId==null">
-            stu.teacher_id =#{teacherId}
+           and stu.teacher_id =#{teacherId}
         </if>
         order by exp.source_power
         <if test="start!=null">

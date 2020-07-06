@@ -40,16 +40,16 @@ public class StudyFlowController {
     @RequestMapping("/getNode")
     public ServerResponse<Object> getNode(NodeDto dto, @RequestParam(required = false) String isTrueFlow, HttpSession session) {
         dto.setTrueFlow(isTrueFlow);
+        ServerResponse<Object> node;
         if (Objects.equals(dto.getType(), 1)) {
             // 一键排课流程
             session.setAttribute(SessionConstant.STUDY_FLAG, 1);
-            ServerResponse<Object> node = flowService.getNode(dto, isTrueFlow, session);
-            log.info("getNode response={}", node.toString());
-            return node;
+            node = flowService.getNode(dto, isTrueFlow, session);
+        } else {
+            // 自由学习流程
+            session.setAttribute(SessionConstant.STUDY_FLAG, 2);
+            node = freeFlowService.getNode(dto, isTrueFlow, session);
         }
-        // 自由学习流程
-        session.setAttribute(SessionConstant.STUDY_FLAG, 2);
-        ServerResponse<Object> node = freeFlowService.getNode(dto, isTrueFlow, session);
         log.info("getNode response={}", node.toString());
         return node;
     }

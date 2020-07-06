@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.feignclient.center;
 
+import com.zhidejiaoyu.common.dto.student.SaveStudentInfoToCenterDTO;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,21 +38,9 @@ public interface UserInfoFeignClient {
     /**
      * 保存用户信息
      *
-     * @param businessUserInfo
+     * @param dto
      * @return
      */
     @PostMapping("/saveUserInfo")
-    Boolean saveUserInfo(@RequestBody BusinessUserInfo businessUserInfo);
-
-    /**
-     * 判断用户信息是否存在
-     *
-     * @param uuid
-     * @return <ul>
-     * <li>true:已在服务器中存在</li>
-     * <li>false：在服务器中不存在</li>
-     * </ul>
-     */
-    @GetMapping("/isExist")
-    Boolean isExist(@RequestParam String uuid);
+    Boolean saveUserInfo(@RequestBody SaveStudentInfoToCenterDTO dto);
 }
