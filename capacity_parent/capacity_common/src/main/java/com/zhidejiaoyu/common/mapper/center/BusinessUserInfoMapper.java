@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * 中台存放学生、校管信息
  *
@@ -42,4 +45,15 @@ public interface BusinessUserInfoMapper extends BaseMapper<BusinessUserInfo> {
      * @return
      */
     BusinessUserInfo selectByUserUuid(@Param("uuid") String uuid);
+
+    /**
+     * 查询账号所属服务器名
+     *
+     * @param accountArray
+     * @return <ul>
+     * <li>account:学生账号</li>
+     * <li>serverName:账号所属服务器名称</li>
+     * </ul>
+     */
+    List<Map<String, String>> selectAccountAndServerName(@Param("accountArray") String[] accountArray);
 }
