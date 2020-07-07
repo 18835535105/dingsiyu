@@ -104,9 +104,17 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
     }
 
     @Override
-    public boolean checkUpload(String openId) {
-        Student student = studentMapper.selectByOpenId(openId);
+    public boolean checkUpload(String uuid) {
+        Student student = studentMapper.selectByUuid(uuid);
         int count = currentDayOfStudyMapper.countByStudentIdAndDate(student.getId(), new Date());
         return count == 0;
+    }
+
+    @Override
+    public List<String> getFlyCalendar(String uuid, String month) {
+
+        Student student = studentMapper.selectByUuid(uuid);
+
+        return currentDayOfStudyMapper.selectCreateTimeByMonth(student.getId(), month);
     }
 }

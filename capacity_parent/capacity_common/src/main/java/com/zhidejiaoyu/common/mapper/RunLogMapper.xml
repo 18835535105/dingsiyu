@@ -419,5 +419,14 @@
           and `type` = 1
         limit 1
     </select>
+    <select id="countLoginCountByStudentIdAndCreateTime" resultType="java.lang.Integer" parameterType="map">
+        SELECT count(id)
+        FROM run_log
+        WHERE type = 1
+          and operate_user_id = #{stuId}
+          <if test="date != null and date != ''">
+              and to_days(create_time) = to_days(#{date})
+          </if>
+    </select>
 
 </mapper>

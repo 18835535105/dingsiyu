@@ -36,4 +36,12 @@ public interface KnownWordsMapper extends BaseMapper<KnownWords> {
      */
     @Select("select count(distinct word_id) from known_words where student_id = #{studentId}")
     Integer countByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * 查询学生指定日期的熟词数
+     *
+     * @param studentId
+     * @return
+     */
+    Integer countByStudentIdAndCreateTime(@Param("studentId") Long studentId, @Param("date") String date);
 }

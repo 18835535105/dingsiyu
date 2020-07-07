@@ -6,6 +6,8 @@ import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * @author: wuchenxi
  * @date: 2020/6/16 13:54:54
@@ -33,8 +35,17 @@ public interface QyFlyService extends IService<CurrentDayOfStudy> {
     /**
      * 校验学生今天智慧飞行记录是否已经上传
      *
-     * @param studentUuid
+     * @param uuid
      * @return
      */
-    boolean checkUpload(String openId);
+    boolean checkUpload(String uuid);
+
+    /**
+     * 获取学生智慧飞行记录日历
+     *
+     * @param uuid
+     * @param month  指定月份
+     * @return
+     */
+    List<String> getFlyCalendar(String uuid, String month);
 }

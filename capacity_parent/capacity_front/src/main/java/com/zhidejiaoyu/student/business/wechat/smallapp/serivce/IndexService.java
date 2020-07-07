@@ -61,4 +61,13 @@ public interface IndexService extends BaseService<Student> {
      * @return
      */
     ServerResponse<Object> recordOverview(String openId);
+
+    /**
+     * 飞行记录总览
+     *
+     * @param uuid 学生uuid
+     * @param date 指定日期
+     * @return
+     */
+    ServerResponse<Object> recordOverviewByUuid(String uuid, String date);
 }

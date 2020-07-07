@@ -36,7 +36,7 @@ public class ServerConfigUtil {
     public static ServerConfig getServerInfoByStudentOpenid(String openid) {
         ServerConfig serverConfig = serverConfigMapperStatic.selectStudentServerByOpenid(openid);
         if (serverConfig == null) {
-            throw new ServiceException(400, "中台服务器为查询到openid=" + openid + "的学生信息！");
+            throw new ServiceException(400, "中台服务器未查询到openid=" + openid + "的学生信息！");
         }
         return serverConfig;
     }
