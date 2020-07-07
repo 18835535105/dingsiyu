@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.translate.controller;
+package com.zhidejioayu.center.business.translate.controller;
 
 import com.zhidejiaoyu.aliyuntranslate.translate.Translate;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
