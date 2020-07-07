@@ -5,16 +5,14 @@ import com.zhidejiaoyu.common.dto.wechat.qy.fly.UploadFlyRecordDTO;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejioayu.center.business.feignclient.qy.BaseQyFeignClient;
+import com.zhidejioayu.center.business.feignclient.smallapp.BaseSmallAppFeignClient;
 import com.zhidejioayu.center.business.util.BaseFeignClientUtil;
 import com.zhidejioayu.center.business.util.ServerConfigUtil;
-import com.zhidejioayu.center.business.feignclient.qy.BaseQyFeignClient;
 import com.zhidejioayu.center.business.wechat.qy.fly.service.QyFlyService;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -97,6 +95,12 @@ public class QyFlyController {
         return qyServerFeignClient.get(serverConfig.getServerName());
     }
 
+    /**
+     * 获取学生当日的智慧飞行记录
+     *
+     * @param openId
+     * @return
+     */
     @GetMapping("/getCurrentDayOfStudy")
     public ServerResponse<Object> getCurrentDayOfStudy(String openId) {
         if (StringUtil.isEmpty(openId)) {
@@ -105,6 +109,21 @@ public class QyFlyController {
 
         BaseQyFeignClient baseQyFeignClient = BaseFeignClientUtil.getBaseQyFeignClient(openId);
         return baseQyFeignClient.getCurrentDayOfStudy(openId);
+    }
+
+    /**
+     * 智慧飞行记录学习总览
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/recordOverview")
+    public ServerResponse<Object> recordOverview(@RequestParam String openId) {
+        if (StringUtil.isEmpty(openId)) {
+            return ServerResponse.createByError(400, "openId can't be null!");
+        }
+        BaseSmallAppFeignClient baseSmallAppFeignClient = BaseFeignClientUtil.getBaseSmallAppFeignClient(openId);
+        return baseSmallAppFeignClient.recordOverview(openId);
     }
 
 }
