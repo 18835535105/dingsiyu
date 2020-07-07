@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.timingtask.service.impl;
+package com.zhidejiaoyu.student.business.learn.service.impl;
 
 import com.zhidejiaoyu.common.mapper.ClockInMapper;
 import com.zhidejiaoyu.common.mapper.DurationMapper;
@@ -7,10 +7,9 @@ import com.zhidejiaoyu.common.mapper.UpLevelConfigMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.UpLevelConfig;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DailyStateVO;
+import com.zhidejiaoyu.student.business.learn.service.WxRobotService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.timingtask.service.QuartzRobotService;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
  * @date: 2020/4/7 17:56:56
  */
 @Service
-public class QuartzRobotServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements QuartzRobotService {
+public class WxRobotServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements WxRobotService {
 
     @Resource
     private DurationMapper durationMapper;
@@ -41,7 +40,7 @@ public class QuartzRobotServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     private UpLevelConfigMapper upLevelConfigMapper;
 
     @Override
-    public ServerResponse<Object> getDailyState(String account) {
+    public List<DailyStateVO> getDailyState(String account) {
 
         // 当天所有学生在线时长平均值
         Double avg = durationMapper.selectAvgOnlineTime();
@@ -155,7 +154,7 @@ public class QuartzRobotServiceImpl extends BaseServiceImpl<StudentMapper, Stude
                     dailyStateVO.setMsg(sb.toString());
                 }).collect(Collectors.toList()));
 
-        return ServerResponse.createBySuccess(collect);
+        return collect;
     }
 
     public int getPercent(Map<Long, Integer> sortMap, int totalStudent, DailyStateVO dailyStateVO) {
