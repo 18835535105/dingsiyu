@@ -94,7 +94,7 @@ public interface BaseQyFeignClient {
      * @return
      */
     @GetMapping("/qy/fly/getCurrentDayOfStudy")
-    ServerResponse<Object> getCurrentDayOfStudy(@RequestParam String uuid, @RequestParam String date);
+    ServerResponse<Object> getCurrentDayOfStudy(@RequestParam String uuid, @RequestParam(required = false) String date);
 
     /**
      * 获取学生智慧飞行记录日历

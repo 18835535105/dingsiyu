@@ -147,7 +147,7 @@ public class QyFlyController {
      * @return
      */
     @GetMapping("/getCurrentDayOfStudy")
-    public ServerResponse<Object> getCurrentDayOfStudy(@RequestParam String uuid, @RequestParam String date) {
+    public ServerResponse<Object> getCurrentDayOfStudy(@RequestParam String uuid, @RequestParam(required = false) String date) {
         Student student = studentInfoService.getByUuid(uuid);
         if (Objects.equals(DateUtil.formatYYYYMMDD(new Date()), date)) {
             // 查询当天的数据

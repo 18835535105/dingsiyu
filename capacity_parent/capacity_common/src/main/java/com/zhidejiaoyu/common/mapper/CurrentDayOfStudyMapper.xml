@@ -75,7 +75,9 @@
         <include refid="base_sql"/>
         from current_day_of_study
         where student_id = #{studentId}
-        and to_days(#{date}) = to_days(create_time)
+          <if test="date != null and date != ''" >
+              and to_days(#{date}) = to_days(create_time)
+          </if>
         limit 1
     </select>
 

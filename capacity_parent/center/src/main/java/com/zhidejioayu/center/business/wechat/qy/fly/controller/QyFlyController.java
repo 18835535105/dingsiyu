@@ -141,12 +141,9 @@ public class QyFlyController {
      * @return
      */
     @GetMapping("/recordOverview")
-    public ServerResponse<Object> recordOverview(@RequestParam String uuid, @RequestParam String date) {
+    public ServerResponse<Object> recordOverview(@RequestParam String uuid, @RequestParam(required = false) String date) {
         if (StringUtil.isEmpty(uuid)) {
             return ServerResponse.createByError(400, "uuid can't be null!");
-        }
-        if (StringUtil.isEmpty(date)) {
-            return ServerResponse.createByError(400, "date can't be null!");
         }
         ServerConfig serverConfig = ServerConfigUtil.getByUuid(uuid);
         BaseQyFeignClient qyFeignClient = FeignClientUtil.getQyFeignClient(serverConfig.getServerName());
