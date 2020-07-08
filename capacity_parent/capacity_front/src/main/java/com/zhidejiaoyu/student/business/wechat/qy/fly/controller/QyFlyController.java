@@ -120,7 +120,7 @@ public class QyFlyController {
      * @return
      */
     @GetMapping("/recordOverview")
-    public ServerResponse<Object> recordOverviewByUuid(@RequestParam String uuid, @RequestParam String date) {
+    public ServerResponse<Object> recordOverviewByUuid(@RequestParam String uuid, @RequestParam(required = false) String date) {
         if (StringUtils.isEmpty(uuid)) {
             throw new ServiceException("uuid can't be null");
         }
