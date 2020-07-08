@@ -1,10 +1,5 @@
 package com.zhidejioayu.center.business.wechat.qy.auth.service;
 
-import com.zhidejiaoyu.common.pojo.SysUser;
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.vo.wechat.qy.LoginVO;
-import com.zhidejioayu.center.business.wechat.qy.auth.dto.LoginDTO;
-
 /**
  * 企业微信授权、用户信息获取
  *
@@ -18,13 +13,12 @@ public interface QyAuthService {
      *
      * @return
      */
-    SysUser getUserInfo();
+    void auth();
 
     /**
-     * 用户登录
+     * 获取用户需要跳转的url
      *
-     * @param loginDTO
      * @return
      */
-    ServerResponse<LoginVO> login(LoginDTO loginDTO);
+    String getRedirectUrl();
 }

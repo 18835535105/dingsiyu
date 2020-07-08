@@ -94,9 +94,9 @@ qywx:
   authLink: https://open.weixin.qq.com/connect/oauth2/authorize?appid=${qywx.appId}&redirect_uri=${qywx.redirect.redirect_uri}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect
   redirect:
     # 企业微信登录地址
-    login: ${studyUrl}/qy/login
+    login: ${studyUrl}/center/wechat/qy/login
     # 授权后重定向的回调链接地址
-    redirect_uri: ${studyUrl}/ec/qy/authgetUserInfo
+    redirect_uri: ${studyUrl}/center/wechat/qy/auth/auth
 
 management:
   endpoints:
