@@ -64,7 +64,7 @@
         group by student_id
 
     </select>
-    <select id="selectCreateTimeByMonth" resultType="java.util.Date" parameterType="map">
+    <select id="selectCreateTimeByMonth" resultType="java.lang.String" parameterType="map">
         select date_format(create_time, '%Y-%m-%d')
         from current_day_of_study
         where student_id = #{studentId}
