@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 /**
  * @author: wuchenxi
  * @date: 2020/6/29 12:30:30
@@ -29,14 +31,14 @@ public interface BaseQyFeignClient {
     /**
      * 校验学生今天智慧飞行记录是否已经上传
      *
-     * @param openId
+     * @param uuid
      * @return <ul>
      * <li>true:未上传</li>
      * <li>false:已上传</li>
      * </ul>
      */
     @GetMapping("/qy/fly/checkUpload")
-    boolean checkUpload(@RequestParam String openId);
+    boolean checkUpload(@RequestParam String uuid);
 
     /**
      * 保存智慧飞行记录
@@ -75,11 +77,32 @@ public interface BaseQyFeignClient {
     boolean updateSysUser(@RequestBody SysUser sysUser);
 
     /**
+     * 飞行记录学习总览
+     *
+     * @param uuid 学生uuid
+     * @param date 指定日期
+     * @return
+     */
+    @GetMapping("/qy/fly/recordOverview")
+    ServerResponse<Object> recordOverview(@RequestParam String uuid, @RequestParam String date);
+
+    /**
      * 获取新学生当天的智慧飞行记录
      *
-     * @param openId
+     * @param uuid
+     * @param date 指定日期
      * @return
      */
     @GetMapping("/qy/fly/getCurrentDayOfStudy")
-    ServerResponse<Object> getCurrentDayOfStudy(@RequestParam String openId);
+    ServerResponse<Object> getCurrentDayOfStudy(@RequestParam String uuid, @RequestParam(required = false) String date);
+
+    /**
+     * 获取学生智慧飞行记录日历
+     *
+     * @param uuid
+     * @param month
+     * @return
+     */
+    @GetMapping("/qy/fly/getFlyCalendar")
+    List<String> getFlyCalendar(@RequestParam String uuid, @RequestParam String month);
 }

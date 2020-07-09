@@ -1,11 +1,13 @@
 package com.zhidejioayu.center.business.userinfo.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.zhidejiaoyu.common.dto.student.SaveStudentInfoToCenterDTO;
 import com.zhidejiaoyu.common.mapper.center.BusinessUserInfoMapper;
 import com.zhidejiaoyu.common.mapper.center.ServerConfigMapper;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.IdUtil;
+import com.zhidejioayu.center.business.redis.UserInfoRedisOpt;
 import com.zhidejioayu.center.business.userinfo.service.UserInfoService;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,9 @@ public class UserInfoServiceImpl extends ServiceImpl<BusinessUserInfoMapper, Bus
     @Resource
     private ServerConfigMapper serverConfigMapper;
 
+    @Resource
+    private UserInfoRedisOpt userInfoRedisOpt;
+
     @Override
     public BusinessUserInfo getUserInfoByUserUuid(String uuid) {
         return businessUserInfoMapper.selectByUserUuid(uuid);
@@ -40,5 +45,34 @@ public class UserInfoServiceImpl extends ServiceImpl<BusinessUserInfoMapper, Bus
             businessUserInfo.setId(IdUtil.getId());
             businessUserInfoMapper.insert(businessUserInfo);
         }
+    }
+
+    @Override
+    public Boolean saveUserInfo(SaveStudentInfoToCenterDTO dto) {
+
+        ServerConfig serverConfig = serverConfigMapper.selectByServerNo(dto.getServerNo());
+        if (serverConfig == null) {
+            log.error("server_config未配置server_no=" + dto.getServerNo() + "的服务器信息！请联系管理员！");
+            return false;
+        }
+
+        Boolean exist = userInfoRedisOpt.userInfoIsExist(dto.getUuid());
+        if (exist) {
+            return true;
+        }
+
+        BusinessUserInfo businessUserInfo = new BusinessUserInfo();
+        businessUserInfo.setAccount(dto.getAccount());
+        businessUserInfo.setCreateTime(new Date());
+        businessUserInfo.setId(IdUtil.getId());
+        businessUserInfo.setOpenid(dto.getOpenid());
+        businessUserInfo.setPassword(dto.getPassword());
+        businessUserInfo.setServerConfigId(serverConfig.getId());
+        businessUserInfo.setUpdateTime(new Date());
+        businessUserInfo.setUserUuid(dto.getUuid());
+
+        boolean save = this.save(businessUserInfo);
+        userInfoRedisOpt.saveUserInfoToCenterServer(businessUserInfo.getUserUuid());
+        return save;
     }
 }

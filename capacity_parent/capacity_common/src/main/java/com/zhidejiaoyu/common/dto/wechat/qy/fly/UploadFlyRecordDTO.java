@@ -15,10 +15,10 @@ import javax.validation.constraints.NotNull;
 public class UploadFlyRecordDTO {
 
     /**
-     * 学生openId
+     * 学生uuid
      */
-    @NotBlank(message = "openId can't be null!")
-    private String openId;
+    @NotBlank(message = "uuid can't be null!")
+    private String uuid;
 
     @NotNull(message = "二维码序号不能为空！")
     private Integer num;

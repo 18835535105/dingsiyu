@@ -42,6 +42,28 @@ public class QyApiConstant {
     }
 
     /**
+     * openId 转 userId
+     *
+     * @return
+     * @see <a href="https://work.weixin.qq.com/api/doc/90000/90135/90202">参考链接</a>
+     */
+    public static String getOpenidToUserIdApi() {
+        String qyAccessToken = AccessTokenUtil.getQyAccessToken();
+        return "https://qyapi.weixin.qq.com/cgi-bin/user/convert_to_userid?access_token=" + qyAccessToken;
+    }
+
+    /**
+     * 读取成员信息
+     *
+     * @param userId
+     * @return
+     */
+    public static String getUserByUserIdApi(String userId) {
+        String qyAccessToken = AccessTokenUtil.getQyAccessToken();
+        return "https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=" + qyAccessToken + "&userid=" + userId;
+    }
+
+    /**
      * 获得jsapi_ticket
      *
      * @return

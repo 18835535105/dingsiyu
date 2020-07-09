@@ -3,7 +3,7 @@ package com.zhidejioayu.center.business.wechat.qy.auth.vo;
 import lombok.Data;
 
 /**
- * userId转换为openid
+ * userId与openid互转
  *
  * @author: wuchenxi
  * @date: 2020/6/4 14:35:35
@@ -14,4 +14,5 @@ public class UserIdToOpenidVO {
     private Integer errcode;
     private String errmsg;
     private String openid;
+    private String userid;
 }

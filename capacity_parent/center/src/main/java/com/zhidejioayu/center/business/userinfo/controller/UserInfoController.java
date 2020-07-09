@@ -1,5 +1,6 @@
 package com.zhidejioayu.center.business.userinfo.controller;
 
+import com.zhidejiaoyu.common.dto.student.SaveStudentInfoToCenterDTO;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 import com.zhidejioayu.center.business.redis.UserInfoRedisOpt;
 import com.zhidejioayu.center.business.userinfo.service.UserInfoService;
@@ -35,20 +36,6 @@ public class UserInfoController {
     }
 
     /**
-     * 判断用户信息是否存在
-     *
-     * @param uuid
-     * @return <ul>
-     * <li>true:已在服务器中存在</li>
-     * <li>false：在服务器中不存在</li>
-     * </ul>
-     */
-    @GetMapping("/isExist")
-    public Boolean isExist(String uuid) {
-        return userInfoRedisOpt.userInfoIsExist(uuid);
-    }
-
-    /**
      * 修改用户信息
      *
      * @param businessUserInfo
@@ -62,19 +49,17 @@ public class UserInfoController {
     /**
      * 保存用户信息
      *
-     * @param businessUserInfo
+     * @param dto
      * @return
      */
     @PostMapping("/saveUserInfo")
-    public Boolean saveUserInfo(@RequestBody BusinessUserInfo businessUserInfo) {
-        boolean save = userInfoService.save(businessUserInfo);
-        userInfoRedisOpt.saveUserInfoToCenterServer(businessUserInfo.getUserUuid());
-        return save;
+    public Boolean saveUserInfo(@RequestBody SaveStudentInfoToCenterDTO dto) {
+        return userInfoService.saveUserInfo(dto);
     }
 
     @GetMapping("/user")
     public void getUser(BusinessUserInfo businessUserInfo, String no) {
-        userInfoService.getUser(businessUserInfo,no);
+        userInfoService.getUser(businessUserInfo, no);
         userInfoRedisOpt.saveUserInfoToCenterServer(businessUserInfo.getUserUuid());
     }
 }

@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.vo.currentdayofstudy.CurrentDayOfStudyVo;
 import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.business.wechat.smallapp.vo.fly.StudyInfoVO;
 import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,9 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
 
     @Resource
     private TestRecordMapper testRecordMapper;
+
+    @Resource
+    private CurrentDayOfStudyMapper currentDayOfStudyMapper;
 
     @Override
     public ServerResponse<Object> getCurrentDayOfStudy() {
@@ -90,6 +94,28 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         studyTimeAndMileageVO.setMileage(mileage);
         studyTimeAndMileageVO.setTime(onlineTime);
         return studyTimeAndMileageVO;
+    }
+
+    @Override
+    public ServerResponse<Object> getCurrentDayOfStudyWithDate(Long studentId, String date) {
+        CurrentDayOfStudy currentDayOfStudy = currentDayOfStudyMapper.selectByStudentIdAndCreateTime(studentId, date);
+
+        if (currentDayOfStudy == null) {
+            return ServerResponse.createByError(400, "未查询到指定日期的飞行记录！");
+        }
+
+        return ServerResponse.createBySuccess(StudyInfoVO.builder()
+                .contents(currentDayOfStudy.getStudyModel() == null ? new String[0] : currentDayOfStudy.getStudyModel().split("##"))
+                .date(currentDayOfStudy.getCreateTime() == null ? "" : DateUtil.formatYYYYMMDD(currentDayOfStudy.getCreateTime()))
+                .errorSentence(currentDayOfStudy.getSentence() == null ? new String[0] : currentDayOfStudy.getSentence().split("##"))
+                .errorSyntax(currentDayOfStudy.getSyntax() == null ? new String[0] : currentDayOfStudy.getSyntax().split("##"))
+                .errorTest(currentDayOfStudy.getTest() == null ? new String[0] : currentDayOfStudy.getTest().split("##"))
+                .errorText(currentDayOfStudy.getText() == null ? new String[0] : currentDayOfStudy.getText().split("##"))
+                .errorWord(currentDayOfStudy.getWord() == null ? new String[0] : currentDayOfStudy.getWord().split("##"))
+                .totalGold(currentDayOfStudy.getGold())
+                .totalOnlineTime(currentDayOfStudy.getOnlineTime())
+                .totalValidTime(currentDayOfStudy.getValidTime())
+                .build());
     }
 
     private List<String> getReturnList(String errorInfo) {

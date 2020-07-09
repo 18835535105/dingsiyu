@@ -49,4 +49,22 @@ public interface CurrentDayOfStudyMapper extends BaseMapper<CurrentDayOfStudy> {
      */
     @MapKey("studentId")
     Map<Long, Map<Long, Long>> countByStudentIdsAndDate(@Param("studentIds") List<Long> studentIds, @Param("date") Date date);
+
+    /**
+     * 查询指定月份有飞行记录的日期
+     *
+     * @param studentId
+     * @param month
+     * @return
+     */
+    List<String> selectCreateTimeByMonth(@Param("studentId") Long studentId, @Param("month") String month);
+
+    /**
+     * 查询学生指定日期的飞行记录
+     *
+     * @param studentId
+     * @param date
+     * @return
+     */
+    CurrentDayOfStudy selectByStudentIdAndCreateTime(@Param("studentId") Long studentId, @Param("date") String date);
 }

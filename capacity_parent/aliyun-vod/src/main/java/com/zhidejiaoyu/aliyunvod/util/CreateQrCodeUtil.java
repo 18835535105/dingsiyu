@@ -86,4 +86,14 @@ public class CreateQrCodeUtil {
         }
     }
 
+    public static void main(String[] args) {
+        String path = "/Users/wuchenxi/Documents/qrcode/-1.png";
+        CreateQrCodeUtil.encodeQRCode("-1", path);
+        for (int i = 0; i < 50; i++) {
+            path = "/Users/wuchenxi/Documents/qrcode/" + (i + 1) + ".png";
+            CreateQrCodeUtil.encodeQRCode(String.valueOf(i + 1), path);
+        }
+
+    }
+
 }

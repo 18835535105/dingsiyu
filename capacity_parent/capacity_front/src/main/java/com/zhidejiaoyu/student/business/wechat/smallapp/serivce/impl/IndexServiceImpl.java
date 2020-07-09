@@ -232,14 +232,23 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     public ServerResponse<Object> recordOverview(String openId) {
         val student = studentMapper.selectByOpenId(openId);
-        Long studentId = student.getId();
+        return getRecordOverviewResponse(student, null);
+    }
 
-        Long validTime = durationMapper.selectTotalValidTimeByStudentId(studentId);
+    @Override
+    public ServerResponse<Object> recordOverviewByUuid(String uuid, String date) {
+        Student student = studentMapper.selectByUuid(uuid);
+        return getRecordOverviewResponse(student, date);
+    }
+
+    public ServerResponse<Object> getRecordOverviewResponse(Student student, String date) {
+        Long studentId = student.getId();
+        Long validTime = durationMapper.selectTotalValidTimeByStudentIdAndLoginTime(studentId, date);
         if (validTime == null) {
             validTime = 0L;
         }
 
-        Long onlineTime = durationMapper.selectTotalOnlineByStudentId(studentId);
+        Long onlineTime = durationMapper.selectTotalOnlineTimeByStudentIdAndLoginTime(studentId, date);
         if (onlineTime == null) {
             onlineTime = 0L;
         }
@@ -247,8 +256,8 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             validTime = Math.round(onlineTime * 0.9);
         }
 
-        Integer loginCount = runLogMapper.countLoginCountByStudentId(studentId);
-        Integer count = knownWordsMapper.countByStudentId(studentId);
+        Integer loginCount = runLogMapper.countLoginCountByStudentIdAndCreateTime(studentId, date);
+        Integer count = knownWordsMapper.countByStudentIdAndCreateTime(studentId, date);
 
         return ServerResponse.createBySuccess(StudyOverviewVO.builder()
                 .studyCount(loginCount)

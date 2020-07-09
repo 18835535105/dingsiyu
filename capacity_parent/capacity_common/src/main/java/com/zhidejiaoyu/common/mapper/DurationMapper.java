@@ -286,7 +286,25 @@ public interface DurationMapper extends BaseMapper<Duration> {
     @MapKey("studentId")
     Map<Long, Map<String, Object>> selectWeekOnlineTime(@Param("accountArr") String[] accountArr, @Param("startDay") Date startDay, @Param("endDay") Date endDay);
 
-    Long selectByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") String date);
+    Long selectByStudentIdAndDate(@Param("studentId") Long studentId, @Param("date") String date);
 
-    Long selectValidTimeByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") String date);
+    Long selectValidTimeByStudentIdAndDate(@Param("studentId") Long studentId, @Param("date") String date);
+
+    /**
+     * 查询学生指定日期总有效时长
+     *
+     * @param studentId
+     * @param date
+     * @return
+     */
+    Long selectTotalValidTimeByStudentIdAndLoginTime(@Param("studentId") Long studentId, @Param("date") String date);
+
+    /**
+     * 查询学生指定日期总在线时长
+     *
+     * @param studentId
+     * @param date
+     * @return
+     */
+    Long selectTotalOnlineTimeByStudentIdAndLoginTime(@Param("studentId") Long studentId, @Param("date") String date);
 }

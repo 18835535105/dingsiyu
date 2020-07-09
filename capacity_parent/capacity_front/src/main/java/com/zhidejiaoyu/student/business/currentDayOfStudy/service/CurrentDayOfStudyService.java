@@ -24,4 +24,13 @@ public interface CurrentDayOfStudyService extends IService<CurrentDayOfStudy> {
      * @return
      */
     StudyTimeAndMileageVO getTodayInfo();
+
+    /**
+     * 获取指定日期的智慧飞行记录
+     *
+     * @param studentId
+     * @param date
+     * @return
+     */
+    ServerResponse<Object> getCurrentDayOfStudyWithDate(Long studentId, String date);
 }

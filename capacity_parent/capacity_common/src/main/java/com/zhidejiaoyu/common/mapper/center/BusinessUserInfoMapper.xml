@@ -33,7 +33,7 @@
         select
         <include refid="base_sql"/>
         from business_user_info
-        where openid = #{openid}
+        where openid = #{openId}
         and (account like 'xg%' or account like 'js%')
         limit 1
     </select>
@@ -42,5 +42,14 @@
         <include refid="base_sql"/>
         from business_user_info
         where user_uuid = #{uuid} limit 1
+    </select>
+    <select id="selectAccountAndServerName" resultType="java.util.Map" parameterType="map">
+        select bui.account, sc.server_name serverName from business_user_info bui , server_config sc where
+        bui.server_config_id = sc.id
+        and bui.account in (
+        <foreach collection="accountArray" item="account" separator=",">
+            #{account}
+        </foreach>
+        )
     </select>
 </mapper>

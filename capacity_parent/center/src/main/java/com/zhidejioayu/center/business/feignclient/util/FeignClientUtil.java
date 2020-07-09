@@ -3,6 +3,7 @@ package com.zhidejioayu.center.business.feignclient.util;
 import com.zhidejioayu.center.business.feignclient.qy.BaseQyFeignClient;
 import com.zhidejioayu.center.business.feignclient.smallapp.BaseSmallAppFeignClient;
 import com.zhidejioayu.center.business.feignclient.student.BaseStudentFeignClient;
+import com.zhidejioayu.center.business.feignclient.wxrobot.BaseWxRobotFeignClient;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +23,8 @@ public class FeignClientUtil {
 
     private static Map<String, BaseStudentFeignClient> studentServerFeignClientStatic;
 
+    private static Map<String, BaseWxRobotFeignClient> wxRobotServerFeignClientStatic;
+
     @Resource
     private Map<String, BaseSmallAppFeignClient> smallAppServerFeignClient;
 
@@ -31,11 +34,15 @@ public class FeignClientUtil {
     @Resource
     private Map<String, BaseStudentFeignClient> studentServerFeignClient;
 
+    @Resource
+    private Map<String, BaseWxRobotFeignClient> wxRobotServerFeignClient;
+
     @PostConstruct
     public void init() {
         smallAppServerFeignClientStatic = this.smallAppServerFeignClient;
         qyServerFeignClientStatic = this.qyServerFeignClient;
         studentServerFeignClientStatic = this.studentServerFeignClient;
+        wxRobotServerFeignClientStatic = this.wxRobotServerFeignClient;
     }
 
     /**
@@ -66,6 +73,16 @@ public class FeignClientUtil {
      */
     public static BaseStudentFeignClient getStudentFeignClient(String serverName) {
         return studentServerFeignClientStatic.get(serverName);
+    }
+
+    /**
+     * 获取指定服务的微信机器人feignClient
+     *
+     * @param serverName
+     * @return
+     */
+    public static BaseWxRobotFeignClient getWxRobotFeignClient(String serverName) {
+        return wxRobotServerFeignClientStatic.get(serverName);
     }
 
 

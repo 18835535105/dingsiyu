@@ -14,6 +14,7 @@ import com.zhidejiaoyu.student.business.flow.service.impl.FreeFlowServiceImpl;
 import com.zhidejiaoyu.student.business.flow.service.impl.StudyFlowServiceImpl;
 import com.zhidejiaoyu.student.common.redis.PayLogRedisOpt;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  * @author: wuchenxi
  * @date: 2020/1/3 17:51:51
  */
+@Slf4j
 @Component
 public class FinishGroupOrUnit {
 
@@ -270,6 +272,7 @@ public class FinishGroupOrUnit {
             boolean isPaid = payLogRedisOpt.isPaid(student.getId());
             if (!isPaid) {
                 // 学生没有充值，不修改优先级
+                log.info("当前学生{}->{}->{}没有充值，不改变优先级！", student.getId(), student.getAccount(), student.getStudentName());
                 return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
             }
             // 说明当前单元学习完毕

@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.translate.service;
+package com.zhidejioayu.center.business.translate.service;
 
 /**
  * @author: wuchenxi

@@ -1,6 +1,6 @@
-package com.zhidejiaoyu.student.business.translate.service.impl;
+package com.zhidejioayu.center.business.translate.service.impl;
 
-import com.zhidejiaoyu.student.business.translate.service.TranslateService;
+import com.zhidejioayu.center.business.translate.service.TranslateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

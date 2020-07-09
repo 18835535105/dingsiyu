@@ -32,12 +32,12 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
 
     @Override
     public ServerResponse<Object> uploadFlyRecord(MultipartFile file, UploadFlyRecordDTO uploadFlyRecordDTO) {
-        String openId = uploadFlyRecordDTO.getOpenId();
+        String uuid = uploadFlyRecordDTO.getUuid();
 
-        ServerConfig serverInfoByStudentOpenid = ServerConfigUtil.getServerInfoByStudentOpenid(openId);
+        ServerConfig serverInfoByStudentOpenid = ServerConfigUtil.getByUuid(uuid);
         BaseQyFeignClient baseQyFeignClient = qyServerFeignClient.get(serverInfoByStudentOpenid.getServerName());
 
-        boolean flag = baseQyFeignClient.checkUpload(openId);
+        boolean flag = baseQyFeignClient.checkUpload(uuid);
         if (!flag) {
             return ServerResponse.createByError(400, "学生当天信息已经上传，不能再次上传！");
         }

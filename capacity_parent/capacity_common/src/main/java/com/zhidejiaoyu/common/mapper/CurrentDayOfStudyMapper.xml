@@ -26,7 +26,7 @@
 
     <sql id="base_sql">
         id,student_id,qr_code_num,img_url,gold,valid_time,online_time,study_model,word,sentence,`text`,syntax,test,create_time,
-    evaluate, `show`, `comment`, siteNo
+    evaluate, `show`, `comment`, site_no
     </sql>
 
     <select id="selectByDate" parameterType="map" resultMap="BaseResultMap">
@@ -63,6 +63,22 @@
         </if>
         group by student_id
 
+    </select>
+    <select id="selectCreateTimeByMonth" resultType="java.lang.String" parameterType="map">
+        select date_format(create_time, '%Y-%m-%d')
+        from current_day_of_study
+        where student_id = #{studentId}
+          and create_time like concat(#{month}, '%')
+    </select>
+    <select id="selectByStudentIdAndCreateTime" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from current_day_of_study
+        where student_id = #{studentId}
+          <if test="date != null and date != ''" >
+              and to_days(#{date}) = to_days(create_time)
+          </if>
+        limit 1
     </select>
 
 </mapper>

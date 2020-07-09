@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.feignclient.center;
 
 import com.zhidejiaoyu.ZdjyFrontApplication;
+import com.zhidejiaoyu.common.dto.student.SaveStudentInfoToCenterDTO;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 import com.zhidejiaoyu.common.utils.IdUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
-import java.util.Date;
 
 /**
  * @author: wuchenxi
@@ -40,17 +40,13 @@ public class UserInfoFeignClientTest {
 
 //    @Test
     public void testSaveUserInfo() {
-        BusinessUserInfo businessUserInfo = BusinessUserInfo.builder()
-                .account("dz002035")
-                .createTime(new Date())
-                .openid("1123")
-                .password("123")
-                .serverConfigId("server_0123")
-                .updateTime(new Date())
-                .userUuid(IdUtil.getId())
-                .id(IdUtil.getId())
-                .build();
-        Boolean aBoolean = userInfoFeignClient.saveUserInfo(businessUserInfo);
+        Boolean aBoolean = userInfoFeignClient.saveUserInfo(SaveStudentInfoToCenterDTO.builder()
+                .account("dz000000")
+                .openid("123")
+                .password("1123")
+                .serverNo("2972466fd794414e83ddacefb7b78c8f1592189768879")
+                .uuid(IdUtil.getId())
+                .build());
         log.info("saveResult={}", aBoolean);
 
     }

@@ -290,7 +290,8 @@
         where student_id = #{studentId}
           and date(login_time) &lt;= date(#{date})
     </select>
-    <select id="selectLearnDateAndOnlineTime" resultType="com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DurationInfoVO"
+    <select id="selectLearnDateAndOnlineTime"
+            resultType="com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DurationInfoVO"
             parameterType="map">
         select sum(d.online_time)                  onlineTime,
                date_format(login_time, '%Y-%m-%d') learnDate
@@ -478,6 +479,23 @@
         </if>
         <if test="date!='' and date != null">
             and to_days(login_time)=to_days(#{date})
+        </if>
+    </select>
+    <select id="selectTotalValidTimeByStudentIdAndLoginTime" resultType="java.lang.Long" parameterType="map">
+        select sum(valid_time)
+        from duration
+        where student_id = #{studentId}
+        <if test="date != null and date != ''">
+            and to_days(login_time) = to_days(#{date})
+        </if>
+
+    </select>
+    <select id="selectTotalOnlineTimeByStudentIdAndLoginTime" resultType="java.lang.Long" parameterType="map">
+        select sum(online_time)
+        from duration
+        where student_id = #{studentId}
+        <if test="date != null and date != ''">
+            and to_days(login_time) = to_days(#{date})
         </if>
     </select>
 

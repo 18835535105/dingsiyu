@@ -8,11 +8,9 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
-import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.dto.student.SaveStudentInfoToCenterDTO;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
-import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -20,7 +18,6 @@ import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LocationUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LongitudeAndLatitude;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.feignclient.center.ServerConfigFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.center.UserInfoFeignClient;
 import com.zhidejiaoyu.student.business.login.service.LoginService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -121,9 +118,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Resource
     private WeekHistoryPlanMapper weekHistoryPlanMapper;
 
-    @Resource
-    private ServerConfigFeignClient serverConfigFeignClient;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> loginJudge(String account, String password) {
@@ -181,20 +175,22 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             result.put("headUrl", AliyunInfoConst.host + stu.getHeadUrl());
             result.put("schoolName", stu.getSchoolName());
 
-            // 记录登录信息
-            String ip = saveLoginRunLog(stu);
-
             // 每日首次登陆需要初始化的内容
             initFirstLogin(stu);
 
             // 一个账户只能登陆一台
             judgeMultipleLogin(stu);
-            // 判断学生是否是在加盟校半径 1 公里外登录
-            final String finalIp = ip;
+
             executorService.execute(() -> {
                 addUnclock(stu);
                 getStudentEqument(stu);
-                this.isOtherLocation(stu, finalIp);
+
+                // 记录登录信息
+                String ip = this.saveLoginRunLog(stu);
+
+                // 判断学生是否是在加盟校半径 1 公里外登录
+                this.isOtherLocation(stu, ip);
+
                 this.saveUserInfoToCenterServer(stu);
             });
             // 2.判断是否需要完善个人信息
@@ -224,28 +220,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * @param student
      */
     private void saveUserInfoToCenterServer(Student student) {
-        Boolean exist = userInfoFeignClient.isExist(student.getUuid());
-        if (exist) {
-            return;
-        }
-
-        ServerConfig serverConfig = serverConfigFeignClient.getByServerNo(ServerNoConstant.SERVER_NO);
-        if (serverConfig == null) {
-            log.error("server_config未配置server_no={}的服务器信息！请联系管理员！", ServerNoConstant.SERVER_NO);
-            throw new ServiceException("服务器配置异常，请联系管理员！");
-        }
-
-        BusinessUserInfo businessUserInfo = new BusinessUserInfo();
-        businessUserInfo.setAccount(student.getAccount());
-        businessUserInfo.setCreateTime(new Date());
-        businessUserInfo.setId(IdUtil.getId());
-        businessUserInfo.setOpenid(student.getOpenid());
-        businessUserInfo.setPassword(student.getPassword());
-        businessUserInfo.setServerConfigId(serverConfig.getId());
-        businessUserInfo.setUpdateTime(new Date());
-        businessUserInfo.setUserUuid(student.getUuid());
-
-        userInfoFeignClient.saveUserInfo(businessUserInfo);
+        SaveStudentInfoToCenterDTO saveStudentInfoToCenterDTO = new SaveStudentInfoToCenterDTO();
+        saveStudentInfoToCenterDTO.setServerNo(ServerNoConstant.SERVER_NO);
+        saveStudentInfoToCenterDTO.setAccount(student.getAccount());
+        saveStudentInfoToCenterDTO.setOpenid(student.getOpenid());
+        saveStudentInfoToCenterDTO.setPassword(student.getPassword());
+        saveStudentInfoToCenterDTO.setUuid(student.getUuid());
+        userInfoFeignClient.saveUserInfo(saveStudentInfoToCenterDTO);
     }
 
     private void getStudentEqument(Student stu) {

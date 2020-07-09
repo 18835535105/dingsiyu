@@ -1,8 +1,8 @@
 package com.zhidejioayu.center.business.userinfo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zhidejiaoyu.common.dto.student.SaveStudentInfoToCenterDTO;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 /**
  * @author: wuchenxi
@@ -19,4 +19,12 @@ public interface UserInfoService extends IService<BusinessUserInfo> {
     BusinessUserInfo getUserInfoByUserUuid(String uuid);
 
     void getUser(BusinessUserInfo businessUserInfo, String no);
+
+    /**
+     * 保存用户信息
+     *
+     * @param dto
+     * @return
+     */
+    Boolean saveUserInfo(SaveStudentInfoToCenterDTO dto);
 }

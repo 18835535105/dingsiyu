@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.SysUser;
 import com.zhidejiaoyu.common.utils.IdUtil;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
@@ -94,7 +95,7 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
         List<SearchStudentVO> collect = students.stream().map(student -> SearchStudentVO.builder()
                 .studentId(student.getId())
                 .uuid(student.getUuid())
-                .studentName(student.getStudentName())
+                .studentName(StringUtil.isEmpty(student.getStudentName()) ? "默认昵称" : student.getStudentName())
                 .canSubmit(finalMap.get(student.getId()) == null || finalMap.get(student.getId()).get("count") == 0)
                 .build()).collect(Collectors.toList());
 
@@ -103,9 +104,17 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
     }
 
     @Override
-    public boolean checkUpload(String openId) {
-        Student student = studentMapper.selectByOpenId(openId);
+    public boolean checkUpload(String uuid) {
+        Student student = studentMapper.selectByUuid(uuid);
         int count = currentDayOfStudyMapper.countByStudentIdAndDate(student.getId(), new Date());
         return count == 0;
+    }
+
+    @Override
+    public List<String> getFlyCalendar(String uuid, String month) {
+
+        Student student = studentMapper.selectByUuid(uuid);
+
+        return currentDayOfStudyMapper.selectCreateTimeByMonth(student.getId(), month);
     }
 }
