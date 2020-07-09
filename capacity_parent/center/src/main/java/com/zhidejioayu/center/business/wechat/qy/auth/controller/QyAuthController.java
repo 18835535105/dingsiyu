@@ -2,6 +2,7 @@ package com.zhidejioayu.center.business.wechat.qy.auth.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.wechat.qy.auth.service.QyAuthService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,9 +12,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 企业微信授权、用户信息获取
+ *
+ * <a href="https://www.showdoc.cc/dfdzcenter?page_id=4793315288477743">授权逻辑</a>
  *
  * @author: wuchenxi
  * @date: 2020/6/4 14:13:13
@@ -23,6 +28,12 @@ import java.io.IOException;
 @RequestMapping("/wechat/qy/auth")
 public class QyAuthController {
 
+    @Value("${qywx.authLink}")
+    private String authLink;
+
+    @Value("${qywx.redirect.login}")
+    private String loginUrl;
+
     @Resource
     private QyAuthService qyAuthService;
 
@@ -31,11 +42,22 @@ public class QyAuthController {
      *
      * @return
      */
-    @ResponseBody
     @GetMapping("/auth")
-    public ServerResponse<Object> auth() {
+    public void auth(HttpServletResponse response) throws IOException {
         qyAuthService.auth();
-        return ServerResponse.createBySuccess();
+        response.sendRedirect(loginUrl + "/#/?state=1&msg=授权申请已提交，请耐心等待！");
+    }
+
+    /**
+     * 验证授权状态
+     *
+     * @param response
+     * @throws IOException
+     */
+    @GetMapping("/auth/state")
+    public void authState(HttpServletResponse response) throws IOException {
+        int state = qyAuthService.authState();
+        response.sendRedirect(loginUrl + "/#/?state=" + state);
     }
 
     /**
@@ -49,6 +71,19 @@ public class QyAuthController {
     public void getUserInfo(HttpServletResponse response) throws IOException {
         String url = qyAuthService.getRedirectUrl();
         response.sendRedirect(url);
+    }
+
+    /**
+     * 获取授权链接url
+     *
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/getAuthUrl")
+    public ServerResponse<Object> getAuthUrl() {
+        Map<String, String> map = new HashMap<>(16);
+        map.put("url", authLink);
+        return ServerResponse.createBySuccess(map);
     }
 
 }

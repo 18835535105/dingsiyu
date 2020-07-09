@@ -1,6 +1,7 @@
 package com.zhidejioayu.center.business.wechat.qy.auth.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zhidejiaoyu.common.constant.CookieConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.center.BusinessUserInfoMapper;
 import com.zhidejiaoyu.common.mapper.center.QyAuthMapper;
@@ -19,10 +20,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author: wuchenxi
@@ -71,7 +75,6 @@ public class QyAuthServiceImpl implements QyAuthService {
         }
 
         String name = getName(userId);
-
         QyAuth qyAuth = qyAuthMapper.selectByOpenId(openId);
         if (qyAuth == null) {
             qyAuth = new QyAuth();
@@ -98,6 +101,17 @@ public class QyAuthServiceImpl implements QyAuthService {
     @Override
     public String getRedirectUrl() {
         HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
+        String openId = getOpenId(httpServletRequest);
+
+        String url = httpServletRequest.getParameter("url");
+        BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectTeacherInfoByOpenid(openId);
+        if (businessUserInfo == null) {
+            url = loginUrl;
+        }
+        return url + "/#/?openId=" + openId;
+    }
+
+    public String getOpenId(HttpServletRequest httpServletRequest) {
         UserInfoVO userInfoVO = this.getUserInfoVO(httpServletRequest);
 
         String openId;
@@ -107,13 +121,41 @@ public class QyAuthServiceImpl implements QyAuthService {
         } else {
             openId = userInfoVO.getOpenId();
         }
+        return openId;
+    }
 
-        String url = httpServletRequest.getParameter("url");
-        BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectTeacherInfoByOpenid(openId);
-        if (businessUserInfo == null) {
-            url = loginUrl;
+    @Override
+    public int authState() {
+        HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
+        Cookie[] cookies = httpServletRequest.getCookies();
+        for (Cookie cookie : cookies) {
+            if (Objects.equals(cookie.getName(), CookieConstant.QY_WX_USER_INFO)) {
+                // 已授权
+                return 0;
+            }
         }
-        return url + "/#/?openId=" + openId;
+
+        String openId = this.getOpenId(httpServletRequest);
+
+        BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectTeacherInfoByOpenid(openId);
+        if (businessUserInfo != null) {
+            Cookie cookie = new Cookie(CookieConstant.QY_WX_USER_INFO, "true");
+            // todo：设置为0秒，便于调试，开发完成后修改为86400秒
+            cookie.setMaxAge(0);
+            HttpServletResponse response = HttpUtil.getResponse();
+            response.addCookie(cookie);
+            // 已授权
+            return 0;
+        }
+
+        QyAuth qyAuth = qyAuthMapper.selectByOpenId(openId);
+        if (qyAuth != null) {
+            // 待授权
+            return 1;
+        }
+
+        // 未授权
+        return 2;
     }
 
     public String userIdToOpenId(UserInfoVO userInfoVO) {

@@ -21,4 +21,9 @@ public interface QyAuthService {
      * @return
      */
     String getRedirectUrl();
+
+    /**
+     * 验证授权状态
+     */
+    int authState();
 }
