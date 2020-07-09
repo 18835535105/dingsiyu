@@ -109,10 +109,10 @@ public class QyAuthServiceImpl implements QyAuthService {
             QyAuth qyAuth = qyAuthMapper.selectByOpenId(openId);
             if (qyAuth == null) {
                 // 未授权
-                url = loginUrl + "/#/?state=2";
+                return loginUrl + "/#/?state=2";
             } else {
                 // 待授权
-                url = loginUrl + "/#/?state=1";
+                return loginUrl + "/#/?state=1";
             }
         }
         return url + "/#/?openId=" + openId;
