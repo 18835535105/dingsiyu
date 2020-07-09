@@ -113,7 +113,7 @@ public class QyAuthServiceImpl implements QyAuthService {
         if (businessUserInfo == null) {
             url = loginUrl;
         }
-        return url + "?openId=" + openId;
+        return url + "/#/?openId=" + openId;
     }
 
     public String userIdToOpenId(UserInfoVO userInfoVO) {
