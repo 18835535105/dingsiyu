@@ -128,10 +128,12 @@ public class QyAuthServiceImpl implements QyAuthService {
     public int authState() {
         HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
         Cookie[] cookies = httpServletRequest.getCookies();
-        for (Cookie cookie : cookies) {
-            if (Objects.equals(cookie.getName(), CookieConstant.QY_WX_USER_INFO)) {
-                // 已授权
-                return 0;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (Objects.equals(cookie.getName(), CookieConstant.QY_WX_USER_INFO)) {
+                    // 已授权
+                    return 0;
+                }
             }
         }
 
