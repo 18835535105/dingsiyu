@@ -20,6 +20,7 @@ import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
+import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
@@ -886,7 +887,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             testRecord.setPass(1);
         }
         map.put("point", point);
-        map.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
+        map.put("imgUrl",  PetUrlUtil.getTestPetUrl(student,point,"单元闯关测试"));
         return map;
     }
 

@@ -1009,8 +1009,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             testResultVo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
         }
         resultMap.put("point", point);
-        resultMap.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
-        resultMap.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
+        resultMap.put("imgUrl", PetUrlUtil.getTestPetUrl(student,point,"单元闯关测试"));
+        resultMap.put("petUrl", PetUrlUtil.getTestPetUrl(student,point,"单元闯关测试"));
         testRecordMapper.insert(testRecord);
     }
 

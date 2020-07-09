@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
+import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.learn.vo.GetVo;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -153,7 +154,7 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
         resultMap.put("energy", enger);
         resultMap.put("gold", gold);
         resultMap.put("point", getVo.getTotal());
-        resultMap.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
+        resultMap.put("petUrl", PetUrlUtil.getTestPetUrl(student,getVo.getTotal(),"单元闯关测试"));
         return resultMap;
     }
 }
