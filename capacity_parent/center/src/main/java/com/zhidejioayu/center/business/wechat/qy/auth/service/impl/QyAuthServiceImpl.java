@@ -106,7 +106,7 @@ public class QyAuthServiceImpl implements QyAuthService {
         String url = httpServletRequest.getParameter("url");
         BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectTeacherInfoByOpenid(openId);
         if (businessUserInfo == null) {
-            url = loginUrl;
+            url = loginUrl + "/#/?state=2";
         }
         return url + "/#/?openId=" + openId;
     }
