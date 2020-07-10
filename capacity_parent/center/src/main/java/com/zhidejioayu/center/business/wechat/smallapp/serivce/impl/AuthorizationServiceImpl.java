@@ -55,6 +55,9 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
     public ServerResponse<Object> bind(BindAccountDTO dto) {
 
         ServerConfig serverConfig = serverConfigMapper.selectByAccount(dto.getAccount());
+        if (serverConfig == null) {
+            return ServerResponse.createByError(400, "账号或密码输入错误！");
+        }
 
         BaseSmallAppFeignClient smallAppFeignClient = FeignClientUtil.getSmallAppFeignClient(serverConfig.getServerName());
         ServerResponse<Object> response = smallAppFeignClient.bind(dto);
