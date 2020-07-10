@@ -79,6 +79,9 @@ public class LoginController extends BaseController {
      */
     @PostMapping("/loginOut")
     public ServerResponse<Object> loginOut(HttpSession session) {
+        if (session.isNew()) {
+            return ServerResponse.createBySuccess();
+        }
         StudyTimeAndMileageVO todayInfo = currentDayOfStudyService.getTodayInfo();
         if (todayInfo.getMileage() < 4 || todayInfo.getTime() / 60 < 45) {
             // 小于4个里程或者在线时长小于45分钟不让退出
