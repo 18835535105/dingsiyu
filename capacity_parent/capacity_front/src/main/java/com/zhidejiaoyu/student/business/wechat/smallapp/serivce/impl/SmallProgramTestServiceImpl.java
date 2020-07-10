@@ -87,6 +87,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
                 Map<String, Object> listMap = new HashMap<>();
                 listMap.put("wordId", vocabulary.getId());
                 listMap.put("word", vocabulary.getWord());
+                listMap.put("wordList", getWordList(vocabulary.getWord()));
                 listMap.put("wordChinese", vocabulary.getWordChinese());
                 listMap.put("listenUtrl", baiduSpeak.getLanguagePath(vocabulary.getWord()));
                 maps.add(listMap);
@@ -112,6 +113,15 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         //更新获取单词复习数量
         updateErrorLearnLog(vocabularyIds, student.getId());
         return returnMap;
+    }
+
+    private List<String> getWordList(String word) {
+        List<String> wordList = new ArrayList<>();
+        char[] chars = word.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            wordList.add(chars[i] + "");
+        }
+        return wordList;
     }
 
     @Override
