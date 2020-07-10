@@ -96,6 +96,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             List<Map<String, Object>> mapList = new ArrayList<>();
             maps.forEach(map -> {
                 map.put("listenUtrl", baiduSpeak.getLanguagePath(map.get("word").toString()));
+                map.put("wordList", getWordList(map.get("word").toString()));
                 mapList.add(map);
             });
         }
