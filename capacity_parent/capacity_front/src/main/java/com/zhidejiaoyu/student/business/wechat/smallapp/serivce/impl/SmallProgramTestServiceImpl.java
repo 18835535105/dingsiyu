@@ -285,6 +285,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("subject", map.get("wordChinese"));
             returnMap.put("answer", map.get("word"));
+            map.put("wordList", getWordList(map.get("word").toString()));
             returnMap.put("listenUtrl", map.get("listenUtrl"));
             returnList.add(returnMap);
         });
