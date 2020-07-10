@@ -11,13 +11,15 @@ spring:
     time-zone: Asia/Chongqing
   main:
     allow-bean-definition-overriding: true
+  servlet:
+    multipart:
+      max-file-size: 15MB
 server:
   servlet:
     context-path: /center
   tomcat:
     uri-encoding: utf-8
     connection-timeout: 30m
-
 mybatis:
   type-aliases-package: com.zhidejiaoyu.common.pojo
 
