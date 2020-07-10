@@ -106,7 +106,14 @@ public class QyAuthServiceImpl implements QyAuthService {
         String url = httpServletRequest.getParameter("url");
         BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectTeacherInfoByOpenid(openId);
         if (businessUserInfo == null) {
-            url = loginUrl;
+            QyAuth qyAuth = qyAuthMapper.selectByOpenId(openId);
+            if (qyAuth == null) {
+                // 未授权
+                return loginUrl + "/#/?state=2";
+            } else {
+                // 待授权
+                return loginUrl + "/#/?state=1";
+            }
         }
         return url + "/#/?openId=" + openId;
     }
@@ -128,10 +135,12 @@ public class QyAuthServiceImpl implements QyAuthService {
     public int authState() {
         HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
         Cookie[] cookies = httpServletRequest.getCookies();
-        for (Cookie cookie : cookies) {
-            if (Objects.equals(cookie.getName(), CookieConstant.QY_WX_USER_INFO)) {
-                // 已授权
-                return 0;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (Objects.equals(cookie.getName(), CookieConstant.QY_WX_USER_INFO)) {
+                    // 已授权
+                    return 0;
+                }
             }
         }
 

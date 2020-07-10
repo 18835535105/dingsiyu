@@ -45,7 +45,7 @@ public class QyAuthController {
     @GetMapping("/auth")
     public void auth(HttpServletResponse response) throws IOException {
         qyAuthService.auth();
-        response.sendRedirect(loginUrl + "/#/?state=1&msg=授权申请已提交，请耐心等待！");
+        response.sendRedirect(loginUrl + "/#/?state=3");
     }
 
     /**
