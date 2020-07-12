@@ -18,6 +18,10 @@
 *.zip
 *.tar.gz
 *.rar
+*.settings
+*.classpath
+*.project
+*.factorypath
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
@@ -28,4 +32,8 @@ hs_err_pid*
 /capacity_front/simple_front.iml
 /capacity_common/log/
 /capacity_common/d:/
+/capacity_common/target/classes/
+/capacity_front/target/classes/
+/aliyun-common/bin
+
 /.idea
