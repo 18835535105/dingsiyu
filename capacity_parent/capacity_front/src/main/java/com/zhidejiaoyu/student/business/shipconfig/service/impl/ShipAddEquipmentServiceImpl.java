@@ -275,8 +275,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         equSort.forEach(equ -> {
             List<Map<String, Object>> equipmentUrls = equipmentMap.get(Long.parseLong(equ.get("equipmentId").toString()));
             List<Map<String, Object>> collect = equipmentUrls.stream()
-                    .filter(url ->
-                            Integer.parseInt(url.get("degree").toString()) == Integer.parseInt(equ.get("enhancementGrade").toString()))
+                    .filter(url -> Objects.equals(Integer.parseInt(url.get("degree").toString()), Integer.parseInt(equ.get("enhancementGrade").toString())))
                     .collect(Collectors.toList());
             if (collect.size() > 0) {
                 equ.put("imgUrl", GetOssFile.getPublicObjectUrl(collect.get(0).get("imgUrl").toString()));
