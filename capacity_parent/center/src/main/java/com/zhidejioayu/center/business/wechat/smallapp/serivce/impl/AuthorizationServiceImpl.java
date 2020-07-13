@@ -28,7 +28,10 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author: wuchenxi
@@ -52,6 +55,9 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
     public ServerResponse<Object> bind(BindAccountDTO dto) {
 
         ServerConfig serverConfig = serverConfigMapper.selectByAccount(dto.getAccount());
+        if (serverConfig == null) {
+            return ServerResponse.createByError(400, "账号或密码输入错误！");
+        }
 
         BaseSmallAppFeignClient smallAppFeignClient = FeignClientUtil.getSmallAppFeignClient(serverConfig.getServerName());
         ServerResponse<Object> response = smallAppFeignClient.bind(dto);
@@ -59,7 +65,14 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
         if (Objects.equals(response.getStatus(), ResponseCode.SUCCESS.getCode())) {
             BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectByAccount(dto.getAccount());
             String openid = businessUserInfo.getOpenid() + "," + dto.getOpenId();
-            businessUserInfo.setOpenid(openid);
+
+            Set<String> set = new HashSet<>(Arrays.asList(openid.split(",")));
+
+            StringBuilder sb = new StringBuilder();
+            for (String s : set) {
+                sb.append(s).append(",");
+            }
+            businessUserInfo.setOpenid(StringUtils.removeEnd(sb.toString(), ","));
             businessUserInfoMapper.updateById(businessUserInfo);
         }
 

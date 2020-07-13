@@ -18,7 +18,7 @@
         select
         <include refid="base_sql"/>
         from business_user_info
-        where openid = #{openid}
+        where openid like concat('%', #{openid}, '%')
         and account like 'dz%'
         limit 1
     </select>

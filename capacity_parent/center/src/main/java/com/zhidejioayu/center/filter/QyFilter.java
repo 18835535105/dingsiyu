@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -17,8 +18,7 @@ import java.io.IOException;
  * @author: wuchenxi
  * @date: 2020/7/9 10:35:35
  */
-//@Component
-//@WebFilter(urlPatterns = "/center/wechat/qy/**")
+@WebFilter(urlPatterns = {"/wechat/qy/*"})
 public class QyFilter implements Filter {
 
     @Value("${qywx.redirect.login}")

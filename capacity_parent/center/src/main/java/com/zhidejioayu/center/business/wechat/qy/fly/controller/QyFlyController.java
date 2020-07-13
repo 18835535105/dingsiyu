@@ -50,8 +50,8 @@ public class QyFlyController {
 
         // 文件大小M
         long size = file.getSize() / 1024 / 1024;
-        if (size > 1) {
-            return ServerResponse.createByError(400, "上传的图片不能大于1M！");
+        if (size > 5) {
+            return ServerResponse.createByError(400, "上传的图片不能大于5M！");
         }
 
         try {

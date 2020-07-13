@@ -368,7 +368,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         char[] chars = word.toCharArray();
         List<String> returnList = new ArrayList<>();
         List<String> allList = new ArrayList<>();
-        if (chars.length > 1) {
+        if (chars.length >= 2) {
             List<Integer> letterList = new ArrayList<>();
             int starti = 0;
             List<String> strList = new ArrayList<>();
@@ -391,6 +391,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 map.put(integer, integer);
             }
             Set<Integer> integers = map.keySet();
+
             // StringBuilder builder = new StringBuilder();
             for (int i = 0; i < strList.size(); i++) {
                 if (integers.contains(i)) {
@@ -404,12 +405,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                     //builder.append(strList.get(i));
                 }
             }
-        } else {
-            allList.add("$&$");
-            returnList.add(word);
-            wordCompletionStudyVo.setSize(1);
         }
-
         returnMap.put("getWord", allList);
         returnMap.put("successWords", returnList);
     }
@@ -501,7 +497,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     public Vocabulary getVocabulary(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
         List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel, modelType);
-        Long[] wordId = new Long[wordIds.size()];
+        Long[] wordId=new Long[wordIds.size()];
         wordIds.toArray(wordId);
         return courseFeignClient.getOneWordNotInIdsNew(wordId, unitId, group);
     }

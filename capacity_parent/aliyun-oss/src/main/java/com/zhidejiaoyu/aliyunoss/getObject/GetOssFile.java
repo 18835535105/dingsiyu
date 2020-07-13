@@ -31,7 +31,6 @@ public class GetOssFile {
         client = this.ossClient;
     }
 
-
     /**
      * 获取文件 url 地址,公共权限
      *
@@ -41,6 +40,10 @@ public class GetOssFile {
     public static String getPublicObjectUrl(String objectName) {
         if (StringUtils.isEmpty(objectName)) {
             return "";
+        }
+        if (objectName.startsWith("/")) {
+            // 防止url后面有多余的/，例如：https://oss.yydz100.com//static/img/1.png
+            objectName = objectName.substring(1);
         }
         if (objectName.contains(AliyunInfoConst.host)) {
             objectName = objectName.replace(AliyunInfoConst.host, "");
@@ -59,5 +62,10 @@ public class GetOssFile {
         URL url = client.generatePresignedUrl(AliyunInfoConst.bucketName, objectName, expiration);
 
         return url.toString();
+    }
+
+    public static void main(String[] args) {
+        String url = getPublicObjectUrl("/abcd");
+        log.info("url={}", url);
     }
 }
