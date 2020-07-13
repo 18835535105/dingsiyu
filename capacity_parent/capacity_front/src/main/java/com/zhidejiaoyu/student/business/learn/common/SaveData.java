@@ -408,6 +408,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         } else {
             allList.add("$&$");
             returnList.add(word);
+            wordCompletionStudyVo.setSize(1);
         }
         returnMap.put("getWord", allList);
         returnMap.put("successWords", returnList);
