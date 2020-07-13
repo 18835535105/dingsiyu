@@ -366,42 +366,48 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
 
     private void getStudyWordComplets(String word, Map<String, Object> returnMap, WordCompletionStudyVo wordCompletionStudyVo) {
         char[] chars = word.toCharArray();
-        List<Integer> letterList = new ArrayList<>();
-        int starti = 0;
-        List<String> strList = new ArrayList<>();
-        for (char ch : chars) {
-            strList.add(ch + "");
-        }
-        for (String letter : strList) {
-            if (Pattern.matches(END_MATCH, letter) && !" ".equals(letter)) {
-                letterList.add(starti);
-            }
-            starti++;
-        }
-        Random random = new Random();
-        int size = letterList.size() / 2;
-        wordCompletionStudyVo.setSize(size);
-        Map<Integer, Integer> map = new HashMap<>();
-        while (map.size() < size) {
-            int i = random.nextInt(letterList.size());
-            Integer integer = letterList.get(i);
-            map.put(integer, integer);
-        }
-        Set<Integer> integers = map.keySet();
         List<String> returnList = new ArrayList<>();
         List<String> allList = new ArrayList<>();
-        // StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < strList.size(); i++) {
-            if (integers.contains(i)) {
-                String letts = strList.get(i);
-                returnList.add(letts);
-                allList.add("$&$");
-                //builder.append("$&$");
-            } else {
-                allList.add(strList.get(i));
-                returnList.add(strList.get(i));
-                //builder.append(strList.get(i));
+        if (chars.length >= 2) {
+            List<Integer> letterList = new ArrayList<>();
+            int starti = 0;
+            List<String> strList = new ArrayList<>();
+            for (char ch : chars) {
+                strList.add(ch + "");
             }
+            for (String letter : strList) {
+                if (Pattern.matches(END_MATCH, letter) && !" ".equals(letter)) {
+                    letterList.add(starti);
+                }
+                starti++;
+            }
+            Random random = new Random();
+            int size = letterList.size() / 2;
+            wordCompletionStudyVo.setSize(size);
+            Map<Integer, Integer> map = new HashMap<>();
+            while (map.size() < size) {
+                int i = random.nextInt(letterList.size());
+                Integer integer = letterList.get(i);
+                map.put(integer, integer);
+            }
+            Set<Integer> integers = map.keySet();
+
+            // StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < strList.size(); i++) {
+                if (integers.contains(i)) {
+                    String letts = strList.get(i);
+                    returnList.add(letts);
+                    allList.add("$&$");
+                    //builder.append("$&$");
+                } else {
+                    allList.add(strList.get(i));
+                    returnList.add(strList.get(i));
+                    //builder.append(strList.get(i));
+                }
+            }
+        } else {
+            allList.add("$&$");
+            returnList.add(word);
         }
         returnMap.put("getWord", allList);
         returnMap.put("successWords", returnList);
@@ -494,7 +500,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     public Vocabulary getVocabulary(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
         List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel, modelType);
-        Long[] wordId=new Long[wordIds.size()];
+        Long[] wordId = new Long[wordIds.size()];
         wordIds.toArray(wordId);
         return courseFeignClient.getOneWordNotInIdsNew(wordId, unitId, group);
     }
