@@ -405,6 +405,10 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                     //builder.append(strList.get(i));
                 }
             }
+        } else {
+            allList.add("$&$");
+            returnList.add(word);
+            wordCompletionStudyVo.setSize(1);
         }
         returnMap.put("getWord", allList);
         returnMap.put("successWords", returnList);
@@ -497,7 +501,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     public Vocabulary getVocabulary(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
         List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel, modelType);
-        Long[] wordId=new Long[wordIds.size()];
+        Long[] wordId = new Long[wordIds.size()];
         wordIds.toArray(wordId);
         return courseFeignClient.getOneWordNotInIdsNew(wordId, unitId, group);
     }
