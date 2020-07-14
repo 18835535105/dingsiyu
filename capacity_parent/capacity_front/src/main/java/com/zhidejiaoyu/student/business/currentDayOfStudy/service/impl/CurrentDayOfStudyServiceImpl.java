@@ -57,13 +57,13 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         }
         Long validTime = durationMapper.selectValidTimeByStudentIdAndDate(studentId, dateStr);
         if (validTime != null && validTime > 0) {
-            vo.setValidTime(validTime.intValue() / 60 / 1000);
+            vo.setValidTime(validTime.intValue() / 60);
         } else {
             vo.setValidTime(0);
         }
         Long onlineTime = durationMapper.selectByStudentIdAndDate(studentId, dateStr);
         if (onlineTime != null && onlineTime > 0) {
-            vo.setOnlineTime(onlineTime.intValue() / 60 / 1000);
+            vo.setOnlineTime(onlineTime.intValue() / 60);
         } else {
             vo.setOnlineTime(0);
         }
