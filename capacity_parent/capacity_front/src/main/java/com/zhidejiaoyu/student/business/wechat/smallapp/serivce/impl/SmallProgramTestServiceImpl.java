@@ -122,6 +122,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         for (int i = 0; i < chars.length; i++) {
             wordList.add(chars[i] + "");
         }
+        Collections.shuffle(wordList);
         return wordList;
     }
 
