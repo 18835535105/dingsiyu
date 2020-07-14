@@ -86,7 +86,7 @@ gongzhonghao:
     partner: ${studyUrl}/partner
 qywx:
   appId: ww50bff9461dc34208
-  secret: h3URdX9xrlN7hAGOwPPQSH0Uif5b_gQLa4Nxop36t2w
+  secret: DwNg4QieQYGQ9mJdu1wkV50z4YiHPpiH1gQ0TcKty4U
   # 授权链接
   authLink: https://open.weixin.qq.com/connect/oauth2/authorize?appid=${qywx.appId}&redirect_uri=${qywx.redirect.redirect_uri}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect
   redirect:
