@@ -57,13 +57,13 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         }
         Long validTime = durationMapper.selectValidTimeByStudentIdAndDate(studentId, dateStr);
         if (validTime != null && validTime > 0) {
-            vo.setValidTime(validTime.intValue());
+            vo.setValidTime(validTime.intValue() / 60 / 1000);
         } else {
             vo.setValidTime(0);
         }
         Long onlineTime = durationMapper.selectByStudentIdAndDate(studentId, dateStr);
         if (onlineTime != null && onlineTime > 0) {
-            vo.setOnlineTime(onlineTime.intValue());
+            vo.setOnlineTime(onlineTime.intValue() / 60 / 1000);
         } else {
             vo.setOnlineTime(0);
         }
@@ -83,7 +83,7 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
     @Override
     public StudyTimeAndMileageVO getTodayInfo() {
         Long studentId = super.getStudentId();
-        Long onlineTime =  durationMapper.countTodayOnlineTimeByStudentId(studentId);
+        Long onlineTime = durationMapper.countTodayOnlineTimeByStudentId(studentId);
 
         int groupCount = learnHistoryMapper.countByStudentIdToDay(studentId);
         int testCount = testRecordMapper.countGoldTestByStudentIdToday(studentId);
