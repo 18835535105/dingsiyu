@@ -101,10 +101,15 @@
         select distinct(c.id)
         from course_new c
         where c.version = #{version}
-        and c.grade in (
+        and (c.grade in (
         <foreach collection="smallGradeList" item="grade" separator=",">
             #{grade}
         </foreach>)
+        or c.grade_ext in (
+        <foreach collection="smallGradeList" item="grade" separator=",">
+            #{grade}
+        </foreach>
+        ))
     </select>
     <select id="selectByIds" resultMap="BaseResultMap" parameterType="map">
         select
@@ -145,7 +150,7 @@
         <foreach collection="courseNews" item="courseNew" separator="or">
             cn.grade = #{courseNew.grade} or cn.grade_ext = #{courseNew.grade}
         </foreach>
-            )
+        )
         and (
         <foreach collection="courseNews" item="courseNew" separator="or">
             cn.label = #{courseNew.label} or cn.label_ext = #{courseNew.label}
