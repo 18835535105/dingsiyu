@@ -525,8 +525,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * @param student
      */
     private void initAccountTime(Student student) {
-        boolean flag = redisOpt.firstLogin(student.getId());
-        if (flag) {
+        if (student.getAccountTime() == null) {
             student.setAccountTime(new Date(System.currentTimeMillis() + student.getRank() * 24 * 60 * 60 * 1000L));
             student.setUuid(IdUtil.getId());
             studentMapper.updateById(student);
