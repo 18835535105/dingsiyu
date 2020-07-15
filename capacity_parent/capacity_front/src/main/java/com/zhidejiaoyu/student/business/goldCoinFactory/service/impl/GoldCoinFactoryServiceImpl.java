@@ -78,8 +78,10 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
                 }
             }
             returnMap.put("satelliteClass", satelliteClass);
+            returnMap.put("nextSatelliteClass", satelliteClass + 1 >= 5 ? 5 : satelliteClass + 1);
         } else {
             returnMap.put("satelliteClass", 0);
+            returnMap.put("nextSatelliteClass", 1);
         }
         returnMap.put("studentGold", gold.intValue());
         returnMap.put("nextSatelliteClassGold", satelliteClassGold.intValue());
