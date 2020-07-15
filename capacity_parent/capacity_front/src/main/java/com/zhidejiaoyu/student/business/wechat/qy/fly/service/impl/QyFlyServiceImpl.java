@@ -117,4 +117,13 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
 
         return currentDayOfStudyMapper.selectCreateTimeByMonth(student.getId(), month);
     }
+
+    @Override
+    public ServerResponse<Object> checkScanQrCode(Long studentId, Integer num) {
+        int i = currentDayOfStudyMapper.countByStudentIdAndQrCodeNum(studentId, num);
+        if (i > 0) {
+            return ServerResponse.createByError(400, "已经上传，再上传将覆盖原有信息！是否继续上传？");
+        }
+        return ServerResponse.createBySuccess();
+    }
 }

@@ -48,4 +48,13 @@ public interface QyFlyService extends IService<CurrentDayOfStudy> {
      * @return
      */
     List<String> getFlyCalendar(String uuid, String month);
+
+    /**
+     * 检查当前学生二维码序号是否已经上传
+     *
+     * @param studentId
+     * @param num       二维码序号
+     * @return
+     */
+    ServerResponse<Object> checkScanQrCode(Long studentId, Integer num);
 }

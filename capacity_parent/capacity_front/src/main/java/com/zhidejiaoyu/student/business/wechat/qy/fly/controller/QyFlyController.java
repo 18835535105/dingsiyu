@@ -84,6 +84,18 @@ public class QyFlyController {
     }
 
     /**
+     * 检查当前学生二维码序号是否已经上传
+     *
+     * @param studentId
+     * @param num       二维码序号
+     * @return
+     */
+    @GetMapping("/checkScanQrCode")
+    public ServerResponse<Object> checkScanQrCode(@RequestParam Long studentId, @RequestParam Integer num) {
+        return qyFlyService.checkScanQrCode(studentId, num);
+    }
+
+    /**
      * 校验学生今天智慧飞行记录是否已经上传
      *
      * @param uuid
@@ -131,7 +143,7 @@ public class QyFlyController {
      * 获取学生智慧飞行记录日历
      *
      * @param uuid
-     * @param month  指定月份
+     * @param month 指定月份
      * @return
      */
     @GetMapping("/getFlyCalendar")
