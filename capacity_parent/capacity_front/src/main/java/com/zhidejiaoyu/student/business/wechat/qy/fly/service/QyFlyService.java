@@ -15,16 +15,6 @@ import java.util.List;
 public interface QyFlyService extends IService<CurrentDayOfStudy> {
 
     /**
-     * 上传学生飞行记录
-     *
-     * @param file
-     * @param studentId
-     * @param num       作业本中二维码序号
-     * @return
-     */
-    ServerResponse<Object> uploadFlyRecord(MultipartFile file, Long studentId, Integer num);
-
-    /**
      * 获取当前教师下的所有学生
      *
      * @param dto 查询条件
@@ -48,4 +38,13 @@ public interface QyFlyService extends IService<CurrentDayOfStudy> {
      * @return
      */
     List<String> getFlyCalendar(String uuid, String month);
+
+    /**
+     * 检查当前学生二维码序号是否已经上传
+     *
+     * @param studentId
+     * @param num       二维码序号
+     * @return
+     */
+    ServerResponse<Object> checkScanQrCode(Long studentId, Integer num);
 }

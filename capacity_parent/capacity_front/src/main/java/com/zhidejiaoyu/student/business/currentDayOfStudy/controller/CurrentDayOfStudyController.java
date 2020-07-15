@@ -27,9 +27,9 @@ public class CurrentDayOfStudyController extends BaseController {
      * @param currentDayOfStudy
      * @return
      */
-    @PostMapping("/save")
-    public Boolean save(@RequestBody CurrentDayOfStudy currentDayOfStudy) {
-        return currentDayOfStudyService.save(currentDayOfStudy);
+    @PostMapping("/saveOrUpdate")
+    public Boolean saveOrUpdate(@RequestBody CurrentDayOfStudy currentDayOfStudy) {
+        return currentDayOfStudyService.saveOrUpdate1(currentDayOfStudy);
     }
 
     /**

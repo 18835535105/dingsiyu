@@ -45,42 +45,15 @@ public class QyFlyController {
     private IndexService smallAppIndexService;
 
     /**
-     * 上传飞行记录
+     * 检查当前学生二维码序号是否已经上传
      *
-     * @param file
      * @param studentId
-     * @param num       作业本中二维码序号
+     * @param num       二维码序号
      * @return
      */
-    @PostMapping("/uploadFlyRecord")
-    public ServerResponse<Object> uploadFlyRecord(MultipartFile file, Long studentId, Integer num) {
-        if (file == null) {
-            return ServerResponse.createByError(400, "上传的图片不能为空！");
-        }
-        if (studentId == null) {
-            return ServerResponse.createByError(400, "studentId can't be null!");
-        }
-        if (num == null) {
-            return ServerResponse.createByError(400, "二维码序号不能为空！");
-        }
-
-        // 文件大小M
-        long size = file.getSize() / 1024 / 1024;
-        if (size > 1) {
-            return ServerResponse.createByError(400, "上传的图片不能大于1M！");
-        }
-
-        try {
-            BufferedImage read = ImageIO.read(file.getInputStream());
-            if (read == null) {
-                return ServerResponse.createByError(400, "上传的文件不是图片类型，请重新上传！");
-            }
-        } catch (IOException e) {
-            return ServerResponse.createByError(400, "上传的文件不是图片类型，请重新上传！");
-        }
-
-
-        return qyFlyService.uploadFlyRecord(file, studentId, num);
+    @GetMapping("/checkScanQrCode")
+    public ServerResponse<Object> checkScanQrCode(@RequestParam Long studentId, @RequestParam Integer num) {
+        return qyFlyService.checkScanQrCode(studentId, num);
     }
 
     /**
@@ -131,7 +104,7 @@ public class QyFlyController {
      * 获取学生智慧飞行记录日历
      *
      * @param uuid
-     * @param month  指定月份
+     * @param month 指定月份
      * @return
      */
     @GetMapping("/getFlyCalendar")

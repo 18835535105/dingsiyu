@@ -46,8 +46,8 @@ public interface BaseQyFeignClient {
      * @param currentDayOfStudy
      * @return
      */
-    @PostMapping("/currentDayOfStudy/save")
-    boolean saveCurrentDayOfStudy(@RequestBody CurrentDayOfStudy currentDayOfStudy);
+    @PostMapping("/currentDayOfStudy/saveOrUpdate")
+    boolean saveOrUpdateCurrentDayOfStudy(@RequestBody CurrentDayOfStudy currentDayOfStudy);
 
     /**
      * 查询教师下的学生信息
@@ -105,4 +105,14 @@ public interface BaseQyFeignClient {
      */
     @GetMapping("/qy/fly/getFlyCalendar")
     List<String> getFlyCalendar(@RequestParam String uuid, @RequestParam String month);
+
+    /**
+     * 检查当前学生二维码序号是否已经上传
+     *
+     * @param studentId
+     * @param num       二维码序号
+     * @return
+     */
+    @GetMapping("/qy/fly/checkScanQrCode")
+    ServerResponse<Object> checkScanQrCode(@RequestParam Long studentId, @RequestParam Integer num);
 }

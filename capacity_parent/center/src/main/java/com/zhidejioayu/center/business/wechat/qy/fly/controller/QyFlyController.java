@@ -67,6 +67,32 @@ public class QyFlyController {
     }
 
     /**
+     * 检查当前学生二维码序号是否已经上传
+     *
+     * @param uuid      学生uuid
+     * @param studentId
+     * @param num       二维码序号
+     * @return
+     */
+    @GetMapping("/checkScanQrCode")
+    public ServerResponse<Object> checkScanQrCode(String uuid, Long studentId, Integer num) {
+        if (StringUtil.isEmpty(uuid)) {
+            return ServerResponse.createByError(400, "uuid can't be null!");
+        }
+        if (studentId == null) {
+            return ServerResponse.createByError(400, "studentId can't be null!");
+        }
+        if (num == null) {
+            return ServerResponse.createByError(400, "num can't be null!");
+        }
+        ServerConfig serverConfig = ServerConfigUtil.getByUuid(uuid);
+
+        BaseQyFeignClient qyFeignClient = FeignClientUtil.getQyFeignClient(serverConfig.getServerName());
+
+        return qyFeignClient.checkScanQrCode(studentId, num);
+    }
+
+    /**
      * 获取当前教师下的所有学生
      *
      * @param dto 查询条件
