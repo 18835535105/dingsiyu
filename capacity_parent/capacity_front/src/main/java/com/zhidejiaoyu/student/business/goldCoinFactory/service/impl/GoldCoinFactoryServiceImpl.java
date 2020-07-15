@@ -18,11 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements GoldCoinFactoryService {
@@ -68,8 +64,9 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
     @Override
     public Object getSatelliteClass(HttpSession session) {
         Student student = getStudent(session);
-        double gold = student.getOfflineGold() + student.getSystemGold();
-        double satelliteClassGold = 10000;
+        Double gold = student.getOfflineGold() + student.getSystemGold();
+        Double satelliteClassGold = 10000.0;
+        Map<String, Object> returnMap = new HashMap<>();
         Integer satelliteClass = 1;
         if (gold >= satelliteClassGold) {
             for (int i = 1; i <= 4; i++) {
@@ -77,13 +74,16 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
                 if (gold >= satelliteClassGold) {
                     satelliteClass += 1;
                 } else {
-                    continue;
+                    break;
                 }
             }
-            return ServerResponse.createBySuccess(satelliteClass);
+            returnMap.put("satelliteClass", satelliteClass);
         } else {
-            return ServerResponse.createBySuccess(0);
+            returnMap.put("satelliteClass", 0);
         }
+        returnMap.put("studentGold", gold.intValue());
+        returnMap.put("nextSatelliteClassGold", satelliteClassGold.intValue());
+        return ServerResponse.createBySuccess(returnMap);
     }
 
     private void getReturnList(Integer schoolAdminId, Date date, GoldCoinFactoryGoldList vo) {
