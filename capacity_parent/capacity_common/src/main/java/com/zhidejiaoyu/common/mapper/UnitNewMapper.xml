@@ -117,5 +117,23 @@
         order by un.id desc
         limit 1
     </select>
+    <select id="selectMaxGroupByUnitIsdAndType" resultType="java.util.Map" parameterType="map">
+        select unit_id, max(`group`) `group` from
+        <if test="type == 1">
+            unit_vocabulary_new
+        </if>
+        <if test="type == 2">
+            unit_sentence_new
+        </if>
+        <if test="type == 4">
+            unit_teks_new
+        </if>
+        where unit_id in (
+        <foreach collection="unitIds" separator="," item="unitId">
+            #{unitId}
+        </foreach>
+        )
+        group by unit_id
+    </select>
 
 </mapper>

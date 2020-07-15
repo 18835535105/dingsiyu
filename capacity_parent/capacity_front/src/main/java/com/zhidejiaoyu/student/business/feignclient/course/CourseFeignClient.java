@@ -179,4 +179,13 @@ public interface CourseFeignClient {
     List<TeksNew> getTwentyTeks();
 
 
+    /**
+     * 根据类型查询单元最大group
+     *
+     * @param unitIds
+     * @param type  1：单词；2：句型；3：语法；4：课文
+     * @return
+     */
+    @GetMapping
+    Map<Long, Map<Long, Integer>> getMaxGroupByUnitIsdAndType(@RequestParam List<Long> unitIds, @RequestParam Integer type);
 }

@@ -103,4 +103,14 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @return
      */
     UnitNew selectNextSyntaxUnitByCourseId(@Param("unitId") Long unitId, @Param("courseId") Long courseId);
+
+    /**
+     * 查询各个模块单元最大group
+     *
+     * @param unitIds
+     * @param type    1：单词；2：句型；3：语法；4：课文
+     * @return
+     */
+    @MapKey("unitId")
+    Map<Long, Map<Long, Integer>> selectMaxGroupByUnitIsdAndType(@Param("unitIds") List<Long> unitIds, @Param("type") Integer type);
 }

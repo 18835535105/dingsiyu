@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.grade.GradeUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.index.dto.UnitInfoDTO;
 import com.zhidejiaoyu.student.business.index.service.IndexCourseInfoService;
 import com.zhidejiaoyu.student.business.index.vo.course.CourseInfoVO;
@@ -65,6 +66,9 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     @Resource
     private TestRecordMapper testRecordMapper;
+
+    @Resource
+    private  CourseFeignClient courseFeignClient;
 
     static {
         MAPPING.put(GradeNameConstant.FIRST_GRADE, "one");
@@ -128,6 +132,11 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     @Override
     public ServerResponse<Object> getUnitInfo(UnitInfoDTO dto) {
         List<Map<String, Object>> map = unitNewMapper.selectIdAndNameByCourseId(dto.getCourseId(), dto.getType());
+        List<Long> unitIds = map.stream().map(map1 -> Long.parseLong(map1.get("unitId").toString())).collect(Collectors.toList());
+
+        Map<Long, Map<Long, Integer>> maxGroup = courseFeignClient.getMaxGroupByUnitIsdAndType(unitIds, dto.getType());
+
+
         return ServerResponse.createBySuccess(map);
     }
 
