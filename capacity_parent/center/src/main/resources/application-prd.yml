@@ -85,8 +85,8 @@ gongzhonghao:
     # 微信授权结束后跳转的路径
     partner: ${studyUrl}/partner
 qywx:
-  appId: wwe6e0ef9e01f6d6aa
-  secret: pxf5D_K3F9jFPwRTksCRXERkar3rOdOLmyYfImmv11o
+  appId: ww50bff9461dc34208
+  secret: DwNg4QieQYGQ9mJdu1wkV50z4YiHPpiH1gQ0TcKty4U
   # 授权链接
   authLink: https://open.weixin.qq.com/connect/oauth2/authorize?appid=${qywx.appId}&redirect_uri=${qywx.redirect.redirect_uri}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect
   redirect:

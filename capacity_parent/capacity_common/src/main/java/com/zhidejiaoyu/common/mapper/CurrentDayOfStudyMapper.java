@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.Date;
 import java.util.List;
@@ -67,4 +68,14 @@ public interface CurrentDayOfStudyMapper extends BaseMapper<CurrentDayOfStudy> {
      * @return
      */
     CurrentDayOfStudy selectByStudentIdAndCreateTime(@Param("studentId") Long studentId, @Param("date") String date);
+
+    /**
+     * 查询学生当前二维码是否已经使用过
+     *
+     * @param studentId
+     * @param num       二维码编号
+     * @return
+     */
+    @Select("select count(id) from current_day_of_study where student_id = #{studentId} and qr_code_num = #{num}")
+    int countByStudentIdAndQrCodeNum(@Param("studentId") Long studentId, @Param("num") Integer num);
 }

@@ -33,4 +33,12 @@ public interface CurrentDayOfStudyService extends IService<CurrentDayOfStudy> {
      * @return
      */
     ServerResponse<Object> getCurrentDayOfStudyWithDate(Long studentId, String date);
+
+    /**
+     * 保存或修改记录
+     *
+     * @param currentDayOfStudy
+     * @return
+     */
+    Boolean saveOrUpdate1(CurrentDayOfStudy currentDayOfStudy);
 }

@@ -37,7 +37,7 @@ public class BaseQyFeignClientTest {
 
     @Test
     public void testSave() {
-        boolean b = server1QyAuthFeignClient.saveCurrentDayOfStudy(CurrentDayOfStudy.builder()
+        boolean b = server1QyAuthFeignClient.saveOrUpdateCurrentDayOfStudy(CurrentDayOfStudy.builder()
                 .createTime(new Date())
                 .imgUrl("111")
                 .qrCodeNum(1)

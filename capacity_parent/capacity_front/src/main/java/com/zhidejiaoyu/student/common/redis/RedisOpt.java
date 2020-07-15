@@ -442,24 +442,6 @@ public class RedisOpt {
     }
 
     /**
-     * 判断学生是否是第一次登录系统
-     *
-     * @param studentId
-     * @return true：是第一次登录系统；false：不是第一次登录系统
-     */
-    public boolean firstLogin(Long studentId) {
-        Object object = redisTemplate.opsForHash().get(RedisKeysConst.FIRST_LOGIN, studentId);
-        if (object != null) {
-            return false;
-        }
-        Integer count = runLogMapper.countLoginCountByStudentId(studentId);
-        boolean flag = count == 0;
-        redisTemplate.opsForHash().put(RedisKeysConst.FIRST_LOGIN, studentId, flag);
-        redisTemplate.expire(RedisKeysConst.FIRST_LOGIN, 7, TimeUnit.DAYS);
-        return flag;
-    }
-
-    /**
      * 将当前 sessionId 标记为异地登录被挤掉的 sessionId，在 session 失效时不保存该 session 的时长信息
      *
      * @param oldSessionId

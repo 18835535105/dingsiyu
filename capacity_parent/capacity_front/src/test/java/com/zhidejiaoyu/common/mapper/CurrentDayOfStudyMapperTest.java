@@ -19,7 +19,7 @@ import java.util.Map;
 @Slf4j
 @SpringBootTest(classes = ZdjyFrontApplication.class)
 @RunWith(SpringRunner.class)
-public class CurrentDayOfStudyMapperTest{
+public class CurrentDayOfStudyMapperTest {
 
     @Resource
     private CurrentDayOfStudyMapper currentDayOfStudyMapper;
@@ -31,5 +31,11 @@ public class CurrentDayOfStudyMapperTest{
         objects.add(9319L);
         Map<Long, Map<Long, Long>> longMapMap = currentDayOfStudyMapper.countByStudentIdsAndDate(objects, null);
         log.info("longMapMap={}", longMapMap);
+    }
+
+    @Test
+    public void countByStudentIdAndQrCodeNum() {
+        int i = currentDayOfStudyMapper.countByStudentIdAndQrCodeNum(9319L, 24);
+        log.info("count={}", i);
     }
 }

@@ -96,11 +96,6 @@ public interface RedisKeysConst {
     String PHONETIC_SYMBOL = "PHONETIC_SYMBOL:" + ServerNoConstant.SERVER_NO;
 
     /**
-     * 存储学生是否是第一次登录信息
-     */
-    String FIRST_LOGIN = "FIRST_LOGIN:" + ServerNoConstant.SERVER_NO;
-
-    /**
      * 被标记为异地登录被挤掉的 sessionId
      */
     String MULTIPLE_LOGIN_SESSION_ID = "MULTIPLE_LOGIN_SESSION_ID:" + ServerNoConstant.SERVER_NO + ":";
