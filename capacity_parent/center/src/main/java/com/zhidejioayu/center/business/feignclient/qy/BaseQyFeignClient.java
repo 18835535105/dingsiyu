@@ -46,8 +46,8 @@ public interface BaseQyFeignClient {
      * @param currentDayOfStudy
      * @return
      */
-    @PostMapping("/currentDayOfStudy/save")
-    boolean saveCurrentDayOfStudy(@RequestBody CurrentDayOfStudy currentDayOfStudy);
+    @PostMapping("/currentDayOfStudy/saveOrUpdate")
+    boolean saveOrUpdateCurrentDayOfStudy(@RequestBody CurrentDayOfStudy currentDayOfStudy);
 
     /**
      * 查询教师下的学生信息

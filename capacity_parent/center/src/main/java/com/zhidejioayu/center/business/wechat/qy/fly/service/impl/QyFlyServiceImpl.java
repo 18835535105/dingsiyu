@@ -47,7 +47,7 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
 
         String upload = OssUpload.upload(file, dir, IdUtil.getId());
 
-        boolean b = baseQyFeignClient.saveCurrentDayOfStudy(CurrentDayOfStudy.builder()
+        boolean b = baseQyFeignClient.saveOrUpdateCurrentDayOfStudy(CurrentDayOfStudy.builder()
                 .createTime(date)
                 .imgUrl(upload)
                 .qrCodeNum(uploadFlyRecordDTO.getNum())

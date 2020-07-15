@@ -118,6 +118,16 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
                 .build());
     }
 
+    @Override
+    public Boolean saveOrUpdate1(CurrentDayOfStudy currentDayOfStudy) {
+        CurrentDayOfStudy currentDayOfStudy1 = currentDayOfStudyMapper.selectByStudentIdAndQrCodeNum(currentDayOfStudy.getStudentId(), currentDayOfStudy.getQrCodeNum());
+        if (currentDayOfStudy1 == null) {
+            return this.save(currentDayOfStudy);
+        }
+        currentDayOfStudy.setId(currentDayOfStudy1.getId());
+        return this.updateById(currentDayOfStudy);
+    }
+
     private List<String> getReturnList(String errorInfo) {
         if (StringUtil.isEmpty(errorInfo)) {
             return null;
