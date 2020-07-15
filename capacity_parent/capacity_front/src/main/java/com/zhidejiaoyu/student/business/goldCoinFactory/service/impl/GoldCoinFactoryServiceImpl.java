@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.goldCoinFactory.service.GoldCoinFactoryService;
 import com.zhidejiaoyu.student.business.goldCoinFactory.vo.GoldCoinFactoryGoldList;
 import com.zhidejiaoyu.student.business.goldCoinFactory.vo.GoldCoinFactoryGoldVo;
@@ -62,6 +63,27 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
         }
         vo.setDeadline(DateUtil.formatYYYYMMDDHHMMSS(DateUtil.minTime(new Date())));
         return vo;
+    }
+
+    @Override
+    public Object getSatelliteClass(HttpSession session) {
+        Student student = getStudent(session);
+        double gold = student.getOfflineGold() + student.getSystemGold();
+        double satelliteClassGold = 10000;
+        Integer satelliteClass = 1;
+        if (gold >= satelliteClassGold) {
+            for (int i = 1; i <= 4; i++) {
+                satelliteClassGold *= 1.5;
+                if (gold >= satelliteClassGold) {
+                    satelliteClass += 1;
+                } else {
+                    continue;
+                }
+            }
+            return ServerResponse.createBySuccess(satelliteClass);
+        } else {
+            return ServerResponse.createBySuccess(0);
+        }
     }
 
     private void getReturnList(Integer schoolAdminId, Date date, GoldCoinFactoryGoldList vo) {

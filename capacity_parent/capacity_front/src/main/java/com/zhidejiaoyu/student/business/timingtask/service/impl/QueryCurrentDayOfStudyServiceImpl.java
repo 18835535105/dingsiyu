@@ -71,7 +71,6 @@ public class QueryCurrentDayOfStudyServiceImpl implements BaseQuartzService, Que
             currentDayOfStudyRedisOpt.deleteStudy(stu);
         });
         log.info("定时任务 -> 智慧飞信信息记录保存结束....");
-
     }
 
 

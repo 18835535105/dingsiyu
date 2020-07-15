@@ -10,4 +10,6 @@ public interface GoldCoinFactoryService extends BaseService<Student> {
     Object getList(HttpSession session);
 
     Object getIndex(HttpSession session);
+
+    Object getSatelliteClass(HttpSession session);
 }
