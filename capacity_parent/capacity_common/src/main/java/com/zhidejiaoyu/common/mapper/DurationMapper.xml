@@ -498,6 +498,13 @@
             and to_days(login_time) = to_days(#{date})
         </if>
     </select>
+    <select id="selectStudentIdByDate" parameterType="map" resultType="long">
+        select student_id
+        from duration
+        where
+        to_days(login_time) = to_days(#{date})
+        group by student_id
+    </select>
 
 
 </mapper>

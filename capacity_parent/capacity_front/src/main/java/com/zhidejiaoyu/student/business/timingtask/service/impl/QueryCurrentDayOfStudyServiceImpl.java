@@ -66,6 +66,10 @@ public class QueryCurrentDayOfStudyServiceImpl implements BaseQuartzService, Que
             currentDayOfStudyRedisOpt.deleteStudy(study.getStudentId());
             currentDayOfStudyMapper.updateById(study);
         });
+        List<Long> studentIds = durationMapper.selectStudentIdByDate(dateStr);
+        studentIds.forEach(stu ->{
+            currentDayOfStudyRedisOpt.deleteStudy(stu);
+        });
         log.info("定时任务 -> 智慧飞信信息记录保存结束....");
 
     }

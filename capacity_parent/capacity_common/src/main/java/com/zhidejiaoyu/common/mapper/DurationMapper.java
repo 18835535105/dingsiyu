@@ -307,4 +307,6 @@ public interface DurationMapper extends BaseMapper<Duration> {
      * @return
      */
     Long selectTotalOnlineTimeByStudentIdAndLoginTime(@Param("studentId") Long studentId, @Param("date") String date);
+
+    List<Long> selectStudentIdByDate(@Param("date") String dateStr);
 }
