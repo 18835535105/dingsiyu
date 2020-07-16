@@ -78,4 +78,14 @@ public interface LearnHistoryMapper extends BaseMapper<LearnHistory> {
      */
     @Select("select count(id) from learn_history WHERE student_id = #{studentId} and TO_DAYS(update_time) = TO_DAYS(now())")
     int countByStudentIdToDay(@Param("studentId") Long studentId);
+
+    /**
+     * 查询指定单元及学习模块历史记录
+     *
+     * @param studentId
+     * @param unitIds
+     * @param type
+     * @return
+     */
+    List<LearnHistory> selectByStudentAndUnitIdsAndType(@Param("studentId") Long studentId, @Param("unitIds") List<Long> unitIds, @Param("type") Integer type);
 }

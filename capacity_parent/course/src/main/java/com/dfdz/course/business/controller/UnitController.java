@@ -20,7 +20,7 @@ import java.util.Map;
  * @date: 2020/7/15 16:43:43
  */
 @RestController
-@RequestMapping("/unit")
+@RequestMapping("/course/unit")
 public class UnitController {
 
     @Resource

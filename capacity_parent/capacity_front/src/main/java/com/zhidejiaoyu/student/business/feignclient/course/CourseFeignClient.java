@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.feignclient.course;
 
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -183,9 +184,9 @@ public interface CourseFeignClient {
      * 根据类型查询单元最大group
      *
      * @param unitIds
-     * @param type  1：单词；2：句型；3：语法；4：课文
+     * @param type    1：单词；2：句型；4：课文
      * @return
      */
-    @GetMapping
-    Map<Long, Map<Long, Integer>> getMaxGroupByUnitIsdAndType(@RequestParam List<Long> unitIds, @RequestParam Integer type);
+    @GetMapping("/unit/getMaxGroupByUnitIsdAndType")
+    ServerResponse<Map<Long, Integer>> getMaxGroupByUnitIsdAndType(@RequestParam List<Long> unitIds, @RequestParam Integer type);
 }
