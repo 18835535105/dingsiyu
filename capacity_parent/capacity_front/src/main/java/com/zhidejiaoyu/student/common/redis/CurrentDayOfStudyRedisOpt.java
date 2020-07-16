@@ -128,27 +128,24 @@ public class CurrentDayOfStudyRedisOpt {
         Set<Object> objects = entries.keySet();
         StringBuilder stringBuilder = new StringBuilder();
         objects.forEach(key -> {
-            Object o = entries.get(key);
-            if (o != null) {
-                Integer integer = Integer.getInteger(o.toString());
-                if (integer != null && integer > 3) {
-                    if (type.equals(1)) {
-                        Vocabulary vocabulary = courseFeignClient.selectVocabularyById(integer.longValue());
-                        if (vocabulary != null) {
-                            stringBuilder.append(vocabulary.getWord()).append("##");
-                        }
+            Integer integer = Integer.parseInt(key.toString());
+            if (integer != null && integer > 3) {
+                if (type.equals(1)) {
+                    Vocabulary vocabulary = courseFeignClient.selectVocabularyById(integer.longValue());
+                    if (vocabulary != null) {
+                        stringBuilder.append(vocabulary.getWord()).append("##");
                     }
-                    if (type.equals(2)) {
-                        Sentence sentence = courseFeignClient.selectSentenceById(integer.longValue());
-                        if (sentence != null) {
-                            stringBuilder.append(sentence.getCentreExample().replace("#", " ").replace("$", "")).append("##");
-                        }
+                }
+                if (type.equals(2)) {
+                    Sentence sentence = courseFeignClient.selectSentenceById(integer.longValue());
+                    if (sentence != null) {
+                        stringBuilder.append(sentence.getCentreExample().replace("#", " ").replace("$", "")).append("##");
                     }
-                    if (type.equals(3)) {
-                        SyntaxTopic syntaxTopic = courseFeignClient.selectSyntaxTopicById(integer.longValue());
-                        if (syntaxTopic != null) {
-                            stringBuilder.append(syntaxTopic.getTopic() + ":" + syntaxTopic.getAnswer()).append("##");
-                        }
+                }
+                if (type.equals(3)) {
+                    SyntaxTopic syntaxTopic = courseFeignClient.selectSyntaxTopicById(integer.longValue());
+                    if (syntaxTopic != null) {
+                        stringBuilder.append(syntaxTopic.getTopic() + ":" + syntaxTopic.getAnswer()).append("##");
                     }
                 }
             }
