@@ -672,7 +672,7 @@
         select
         <include refid="Base_Column_List"/>
         from test_record where student_id = #{studentId} and genre = #{genre} and unit_id in (
-        <foreach collection="unitIds" index="unitId" separator=",">
+        <foreach collection="unitIds" item="unitId" separator=",">
             #{unitId}
         </foreach>
         )
