@@ -449,7 +449,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         Date date = new Date();
         StringBuilder builder = new StringBuilder();
         if (students.size() > 0) {
-            List<RecycleBin> saveList = new ArrayList<>();
             students.forEach(student -> {
                 RecycleBin bin = new RecycleBin();
                 bin.setCreateTime(date);
@@ -457,7 +456,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 bin.setOperateUserId(student.getTeacherId());
                 bin.setOperateUserName("管理员");
                 bin.setStudentId(student.getId());
-                saveList.add(bin);
+                recycleBinMapper.insert(bin);
                 // 清除学生排行缓存
                 rankOpt.deleteGoldRank(student);
                 rankOpt.deleteCcieRank(student);
@@ -473,7 +472,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             runLog.setCreateTime(new Date());
             runLog.setLogContent("时间:" + date + "将到期的体验账号放入回收站:" + builder.toString());
             runLogMapper.insert(runLog);
-            recycleBinMapper.insertByList(saveList);
             studentMapper.updateStatus(students);
 
         }
