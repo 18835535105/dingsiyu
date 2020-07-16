@@ -42,14 +42,14 @@ public class QueryCurrentDayOfStudyServiceImpl implements BaseQuartzService, Que
     private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
 
     @Override
-    @Scheduled(cron = "0 0 5 * * ?")
+    @Scheduled(cron = "0 1 5 * * ?")
     public void saveCurrentDayOfStudy() {
         if (checkPort(port)) {
             return;
         }
         log.info("定时任务 -> 智慧飞信信息记录保存开始....");
         //1查询保存昨日智慧飞信信息记录
-        String dateStr = DateUtil.beforeHoursTime(4);
+        String dateStr = DateUtil.beforeHoursTime(10);
         List<CurrentDayOfStudy> currentDayOfStudies = currentDayOfStudyMapper.selectByDate(dateStr);
         currentDayOfStudies.forEach(study -> {
             Integer gold = goldLogMapper.selectGoldByStudentIdAndDate(study.getStudentId(), DateUtil.parseYYYYMMDDHHMMSS(dateStr), 1);
