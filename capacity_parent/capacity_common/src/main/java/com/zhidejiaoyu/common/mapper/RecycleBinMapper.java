@@ -1,6 +1,8 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.RecycleBin;
+import com.zhidejiaoyu.common.pojo.SchoolGoldFactory;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -12,7 +14,7 @@ import java.util.Map;
  * @author wuchenxi
  * @date 2018/7/16
  */
-public interface RecycleBinMapper {
+public interface RecycleBinMapper extends BaseMapper<RecycleBin> {
 
     /**
      * 批量新增记录
