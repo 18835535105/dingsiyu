@@ -668,5 +668,15 @@
           and test_start_time &lt;= #{endDate}
           and genre = '金币试卷测试'
     </select>
+    <select id="selectListByUnitIdsAndGenre" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from test_record where student_id = #{studentId} and genre = #{genre} and unit_id in (
+        <foreach collection="unitIds" item="unitId" separator=",">
+            #{unitId}
+        </foreach>
+        )
+        group by unit_id
+    </select>
 
 </mapper>

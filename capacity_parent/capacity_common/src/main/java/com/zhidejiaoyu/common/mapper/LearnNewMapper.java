@@ -136,4 +136,14 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
     List<LearnNew> selectByUpdateTime(Date date);
 
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIds);
+
+    /**
+     * 查询学生指定单元、学习模块正在学习的内容
+     *
+     * @param studentId
+     * @param unitIds
+     * @param modelType
+     * @return
+     */
+    List<LearnNew> selectByStudentIdAndUnitIdsAndModelType(@Param("studentId") Long studentId, @Param("unitIds") List<Long> unitIds, @Param("modelType") int modelType);
 }

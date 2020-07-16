@@ -109,6 +109,17 @@
         WHERE
         TO_DAYS(update_time) = TO_DAYS(#{date});
     </select>
+    <select id="selectByStudentAndUnitIdsAndType" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from learn_history
+        where student_id = #{studentId}
+        and unit_id in (
+        <foreach collection="unitIds" separator="," item="unitId">
+            #{unitId}
+        </foreach>
+        ) and type = #{type}
+    </select>
 
 
 </mapper>

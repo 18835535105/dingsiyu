@@ -403,5 +403,15 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      */
     @Select("select count(id) from test_record where student_id = #{studentId} and genre like '金币%' and TO_DAYS(test_start_time) = TO_DAYS(now())")
     int countGoldTestByStudentIdToday(@Param("studentId") Long studentId);
+
+    /**
+     * 查询指定单元是否已经进行过相关测试
+     *
+     * @param unitIds
+     * @param studentId
+     * @param genre
+     * @return
+     */
+    List<TestRecord> selectListByUnitIdsAndGenre(@Param("unitIds") List<Long> unitIds, @Param("studentId") Long studentId, @Param("genre") String genre);
 }
 

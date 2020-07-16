@@ -1,15 +1,17 @@
 package com.zhidejiaoyu.student.business.index.service.impl;
 
 import com.zhidejiaoyu.common.constant.GradeNameConstant;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.CourseConfig;
-import com.zhidejiaoyu.common.pojo.CourseNew;
-import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.grade.GradeUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.course.UnitStudyStateVO;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.index.dto.UnitInfoDTO;
 import com.zhidejiaoyu.student.business.index.service.IndexCourseInfoService;
 import com.zhidejiaoyu.student.business.index.vo.course.CourseInfoVO;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author: wuchenxi
@@ -65,6 +68,12 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     @Resource
     private TestRecordMapper testRecordMapper;
+
+    @Resource
+    private CourseFeignClient courseFeignClient;
+
+    @Resource
+    private LearnNewMapper learnNewMapper;
 
     static {
         MAPPING.put(GradeNameConstant.FIRST_GRADE, "one");
@@ -125,10 +134,172 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         throw new ServiceException("未查询到学生的自由学习课程！");
     }
 
+
     @Override
     public ServerResponse<Object> getUnitInfo(UnitInfoDTO dto) {
-        List<Map<String, Object>> map = unitNewMapper.selectIdAndNameByCourseId(dto.getCourseId(), dto.getType());
-        return ServerResponse.createBySuccess(map);
+        Long studentId = super.getStudentId();
+        Integer type = dto.getType();
+        List<UnitStudyStateVO> vos = unitNewMapper.selectIdAndNameByCourseId(dto.getCourseId(), type);
+        List<Long> unitIds = vos.stream().map(UnitStudyStateVO::getUnitId).collect(Collectors.toList());
+
+        if (goldTestUnitStudyState(studentId, type, vos, unitIds)) {
+            return ServerResponse.createBySuccess(vos);
+        }
+
+        List<LearnHistory> histories = learnHistoryMapper.selectByStudentAndUnitIdsAndType(studentId, unitIds, type);
+        Map<Long, List<LearnHistory>> collect = histories.stream().collect(Collectors.groupingBy(LearnHistory::getUnitId));
+
+        int modelType = type;
+        if (type == 3) {
+            modelType = 4;
+        } else if (type == 4) {
+            modelType = 3;
+        }
+        List<LearnNew> learnNews = learnNewMapper.selectByStudentIdAndUnitIdsAndModelType(studentId, unitIds, modelType);
+        Map<Long, List<LearnNew>> learnNewCollect = learnNews.stream().collect(Collectors.groupingBy(LearnNew::getUnitId));
+
+        if (syntaxUnitStudyState(type, vos, collect, learnNewCollect)) {
+            return ServerResponse.createBySuccess(vos);
+        }
+
+        ServerResponse<Map<Long, Integer>> maxGroupResponse = courseFeignClient.getMaxGroupByUnitIsdAndType(unitIds, type);
+        if (maxGroupResponse.getStatus() != ResponseCode.SUCCESS.getCode()) {
+            return ServerResponse.createByError(maxGroupResponse.getStatus(), maxGroupResponse.getMsg());
+        }
+        Map<Long, Integer> maxGroup = maxGroupResponse.getData();
+        vos.forEach(vo -> {
+            if (collect.containsKey(vo.getUnitId())) {
+                List<LearnHistory> histories1 = collect.get(vo.getUnitId());
+                Stream<LearnHistory> learnHistoryStream = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 1);
+                if (learnHistoryStream.count() == 0) {
+                    // 说明正常难度还没学习
+                    vo.setEasyState(3);
+                }
+
+                LearnHistory easyHistory = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 1)
+                        .max(Comparator.comparing(LearnHistory::getGroup))
+                        .orElse(new LearnHistory());
+                if (Objects.equals(easyHistory.getGroup(), maxGroup.get(vo.getUnitId()))) {
+                    vo.setEasyState(1);
+                } else if (learnNewCollect.containsKey(vo.getUnitId())) {
+                    for (LearnNew learnNew : learnNewCollect.get(vo.getUnitId())) {
+                        if (learnNew.getEasyOrHard() == 1) {
+                            vo.setEasyState(2);
+                        } else {
+                            vo.setHardState(2);
+                        }
+                    }
+                }
+
+                Stream<LearnHistory> learnHistoryStream1 = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 2);
+                if (learnHistoryStream1.count() == 0) {
+                    // 说明进阶难度还没学习
+                    vo.setHardState(3);
+                }
+                LearnHistory hardHistory = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 2)
+                        .max(Comparator.comparing(LearnHistory::getGroup))
+                        .orElse(new LearnHistory());
+                if (Objects.equals(hardHistory.getGroup(), maxGroup.get(vo.getUnitId()))) {
+                    vo.setHardState(1);
+                } else if (learnNewCollect.containsKey(vo.getUnitId())) {
+                    for (LearnNew learnNew : learnNewCollect.get(vo.getUnitId())) {
+                        if (learnNew.getEasyOrHard() == 1) {
+                            vo.setHardState(1);
+                        } else {
+                            vo.setHardState(2);
+                        }
+                    }
+                }
+                if (vo.getEasyState() == null) {
+                    vo.setEasyState(3);
+                }
+                if (vo.getHardState() == null) {
+                    vo.setHardState(3);
+                }
+
+            } else {
+                vo.setEasyState(3);
+                vo.setHardState(3);
+            }
+        });
+        return ServerResponse.createBySuccess(vos);
+    }
+
+    /**
+     * 语法模块各个单元学习状态
+     *
+     * @param type
+     * @param vos
+     * @param collect
+     * @param learnNewCollect
+     * @return
+     */
+    private boolean syntaxUnitStudyState(Integer type, List<UnitStudyStateVO> vos, Map<Long, List<LearnHistory>> collect, Map<Long, List<LearnNew>> learnNewCollect) {
+        if (type != 3) {
+            return false;
+        }
+        // 语法
+        vos.forEach(vo -> {
+            if (collect.containsKey(vo.getUnitId())) {
+                // 学习历史记录中有的单元说明是学习完的
+                List<LearnHistory> histories1 = collect.get(vo.getUnitId());
+                histories1.forEach(history1 -> {
+                    if (Objects.equals(history1.getEasyOrHard(), 1)) {
+                        vo.setEasyState(1);
+                    }
+                    if (Objects.equals(history1.getEasyOrHard(), 2)) {
+                        vo.setHardState(1);
+                    }
+                });
+            } else if (learnNewCollect.containsKey(vo.getUnitId())) {
+                // 学习历史中没有的单元，需要去学习表中查看是否正在学习
+                List<LearnNew> learnNews1 = learnNewCollect.get(vo.getUnitId());
+                learnNews1.forEach(learnNew -> {
+                    if (Objects.equals(learnNew.getEasyOrHard(), 1)) {
+                        vo.setEasyState(2);
+                    }
+                    if (Objects.equals(learnNew.getEasyOrHard(), 2)) {
+                        vo.setHardState(2);
+                    }
+                });
+            }
+
+            if (vo.getEasyState() == null) {
+                vo.setEasyState(3);
+            }
+            if (vo.getHardState() == null) {
+                vo.setHardState(3);
+            }
+        });
+
+        return true;
+
+    }
+
+    /**
+     * 判断金币试卷各个单元学习状态
+     *
+     * @param studentId
+     * @param type
+     * @param vos
+     * @param unitIds
+     * @return
+     */
+    private boolean goldTestUnitStudyState(Long studentId, Integer type, List<UnitStudyStateVO> vos, List<Long> unitIds) {
+        if (type == 5) {
+            // 金币试卷
+            List<TestRecord> testRecords = testRecordMapper.selectListByUnitIdsAndGenre(unitIds, studentId, GenreConstant.GOLD_TEST);
+            Map<Long, List<TestRecord>> collect = testRecords.stream().collect(Collectors.groupingBy(TestRecord::getUnitId));
+            for (UnitStudyStateVO unitStudyStateVO : vos) {
+                if (collect.containsKey(unitStudyStateVO.getUnitId())) {
+                    unitStudyStateVO.setEasyState(1);
+                } else {
+                    unitStudyStateVO.setEasyState(3);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
 

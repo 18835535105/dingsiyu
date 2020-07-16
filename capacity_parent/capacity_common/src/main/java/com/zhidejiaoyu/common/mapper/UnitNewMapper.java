@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.UnitNew;
+import com.zhidejiaoyu.common.vo.course.UnitStudyStateVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -69,7 +70,7 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @param type
      * @return
      */
-    List<Map<String, Object>> selectIdAndNameByCourseId(@Param("courseId") Long courseId, @Param("type") Integer type);
+    List<UnitStudyStateVO> selectIdAndNameByCourseId(@Param("courseId") Long courseId, @Param("type") Integer type);
 
     /**
      * 查询语法模块当前课程最大的单元信息
@@ -103,4 +104,14 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @return
      */
     UnitNew selectNextSyntaxUnitByCourseId(@Param("unitId") Long unitId, @Param("courseId") Long courseId);
+
+    /**
+     * 查询各个模块单元最大group
+     *
+     * @param unitIds
+     * @param type    1：单词；2：句型；3：语法；4：课文
+     * @return
+     */
+    @MapKey("unitId")
+    Map<Long, Map<Long, Integer>> selectMaxGroupByUnitIsdAndType(@Param("unitIds") List<Long> unitIds, @Param("type") Integer type);
 }
