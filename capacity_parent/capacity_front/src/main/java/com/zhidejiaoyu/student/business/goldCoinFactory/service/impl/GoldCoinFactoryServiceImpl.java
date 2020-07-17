@@ -58,15 +58,21 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
             vo.setGold(0);
         }
         vo.setDeadline(DateUtil.formatYYYYMMDDHHMMSS(DateUtil.minTime(new Date())));
+        getStudentModel(student, vo);
         return vo;
     }
 
     @Override
     public Object getSatelliteClass(HttpSession session) {
+        GoldCoinFactoryGoldVo vo = new GoldCoinFactoryGoldVo();
         Student student = getStudent(session);
+        getStudentModel(student, vo);
+        return ServerResponse.createBySuccess(vo);
+    }
+
+    private void getStudentModel(Student student, GoldCoinFactoryGoldVo vo) {
         Double gold = student.getOfflineGold() + student.getSystemGold();
         Double satelliteClassGold = 10000.0;
-        Map<String, Object> returnMap = new HashMap<>();
         Integer satelliteClass = 1;
         if (gold >= satelliteClassGold) {
             for (int i = 1; i <= 4; i++) {
@@ -77,15 +83,21 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
                     break;
                 }
             }
-            returnMap.put("satelliteClass", satelliteClass);
-            returnMap.put("nextSatelliteClass", satelliteClass + 1 >= 5 ? 5 : satelliteClass + 1);
+            if (vo != null) {
+                vo.setSatelliteClass(satelliteClass);
+                vo.setNextSatelliteClass(satelliteClass + 1 >= 5 ? 5 : satelliteClass + 1);
+            }
         } else {
-            returnMap.put("satelliteClass", 0);
-            returnMap.put("nextSatelliteClass", 1);
+            if (vo != null) {
+                vo.setSatelliteClass(0);
+                vo.setNextSatelliteClass(1);
+            }
         }
-        returnMap.put("studentGold", gold.intValue());
-        returnMap.put("nextSatelliteClassGold", satelliteClassGold.intValue());
-        return ServerResponse.createBySuccess(returnMap);
+        if (vo != null) {
+            vo.setStudentGold(gold.intValue());
+            vo.setNextSatelliteClassGold(satelliteClassGold.intValue());
+        }
+
     }
 
     private void getReturnList(Integer schoolAdminId, Date date, GoldCoinFactoryGoldList vo) {
