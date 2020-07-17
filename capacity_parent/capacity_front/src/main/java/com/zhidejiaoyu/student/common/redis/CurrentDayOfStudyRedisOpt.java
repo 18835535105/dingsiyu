@@ -49,12 +49,27 @@ public class CurrentDayOfStudyRedisOpt {
     }
 
     public void deleteStudy(Long studentId) {
-        redisTemplate.opsForHash().delete(RedisKeysConst.ERROR_TEST + studentId);
-        redisTemplate.opsForHash().delete(RedisKeysConst.ERROR_SYNTAX + studentId);
-        redisTemplate.opsForHash().delete(RedisKeysConst.ERROR_SENTENCE + studentId);
-        redisTemplate.opsForHash().delete(RedisKeysConst.ERROR_TEKS + studentId);
-        redisTemplate.opsForHash().delete(RedisKeysConst.ERROR_WORD + studentId);
-        redisTemplate.opsForHash().delete(RedisKeysConst.STUDY_MODEL + studentId);
+        this.deleteTest(studentId);
+        this.deleteSyntaxAndSentence(RedisKeysConst.ERROR_WORD ,studentId);
+        this.deleteSyntaxAndSentence(RedisKeysConst.ERROR_SYNTAX ,studentId);
+        this.deleteSyntaxAndSentence(RedisKeysConst.ERROR_SENTENCE ,studentId);
+        this.deleteStudyModel(studentId);
+    }
+
+    private void deleteTest(Long studentId) {
+        redisTemplate.opsForHash().delete(RedisKeysConst.ERROR_TEST + studentId, 1);
+    }
+
+    private void deleteStudyModel(Long studentId){
+        redisTemplate.opsForHash().delete(RedisKeysConst.STUDY_MODEL + studentId,1);
+    }
+    private void deleteSyntaxAndSentence(String redisStr, Long studentId) {
+        Map<Object, Object> entries = redisTemplate.opsForHash().entries(redisStr + studentId);
+        Set<Object> objects = entries.keySet();
+        objects.forEach(key -> {
+            Integer integer = Integer.parseInt(key.toString());
+            redisTemplate.opsForHash().delete(redisStr + studentId, integer);
+        });
     }
 
     public void saveStudyModel(Long studentId, String studyModel, Long unitId) {
