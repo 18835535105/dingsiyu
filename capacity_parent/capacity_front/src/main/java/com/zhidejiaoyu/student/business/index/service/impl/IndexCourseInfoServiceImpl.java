@@ -181,14 +181,6 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                         .orElse(new LearnHistory());
                 if (Objects.equals(easyHistory.getGroup(), maxGroup.get(vo.getUnitId()))) {
                     vo.setEasyState(1);
-                } else if (learnNewCollect.containsKey(vo.getUnitId())) {
-                    for (LearnNew learnNew : learnNewCollect.get(vo.getUnitId())) {
-                        if (learnNew.getEasyOrHard() == 1) {
-                            vo.setEasyState(2);
-                        } else {
-                            vo.setHardState(2);
-                        }
-                    }
                 }
 
                 Stream<LearnHistory> learnHistoryStream1 = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 2);
@@ -201,15 +193,8 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                         .orElse(new LearnHistory());
                 if (Objects.equals(hardHistory.getGroup(), maxGroup.get(vo.getUnitId()))) {
                     vo.setHardState(1);
-                } else if (learnNewCollect.containsKey(vo.getUnitId())) {
-                    for (LearnNew learnNew : learnNewCollect.get(vo.getUnitId())) {
-                        if (learnNew.getEasyOrHard() == 1) {
-                            vo.setHardState(1);
-                        } else {
-                            vo.setHardState(2);
-                        }
-                    }
                 }
+
                 if (vo.getEasyState() == null) {
                     vo.setEasyState(3);
                 }
@@ -217,8 +202,20 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                     vo.setHardState(3);
                 }
 
-            } else {
+            } else if (learnNewCollect.containsKey(vo.getUnitId())) {
+                // 查看学习记录中是否有当前单元记录
+                for (LearnNew learnNew : learnNewCollect.get(vo.getUnitId())) {
+                    if (learnNew.getEasyOrHard() == 1) {
+                        vo.setEasyState(2);
+                    } else {
+                        vo.setHardState(2);
+                    }
+                }
+            }
+            if (vo.getEasyState() == null) {
                 vo.setEasyState(3);
+            }
+            if (vo.getHardState() == null) {
                 vo.setHardState(3);
             }
         });
