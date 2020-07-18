@@ -562,7 +562,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         } else if (totalUnitCount == learnedUnitCount) {
             courseVoBuilder.combatProgress(100).battle(3);
         } else {
-            courseVoBuilder.combatProgress((int) (learnedUnitCount * 1.0 / totalUnitCount * 100)).battle(2);
+            courseVoBuilder.combatProgress(Math.min((int) (learnedUnitCount * 1.0 / totalUnitCount * 100), 100)).battle(2);
         }
 
         if (Objects.equals(grade, student.getGrade())) {
