@@ -195,13 +195,6 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                     vo.setHardState(1);
                 }
 
-                if (vo.getEasyState() == null) {
-                    vo.setEasyState(3);
-                }
-                if (vo.getHardState() == null) {
-                    vo.setHardState(3);
-                }
-
             } else if (learnNewCollect.containsKey(vo.getUnitId())) {
                 // 查看学习记录中是否有当前单元记录
                 for (LearnNew learnNew : learnNewCollect.get(vo.getUnitId())) {
@@ -330,7 +323,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         // 判断配置的课程中是否有学生所在的版本
         long count = canStudyCourseNews.stream().filter(courseNew -> Objects.equals(student.getVersion(), courseNew.getVersion())).count();
         String grade = student.getGrade();
-        List<Long> smallCourseIds = this.getSmallCourseIds(courseId, count, versionVos, grade);
+        List<Long> smallCourseIds = this.getSmallCourseIds(courseId, count, versionVos, grade, type);
 
 
         // 其他年级
@@ -385,9 +378,10 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      * @param count
      * @param versionVos
      * @param grade      学生所在年级
+     * @param type       学习模块
      * @return
      */
-    private List<Long> getSmallCourseIds(Long courseId, long count, List<VersionVO> versionVos, String grade) {
+    private List<Long> getSmallCourseIds(Long courseId, long count, List<VersionVO> versionVos, String grade, Integer type) {
         List<VersionVO> versionVOList = new ArrayList<>();
         List<Long> smallCourseIds = new ArrayList<>();
         if (courseId == null) {
@@ -398,7 +392,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
                 if (CollectionUtils.isNotEmpty(gradeList)) {
                     // 当前版本中小于或等于当前年级的所有课程id
-                    List<Long> courseIds = courseNewMapper.selectByGradeListAndVersionAndGrade(version, gradeList);
+                    List<Long> courseIds = courseNewMapper.selectByGradeListAndVersionAndGrade(version, gradeList, type);
                     if (CollectionUtils.isEmpty(courseIds)) {
                         return;
                     }
@@ -431,7 +425,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                 if (flag) {
                     versionVOList.add(versionVO);
                     List<String> gradeList = GradeUtil.smallThanCurrentAllPhase(finalTargetVersion, grade);
-                    smallCourseIds.addAll(courseNewMapper.selectByGradeListAndVersionAndGrade(finalTargetVersion, gradeList));
+                    smallCourseIds.addAll(courseNewMapper.selectByGradeListAndVersionAndGrade(finalTargetVersion, gradeList, type));
                     return;
                 }
 
@@ -439,7 +433,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
                 if (CollectionUtils.isNotEmpty(gradeList)) {
                     // 当前版本中小于或等于当前年级的所有课程id
-                    List<Long> courseIds = courseNewMapper.selectByGradeListAndVersionAndGrade(version, gradeList);
+                    List<Long> courseIds = courseNewMapper.selectByGradeListAndVersionAndGrade(version, gradeList, type);
                     if (CollectionUtils.isEmpty(courseIds)) {
                         return;
                     }
@@ -537,11 +531,6 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         String grade = StringUtils.isNotBlank(courseNew.getGradeExt()) ? courseNew.getGradeExt() : courseNew.getGrade();
         Long courseId = courseNew.getId();
 
-        CourseVO.CourseVOBuilder courseVoBuilder = CourseVO.builder()
-                .courseId(courseId)
-                .grade(courseNew.getGrade() + "（" + courseNew.getLabel() + "）")
-                .englishGrade(getGradeAndLabelEnglishName(grade, courseNew.getLabel()));
-
         // 单元总个数
         long totalUnitCount;
         if (Objects.equals(courseNew.getStatus(), -1)) {
@@ -554,12 +543,16 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         // 已学单元总个数
         long learnedUnitCount = this.getUnitCount(learnUnitCountInCourse, courseId);
 
+        CourseVO.CourseVOBuilder courseVoBuilder = CourseVO.builder()
+                .courseId(courseId)
+                .grade(courseNew.getGrade() + "（" + courseNew.getLabel() + "）")
+                .englishGrade(getGradeAndLabelEnglishName(grade, courseNew.getLabel()));
         if (learnedUnitCount == 0) {
             courseVoBuilder.combatProgress(0).battle(1);
         } else if (totalUnitCount == learnedUnitCount) {
             courseVoBuilder.combatProgress(100).battle(3);
         } else {
-            courseVoBuilder.combatProgress((int) (learnedUnitCount * 1.0 / totalUnitCount * 100)).battle(2);
+            courseVoBuilder.combatProgress(Math.min((int) (learnedUnitCount * 1.0 / totalUnitCount * 100), 100)).battle(2);
         }
 
         if (Objects.equals(grade, student.getGrade())) {

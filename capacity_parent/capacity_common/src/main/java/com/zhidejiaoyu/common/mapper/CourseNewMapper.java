@@ -68,9 +68,10 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
      *
      * @param version        版本
      * @param smallGradeList 年级集合
+     * @param type
      * @return
      */
-    List<Long> selectByGradeListAndVersionAndGrade(@Param("version") String version, @Param("smallGradeList") List<String> smallGradeList);
+    List<Long> selectByGradeListAndVersionAndGrade(@Param("version") String version, @Param("smallGradeList") List<String> smallGradeList, Integer type);
 
     /**
      * 批量获取课程信息
