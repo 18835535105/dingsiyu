@@ -100,7 +100,30 @@
     <select id="selectByGradeListAndVersionAndGrade" resultType="java.lang.Long" parameterType="map">
         select distinct(c.id)
         from course_new c
-        where c.version = #{version}
+        join unit_new u on c.id = u.course_id
+        <!--含有单词的课程-->
+        <if test="type == 1">
+            join unit_vocabulary_new uvn on uvn.unit_id = u.id
+        </if>
+        <!--含有句型的课程-->
+        <if test="type == 2">
+            join unit_sentence_new uvn on uvn.unit_id = u.id
+        </if>
+
+        <!--含有语法的课程-->
+        <if test="type == 3">
+            join syntax_unit_topic_new uvn on uvn.unit_id = u.id
+        </if>
+
+        <!--含有课文的课程-->
+        <if test="type == 4">
+            join unit_teks_new uvn on uvn.unit_id = u.id
+        </if>
+        <!--含有金币试卷的课程-->
+        <if test="type == 5">
+            join unit_test_store uts on uts.unit_id = u.id
+        </if>
+        and c.version = #{version}
         and (c.grade in (
         <foreach collection="smallGradeList" item="grade" separator=",">
             #{grade}
