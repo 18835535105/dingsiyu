@@ -487,7 +487,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     private void saveStudentGold(Student student) {
         Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, AWARD_GOLD);
         studentMapper.updateBySystemGold(BigDecimalUtil.add(goldAddition, student.getSystemGold()), student.getId());
-        GoldLogUtil.saveStudyGoldLog(student.getId(), "飞船个人挑战", Integer.parseInt(goldAddition.toString()));
+        GoldLogUtil.saveStudyGoldLog(student.getId(), "飞船个人挑战", goldAddition.intValue());
     }
 
 
