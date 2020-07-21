@@ -4,11 +4,22 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.center.QaAutoLearn">
-        <id column="id" property="id" />
-        <result column="question" property="question" />
-        <result column="question_id" property="questionId" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="question" property="question"/>
+        <result column="question_id" property="questionId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+    <sql id="base_sql">
+        id, question, question_id, create_time, update_time
+    </sql>
+    <select id="selectByQuestion" resultType="java.util.Map" parameterType="map">
+        select qq.answer,
+               qq.id
+        from qa_auto_learn qal,
+             qa_question qq
+        where qal.question_id = qq.id
+          and qal.question = #{question}
+    </select>
 
 </mapper>
