@@ -15,8 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 学生当日飞行记录详情
@@ -50,9 +49,9 @@ public class CurrentDayOfStudyRedisOpt {
 
     public void deleteStudy(Long studentId) {
         this.deleteTest(studentId);
-        this.deleteSyntaxAndSentence(RedisKeysConst.ERROR_WORD ,studentId);
-        this.deleteSyntaxAndSentence(RedisKeysConst.ERROR_SYNTAX ,studentId);
-        this.deleteSyntaxAndSentence(RedisKeysConst.ERROR_SENTENCE ,studentId);
+        this.deleteSyntaxAndSentence(RedisKeysConst.ERROR_WORD, studentId);
+        this.deleteSyntaxAndSentence(RedisKeysConst.ERROR_SYNTAX, studentId);
+        this.deleteSyntaxAndSentence(RedisKeysConst.ERROR_SENTENCE, studentId);
         this.deleteStudyModel(studentId);
     }
 
@@ -60,9 +59,10 @@ public class CurrentDayOfStudyRedisOpt {
         redisTemplate.opsForHash().delete(RedisKeysConst.ERROR_TEST + studentId, 1);
     }
 
-    private void deleteStudyModel(Long studentId){
-        redisTemplate.opsForHash().delete(RedisKeysConst.STUDY_MODEL + studentId,1);
+    private void deleteStudyModel(Long studentId) {
+        redisTemplate.opsForHash().delete(RedisKeysConst.STUDY_MODEL + studentId, 1);
     }
+
     private void deleteSyntaxAndSentence(String redisStr, Long studentId) {
         Map<Object, Object> entries = redisTemplate.opsForHash().entries(redisStr + studentId);
         Set<Object> objects = entries.keySet();
@@ -128,6 +128,37 @@ public class CurrentDayOfStudyRedisOpt {
         }
         return builder.toString();
 
+    }
+
+    public List<Map<String, Object>> getWordSentenceTest(String redisStr, Long studentId, Integer type) {
+        Map<Object, Object> entries = redisTemplate.opsForHash().entries(redisStr + studentId);
+        Set<Object> objects = entries.keySet();
+        List<Map<String, Object>> returnMap = new ArrayList<>();
+        objects.forEach(key -> {
+            Integer integer = Integer.parseInt(key.toString());
+            if (integer != null && integer > 3) {
+                if (type.equals(1)) {
+                    Vocabulary vocabulary = courseFeignClient.selectVocabularyById(integer.longValue());
+                    if (vocabulary != null) {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("english", vocabulary.getWord());
+                        map.put("chinese", vocabulary.getWordChinese());
+                        returnMap.add(map);
+                    }
+                }
+                if (type.equals(2)) {
+                    Sentence sentence = courseFeignClient.selectSentenceById(integer.longValue());
+                    if (sentence != null) {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("english", sentence.getCentreExample().replace("#", " ").replace("$", ""));
+                        map.put("chinese", sentence.getCentreTranslate().replace("*", ""));
+                        returnMap.add(map);
+                    }
+                }
+
+            }
+        });
+        return returnMap;
     }
 
 

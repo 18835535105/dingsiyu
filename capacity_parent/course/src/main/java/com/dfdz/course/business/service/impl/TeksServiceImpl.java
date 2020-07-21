@@ -26,4 +26,9 @@ public class TeksServiceImpl extends ServiceImpl<TeksMapper, Teks> implements Te
     public List<TeksNew> getTwentyTeks() {
         return teksNewMapper.getTwentyTeks();
     }
+
+    @Override
+    public TeksNew getReplaceTeks(String sentence) {
+        return teksNewMapper.replaceTeks(sentence);
+    }
 }

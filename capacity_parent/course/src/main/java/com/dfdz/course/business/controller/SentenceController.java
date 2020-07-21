@@ -2,6 +2,7 @@ package com.dfdz.course.business.controller;
 
 import com.dfdz.course.business.service.SentenceService;
 import com.zhidejiaoyu.common.pojo.Sentence;
+import com.zhidejiaoyu.common.pojo.TeksNew;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +46,17 @@ public class SentenceController {
     @GetMapping("/getSentenceIdsByUnitIdAndGroup/{unitId}/{group}")
     public List<Long> getSentenceIdsByUnitIdAndGroup(@PathVariable Long unitId,@PathVariable Integer group){
         return sentenceService.getSentenceIdsByUnitIdAndGroup(unitId,group);
+    }
+
+
+    /**
+     * 去掉指定字符查询数据
+     * @param sentence
+     * @return
+     */
+    @GetMapping("/replaceSentence")
+    public Sentence getReplaceSentece(String sentence) {
+        return sentenceService.getReplaceTeks(sentence);
     }
 
 
