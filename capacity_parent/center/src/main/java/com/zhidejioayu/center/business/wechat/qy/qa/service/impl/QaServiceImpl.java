@@ -90,11 +90,7 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
         if (CollectionUtils.isEmpty(answers)) {
             if (CollectionUtils.isEmpty(qaKeywordsInfos)) {
                 // 没有关键词能够匹配到用户的问题，记录到未知问题
-                qaUnknownMapper.insert(QaUnknown.builder()
-                        .createTime(new Date())
-                        .question(question)
-                        .updateTime(new Date())
-                        .build());
+                saveUnknown(question);
                 return ServerResponse.createByError(401, "未能查询到用户的问题答案！");
             }
             qaKeywordsInfos.sort(Comparator.comparingInt(QaKeywordsInfo::getCount));
@@ -116,6 +112,29 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
         qaVO.setOtherAnswers(answers);
 
         return ServerResponse.createBySuccess(qaVO);
+    }
+
+    private void saveUnknown(String question) {
+        qaUnknownMapper.insert(QaUnknown.builder()
+                .createTime(new Date())
+                .question(question)
+                .updateTime(new Date())
+                .build());
+    }
+
+    @Override
+    public void saveQaAutoStudy(String question, Long questionId) {
+        qaAutoLearnMapper.insert(QaAutoLearn.builder()
+                .createTime(new Date())
+                .question(question)
+                .questionId(questionId)
+                .updateTime(new Date())
+                .build());
+    }
+
+    @Override
+    public void saveUnknownQuestion(String question) {
+        this.saveUnknown(question);
     }
 
     /**

@@ -15,4 +15,20 @@ public interface QaService extends IService<QaQuestion> {
      * @return
      */
     ServerResponse<Object> getQa(String question);
+
+    /**
+     * 保存自学习
+     *
+     * @param question
+     * @param questionId
+     * @return
+     */
+    void saveQaAutoStudy(String question, Long questionId);
+
+    /**
+     * 保存未知问题
+     *
+     * @param question
+     */
+    void saveUnknownQuestion(String question);
 }
