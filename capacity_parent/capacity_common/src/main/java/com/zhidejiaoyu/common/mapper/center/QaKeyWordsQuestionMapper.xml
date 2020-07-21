@@ -13,5 +13,11 @@
     <sql id="base_sql">
         id, question_id, key_words_id, create_time,update_time
     </sql>
+    <select id="selectByKeyIdAndQuestionId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from qa_key_words_question
+        where question_id = #{questionId} and key_words_id=#{keyId}
+    </select>
 
 </mapper>

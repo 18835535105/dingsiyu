@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.vo.qa.QaQuestionInputModel;
 import com.zhidejiaoyu.common.vo.qa.QaQuestionKeyInputModel;
 import com.zhidejioayu.center.business.qa.service.QaService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -31,14 +32,12 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
     private QaKeyWordsQuestionMapper qaKeyWordsQuestionMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void importQa(MultipartFile file) {
-        //导入飞船
         List<QaQuestionInputModel> inputQuestion =
                 ExcelUtil.readExcel(file, QaQuestionInputModel.class, 1);
-        //导入英雄
         List<QaQuestionKeyInputModel> inputQuestionKey =
                 ExcelUtil.readExcel(file, QaQuestionKeyInputModel.class, 2);
-        //导入英雄
         List<QaKeyInputModel> inputKey =
                 ExcelUtil.readExcel(file, QaKeyInputModel.class, 3);
         inputKeyModel(inputKey);
@@ -48,7 +47,16 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
 
     private void inputQuestionKeyModel(List<QaQuestionKeyInputModel> inputQuestionKey) {
         inputQuestionKey.forEach(keyQuestion -> {
-            QaKeyWordsQuestion qa=qaKeyWordsQuestionMapper.selectByKeyIdAndQuestionId(keyQuestion.getKeyId(),keyQuestion.getQuestionId());
+            QaKeyWordsQuestion qa =
+                    qaKeyWordsQuestionMapper.selectByKeyIdAndQuestionId(keyQuestion.getKeyId(), keyQuestion.getQuestionId());
+            if (qa == null) {
+                qa = new QaKeyWordsQuestion();
+                qa.setKeyWordsId(Long.parseLong(keyQuestion.getKeyId()));
+                qa.setQuestionId(Long.parseLong(keyQuestion.getQuestionId()));
+                qa.setCreateTime(LocalDateTime.now());
+                qa.setUpdateTime(LocalDateTime.now());
+                qaKeyWordsQuestionMapper.insert(qa);
+            }
         });
     }
 
