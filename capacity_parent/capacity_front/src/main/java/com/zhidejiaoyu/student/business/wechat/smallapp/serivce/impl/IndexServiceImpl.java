@@ -230,9 +230,9 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     @Override
-    public ServerResponse<Object> recordOverview(String openId) {
+    public ServerResponse<Object> recordOverview(String openId, String date) {
         val student = studentMapper.selectByOpenId(openId);
-        return getRecordOverviewResponse(student, null);
+        return getRecordOverviewResponse(student, date);
     }
 
     @Override
