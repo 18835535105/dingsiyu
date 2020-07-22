@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.vo.currentdayofstudy;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -63,5 +64,32 @@ public class CurrentDayOfStudyVo implements Serializable {
      * 错误的考题，多个考题间用##隔开，只统计选择和填空的答错试题
      */
     private List<String> test;
+
+    /**
+     * 老师拍照上传的图片路径
+     */
+    private String imgUrl;
+
+    /**
+     * 老师对学生的评价
+     */
+    private String evaluate;
+
+    /**
+     * 学生表现（1-5颗星）
+     */
+    @TableField("`show`")
+    private Integer show;
+
+    /**
+     * 备注
+     */
+    @TableField("`comment`")
+    private String comment;
+
+    /**
+     * 座位号（在家填写0）
+     */
+    private Integer siteNo;
 
 }

@@ -19,8 +19,8 @@
         <result column="test" property="test"/>
         <result column="create_time" property="createTime"/>
         <result column="evaluate" property="evaluate"/>
-        <result column="`show`" property="show"/>
-        <result column="`comment`" property="comment"/>
+        <result column="show" property="show"/>
+        <result column="comment" property="comment"/>
         <result column="site_no" property="siteNo"/>
     </resultMap>
 

@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.currentDayOfStudy.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
@@ -115,6 +116,11 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
                 .gold(currentDayOfStudy.getGold())
                 .onlineTime(currentDayOfStudy.getOnlineTime())
                 .validTime(currentDayOfStudy.getValidTime())
+                .comment(currentDayOfStudy.getComment())
+                .evaluate(currentDayOfStudy.getEvaluate())
+                .imgUrl(GetOssFile.getPublicObjectUrl(currentDayOfStudy.getImgUrl()))
+                .show(currentDayOfStudy.getShow())
+                .siteNo(currentDayOfStudy.getSiteNo())
                 .build());
     }
 
