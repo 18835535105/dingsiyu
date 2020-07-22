@@ -5,6 +5,9 @@ import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 
+import java.util.List;
+import java.util.Map;
+
 
 public interface CurrentDayOfStudyService extends IService<CurrentDayOfStudy> {
 
@@ -41,4 +44,20 @@ public interface CurrentDayOfStudyService extends IService<CurrentDayOfStudy> {
      * @return
      */
     Boolean saveOrUpdate1(CurrentDayOfStudy currentDayOfStudy);
+
+    /**
+     * 获取课文句型测试中英文
+     *
+     * @param errorInfo
+     * @return
+     */
+    List<Map<String, String>> getTestList(String errorInfo);
+
+    /**
+     * 获取语法模块数据
+     *
+     * @param errorInfo
+     * @return
+     */
+    List<String> getReturnList(String errorInfo);
 }

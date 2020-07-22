@@ -40,6 +40,24 @@ public interface CourseFeignClient {
     UnitNew getUnitNewById(@PathVariable Long id);
 
     /**
+     * 根据类型查询单元最大group
+     *
+     * @param unitIds
+     * @param type    1：单词；2：句型；4：课文
+     * @return
+     */
+    @GetMapping("/unit/getMaxGroupByUnitIsdAndType")
+    ServerResponse<Map<Long, Integer>> getMaxGroupByUnitIsdAndType(@RequestParam List<Long> unitIds, @RequestParam Integer type);
+
+    /**
+     * 根据单词查询中文翻译
+     *
+     * @param word
+     */
+    @RequestMapping(value = "/vocabulary/getVocabularyByWordId", method = RequestMethod.GET)
+    Vocabulary getVocabularyByWordId(@RequestParam("word") String word);
+
+    /**
      * 单词获取数据
      */
     /**
@@ -127,6 +145,7 @@ public interface CourseFeignClient {
 
     /**
      * 去掉指定字符查询数据
+     *
      * @param sentence
      * @return
      */
@@ -189,20 +208,12 @@ public interface CourseFeignClient {
 
     /**
      * 去掉指定字符查询数据
+     *
      * @param sentence
      * @return
      */
     @RequestMapping(value = "/centerTeks/replaceTeks", method = RequestMethod.GET)
-     TeksNew replaceTeks(@RequestParam("sentence") String sentence);
+    TeksNew replaceTeks(@RequestParam("sentence") String sentence);
 
 
-    /**
-     * 根据类型查询单元最大group
-     *
-     * @param unitIds
-     * @param type    1：单词；2：句型；4：课文
-     * @return
-     */
-    @GetMapping("/unit/getMaxGroupByUnitIsdAndType")
-    ServerResponse<Map<Long, Integer>> getMaxGroupByUnitIsdAndType(@RequestParam List<Long> unitIds, @RequestParam Integer type);
 }

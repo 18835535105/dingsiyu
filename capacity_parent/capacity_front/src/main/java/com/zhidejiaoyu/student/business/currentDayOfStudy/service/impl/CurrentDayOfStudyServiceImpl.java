@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.TeksNew;
+import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.ArrayUtil;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -170,7 +171,8 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         return this.updateById(currentDayOfStudy);
     }
 
-    private List<Map<String, String>> getTestList(String errorInfo) {
+    @Override
+    public List<Map<String, String>> getTestList(String errorInfo) {
         List<Map<String, String>> returnList = new ArrayList<>();
         if (StringUtil.isEmpty(errorInfo)) {
             return returnList;
@@ -179,28 +181,36 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         if (split.length > 0) {
             List<String> strings = Arrays.asList(split);
             strings.forEach(str -> {
-                TeksNew teks = courseFeignClient.replaceTeks(str);
                 Map<String, String> map = new HashMap<>();
-                if (teks != null) {
-                    map.put("english", teks.getSentence().replace("#", " ").replace("$", ""));
-                    map.put("chinese", teks.getParaphrase().replace("*", ""));
-                } else {
-                    Sentence sentence = courseFeignClient.getReplaceSentece(str);
-                    if (sentence != null) {
-                        map.put("english", sentence.getCentreExample().replace("#", " ").replace("$", ""));
-                        map.put("chinese", sentence.getCentreTranslate().replace("*", ""));
+                Vocabulary voc = courseFeignClient.getVocabularyByWordId(str);
+                if(voc!=null){
+                    map.put("english", voc.getWord());
+                    map.put("chinese", voc.getWordChinese());
+                }else{
+                    TeksNew teks = courseFeignClient.replaceTeks(str);
+                    if (teks != null) {
+                        map.put("english", teks.getSentence().replace("#", " ").replace("$", ""));
+                        map.put("chinese", teks.getParaphrase().replace("*", ""));
                     } else {
-                        map.put("english", str);
-                        map.put("chinese", null);
+                        Sentence sentence = courseFeignClient.getReplaceSentece(str);
+                        if (sentence != null) {
+                            map.put("english", sentence.getCentreExample().replace("#", " ").replace("$", ""));
+                            map.put("chinese", sentence.getCentreTranslate().replace("*", ""));
+                        } else {
+                            map.put("english", str);
+                            map.put("chinese", null);
+                        }
                     }
                 }
+
                 returnList.add(map);
             });
         }
         return returnList;
     }
 
-    private List<String> getReturnList(String errorInfo) {
+    @Override
+    public List<String> getReturnList(String errorInfo) {
         if (StringUtil.isEmpty(errorInfo)) {
             return null;
         }
