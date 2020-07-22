@@ -524,7 +524,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private void initAccountTime(Student student) {
         if (student.getAccountTime() == null) {
             student.setAccountTime(new Date(System.currentTimeMillis() + student.getRank() * 24 * 60 * 60 * 1000L));
-            student.setUuid(IdUtil.getId());
+            if (StringUtil.isEmpty(student.getUuid())) {
+                student.setUuid(IdUtil.getId());
+            }
             studentMapper.updateById(student);
 
             executorService.execute(() -> {
