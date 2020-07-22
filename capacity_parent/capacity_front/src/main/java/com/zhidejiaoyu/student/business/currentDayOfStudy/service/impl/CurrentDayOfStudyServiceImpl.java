@@ -198,10 +198,10 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
             List<String> strings = Arrays.asList(split);
             strings.forEach(str -> {
                 Map<String, String> map = new HashMap<>();
-                Vocabulary voc = courseFeignClient.getVocabularyByWordId(str);
+                String voc = courseFeignClient.getVocabularyChinsesByWordId(str);
                 if(voc!=null){
-                    map.put("english", voc.getWord());
-                    map.put("chinese", voc.getWordChinese());
+                    map.put("english", str);
+                    map.put("chinese", voc);
                 }else{
                     TeksNew teks = courseFeignClient.replaceTeks(str);
                     if (teks != null) {

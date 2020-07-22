@@ -54,8 +54,8 @@ public interface CourseFeignClient {
      *
      * @param word
      */
-    @RequestMapping(value = "/vocabulary/getVocabularyByWordId", method = RequestMethod.GET)
-    Vocabulary getVocabularyByWordId(@RequestParam("word") String word);
+    @RequestMapping(value = "/vocabulary/getVocabularyChinsesByWordId", method = RequestMethod.GET)
+    String getVocabularyChinsesByWordId(@RequestParam("word") String word);
 
     /**
      * 单词获取数据

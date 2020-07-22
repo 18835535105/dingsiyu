@@ -109,9 +109,9 @@ public class VocabularyController {
      *
      * @param word
      */
-    @RequestMapping(value = "/getVocabularyByWordId", method = RequestMethod.GET)
-    public Vocabulary getVocabularyByWordId( String word){
-        return vocabularyService.getVocabularyByWordId(word);
+    @RequestMapping(value = "/getVocabularyChinsesByWordId", method = RequestMethod.GET)
+    public String getVocabularyChinsesByWordId( String word){
+        return vocabularyService.getVocabularyChinsesByWordId(word);
     }
 
 }

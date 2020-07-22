@@ -54,8 +54,9 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
     }
 
     @Override
-    public Vocabulary getVocabularyByWordId(String word) {
-        return vocabularyMapper.selectByWord(word);
+    public String getVocabularyChinsesByWordId(String word) {
+        Vocabulary vocabulary = vocabularyMapper.selectByWord(word);
+        return vocabulary.getWordChinese();
     }
 
 

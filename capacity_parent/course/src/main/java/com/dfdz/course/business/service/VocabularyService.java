@@ -20,5 +20,5 @@ public interface VocabularyService extends IService<Vocabulary> {
 
     Map<String, Object> selectStudyMap(Long unitId, List<Long> wordIds, Integer type, Integer group);
 
-    Vocabulary getVocabularyByWordId(String word);
+    String getVocabularyChinsesByWordId(String word);
 }
