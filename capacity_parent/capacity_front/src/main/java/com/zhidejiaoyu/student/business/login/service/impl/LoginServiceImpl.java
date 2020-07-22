@@ -185,6 +185,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             executorService.execute(() -> {
                 // 记录登录信息
                 String ip = this.saveLoginRunLog(stu);
+
                 // 判断学生是否是在加盟校半径 1 公里外登录
                 this.isOtherLocation(stu, ip);
 

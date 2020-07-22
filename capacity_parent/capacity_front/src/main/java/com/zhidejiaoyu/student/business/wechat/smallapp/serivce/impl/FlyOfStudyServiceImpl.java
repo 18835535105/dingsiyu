@@ -1,10 +1,10 @@
 package com.zhidejiaoyu.student.business.wechat.smallapp.serivce.impl;
 
-import com.alibaba.excel.util.StringUtils;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.ArrayUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
@@ -13,6 +13,7 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.FlyOfStudyService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.fly.StudyInfoVO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.fly.TotalStudyInfoVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -91,13 +92,13 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
         }
 
         return ServerResponse.createBySuccess(StudyInfoVO.builder()
-                .contents(currentDayOfStudy.getStudyModel() == null ? new String[0] : currentDayOfStudy.getStudyModel().split("##"))
+                .contents(currentDayOfStudy.getStudyModel() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getStudyModel().split("##")))
                 .date(currentDayOfStudy.getCreateTime() == null ? "" : DateUtil.formatYYYYMMDD(currentDayOfStudy.getCreateTime()))
-                .errorSentence(currentDayOfStudy.getSentence() == null ? new String[0] : currentDayOfStudy.getSentence().split("##"))
-                .errorSyntax(currentDayOfStudy.getSyntax() == null ? new String[0] : currentDayOfStudy.getSyntax().split("##"))
-                .errorTest(currentDayOfStudy.getTest() == null ? new String[0] : currentDayOfStudy.getTest().split("##"))
-                .errorText(currentDayOfStudy.getText() == null ? new String[0] : currentDayOfStudy.getText().split("##"))
-                .errorWord(currentDayOfStudy.getWord() == null ? new String[0] : currentDayOfStudy.getWord().split("##"))
+                .errorSentence(currentDayOfStudy.getSentence() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getSentence().split("##")))
+                .errorSyntax(currentDayOfStudy.getSyntax() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getSyntax().split("##")))
+                .errorTest(currentDayOfStudy.getTest() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getTest().split("##")))
+                .errorText(currentDayOfStudy.getText() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getText().split("##")))
+                .errorWord(currentDayOfStudy.getWord() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getWord().split("##")))
                 .totalGold(currentDayOfStudy.getGold())
                 .totalOnlineTime(currentDayOfStudy.getOnlineTime())
                 .totalValidTime(currentDayOfStudy.getValidTime())
