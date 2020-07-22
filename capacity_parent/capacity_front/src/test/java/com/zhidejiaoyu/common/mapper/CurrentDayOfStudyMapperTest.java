@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.ZdjyFrontApplication;
+import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,5 +38,11 @@ public class CurrentDayOfStudyMapperTest {
     public void countByStudentIdAndQrCodeNum() {
         int i = currentDayOfStudyMapper.countByStudentIdAndQrCodeNum(9319L, 24);
         log.info("count={}", i);
+    }
+
+    @Test
+    public void selectByStudentIdAndCreateTime() {
+        CurrentDayOfStudy currentDayOfStudy = currentDayOfStudyMapper.selectByStudentIdAndCreateTime(14985L, "2020-07-15");
+//        log.info("currentDayOfStudy={}", currentDayOfStudy.toString());
     }
 }
