@@ -1009,8 +1009,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             testResultVo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
         }
         resultMap.put("point", point);
-        resultMap.put("imgUrl", PetUrlUtil.getTestPetUrl(student,point,"单元闯关测试"));
-        resultMap.put("petUrl", PetUrlUtil.getTestPetUrl(student,point,"单元闯关测试"));
+        resultMap.put("imgUrl", PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
+        resultMap.put("petUrl", PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
         testRecordMapper.insert(testRecord);
     }
 
@@ -1349,27 +1349,28 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     public static String getTestMessage(Student student, TestResultVo vo, TestRecord testRecord, int pass, PetSayUtil petSayUtil) {
-        String msg;
         Integer point = testRecord.getPoint();
         String failureBackMsg = "别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！";
         String successBackMsg = "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！";
         if (point < pass) {
-            msg = "很遗憾，闯关失败，再接再厉。";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             vo.setBackMsg(failureBackMsg);
             testRecord.setPass(2);
-        } else if (point < PointConstant.HUNDRED) {
-            msg = "闯关成功，独孤求败！";
+            return "很遗憾，闯关失败，再接再厉。";
+        }
+
+        if (point < PointConstant.HUNDRED) {
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
             vo.setBackMsg(successBackMsg);
             testRecord.setPass(1);
-        } else {
-            msg = "恭喜你刷新了纪录！";
-            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
-            vo.setBackMsg(successBackMsg);
-            testRecord.setPass(1);
+            return "闯关成功，独孤求败！";
         }
-        return msg;
+
+        vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+        vo.setBackMsg(successBackMsg);
+        testRecord.setPass(1);
+        return "恭喜你刷新了纪录！";
+
     }
 
     /**
