@@ -34,4 +34,14 @@
         select <include refid="base_sql"></include> from teks_new order by rand() limit 20
     </select>
 
+    <select id="replaceTeks" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="base_sql"></include> from teks_new
+        where
+        REPLACE(REPLACE(sentence, '#', ' '), '$', '')
+        =
+        REPLACE(REPLACE(#{sentence},'#', ' '), '$', '')
+        limit 1
+    </select>
+
+
 </mapper>

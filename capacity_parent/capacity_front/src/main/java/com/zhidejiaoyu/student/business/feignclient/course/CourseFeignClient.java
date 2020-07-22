@@ -126,6 +126,14 @@ public interface CourseFeignClient {
     Sentence selectSentenceById(@PathVariable Long id);
 
     /**
+     * 去掉指定字符查询数据
+     * @param sentence
+     * @return
+     */
+    @RequestMapping(value = "/sentence/replaceSentence", method = RequestMethod.GET)
+    public Sentence getReplaceSentece(@RequestParam("sentence") String sentence);
+
+    /**
      * 根据unitId和sentenceId获取句型中文
      *
      * @param unitId
@@ -178,6 +186,14 @@ public interface CourseFeignClient {
      */
     @GetMapping("/centerTeks/getTwentyTeks")
     List<TeksNew> getTwentyTeks();
+
+    /**
+     * 去掉指定字符查询数据
+     * @param sentence
+     * @return
+     */
+    @RequestMapping(value = "/centerTeks/replaceTeks", method = RequestMethod.GET)
+     TeksNew replaceTeks(@RequestParam("sentence") String sentence);
 
 
     /**

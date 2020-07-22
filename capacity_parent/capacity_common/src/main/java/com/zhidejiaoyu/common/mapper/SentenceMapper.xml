@@ -347,4 +347,13 @@
         )
     </select>
 
+    <select id="replaceSentence" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="more_table_sql"></include> from sentence s
+        where
+        REPLACE(REPLACE(centreExample, '#', ' '), '$', '')
+        =
+        REPLACE(REPLACE(#{sentence},'#', ' '), '$', '')
+        limit 1
+    </select>
+
 </mapper>

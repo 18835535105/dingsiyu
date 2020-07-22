@@ -12,4 +12,5 @@ public interface TeksService extends IService<Teks> {
 
     List<TeksNew> getTwentyTeks();
 
+    TeksNew getReplaceTeks(String sentence);
 }

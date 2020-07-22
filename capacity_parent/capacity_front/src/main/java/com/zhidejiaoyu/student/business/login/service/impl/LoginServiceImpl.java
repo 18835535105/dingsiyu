@@ -180,14 +180,11 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
             // 一个账户只能登陆一台
             judgeMultipleLogin(stu);
-
+            addUnclock(stu);
+            getStudentEqument(stu);
             executorService.execute(() -> {
-                addUnclock(stu);
-                getStudentEqument(stu);
-
                 // 记录登录信息
                 String ip = this.saveLoginRunLog(stu);
-
                 // 判断学生是否是在加盟校半径 1 公里外登录
                 this.isOtherLocation(stu, ip);
 
@@ -232,7 +229,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private void getStudentEqument(Student stu) {
         List<Map<String, Object>> returnList = new ArrayList<>();
         List<Long> addIdList = new ArrayList<>();
-        shipAddEquipmentService.getStudentEqu(stu, returnList, addIdList);
+        shipAddEquipmentService.getStudentEqu(stu, returnList, addIdList, 2);
     }
 
     private void addUnclock(Student stu) {

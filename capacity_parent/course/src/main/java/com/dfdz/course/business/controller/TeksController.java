@@ -38,4 +38,14 @@ public class TeksController {
     public List<TeksNew> getTwentyTeks() {
         return teksService.getTwentyTeks();
     }
+
+    /**
+     * 去掉指定字符查询数据
+     * @param sentence
+     * @return
+     */
+    @GetMapping("/replaceTeks")
+    public TeksNew getReplaceTeks(String sentence) {
+        return teksService.getReplaceTeks(sentence);
+    }
 }

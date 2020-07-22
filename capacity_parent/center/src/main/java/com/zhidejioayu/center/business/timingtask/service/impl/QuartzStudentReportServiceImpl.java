@@ -167,6 +167,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @Scheduled(cron = "0 15 1 * * ?")
     public void exportStudentPay() {
         log.info("定时任务 -> 统计各校区学生充课信息开始。。。");
 

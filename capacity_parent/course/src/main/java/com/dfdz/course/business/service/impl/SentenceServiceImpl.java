@@ -15,6 +15,8 @@ public class SentenceServiceImpl extends ServiceImpl<SentenceMapper, Sentence> i
 
     @Resource
     private UnitSentenceNewMapper unitSentenceNewMapper;
+    @Resource
+    private SentenceMapper sentenceMapper;
 
     @Override
     public String selectSentenceChineseByUnitIdAndSentenceId(Long unitId, Long sentenceId) {
@@ -23,6 +25,11 @@ public class SentenceServiceImpl extends ServiceImpl<SentenceMapper, Sentence> i
 
     @Override
     public List<Long> getSentenceIdsByUnitIdAndGroup(Long unitId, Integer group) {
-        return unitSentenceNewMapper.selectSentenceIdByUnitIdAndGroup(unitId,group);
+        return unitSentenceNewMapper.selectSentenceIdByUnitIdAndGroup(unitId, group);
+    }
+
+    @Override
+    public Sentence getReplaceTeks(String sentence) {
+        return sentenceMapper.replaceSentence(sentence);
     }
 }
