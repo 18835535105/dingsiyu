@@ -1,11 +1,18 @@
 package com.zhidejiaoyu.common.vo.currentdayofstudy;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class CurrentDayOfStudyVo {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CurrentDayOfStudyVo implements Serializable {
 
     /**
      * 当天获取的总金币数

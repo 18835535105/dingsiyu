@@ -10,7 +10,6 @@ import com.zhidejiaoyu.common.vo.currentdayofstudy.CurrentDayOfStudyVo;
 import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.wechat.smallapp.vo.fly.StudyInfoVO;
 import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import org.springframework.stereotype.Service;
 
@@ -104,17 +103,17 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
             return ServerResponse.createByError(400, "未查询到指定日期的飞行记录！");
         }
 
-        return ServerResponse.createBySuccess(StudyInfoVO.builder()
-                .contents(currentDayOfStudy.getStudyModel() == null ? new String[0] : currentDayOfStudy.getStudyModel().split("##"))
-                .date(currentDayOfStudy.getCreateTime() == null ? "" : DateUtil.formatYYYYMMDD(currentDayOfStudy.getCreateTime()))
-                .errorSentence(currentDayOfStudy.getSentence() == null ? new String[0] : currentDayOfStudy.getSentence().split("##"))
-                .errorSyntax(currentDayOfStudy.getSyntax() == null ? new String[0] : currentDayOfStudy.getSyntax().split("##"))
-                .errorTest(currentDayOfStudy.getTest() == null ? new String[0] : currentDayOfStudy.getTest().split("##"))
-                .errorText(currentDayOfStudy.getText() == null ? new String[0] : currentDayOfStudy.getText().split("##"))
-                .errorWord(currentDayOfStudy.getWord() == null ? new String[0] : currentDayOfStudy.getWord().split("##"))
-                .totalGold(currentDayOfStudy.getGold())
-                .totalOnlineTime(currentDayOfStudy.getOnlineTime())
-                .totalValidTime(currentDayOfStudy.getValidTime())
+        return ServerResponse.createBySuccess(CurrentDayOfStudyVo.builder()
+                .studyModel(currentDayOfStudy.getStudyModel() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getStudyModel().split("##")))
+                .time(currentDayOfStudy.getCreateTime() == null ? "" : DateUtil.formatYYYYMMDD(currentDayOfStudy.getCreateTime()))
+                .sentence(currentDayOfStudy.getSentence() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getSentence().split("##")))
+                .syntax(currentDayOfStudy.getSyntax() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getSyntax().split("##")))
+                .test(currentDayOfStudy.getTest() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getTest().split("##")))
+                .text(currentDayOfStudy.getText() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getText().split("##")))
+                .word(currentDayOfStudy.getWord() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getWord().split("##")))
+                .gold(currentDayOfStudy.getGold())
+                .onlineTime(currentDayOfStudy.getOnlineTime())
+                .validTime(currentDayOfStudy.getValidTime())
                 .build());
     }
 
