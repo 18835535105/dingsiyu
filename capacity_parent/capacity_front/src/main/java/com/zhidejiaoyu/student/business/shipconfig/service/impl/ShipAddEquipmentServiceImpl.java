@@ -74,7 +74,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         Student student = getStudent(session);
         List<Map<String, Object>> returnList = new ArrayList<>();
         List<Long> addIdList = new ArrayList<>();
-        getStudentEqu(student, returnList, addIdList);
+        getStudentEqu(student, returnList, addIdList,1);
         if (addIdList.size() > 0) {
             addEquipment(addIdList, student.getId(), studentEquipmentMapper);
         }
@@ -88,29 +88,33 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     @Override
-    public void getStudentEqu(Student student, List<Map<String, Object>> returnList, List<Long> addIdList) {
+    public void getStudentEqu(Student student, List<Map<String, Object>> returnList, List<Long> addIdList,Integer type) {
         //获取等级开启奖品
         //判断是否通过摸底测试
-        boolean flag = redisOpt.getTestBeforeStudy(student.getId());
         //获取所有装备
         List<Equipment> equipments = equipmentMapper.selectAll();
-        //获取所有学生装备
-        List<Long> studentEquipmentIds = studentEquipmentMapper.selectEquipmentIdsByStudentId(student.getId());
-        //获取全部装备lv1的图片
-        Map<Long, Map<String, Object>> map = equipmentExpansionMapper.selectLvOneAllUrl();
-        //获取经验值
-        EquipmentExperienceVo empiricalValue = getEmpiricalValue(student.getId(), 0);
         //将装备分组
         Map<Integer, List<Equipment>> collect = equipments.stream().collect(Collectors.groupingBy(Equipment::getType));
-        //获取飞船需要添加的物品
-        addEquipmentByType(collect.get(1), studentEquipmentIds, empiricalValue.getShipExperience(), returnList, addIdList, map, flag);
-        //添加武器需要的物品
-        addEquipmentByType(collect.get(2), studentEquipmentIds, empiricalValue.getWeaponExperience(), returnList, addIdList, map, null);
-        //添加导弹需要的物品
-        addEquipmentByType(collect.get(3), studentEquipmentIds, empiricalValue.getMissileExperience(), returnList, addIdList, map, null);
-        //添加装备需要的物品
-        addEquipmentByType(collect.get(4), studentEquipmentIds, empiricalValue.getArmorExperience(), returnList, addIdList, map, null);
-        addEquipmentPeople(collect.get(5), student.getId());
+        if(type.equals(1)){
+            boolean flag = redisOpt.getTestBeforeStudy(student.getId());
+            //获取所有学生装备
+            List<Long> studentEquipmentIds = studentEquipmentMapper.selectEquipmentIdsByStudentId(student.getId());
+            //获取全部装备lv1的图片
+            Map<Long, Map<String, Object>> map = equipmentExpansionMapper.selectLvOneAllUrl();
+            //获取经验值
+            EquipmentExperienceVo empiricalValue = getEmpiricalValue(student.getId(), 0);
+            //获取飞船需要添加的物品
+            addEquipmentByType(collect.get(1), studentEquipmentIds, empiricalValue.getShipExperience(), returnList, addIdList, map, flag);
+            //添加武器需要的物品
+            addEquipmentByType(collect.get(2), studentEquipmentIds, empiricalValue.getWeaponExperience(), returnList, addIdList, map, null);
+            //添加导弹需要的物品
+            addEquipmentByType(collect.get(3), studentEquipmentIds, empiricalValue.getMissileExperience(), returnList, addIdList, map, null);
+            //添加装备需要的物品
+            addEquipmentByType(collect.get(4), studentEquipmentIds, empiricalValue.getArmorExperience(), returnList, addIdList, map, null);
+            addEquipmentPeople(collect.get(5), student.getId());
+        }else{
+            addEquipmentPeople(collect.get(5), student.getId());
+        }
     }
 
     private List<String> getReturnStr(List<Map<String, Object>> returnList) {

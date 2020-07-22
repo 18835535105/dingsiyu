@@ -19,4 +19,6 @@ public interface TeksNewMapper extends BaseMapper<TeksNew> {
     List<TeksNew> selTeksByUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     List<TeksNew> getTwentyTeks();
+
+    TeksNew replaceTeks(@Param("sentence") String sentence);
 }

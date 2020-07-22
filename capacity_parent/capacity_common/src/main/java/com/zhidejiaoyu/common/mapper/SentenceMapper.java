@@ -141,6 +141,8 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
 
     int countByCourseId(@Param("unitIds") List<Long> unitIds);
 
+    Sentence replaceSentence(@Param("sentence") String sentence);
+
     /**
      * 查询当前单元未学习的首个例句
      *

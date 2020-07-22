@@ -2,10 +2,7 @@ package com.dfdz.course.business.controller;
 
 import com.dfdz.course.business.service.VocabularyService;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -106,5 +103,15 @@ public class VocabularyController {
         return vocabularyService.selectStudyMap(unitId, wordIds, type, group);
     }
 
+
+    /**
+     * 根据单词查询中文翻译
+     *
+     * @param word
+     */
+    @RequestMapping(value = "/getVocabularyByWordId", method = RequestMethod.GET)
+    public Vocabulary getVocabularyByWordId( String word){
+        return vocabularyService.getVocabularyByWordId(word);
+    }
 
 }

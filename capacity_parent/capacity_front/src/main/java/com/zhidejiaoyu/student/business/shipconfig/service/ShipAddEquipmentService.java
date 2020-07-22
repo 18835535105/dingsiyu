@@ -24,7 +24,7 @@ public interface ShipAddEquipmentService extends BaseService<Student> {
 
     void updateUseEqu(Student student, Equipment equipment);
 
-    void getStudentEqu(Student student, List<Map<String, Object>> returnList, List<Long> addIdList);
+    void getStudentEqu(Student student, List<Map<String, Object>> returnList, List<Long> addIdList,Integer type);
 
     ServerResponse<Object> getEquipmentNexLevlInfromation(Long equipmentId, HttpSession session);
 

@@ -19,4 +19,6 @@ public interface VocabularyService extends IService<Vocabulary> {
     Integer countWordPictureByUnitId(Long unitId, Integer group);
 
     Map<String, Object> selectStudyMap(Long unitId, List<Long> wordIds, Integer type, Integer group);
+
+    Vocabulary getVocabularyByWordId(String word);
 }

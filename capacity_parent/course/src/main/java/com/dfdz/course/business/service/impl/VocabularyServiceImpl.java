@@ -53,5 +53,10 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
         return unitVocabularyNewMapper.selectStudyMap(unitId,wordIds,type,group);
     }
 
+    @Override
+    public Vocabulary getVocabularyByWordId(String word) {
+        return vocabularyMapper.selectByWord(word);
+    }
+
 
 }

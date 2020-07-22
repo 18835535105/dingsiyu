@@ -2,6 +2,7 @@ package com.zhidejioayu.center.business.userinfo.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.dto.student.SaveStudentInfoToCenterDTO;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.center.BusinessUserInfoMapper;
 import com.zhidejiaoyu.common.mapper.center.ServerConfigMapper;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
@@ -37,14 +38,19 @@ public class UserInfoServiceImpl extends ServiceImpl<BusinessUserInfoMapper, Bus
     @Override
     public void getUser(BusinessUserInfo businessUserInfo, String no) {
         BusinessUserInfo info = businessUserInfoMapper.selectByUserUuid(businessUserInfo.getUserUuid());
-        if (info == null) {
-            ServerConfig serverConfig = serverConfigMapper.selectByServerNo(no);
-            businessUserInfo.setCreateTime(new Date());
-            businessUserInfo.setUpdateTime(new Date());
-            businessUserInfo.setServerConfigId(serverConfig.getId());
-            businessUserInfo.setId(IdUtil.getId());
-            businessUserInfoMapper.insert(businessUserInfo);
+        if (info != null) {
+            return;
         }
+
+        ServerConfig serverConfig = serverConfigMapper.selectByServerNo(no);
+        if (serverConfig == null) {
+            throw new ServiceException("server_config未配置server_no=" + no + "的服务器信息！请联系管理员！");
+        }
+        businessUserInfo.setCreateTime(new Date());
+        businessUserInfo.setUpdateTime(new Date());
+        businessUserInfo.setServerConfigId(serverConfig.getId());
+        businessUserInfo.setId(IdUtil.getId());
+        businessUserInfoMapper.insert(businessUserInfo);
     }
 
     @Override

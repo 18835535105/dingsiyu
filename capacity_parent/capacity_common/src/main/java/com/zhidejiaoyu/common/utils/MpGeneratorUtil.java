@@ -24,7 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"qy_auth"};
+        String[] tableName = {"qa_key_words","qa_key_words_question","qa_question","qa_auto_learn","qa_unknown"};
 
         /*
          * 配置：
@@ -39,8 +39,8 @@ public class MpGeneratorUtil {
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig
                 //设置代码生成路径
-//                .setOutputDir("D://pojo")
-                .setOutputDir("/Users/wuchenxi/Desktop/zdjy")
+                .setOutputDir("D://pojo")
+                //.setOutputDir("/Users/wuchenxi/Desktop/zdjy")
                 //设置作者
                 .setAuthor("zdjy")
                 //设置二级缓存的开闭

@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 智慧飞行记录指定序号学习记录
@@ -42,18 +44,18 @@ public class StudyInfoVO implements Serializable {
     /**
      * 学习内容， 模块-单元
      */
-    private String[] contents;
+    private List<String> contents;
 
-    private String[] errorWord;
+    private List<Map<String,String>> errorWord;
 
-    private String[] errorSentence;
+    private List<Map<String,String>> errorSentence;
 
-    private String[] errorSyntax;
+    private List<String> errorSyntax;
 
-    private String[] errorText;
+    private List<String> errorText;
 
     /**
      * 考题总数 测试次数还是所有答题的个数
      */
-    private String[] errorTest;
+    private List<Map<String,String>> errorTest;
 }

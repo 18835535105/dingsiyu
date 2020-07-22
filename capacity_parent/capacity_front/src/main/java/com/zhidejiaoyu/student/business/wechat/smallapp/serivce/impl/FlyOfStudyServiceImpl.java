@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.FlyOfStudyService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.fly.StudyInfoVO;
@@ -45,6 +46,9 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
 
     @Resource
     private CurrentDayOfStudyMapper currentDayOfStudyMapper;
+
+    @Resource
+    private CurrentDayOfStudyService currentDayOfStudyService;
 
     @Override
     public ServerResponse<Object> getTotalStudyInfo(String openId) {
@@ -92,13 +96,13 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
         }
 
         return ServerResponse.createBySuccess(StudyInfoVO.builder()
-                .contents(currentDayOfStudy.getStudyModel() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getStudyModel().split("##")))
+                .contents(currentDayOfStudyService.getReturnList(currentDayOfStudy.getStudyModel()))
                 .date(currentDayOfStudy.getCreateTime() == null ? "" : DateUtil.formatYYYYMMDD(currentDayOfStudy.getCreateTime()))
-                .errorSentence(currentDayOfStudy.getSentence() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getSentence().split("##")))
-                .errorSyntax(currentDayOfStudy.getSyntax() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getSyntax().split("##")))
-                .errorTest(currentDayOfStudy.getTest() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getTest().split("##")))
-                .errorText(currentDayOfStudy.getText() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getText().split("##")))
-                .errorWord(currentDayOfStudy.getWord() == null ? new String[0] : ArrayUtil.removeBlankString(currentDayOfStudy.getWord().split("##")))
+                .errorSentence(currentDayOfStudyService.getTestList(currentDayOfStudy.getSentence()))
+                .errorSyntax(currentDayOfStudyService.getReturnList(currentDayOfStudy.getSyntax()))
+                .errorTest(currentDayOfStudyService.getTestList(currentDayOfStudy.getTest()))
+                .errorText(currentDayOfStudyService.getReturnList(currentDayOfStudy.getText()))
+                .errorWord(currentDayOfStudyService.getTestList(currentDayOfStudy.getWord()))
                 .totalGold(currentDayOfStudy.getGold())
                 .totalOnlineTime(currentDayOfStudy.getOnlineTime())
                 .totalValidTime(currentDayOfStudy.getValidTime())
