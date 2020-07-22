@@ -212,7 +212,7 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
     @Override
     public List<String> getReturnList(String errorInfo) {
         if (StringUtil.isEmpty(errorInfo)) {
-            return null;
+            return new ArrayList<>();
         }
         String[] split = errorInfo.split("##");
         if (split.length > 0) {
@@ -220,6 +220,6 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
             Set<String> set = new HashSet<>(strings);
             return new ArrayList<>(set);
         }
-        return null;
+        return new ArrayList<>();
     }
 }
