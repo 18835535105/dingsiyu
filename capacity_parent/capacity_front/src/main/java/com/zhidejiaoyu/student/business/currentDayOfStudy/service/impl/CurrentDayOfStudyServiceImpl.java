@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.currentDayOfStudy.service.impl;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
+import com.zhidejiaoyu.common.utils.ArrayUtil;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -104,13 +105,13 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         }
 
         return ServerResponse.createBySuccess(CurrentDayOfStudyVo.builder()
-                .studyModel(currentDayOfStudy.getStudyModel() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getStudyModel().split("##")))
+                .studyModel(currentDayOfStudy.getStudyModel() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList(currentDayOfStudy.getStudyModel().split("##")))
                 .time(currentDayOfStudy.getCreateTime() == null ? "" : DateUtil.formatYYYYMMDD(currentDayOfStudy.getCreateTime()))
-                .sentence(currentDayOfStudy.getSentence() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getSentence().split("##")))
-                .syntax(currentDayOfStudy.getSyntax() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getSyntax().split("##")))
-                .test(currentDayOfStudy.getTest() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getTest().split("##")))
-                .text(currentDayOfStudy.getText() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getText().split("##")))
-                .word(currentDayOfStudy.getWord() == null ? Collections.emptyList() : Arrays.asList(currentDayOfStudy.getWord().split("##")))
+                .sentence(currentDayOfStudy.getSentence() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList((currentDayOfStudy.getSentence().split("##"))))
+                .syntax(currentDayOfStudy.getSyntax() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList((currentDayOfStudy.getSyntax().split("##"))))
+                .test(currentDayOfStudy.getTest() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList((currentDayOfStudy.getTest().split("##"))))
+                .text(currentDayOfStudy.getText() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList((currentDayOfStudy.getText().split("##"))))
+                .word(currentDayOfStudy.getWord() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList((currentDayOfStudy.getWord().split("##"))))
                 .gold(currentDayOfStudy.getGold())
                 .onlineTime(currentDayOfStudy.getOnlineTime())
                 .validTime(currentDayOfStudy.getValidTime())
