@@ -21,6 +21,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class StudyInfoVO implements Serializable {
 
+    private String studentName;
+
     /**
      * 日期， yyyy-MM-dd
      */
@@ -58,4 +60,24 @@ public class StudyInfoVO implements Serializable {
      * 考题总数 测试次数还是所有答题的个数
      */
     private List<Map<String,String>> errorTest;
+
+    /**
+     * 老师对学生的评价
+     */
+    private String evaluate;
+
+    /**
+     * 学生表现（1-5颗星）
+     */
+    private Integer show;
+
+    /**
+     * 备注
+     */
+    private String comment;
+
+    /**
+     * 座位号（在家填写0）
+     */
+    private Integer siteNo;
 }

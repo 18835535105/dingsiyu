@@ -26,7 +26,7 @@ public class FlyOfStudyController {
     /**
      * 通过扫码获取学生学习信息
      *
-     * @param studentUuid
+     * @param openId
      * @param num    二维码序号 <ul>
      *               <li>-1：查询学生总的学习情况信息</li>
      *               <li>其他：查询指定序号的学习信息</li>
