@@ -4,10 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.Adsense;
-import com.zhidejiaoyu.common.pojo.ClockIn;
-import com.zhidejiaoyu.common.pojo.PrizeExchangeList;
-import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -67,6 +64,9 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private KnownWordsMapper knownWordsMapper;
+
+    @Resource
+    private CurrentDayOfStudyMapper currentDayOfStudyMapper;
 
     @Override
     public ServerResponse<Object> index(String openId) {
@@ -230,9 +230,20 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     @Override
-    public ServerResponse<Object> recordOverview(String openId, String date) {
-        val student = studentMapper.selectByOpenId(openId);
-        return getRecordOverviewResponse(student, date);
+    public ServerResponse<Object> recordOverview(String openId, Integer num) {
+        Student student = studentMapper.selectByOpenId(openId);
+
+        if (num == -1) {
+            // 查询学习总览
+            return getRecordOverviewResponse(student, null);
+        }
+
+        // 查询指定编号所在日期的学习情况
+        CurrentDayOfStudy currentDayOfStudy = currentDayOfStudyMapper.selectByStudentIdAndQrCodeNum(student.getId(), num);
+        if (currentDayOfStudy == null) {
+            return ServerResponse.createByError(400, "未查询到当前二维码的学习信息！");
+        }
+        return getRecordOverviewResponse(student, DateUtil.formatDate(currentDayOfStudy.getCreateTime(), DateUtil.YYYYMMDD));
     }
 
     @Override

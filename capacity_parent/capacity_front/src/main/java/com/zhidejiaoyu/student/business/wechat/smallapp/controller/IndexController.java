@@ -97,15 +97,15 @@ public class IndexController extends BaseController {
      * 飞行记录学习总览
      *
      * @param openId
-     * @param date   查询日期
+     * @param num 扫码编号 -1：总览；其他编号：查询指定日期学习情况
      * @return
      */
     @GetMapping("/recordOverview")
-    public ServerResponse<Object> recordOverview(@RequestParam String openId, @RequestParam(required = false) String date) {
+    public ServerResponse<Object> recordOverview(@RequestParam String openId, @RequestParam(required = false) Integer num) {
         if (StringUtils.isEmpty(openId)) {
             throw new ServiceException("openId can't be null");
         }
-        return smallAppIndexService.recordOverview(openId, date);
+        return smallAppIndexService.recordOverview(openId, num);
     }
 
     /**
