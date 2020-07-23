@@ -89,7 +89,7 @@ public interface BaseSmallAppFeignClient {
      * @return
      */
     @GetMapping("/smallApp/index/recordOverview")
-    ServerResponse<Object> recordOverview(@RequestParam String openId);
+    ServerResponse<Object> recordOverview(@RequestParam String openId, @RequestParam(required = false) String date);
 
     /**
      * 补签

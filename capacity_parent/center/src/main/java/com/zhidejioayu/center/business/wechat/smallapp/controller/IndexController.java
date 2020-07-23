@@ -97,12 +97,12 @@ public class IndexController {
      * @return
      */
     @GetMapping("/recordOverview")
-    public ServerResponse<Object> recordOverview(@RequestParam String openId) {
+    public ServerResponse<Object> recordOverview(@RequestParam String openId, @RequestParam(required = false) String date) {
         if (StringUtil.isEmpty(openId)) {
             return ServerResponse.createByError(400, "openId can't be null!");
         }
         BaseSmallAppFeignClient baseSmallAppFeignClient = BaseFeignClientUtil.getBaseSmallAppFeignClient(openId);
-        return baseSmallAppFeignClient.recordOverview(openId);
+        return baseSmallAppFeignClient.recordOverview(openId, date);
     }
 
     /**
