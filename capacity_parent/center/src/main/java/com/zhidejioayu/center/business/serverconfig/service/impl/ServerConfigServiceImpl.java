@@ -22,4 +22,9 @@ public class ServerConfigServiceImpl extends ServiceImpl<ServerConfigMapper, Ser
     public ServerConfig getByServerNo(String serverNo) {
         return serverConfigMapper.selectByServerNo(serverNo);
     }
+
+    @Override
+    public ServerConfig getByStudentOpenid(String openid) {
+        return serverConfigMapper.selectStudentServerByOpenid(openid);
+    }
 }

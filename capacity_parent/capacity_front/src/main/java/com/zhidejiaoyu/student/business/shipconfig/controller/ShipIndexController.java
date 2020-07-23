@@ -2,7 +2,7 @@ package com.zhidejiaoyu.student.business.shipconfig.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
-import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

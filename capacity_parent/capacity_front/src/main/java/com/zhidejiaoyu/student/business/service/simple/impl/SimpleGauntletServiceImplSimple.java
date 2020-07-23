@@ -26,7 +26,7 @@ import com.zhidejiaoyu.student.business.game.service.impl.GameServiceImpl;
 import com.zhidejiaoyu.student.business.service.simple.SimpleIGauntletServiceSimple;
 import com.zhidejiaoyu.student.business.service.simple.SimplePersonalCentreServiceSimple;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
-import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1167,12 +1167,11 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         for (Map<String, Object> map : equipments) {
             Integer type = (Integer) map.get("type");
             if (type.equals(getType)) {
-                StudentGauntletVo.shipName build = StudentGauntletVo.shipName
+                return StudentGauntletVo.shipName
                         .builder()
                         .name(map.get("name").toString())
                         .imgUrl(GetOssFile.getPublicObjectUrl(map.get("imgUrl").toString()))
                         .build();
-                return build;
             }
         }
         return StudentGauntletVo.shipName

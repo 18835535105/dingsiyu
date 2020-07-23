@@ -20,7 +20,7 @@ import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentServi
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipTestService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentEquipmentExperienceVo;
-import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.PkInfoVO;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.PkCopyRedisOpt;

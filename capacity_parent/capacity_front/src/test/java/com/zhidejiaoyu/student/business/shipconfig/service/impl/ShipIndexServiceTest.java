@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
-import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;

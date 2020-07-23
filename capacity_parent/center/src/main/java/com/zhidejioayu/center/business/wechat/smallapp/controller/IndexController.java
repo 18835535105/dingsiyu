@@ -1,8 +1,11 @@
 package com.zhidejioayu.center.business.wechat.smallapp.controller;
 
 import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.StudyOverviewVO;
+import com.zhidejioayu.center.business.serverconfig.service.ServerConfigService;
 import com.zhidejioayu.center.business.util.BaseFeignClientUtil;
 import com.zhidejioayu.center.business.feignclient.smallapp.BaseSmallAppFeignClient;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeDTO;
@@ -29,6 +32,9 @@ public class IndexController {
 
     @Resource
     private IndexService smallAppIndexService;
+
+    @Resource
+    private ServerConfigService serverConfigService;
 
     /**
      * 首页数据
@@ -101,8 +107,27 @@ public class IndexController {
         if (StringUtil.isEmpty(openId)) {
             return ServerResponse.createByError(400, "openId can't be null!");
         }
+        ServerConfig serverConfig = serverConfigService.getByStudentOpenid(openId);
+        if (serverConfig == null) {
+            return this.packageDefaultOverview();
+        }
+
         BaseSmallAppFeignClient baseSmallAppFeignClient = BaseFeignClientUtil.getBaseSmallAppFeignClient(openId);
         return baseSmallAppFeignClient.recordOverview(openId, date);
+    }
+
+    /**
+     * 封装默认学习总览
+     *
+     * @return
+     */
+    private ServerResponse<Object> packageDefaultOverview() {
+        return ServerResponse.createBySuccess(StudyOverviewVO.builder()
+                .studyCount(0)
+                .totalOnlineTime(0L)
+                .totalValidTime(0L)
+                .wordCount(0)
+                .build());
     }
 
     /**

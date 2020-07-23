@@ -6,7 +6,7 @@ import com.zhidejiaoyu.common.mapper.EquipmentMapper;
 import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.mapper.TestRecordMapper;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
-import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 

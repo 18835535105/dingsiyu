@@ -9,6 +9,12 @@ import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
  * @date 2018/7/26
  */
 public class PetImageConstant {
+
+    /**
+     * 微信小程序游客头像
+     */
+    public static final String VISITOR = AliyunInfoConst.host + "static/img/portrait/0.png";
+
     /**
      * 大明白默认头像
      */

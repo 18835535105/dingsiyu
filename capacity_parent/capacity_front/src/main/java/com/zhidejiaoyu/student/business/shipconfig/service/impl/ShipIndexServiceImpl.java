@@ -18,7 +18,7 @@ import com.zhidejiaoyu.student.business.shipconfig.constant.FileConstant;
 import com.zhidejiaoyu.student.business.shipconfig.dto.ShipConfigInfoDTO;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.util.CalculateUtil;
-import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.OtherStudentRankVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.OtherStudentShipIndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.RankVO;
