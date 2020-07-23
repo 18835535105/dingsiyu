@@ -28,6 +28,54 @@ public interface CourseFeignClient {
     CourseNew getById(@PathVariable Long id);
 
     /**
+     * 批量获取课程信息
+     *
+     * @param courseIds
+     * @return
+     */
+    @GetMapping("/getByIds")
+    List<CourseNew> getByIds(@RequestParam List<Long> courseIds);
+
+    /**
+     * 获取学生可以学习的版本集合
+     *
+     * @param courseIds
+     * @return
+     */
+    @GetMapping("/getByIdsGroupByVersion")
+    List<CourseNew> getByIdsGroupByVersion(@RequestParam List<Long> courseIds);
+
+    /**
+     * 各个课程下所有单元个数
+     *
+     * @param courseIds
+     * @param type      1：单词；2：句型；3：语法；4：课文；5：金币试卷
+     * @return
+     */
+    @GetMapping("/countUnitByIds")
+    Map<Long, Integer> countUnitByIds(@RequestParam List<Long> courseIds, @RequestParam int type);
+
+    /**
+     * 当前版本中小于或等于当前年级的所有课程id
+     *
+     * @param version   版本
+     * @param gradeList 年级
+     * @param type      1：单词；2：句型；3：语法；4：课文；5：金币试卷
+     * @return
+     */
+    @GetMapping("/getByGradeListAndVersionAndGrade")
+    List<Long> getByGradeListAndVersionAndGrade(@RequestParam String version, @RequestParam List<String> gradeList, @RequestParam Integer type);
+
+    /**
+     * 获取当前课程的语法数据
+     *
+     * @param courseNews
+     * @return
+     */
+    @PostMapping("/getByCourseNews")
+    Map<Long, Map<String, Object>> getByCourseNews(@RequestBody List<CourseNew> courseNews);
+
+    /**
      * 获取单元数据
      */
     /**
