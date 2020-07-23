@@ -4,7 +4,7 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.controller.BaseController;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
-import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.dto.PrizeDTO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.IndexService;
 import org.apache.commons.lang.StringUtils;

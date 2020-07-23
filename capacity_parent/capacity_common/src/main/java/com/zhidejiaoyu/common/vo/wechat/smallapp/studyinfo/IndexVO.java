@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.shipconfig.vo;
+package com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo;
 
 import lombok.*;
 

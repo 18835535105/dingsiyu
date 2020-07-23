@@ -16,4 +16,12 @@ public interface ServerConfigService extends IService<ServerConfig> {
      * @return
      */
     ServerConfig getByServerNo(String serverNo);
+
+    /**
+     * 根据学生openid查询学生所属服务器信息
+     *
+     * @param openid
+     * @return
+     */
+    ServerConfig getByStudentOpenid(String openid);
 }

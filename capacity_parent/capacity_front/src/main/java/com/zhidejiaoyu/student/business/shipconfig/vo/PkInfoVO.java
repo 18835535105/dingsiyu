@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.shipconfig.vo;
 
 import com.zhidejiaoyu.common.vo.ship.EquipmentVo;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

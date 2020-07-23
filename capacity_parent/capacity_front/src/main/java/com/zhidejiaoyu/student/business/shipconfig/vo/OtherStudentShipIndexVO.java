@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.shipconfig.vo;
 
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
