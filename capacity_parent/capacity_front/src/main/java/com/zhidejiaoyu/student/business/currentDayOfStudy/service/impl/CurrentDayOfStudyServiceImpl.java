@@ -84,6 +84,7 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         vo.setSentence(currentDayOfStudyRedisOpt.getWordSentenceTest(RedisKeysConst.ERROR_SENTENCE, studentId, 2));
         String errorSyntax = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SYNTAX, studentId, 3);
         vo.setSyntax(getReturnList(errorSyntax));
+        vo.setText(new ArrayList<>());
         return ServerResponse.createBySuccess(vo);
     }
 
