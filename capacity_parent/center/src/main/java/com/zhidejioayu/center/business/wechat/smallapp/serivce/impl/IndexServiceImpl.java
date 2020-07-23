@@ -150,12 +150,12 @@ public class IndexServiceImpl extends ServiceImpl<StudentMapper, Student> implem
     private ServerResponse<Object> packageDefaultState() {
         // 说明是游客，返回默认值
         com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO.Radar defaultRadar = new com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO.Radar();
-        defaultRadar.setAttack(0);
-        defaultRadar.setDurability(0);
-        defaultRadar.setHitRate(0.0);
-        defaultRadar.setMove(0);
-        defaultRadar.setSource(0);
-        defaultRadar.setSourceAttack(0);
+        defaultRadar.setAttack(60);
+        defaultRadar.setDurability(1100);
+        defaultRadar.setHitRate(0.7);
+        defaultRadar.setMove(50);
+        defaultRadar.setSource(3);
+        defaultRadar.setSourceAttack(120);
 
         return ServerResponse.createBySuccess(com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO.MyState.builder()
                 .petUrl(GetOssFile.getPublicObjectUrl(PetImageConstant.DEFAULT_IMG))
