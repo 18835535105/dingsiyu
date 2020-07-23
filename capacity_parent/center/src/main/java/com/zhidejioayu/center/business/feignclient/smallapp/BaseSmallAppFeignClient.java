@@ -86,10 +86,11 @@ public interface BaseSmallAppFeignClient {
      * 飞行记录学习总览
      *
      * @param openId
+     * @param num 扫码编号 -1：总览；其他编号：查询指定日期学习情况
      * @return
      */
     @GetMapping("/smallApp/index/recordOverview")
-    ServerResponse<Object> recordOverview(@RequestParam String openId, @RequestParam(required = false) String date);
+    ServerResponse<Object> recordOverview(@RequestParam String openId, @RequestParam(required = false) Integer num);
 
     /**
      * 补签

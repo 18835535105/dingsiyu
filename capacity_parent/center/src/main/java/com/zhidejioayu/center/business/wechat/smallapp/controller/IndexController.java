@@ -100,10 +100,11 @@ public class IndexController {
      * 飞行记录学习总览
      *
      * @param openId
+     * @param num 扫码编号 -1：总览；其他编号：查询指定日期学习情况
      * @return
      */
     @GetMapping("/recordOverview")
-    public ServerResponse<Object> recordOverview(@RequestParam String openId, @RequestParam(required = false) String date) {
+    public ServerResponse<Object> recordOverview(@RequestParam String openId, @RequestParam(required = false) Integer num) {
         if (StringUtil.isEmpty(openId)) {
             return ServerResponse.createByError(400, "openId can't be null!");
         }
@@ -113,7 +114,7 @@ public class IndexController {
         }
 
         BaseSmallAppFeignClient baseSmallAppFeignClient = BaseFeignClientUtil.getBaseSmallAppFeignClient(openId);
-        return baseSmallAppFeignClient.recordOverview(openId, date);
+        return baseSmallAppFeignClient.recordOverview(openId, num);
     }
 
     /**
