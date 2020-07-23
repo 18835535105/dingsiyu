@@ -21,15 +21,14 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
     private VocabularyMapper vocabularyMapper;
 
 
-
     @Override
-    public Integer countLearnVocabularyByUnitIdAndGroup(Long unitId,Integer group){
+    public Integer countLearnVocabularyByUnitIdAndGroup(Long unitId, Integer group) {
         return unitVocabularyNewMapper.countByUnitIdAndGroup(unitId, group);
     }
 
     @Override
     public List<Long> getWordIdByUnitIdAndGroup(Long unitId, Integer group) {
-        return unitVocabularyNewMapper.selectWordIdByUnitIdAndGroup(unitId,group);
+        return unitVocabularyNewMapper.selectWordIdByUnitIdAndGroup(unitId, group);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
 
     @Override
     public Vocabulary getOneWordNotInIdsNew(List<Long> wordIds, Long unitId, Integer group) {
-        return vocabularyMapper.selectOneWordNotInIdsNew(wordIds,unitId,group);
+        return vocabularyMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
     }
 
     @Override
@@ -50,13 +49,13 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
     @Override
     public Map<String, Object> selectStudyMap(Long unitId, List<Long> wordIds, Integer type, Integer group) {
 
-        return unitVocabularyNewMapper.selectStudyMap(unitId,wordIds,type,group);
+        return unitVocabularyNewMapper.selectStudyMap(unitId, wordIds, type, group);
     }
 
     @Override
     public String getVocabularyChinsesByWordId(String word) {
         Vocabulary vocabulary = vocabularyMapper.selectByWord(word);
-        return vocabulary.getWordChinese();
+        return vocabulary != null ? vocabulary.getWordChinese() : null;
     }
 
 
