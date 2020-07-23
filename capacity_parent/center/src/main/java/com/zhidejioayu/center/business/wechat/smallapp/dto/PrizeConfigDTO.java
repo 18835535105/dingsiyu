@@ -15,4 +15,5 @@ public class PrizeConfigDTO {
     private Long studentId;
     private String weChatimgUrl;
     private String weChatName;
+    private String studentOpenId;
 }

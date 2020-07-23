@@ -61,5 +61,9 @@ public class ReturnAdminVo {
      * 头像id
      */
     private String headPortrait;
+    /**
+     * 学生的openId
+     */
+    private String studentOpenId;
 
 }

@@ -32,7 +32,7 @@ public class PrizeConfigServiceImpl extends ServiceImpl<PrizeConfigMapper, Prize
 
     @Override
     public Object getPrizeConfig(PrizeConfigDTO dto) {
-        ServerConfig serverConfig = getServerConfig(dto.getOpenId());
+        ServerConfig serverConfig = getServerConfig(dto.getStudentOpenId());
         BaseSmallAppFeignClient smallAppFeignClient = FeignClientUtil.getSmallAppFeignClient(serverConfig.getServerName());
         return smallAppFeignClient.getPrizeConfig(dto);
     }
@@ -47,6 +47,7 @@ public class PrizeConfigServiceImpl extends ServiceImpl<PrizeConfigMapper, Prize
         if (response != null && response.getStatus() == ResponseCode.SUCCESS.getCode()) {
             WeChat weChat = weChatMapper.selectByOpenId(openId);
             ReturnAdminVo returnAdminVo = response.getData();
+            returnAdminVo.setStudentOpenId(openId);
             if (weChat != null) {
                 returnAdminVo.setWeChatName(weChat.getWeChatName());
                 returnAdminVo.setWeChatImgUrl(weChat.getWeChatImgUrl());
