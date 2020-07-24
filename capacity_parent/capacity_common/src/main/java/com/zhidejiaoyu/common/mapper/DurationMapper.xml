@@ -297,7 +297,6 @@
                date_format(login_time, '%Y-%m-%d') learnDate
         from duration d
         where d.student_id = #{studentId}
-          and d.valid_time &lt;> 0
         group by TO_DAYS(d.login_time)
         order by d.login_time desc
     </select>
