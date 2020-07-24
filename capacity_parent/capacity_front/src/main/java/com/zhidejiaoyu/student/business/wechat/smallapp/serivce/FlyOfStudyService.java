@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.wechat.smallapp.serivce;
 
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.BaseService;
 
@@ -13,10 +14,10 @@ public interface FlyOfStudyService extends BaseService<CurrentDayOfStudy> {
     /**
      * 通过扫码获取学生总学习信息
      *
-     * @param openId
+     * @param student
      * @return
      */
-    ServerResponse<Object> getTotalStudyInfo(String openId);
+    ServerResponse<Object> getTotalStudyInfo(Student student);
 
     /**
      * 通过扫码获取学生指定学习序号的学习信息

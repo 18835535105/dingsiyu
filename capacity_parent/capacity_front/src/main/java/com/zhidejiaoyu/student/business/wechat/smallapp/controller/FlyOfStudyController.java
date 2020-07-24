@@ -2,7 +2,9 @@ package com.zhidejiaoyu.student.business.wechat.smallapp.controller;
 
 import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.service.StudentInfoService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.FlyOfStudyService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,9 @@ public class FlyOfStudyController {
     @Resource
     private FlyOfStudyService flyOfStudyService;
 
+    @Resource
+    private StudentInfoService studentInfoService;
+
     /**
      * 通过扫码获取学生学习信息
      *
@@ -38,7 +43,8 @@ public class FlyOfStudyController {
     public ServerResponse<Object> getStudyInfo(@RequestParam String openId, @RequestParam Integer num) {
         checkParam(openId, num);
         if (num == -1) {
-            return flyOfStudyService.getTotalStudyInfo(openId);
+            Student student = studentInfoService.getByOpenId(openId);
+            return flyOfStudyService.getTotalStudyInfo(student);
         }
         return flyOfStudyService.getStudyInfo(openId, num);
     }

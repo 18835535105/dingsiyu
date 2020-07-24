@@ -48,9 +48,11 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
     @Resource
     private CurrentDayOfStudyService currentDayOfStudyService;
 
+    @Resource
+    private PayLogMapper payLogMapper;
+
     @Override
-    public ServerResponse<Object> getTotalStudyInfo(String openId) {
-        Student student = studentMapper.selectByOpenId(openId);
+    public ServerResponse<Object> getTotalStudyInfo(Student student) {
         if (student == null) {
             return ServerResponse.createByError(400, "您还未绑定队长账号，不能使用该功能！");
         }
@@ -58,7 +60,6 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
         Long studentId = student.getId();
         Long totalValidTime = durationMapper.countTotalValidTime(studentId);
         Long totalOnlineTime = durationMapper.countTotalOnlineTime(student);
-        Date firstLoginTime = runLogMapper.selectFirstLoginTimeByStudentId(studentId);
 
         int wordCount = learnNewMapper.countLearnedWordCount(studentId);
         int sentenceCount = learnNewMapper.countLearnedSentenceCount(studentId);
@@ -66,10 +67,12 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
         int textCount = learnNewMapper.countLearnedTextCount(studentId);
         int testCount = testRecordMapper.countTotalSubjects(studentId);
 
+        Date firstPay =  payLogMapper.selectFirstPayTimeByStudentId(student.getId());
+
         return ServerResponse.createBySuccess(TotalStudyInfoVO.builder()
                 .studentName(StringUtils.isEmpty(student.getStudentName()) ? "默认姓名" : student.getStudentName())
                 .totalGold((int) BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold()))
-                .firstLoginTime(firstLoginTime == null ? "无" : DateUtil.formatDate(firstLoginTime, DateUtil.YYYYMMDDHHMMSS))
+                .firstLoginTime(firstPay == null ? "无" : DateUtil.formatYYYYMMDD(firstPay))
                 .totalOnlineTime(totalOnlineTime == null ? 0 : totalOnlineTime)
                 .totalValidTime(totalValidTime == null ? 0 : totalValidTime)
                 .wordCount(wordCount)
