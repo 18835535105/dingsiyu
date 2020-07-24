@@ -50,9 +50,6 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
     @Resource
     private PayLogMapper payLogMapper;
 
-    @Resource
-    private RunLogMapper runLogMapper;
-
     @Override
     public ServerResponse<Object> getTotalStudyInfo(Student student) {
         if (student == null) {
