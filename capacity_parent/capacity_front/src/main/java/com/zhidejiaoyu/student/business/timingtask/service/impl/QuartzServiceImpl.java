@@ -644,7 +644,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 studentFlowNewMapper.deleteByLearnIds(delLearnIds);
                 learnNewMapper.deleteBatchIds(delLearnIds);
             }
-            log.error("删除学生[{}],课程Id为[{}]", studentId, delUnitIds);
+            log.info("删除学生[{}],课程Id为[{}]", studentId, delUnitIds);
         }
     }
 
