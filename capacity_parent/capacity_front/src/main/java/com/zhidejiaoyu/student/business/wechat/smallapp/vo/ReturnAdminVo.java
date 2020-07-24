@@ -33,7 +33,7 @@ public class ReturnAdminVo {
     /**
      * 点赞微信信息
      */
-    private List<Map<String,Object>>  weChatList;
+    private List<Map<String, Object>> weChatList;
     /**
      * 分数
      */
@@ -62,5 +62,9 @@ public class ReturnAdminVo {
      * 头像id
      */
     private String headPortrait;
+    /**
+     * 学习日期
+     */
+    private String learnTime;
 
 }

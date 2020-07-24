@@ -65,5 +65,9 @@ public class ReturnAdminVo {
      * 学生的openId
      */
     private String studentOpenId;
+    /**
+     * 学习时间
+     */
+    private String learnTime;
 
 }

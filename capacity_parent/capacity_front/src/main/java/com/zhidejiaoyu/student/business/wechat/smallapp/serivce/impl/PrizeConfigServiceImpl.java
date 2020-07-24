@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.center.WeChatMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.pojo.center.WeChat;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.PrizeConfigService;
@@ -95,7 +96,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         } else {
             returnMap.put("background", null);
         }
-        returnMap.put("obtain", studentPayConfig.getObtain());
+        returnMap.put("obtain", studentPayConfig==null?"谢谢参与":studentPayConfig.getObtain());
         returnMap.put("campus", teacher.getSchool().replace("体验中心", "校区"));
         return ServerResponse.createBySuccess(returnMap);
     }
@@ -114,6 +115,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
                 .vaildTime(vaildTime)
                 .headPortrait(GetOssFile.getPublicObjectUrl(student.getHeadUrl()))
                 .imgUrl(imgUrl)
+                .learnTime(DateUtil.formatDate(testRecord.getTestEndTime(),DateUtil.YYYYMMDDYEAR))
                 .wordCount(wordCount)
                 .weChatList(studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(student.getId()))
                 .point(testRecord.getPoint())
