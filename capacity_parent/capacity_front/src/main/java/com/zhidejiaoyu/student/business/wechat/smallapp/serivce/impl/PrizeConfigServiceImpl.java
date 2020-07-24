@@ -36,13 +36,9 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     @Resource
     private JoinSchoolMapper joinSchoolMapper;
     @Resource
-    private WeChatMapper weChatMapper;
-    @Resource
     private DurationMapper durationMapper;
     @Resource
     private LearnNewMapper learnNewMapper;
-    @Resource
-    private LearnHistoryMapper learnHistoryMapper;
 
     @Override
     public Object getPrizeConfig(String openId, Long adminId, Long studentId, String weChatimgUrl, String weChatName) {
@@ -110,7 +106,6 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenreAndStudyModel(student.getId(), GenreConstant.SMALLAPP_GENRE, StudyModelConstant.SMALLAPP_STUDY_MODEL);
         String imgUrl = shareConfigMapper.selectImgByAdminId(adminId);
-        WeChat weChat = weChatMapper.selectByOpenId(openId);
         Long vaildTime = durationMapper.selectTotalValidTimeByStudentId(student.getId());
         int wordCount = learnNewMapper.countLearnedWordCount(student.getId());
         ReturnAdminVo returnAdminVo = ReturnAdminVo.builder()
@@ -122,8 +117,6 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
                 .wordCount(wordCount)
                 .weChatList(studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(student.getId()))
                 .point(testRecord.getPoint())
-                .weChatName(weChat.getWeChatName())
-                .weChatImgUrl(weChat.getWeChatImgUrl())
                 .studentId(student.getId())
                 .studentName(student.getNickname())
                 .build();
