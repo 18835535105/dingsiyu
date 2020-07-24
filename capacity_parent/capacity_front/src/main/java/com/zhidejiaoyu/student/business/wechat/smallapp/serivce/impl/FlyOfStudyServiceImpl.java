@@ -4,7 +4,6 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -51,6 +50,9 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
     @Resource
     private PayLogMapper payLogMapper;
 
+    @Resource
+    private RunLogMapper runLogMapper;
+
     @Override
     public ServerResponse<Object> getTotalStudyInfo(Student student) {
         if (student == null) {
@@ -67,11 +69,12 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
         int textCount = learnNewMapper.countLearnedTextCount(studentId);
         int testCount = testRecordMapper.countTotalSubjects(studentId);
 
-        Date firstPay =  payLogMapper.selectFirstPayTimeByStudentId(student.getId());
+        Date firstPay = payLogMapper.selectFirstPayTimeByStudentId(student.getId());
+        Integer loginCount = runLogMapper.countLoginCountByStudentId(studentId);
 
         return ServerResponse.createBySuccess(TotalStudyInfoVO.builder()
                 .studentName(StringUtils.isEmpty(student.getStudentName()) ? "默认姓名" : student.getStudentName())
-                .totalGold((int) BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold()))
+                .systemGold((int) Math.floor(student.getSystemGold()))
                 .firstLoginTime(firstPay == null ? "无" : DateUtil.formatYYYYMMDD(firstPay))
                 .totalOnlineTime(totalOnlineTime == null ? 0 : totalOnlineTime)
                 .totalValidTime(totalValidTime == null ? 0 : totalValidTime)
@@ -80,6 +83,7 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
                 .syntaxCount(syntaxCount)
                 .textCount(textCount)
                 .testCount(testCount)
+                .loginCount(loginCount)
                 .build());
     }
 
