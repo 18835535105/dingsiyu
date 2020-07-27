@@ -219,7 +219,6 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
                         }
                     }
                 }
-
                 returnList.add(map);
             });
         }

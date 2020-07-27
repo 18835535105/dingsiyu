@@ -37,7 +37,7 @@
     <select id="replaceTeks" resultMap="BaseResultMap" parameterType="map">
         select <include refid="base_sql"></include> from teks_new
         where
-        REPLACE(REPLACE(sentence, '#', ' '), '$', '')
+        REPLACE(REPLACE(teks_new, '#', ' '), '$', '')
         =
         REPLACE(REPLACE(#{sentence},'#', ' '), '$', '')
         limit 1
