@@ -151,6 +151,7 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
                 qaVO.setUrl(qaKeywordsInfo.getUrl());
                 qaVO.setId(qaKeywordsInfo.getId());
                 qaVO.setAnswer(qaKeywordsInfo.getAnswer());
+                qaVO.setNum(this.getNum(i));
                 qaVOList.add(qaVO);
             } else {
                 break;
@@ -160,6 +161,25 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
         PageVo<QaVO> qaVOPageVo = PageUtil.packagePage(qaVOList, size);
 
         return ServerResponse.createBySuccess(qaVOPageVo);
+    }
+
+    /**
+     * 获取问题序号
+     *
+     * @param i
+     * @return
+     */
+    private String getNum(int i) {
+        int num = PageUtil.getStartOffset() + i;
+        String str = "问题";
+        if (num < 10) {
+            return str + "00" + num;
+        }
+        if (num > 10 && num < 100) {
+            return str + "0" + num;
+        }
+
+        return str + num;
     }
 
     /**
