@@ -21,9 +21,9 @@ public class TotalStudyInfoVO implements Serializable {
     private String studentName;
 
     /**
-     * 获取的总金币数
+     * 剩余金币数
      */
-    private Integer totalGold;
+    private Integer systemGold;
 
     /**
      * 学生报名时间
@@ -52,4 +52,9 @@ public class TotalStudyInfoVO implements Serializable {
      * 考题总数 测试次数还是所有答题的个数
      */
     private Integer testCount;
+
+    /**
+     * （登录次数）学习次数
+     */
+    private Integer loginCount;
 }

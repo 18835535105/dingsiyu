@@ -29,21 +29,6 @@ public class StudyInfoVO implements Serializable {
     private String date;
 
     /**
-     * 当天获取的总金币数
-     */
-    private Integer totalGold;
-
-    /**
-     * 当天总在线时长，单位秒
-     */
-    private Integer totalOnlineTime;
-
-    /**
-     * 当天总有效时长，单位秒
-     */
-    private Integer totalValidTime;
-
-    /**
      * 学习内容， 模块-单元
      */
     private List<String> contents;

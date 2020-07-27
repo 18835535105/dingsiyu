@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.PayLogExample;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -40,4 +41,13 @@ public interface PayLogMapper extends BaseMapper<PayLog> {
      */
     @Select("select count(id) from pay_log where student_id = #{studentId}")
     int countByStudent(Long studentId);
+
+    /**
+     * 查询学生首次充值时间
+     *
+     * @param studentId
+     * @return
+     */
+    @Select("SELECT recharge from pay_log where student_id = #{studentId} order by recharge asc limit 1")
+    Date selectFirstPayTimeByStudentId(Long studentId);
 }

@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
 import com.zhidejiaoyu.student.business.service.StudentInfoService;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.service.QyFlyService;
+import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.FlyOfStudyService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.IndexService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,9 @@ public class QyFlyController {
 
     @Resource
     private IndexService smallAppIndexService;
+
+    @Resource
+    private FlyOfStudyService flyOfStudyService;
 
     /**
      * 检查当前学生二维码序号是否已经上传
@@ -96,6 +100,13 @@ public class QyFlyController {
         if (StringUtils.isEmpty(uuid)) {
             throw new ServiceException("uuid can't be null");
         }
+        if (StringUtil.isEmpty(date)) {
+            // 查询总学习记录
+            Student student = studentInfoService.getByUuid(uuid);
+            return flyOfStudyService.getTotalStudyInfo(student);
+        }
+
+        // 查询指定日期的学习记录
         return smallAppIndexService.recordOverviewByUuid(uuid, date);
     }
 
