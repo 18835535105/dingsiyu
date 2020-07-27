@@ -140,7 +140,6 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
         qaKeywordsInfos.sort(Comparator.comparingInt(QaKeywordsInfo::getCount));
 
         int pageSize = PageUtil.getPageSize();
-        int pageNum = PageUtil.getPageNum();
 
         List<QaVO> qaVOList = new ArrayList<>(pageSize);
         int size = qaKeywordsInfos.size();
@@ -153,8 +152,9 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
                 qaVO.setId(qaKeywordsInfo.getId());
                 qaVO.setAnswer(qaKeywordsInfo.getAnswer());
                 qaVOList.add(qaVO);
+            } else {
+                break;
             }
-            break;
         }
 
         PageVo<QaVO> qaVOPageVo = PageUtil.packagePage(qaVOList, size);
