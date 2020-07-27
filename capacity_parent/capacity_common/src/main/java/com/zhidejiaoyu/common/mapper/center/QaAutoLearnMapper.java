@@ -1,10 +1,8 @@
 package com.zhidejiaoyu.common.mapper.center;
 
-import com.zhidejiaoyu.common.pojo.center.QaAutoLearn;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
-import java.util.List;
-import java.util.Map;
+import com.zhidejiaoyu.common.pojo.center.QaAutoLearn;
+import com.zhidejiaoyu.common.vo.wechat.qy.QaVO;
 
 /**
  * <p>
@@ -20,8 +18,10 @@ public interface QaAutoLearnMapper extends BaseMapper<QaAutoLearn> {
      * 根据问题查询答案
      *
      * @param question
-     * @return key:answer  答案
+     * @return key:question  问题
      * key:id   问题id
+     * key:url  答案读音地址
+     * key:answer  答案
      */
-    List<Map<String, Object>> selectByQuestion(String question);
+    QaVO selectByQuestion(String question);
 }

@@ -23,6 +23,8 @@ public interface QaQuestionMapper extends BaseMapper<QaQuestion> {
      *     <li>key:id  问题id</li>
      *     <li>key:answer 问题答案</li>
      *     <li>key:keyWords 关键词</li>
+     *     <li>key:url 答案读音</li>
+     *     <li>key:question 问题描述</li>
      * </ul>
      */
     List<Map<String, Object>> selectKeyWordsAndQuestion();

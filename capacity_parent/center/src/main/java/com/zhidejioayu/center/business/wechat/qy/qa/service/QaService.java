@@ -31,4 +31,12 @@ public interface QaService extends IService<QaQuestion> {
      * @param question
      */
     void saveUnknownQuestion(String question);
+
+    /**
+     * 获取其他答案
+     *
+     * @param question
+     * @return
+     */
+    ServerResponse<Object> getQaOtherAnswer(String question);
 }

@@ -13,13 +13,16 @@
     <sql id="base_sql">
         id, question, question_id, create_time, update_time
     </sql>
-    <select id="selectByQuestion" resultType="java.util.Map" parameterType="map">
-        select qq.answer,
-               qq.id
+    <select id="selectByQuestion" resultType="com.zhidejiaoyu.common.vo.wechat.qy.QaVO" parameterType="map">
+        select qq.question,
+               qq.id,
+               qq.audio_url url,
+               qq.answer
         from qa_auto_learn qal,
              qa_question qq
         where qal.question_id = qq.id
           and qal.question = #{question}
+        limit 1
     </select>
 
 </mapper>

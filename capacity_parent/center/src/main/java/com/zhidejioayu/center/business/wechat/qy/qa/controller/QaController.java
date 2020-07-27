@@ -48,6 +48,20 @@ public class QaController {
     }
 
     /**
+     * 获取其他答案
+     *
+     * @param question
+     * @return
+     */
+    @GetMapping("/getQaOtherAnswer")
+    public ServerResponse<Object> getQaOtherAnswer(String question) {
+        if (StringUtil.isEmpty(question)) {
+            return ServerResponse.createByError(400, "question can't be null!");
+        }
+        return qaService.getQaOtherAnswer(StringUtil.trim(question));
+    }
+
+    /**
      * 保存自学习
      *
      * @param question

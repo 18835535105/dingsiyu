@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 李糖心Q&A问题及可能的答案
@@ -26,28 +25,17 @@ public class QaVO implements Serializable {
     private String answer;
 
     /**
+     * 问题
+     */
+    private String question;
+
+    /**
+     * 答案读音
+     */
+    private String url;
+
+    /**
      * 问题id
      */
     private Integer id;
-
-    private List<OtherAnswers> otherAnswers;
-
-    /**
-     * 其他可能的答案
-     */
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class OtherAnswers {
-        /**
-         * 答案id
-         */
-        private Integer id;
-
-        /**
-         * 答案
-         */
-        private String answer;
-    }
 }
