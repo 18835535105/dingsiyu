@@ -12,7 +12,7 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
     <select id="selectKeyWordsAndQuestion" resultType="java.util.Map" parameterType="map">
-        select qq.id, qq.answer, qkw.key_words keyWords
+        select qq.id, qq.answer, qkw.key_words keyWords, qq.audio_url url, qq.question
         from qa_question qq,
              qa_key_words qkw,
              qa_key_words_question qkwq
