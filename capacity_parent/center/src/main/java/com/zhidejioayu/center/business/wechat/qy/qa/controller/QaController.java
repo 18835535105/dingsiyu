@@ -90,7 +90,7 @@ public class QaController {
         if (StringUtil.isEmpty(question)) {
             return ServerResponse.createByError(400, "question can't be null!");
         }
-        qaService.saveUnknownQuestion(question);
+        qaService.saveUnknownQuestion(question.trim());
         return ServerResponse.createBySuccess();
     }
 

@@ -83,11 +83,14 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
     }
 
     private void saveUnknown(String question) {
-        qaUnknownMapper.insert(QaUnknown.builder()
-                .createTime(new Date())
-                .question(question)
-                .updateTime(new Date())
-                .build());
+        int count = qaUnknownMapper.countByQuestion(question);
+        if (count == 0) {
+            qaUnknownMapper.insert(QaUnknown.builder()
+                    .createTime(new Date())
+                    .question(question)
+                    .updateTime(new Date())
+                    .build());
+        }
     }
 
     @Override
@@ -130,7 +133,7 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
 
         if (CollectionUtils.isEmpty(qaKeywordsInfos)) {
             // 没有关键词能够匹配到用户的问题，记录到未知问题
-            saveUnknown(question);
+            this.saveUnknown(question);
             return ServerResponse.createByError(401, "未能查询到用户的问题答案！");
         }
 
