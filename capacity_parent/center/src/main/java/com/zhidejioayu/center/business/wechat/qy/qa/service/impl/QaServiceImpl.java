@@ -170,7 +170,7 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
      * @return
      */
     private String getNum(int i) {
-        int num = PageUtil.getStartOffset() + i;
+        int num = i + 1;
         String str = "问题";
         if (num < 10) {
             return str + "00" + num;
