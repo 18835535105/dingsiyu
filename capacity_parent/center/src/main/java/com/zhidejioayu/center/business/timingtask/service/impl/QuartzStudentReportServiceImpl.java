@@ -191,8 +191,16 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         List<ExportRechargePayCardCountModel> exportRechargePayCardCountModels = new ArrayList<>();
         List<ExportRechargePayCardModel> exportRechargePayCardModels = new ArrayList<>();
         exportRechargePayResultVos.forEach(exportRechargePayResultVO -> {
-            exportRechargePayCardCountModels.addAll(exportRechargePayResultVO.getExportRechargePayCardCountModelList());
-            exportRechargePayCardModels.addAll(exportRechargePayResultVO.getExportRechargePayCardModelList());
+            List<ExportRechargePayCardCountModel> exportRechargePayCardCountModelList = exportRechargePayResultVO.getExportRechargePayCardCountModelList();
+            if (!exportRechargePayCardCountModelList.isEmpty()) {
+                exportRechargePayCardCountModels.addAll(exportRechargePayCardCountModelList);
+            }
+
+            List<ExportRechargePayCardModel> exportRechargePayCardModelList = exportRechargePayResultVO.getExportRechargePayCardModelList();
+            if (CollectionUtils.isNotEmpty(exportRechargePayCardModelList)) {
+                exportRechargePayCardModels.addAll(exportRechargePayCardModelList);
+            }
+
         });
 
 
