@@ -887,7 +887,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             testRecord.setPass(1);
         }
         map.put("point", point);
-        map.put("imgUrl",  PetUrlUtil.getTestPetUrl(student,point,"单元闯关测试"));
+        map.put("imgUrl", PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试", PASS));
         return map;
     }
 

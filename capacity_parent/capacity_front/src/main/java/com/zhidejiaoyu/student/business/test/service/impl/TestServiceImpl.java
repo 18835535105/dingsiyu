@@ -238,7 +238,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         TestResultVo vo = new TestResultVo();
         vo.setMsg(getMessage(student, vo, testRecord, testRecord.getPoint(), PointConstant.EIGHTY));
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, testRecord.getPoint(), GenreConstant.UNIT_TEST));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, testRecord.getPoint(), GenreConstant.UNIT_TEST, null));
         vo.setGold(awardGold);
         vo.setEnergy(awardEnergy);
         return vo;
@@ -1009,8 +1009,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             testResultVo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
         }
         resultMap.put("point", point);
-        resultMap.put("imgUrl", PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
-        resultMap.put("petUrl", PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
+        resultMap.put("imgUrl", PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试", PointConstant.EIGHTY));
+        resultMap.put("petUrl", PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试", PointConstant.EIGHTY));
         testRecordMapper.insert(testRecord);
     }
 
@@ -1158,7 +1158,14 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         studentMapper.updateById(student);
 
         vo.setMsg(msg);
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
+        if (classify == 3 || classify == 6) {
+            vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试", PointConstant.FIFTY));
+        } else if (classify == 4 || classify == 2) {
+            vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试", PointConstant.SIXTY));
+        } else {
+            vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试", null));
+        }
+
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
 
@@ -1320,7 +1327,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
 
         vo.setMsg(msg);
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "句子测试"));
+        // 默写
+        if (classify == 3 || classify == 6) {
+            vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "句子测试", PointConstant.FIFTY));
+        } else if (classify == 4 || classify == 2) {
+            // 听力
+            vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "句子测试", PointConstant.SIXTY));
+        } else {
+            vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "句子测试", null));
+        }
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
         ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
@@ -1540,7 +1555,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setExplain(message);
 
         vo.setMsg(message);
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, GenreConstant.UNIT_TEST));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, GenreConstant.UNIT_TEST, null));
         vo.setGold(getBonusGold(student, goldCount));
         //获取测试有效次数
         int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),

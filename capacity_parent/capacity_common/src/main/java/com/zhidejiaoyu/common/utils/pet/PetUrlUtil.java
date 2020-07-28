@@ -31,20 +31,20 @@ public class PetUrlUtil {
      *                 </ul>
      * @return
      */
-    public static String getTestPetUrl(Student student, Integer point, String testType) {
+    public static String getTestPetUrl(Student student, Integer point, String testType, Integer isPoint) {
         Assert.notNull(student, "student can't be null!");
         Assert.notNull(point, "point can't be null!");
         String petName = student.getPetName();
         Assert.notNull(petName, "petName is null！");
         switch (petName) {
             case "李糖心":
-                return getHoneyImg(point);
+                return getHoneyImg(point, isPoint);
             case "威士顿":
-                return getCatImg(point);
+                return getCatImg(point, isPoint);
             case "大明白":
-                return robotImg(point, testType);
+                return robotImg(point, testType, isPoint);
             case "无名":
-                return getHeroImg(point);
+                return getHeroImg(point, isPoint);
             default:
         }
         return null;
@@ -56,10 +56,17 @@ public class PetUrlUtil {
      * @param point
      * @return
      */
-    private static String getHeroImg(Integer point) {
-        if (point < PointConstant.EIGHTY) {
-            return PetImageConstant.HERO_NOT_PASS;
+    private static String getHeroImg(Integer point, Integer isPoint) {
+        if (isPoint == null) {
+            if (point < PointConstant.EIGHTY) {
+                return PetImageConstant.HERO_NOT_PASS;
+            }
+        } else {
+            if (point < isPoint) {
+                return PetImageConstant.HERO_NOT_PASS;
+            }
         }
+
         if (point < PointConstant.HUNDRED) {
             return PetImageConstant.HERO_PASS;
         }
@@ -72,10 +79,17 @@ public class PetUrlUtil {
      * @param point
      * @return
      */
-    private static String getCatImg(Integer point) {
-        if (point < PointConstant.EIGHTY) {
-            return PetImageConstant.CAT_NOT_PASS;
+    private static String getCatImg(Integer point, Integer isPoint) {
+        if (isPoint == null) {
+            if (point < PointConstant.EIGHTY) {
+                return PetImageConstant.CAT_NOT_PASS;
+            }
+        } else {
+            if (point < isPoint) {
+                return PetImageConstant.CAT_NOT_PASS;
+            }
         }
+
         if (point < PointConstant.HUNDRED) {
             return PetImageConstant.CAT_PASS;
         }
@@ -88,9 +102,15 @@ public class PetUrlUtil {
      * @param point
      * @return
      */
-    private static String getHoneyImg(Integer point) {
-        if (point < PointConstant.EIGHTY) {
-            return PetImageConstant.HONEY_NOT_PASS;
+    private static String getHoneyImg(Integer point, Integer isPoint) {
+        if (isPoint == null) {
+            if (point < PointConstant.EIGHTY) {
+                return PetImageConstant.HONEY_NOT_PASS;
+            }
+        } else {
+            if (point < isPoint) {
+                return PetImageConstant.HONEY_NOT_PASS;
+            }
         }
         if (point < PointConstant.HUNDRED) {
             return PetImageConstant.HONEY_PASS;
@@ -105,12 +125,12 @@ public class PetUrlUtil {
      * @param testType
      * @return
      */
-    private static String robotImg(Integer point, String testType) {
+    private static String robotImg(Integer point, String testType, Integer isPoint) {
         switch (testType) {
             case "摸底测试":
                 return robotLevelTestImgUrl(point);
             case "单元闯关测试":
-                return robotUnitTestImgUrl(point);
+                return robotUnitTestImgUrl(point, isPoint);
             case "阶段测试":
                 return robotStageTestImgUrl(point);
             case "智能复习测试":
@@ -242,9 +262,15 @@ public class PetUrlUtil {
      * @param point
      * @return
      */
-    private static String robotUnitTestImgUrl(Integer point) {
-        if (point < PointConstant.EIGHTY) {
-            return PetImageConstant.LOSE;
+    private static String robotUnitTestImgUrl(Integer point, Integer isPoint) {
+        if (isPoint == null) {
+            if (point < PointConstant.EIGHTY) {
+                return PetImageConstant.LOSE;
+            }
+        } else {
+            if (point < isPoint) {
+                return PetImageConstant.LOSE;
+            }
         }
         if (point < PointConstant.HUNDRED) {
             return PetImageConstant.WIN;

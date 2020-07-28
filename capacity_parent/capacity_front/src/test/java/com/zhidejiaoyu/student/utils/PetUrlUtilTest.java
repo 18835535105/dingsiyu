@@ -20,10 +20,10 @@ public class PetUrlUtilTest {
 
     @Test
     public void getTestPetUrl() {
-        for (String genre: genres) {
+        for (String genre : genres) {
             for (int i = 0; i < points.length; i++) {
-               String url = PetUrlUtil.getTestPetUrl(new Student(petName[i]), points[i], genre);
-               System.out.println(petName[i] + " : " + points[i] + " : " + genre + " : " + url);
+                String url = PetUrlUtil.getTestPetUrl(new Student(petName[i]), points[i], genre, null);
+                System.out.println(petName[i] + " : " + points[i] + " : " + genre + " : " + url);
             }
 
         }

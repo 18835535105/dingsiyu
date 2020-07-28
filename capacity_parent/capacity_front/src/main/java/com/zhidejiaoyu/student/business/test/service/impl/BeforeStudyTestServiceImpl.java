@@ -245,7 +245,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         String msg = TestServiceImpl.getTestMessage(student, vo, testRecord, PointConstant.FIFTY, petSayUtil);
 
         vo.setMsg(msg);
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, GenreConstant.UNIT_TEST));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, GenreConstant.UNIT_TEST, null));
         vo.setGold(awardGold);
         vo.setEnergy(energy);
 

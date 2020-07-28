@@ -962,7 +962,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     vo.setBackMsg(successBackMsg);
                     testRecord.setPass(1);
                 }
-                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "智能复习测试"));
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "智能复习测试", null));
                 break;
             case "已学测试":
                 if (point < 80) {
@@ -982,7 +982,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 }
 
                 msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
-                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre));
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre, null));
                 break;
             case "生词测试":
                 if (point < 80) {
@@ -1002,7 +1002,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 }
 
                 msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
-                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre));
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre, null));
                 break;
             case "熟词测试":
                 if (point < 80) {
@@ -1022,7 +1022,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 }
 
                 msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
-                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre));
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre, null));
                 break;
             case "生句测试":
                 if (point < 80) {
@@ -1042,7 +1042,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 }
 
                 msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
-                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre));
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre, null));
                 break;
             case "熟句测试":
                 if (point < 80) {
@@ -1062,7 +1062,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 }
 
                 msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
-                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre));
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre, null));
                 break;
             case "单词五维测试":
             case "例句五维测试":
@@ -1080,7 +1080,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     testRecord.setPass(1);
                 }
                 msg = point < 90 ? "你的测试未成功，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
-                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "五维测试"));
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "五维测试", null));
                 break;
             default:
         }

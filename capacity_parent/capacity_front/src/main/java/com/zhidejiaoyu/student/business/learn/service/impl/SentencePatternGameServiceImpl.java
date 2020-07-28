@@ -154,7 +154,7 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
         resultMap.put("energy", enger);
         resultMap.put("gold", gold);
         resultMap.put("point", getVo.getTotal());
-        resultMap.put("petUrl", PetUrlUtil.getTestPetUrl(student,getVo.getTotal(),"单元闯关测试"));
+        resultMap.put("petUrl", PetUrlUtil.getTestPetUrl(student, getVo.getTotal(), "单元闯关测试", null));
         return resultMap;
     }
 }

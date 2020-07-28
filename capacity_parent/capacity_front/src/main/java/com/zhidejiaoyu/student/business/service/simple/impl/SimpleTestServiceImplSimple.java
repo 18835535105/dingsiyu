@@ -544,7 +544,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
             //获取单元闯关获取的能量数量
             int number = testRecordMapper.selCount(student.getId(), courseId, unitId[0],
-                    simpleCommonMethod.getTestType(wordUnitTestDTO.getClassify()), "单元闯关测试",null);
+                    simpleCommonMethod.getTestType(wordUnitTestDTO.getClassify()), "单元闯关测试", null);
             //判断得分成绩大于80给与2个能量 小于80 给与1个能量
             addEnergy = super.getEnergy(student, point, number);
 
@@ -580,7 +580,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         }
 
         vo.setMsg(msg);
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试", null));
         vo.setLockMsg(lockMsg);
         vo.setGold(goldCount);
         vo.setTestId(testId);
@@ -909,7 +909,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                 getPreSchoolTestGold(testRecord, modelType, student, typeModel, vo, point);
 
                 vo.setGold(0);
-                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, typeModel));
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, typeModel, null));
                 vo.setTestId(preUnitTest.getId());
                 vo.setEnergy(0);
                 return ServerResponse.createBySuccess(vo);
@@ -927,7 +927,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         int point = testRecordPoint;
         //获取单元闯关获取的能量数量
         int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
-                studyModel, typeModel,null);
+                studyModel, typeModel, null);
         int addEnergy = super.getEnergy(student, point, number);
 
         int gold = getPreSchoolTestGold(testRecord, modelType, student, typeModel, vo, point);
@@ -964,7 +964,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         vo.setAwardInfo(awardInfo);
         vo.setGold(gold);
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, typeModel));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, typeModel,null));
         vo.setTestId(testRecord.getId());
         vo.setEnergy(addEnergy);
         studentMapper.updateById(student);
@@ -992,7 +992,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
             List<Map<String, String>> equipments = ShipAddEquipmentServiceImpl.getTestAddEquipment(student.getId());
 
-           return TestResultVo.AwardInfo.builder()
+            return TestResultVo.AwardInfo.builder()
                     .equipmentList(equipments)
                     .voucher(random)
                     .build();

@@ -212,7 +212,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
         TestResultVo vo = new TestResultVo();
         // 首次学习70分及格；非首次学习80分及格
         vo.setMsg(this.getMessage(student, vo, testRecord, isFirst ? PointConstant.SEVENTY : PointConstant.EIGHTY));
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, testRecord.getPoint(), GenreConstant.UNIT_TEST));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, testRecord.getPoint(), GenreConstant.UNIT_TEST, null));
         vo.setGold(awardGold);
         vo.setEnergy(awardEnergy);
         return vo;
