@@ -16,16 +16,16 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 
+ *
  * <a href=
  * "https://help.aliyun.com/document_detail/100649.html?spm=a2c4g.11186623.6.917.31984968PQXB02">视频剪辑</a>
- * 
+ *
  * @author wuchenxi
  * @date 2020-07-13 17:46:58
  */
 @Slf4j
 @Component
-public class VedioEditing {
+public class VideoEditing {
 
     private static DefaultAcsClient client;
 
@@ -39,12 +39,12 @@ public class VedioEditing {
 
     /**
      * 视频合成
-     * 
+     *
      * @param mediaIdArray 需要合并的视频id数组，顺序要正确
-     * @param title        媒体名
-     * @param cateId       媒体分类id
-     * @param tags         媒体标签
-     * @param coverUrl     媒体封面图片url
+     * @param title        合成后的媒体名
+     * @param cateId       合成后的媒体分类id
+     * @param tags         合成后的媒体标签
+     * @param coverUrl     合成后的媒体封面图片url
      */
     public static void concatMedia(String[] mediaIdArray, String title, Long cateId, String tags, String coverUrl) {
         ProduceEditingProjectVideoRequest request = new ProduceEditingProjectVideoRequest();
@@ -54,7 +54,7 @@ public class VedioEditing {
         request.setMediaMetadata(buildMediaMetadata(title, cateId, tags, coverUrl));
         // Set Produce Configuration
         request.setProduceConfig(buildProduceConfig());
-        ProduceEditingProjectVideoResponse response = null;
+        ProduceEditingProjectVideoResponse response;
 
         try {
             response = client.getAcsResponse(request);
@@ -75,7 +75,7 @@ public class VedioEditing {
 
     /**
      * 媒体信息
-     * 
+     *
      * @param title    媒体名
      * @param cateId   媒体分类id
      * @param tags     媒体标签

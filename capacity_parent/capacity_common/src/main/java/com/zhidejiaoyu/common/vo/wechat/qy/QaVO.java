@@ -38,4 +38,9 @@ public class QaVO implements Serializable {
      * 问题id
      */
     private Integer id;
+
+    /**
+     * 问题序号
+     */
+    private String num;
 }

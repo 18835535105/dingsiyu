@@ -608,6 +608,16 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         return studentMapper.selectByOpenId(openId);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveGold(String openId, Integer gold) {
+        Student student = studentMapper.selectByOpenId(openId);
+        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
+        studentMapper.updateById(student);
+
+        GoldLogUtil.saveStudyGoldLog(student.getId(), "观看夺分队长每日复习学习视频", gold);
+    }
+
     /**
      * 获取已经获取的勋章图片
      *

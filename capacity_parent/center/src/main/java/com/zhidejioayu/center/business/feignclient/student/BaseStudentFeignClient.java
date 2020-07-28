@@ -3,7 +3,7 @@ package com.zhidejioayu.center.business.feignclient.student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.ExportRechargePayResultVO;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolResult;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author: wuchenxi
@@ -26,5 +26,23 @@ public interface BaseStudentFeignClient {
      */
     @GetMapping("/student/report/getStudentPayInfo")
     ServerResponse<ExportRechargePayResultVO> getStudentPayInfo();
+
+    /**
+     * 保存学生金币
+     *
+     * @param openId
+     * @param gold
+     */
+    @PostMapping("/student/saveGold")
+    void saveGold(@RequestParam String openId, @RequestParam Integer gold);
+
+    /**
+     * 获取学生年级
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/student/getStudentGradeByOpenId")
+    String getStudentGradeByOpenId(@RequestParam String openId);
 }
 

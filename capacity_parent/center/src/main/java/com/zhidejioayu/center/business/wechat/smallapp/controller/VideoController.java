@@ -1,5 +1,6 @@
 package com.zhidejioayu.center.business.wechat.smallapp.controller;
 
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.VideoService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,6 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/wechat/smallApp/video")
 public class VideoController {
-
     @Resource
     private VideoService videoService;
 
@@ -30,7 +30,10 @@ public class VideoController {
      */
     @GetMapping("/getVideo")
     public ServerResponse<Object> getVideo(String openId) {
-        return ServerResponse.createBySuccess("http://media.yydz100.com/sv/5116dc8a-170e26c49cb/5116dc8a-170e26c49cb.mp4");
+        if (StringUtil.isEmpty(openId)) {
+            return ServerResponse.createBySuccess(400, "openId can't be null!");
+        }
+        return videoService.getVideo(openId);
     }
 
     /**
@@ -41,7 +44,16 @@ public class VideoController {
      * @return
      */
     @PostMapping("/saveVideo")
-    public ServerResponse<Object> saveVideo(String openId, Integer gold) {
-        return ServerResponse.createBySuccess();
+    public ServerResponse<Object> saveVideo(String openId, Integer gold, String videoId) {
+        if (StringUtil.isEmpty(openId)) {
+            return ServerResponse.createBySuccess(400, "openId can't be null!");
+        }
+        if (StringUtil.isEmpty(videoId)) {
+            return ServerResponse.createBySuccess(400, "videoId can't be null!");
+        }
+        if (gold == null) {
+            return ServerResponse.createBySuccess(400, "gold can't be null!");
+        }
+        return videoService.saveVideo(openId, gold, videoId);
     }
 }

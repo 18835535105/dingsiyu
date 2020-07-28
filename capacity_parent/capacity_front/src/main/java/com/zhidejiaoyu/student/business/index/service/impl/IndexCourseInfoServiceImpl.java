@@ -75,7 +75,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     static {
         MAPPING.put(GradeNameConstant.FIRST_GRADE, "one");
         MAPPING.put(GradeNameConstant.SECOND_GRADE, "two");
-        MAPPING.put(GradeNameConstant.WRITE_GRADE, "three");
+        MAPPING.put(GradeNameConstant.THREE_GRADE, "three");
         MAPPING.put(GradeNameConstant.FOURTH_GRADE, "four");
         MAPPING.put(GradeNameConstant.FIFTH_GRADE, "five");
         MAPPING.put(GradeNameConstant.SIXTH_GRADE, "six");

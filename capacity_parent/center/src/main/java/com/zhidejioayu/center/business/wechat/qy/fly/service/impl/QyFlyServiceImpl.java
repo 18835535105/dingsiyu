@@ -10,15 +10,14 @@ import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.IdUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejioayu.center.business.util.ServerConfigUtil;
 import com.zhidejioayu.center.business.feignclient.qy.BaseQyFeignClient;
+import com.zhidejioayu.center.business.feignclient.util.FeignClientUtil;
+import com.zhidejioayu.center.business.util.ServerConfigUtil;
 import com.zhidejioayu.center.business.wechat.qy.fly.service.QyFlyService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * @author: wuchenxi
@@ -27,15 +26,12 @@ import java.util.Map;
 @Service
 public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, CurrentDayOfStudy> implements QyFlyService {
 
-    @Resource
-    private Map<String, BaseQyFeignClient> qyServerFeignClient;
-
     @Override
     public ServerResponse<Object> uploadFlyRecord(MultipartFile file, UploadFlyRecordDTO uploadFlyRecordDTO) {
         String uuid = uploadFlyRecordDTO.getUuid();
 
         ServerConfig serverInfoByStudentOpenid = ServerConfigUtil.getByUuid(uuid);
-        BaseQyFeignClient baseQyFeignClient = qyServerFeignClient.get(serverInfoByStudentOpenid.getServerName());
+        BaseQyFeignClient baseQyFeignClient = FeignClientUtil.getQyFeignClient(serverInfoByStudentOpenid.getServerName());
 
         boolean flag = baseQyFeignClient.checkUpload(uuid);
         if (!flag) {

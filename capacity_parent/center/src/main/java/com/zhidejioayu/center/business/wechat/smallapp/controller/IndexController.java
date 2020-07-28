@@ -5,8 +5,8 @@ import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.StudyOverviewVO;
+import com.zhidejioayu.center.business.feignclient.util.FeignClientUtil;
 import com.zhidejioayu.center.business.serverconfig.service.ServerConfigService;
-import com.zhidejioayu.center.business.util.BaseFeignClientUtil;
 import com.zhidejioayu.center.business.feignclient.smallapp.BaseSmallAppFeignClient;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeDTO;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.IndexService;
@@ -113,7 +113,7 @@ public class IndexController {
             return this.packageDefaultOverview();
         }
 
-        BaseSmallAppFeignClient baseSmallAppFeignClient = BaseFeignClientUtil.getBaseSmallAppFeignClient(openId);
+        BaseSmallAppFeignClient baseSmallAppFeignClient = FeignClientUtil.getBaseSmallAppFeignClient(openId);
         return baseSmallAppFeignClient.recordOverview(openId, num);
     }
 

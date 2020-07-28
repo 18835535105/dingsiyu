@@ -23,19 +23,19 @@ import java.util.Date;
 @SpringBootTest(classes = CenterApplication.class)
 public class BaseQyFeignClientTest {
 
-    @Resource
+//    @Resource
     private BaseQyFeignClient server1QyAuthFeignClient;
 
     public void testLogin() {
     }
 
-    @Test
+//    @Test
     public void testCheckUpload() {
         boolean flag = server1QyAuthFeignClient.checkUpload("f72f0e5406c24f0d86b07c41ff7d44551592810389824");
         log.info("flag={}", flag);
     }
 
-    @Test
+//    @Test
     public void testSave() {
         boolean b = server1QyAuthFeignClient.saveOrUpdateCurrentDayOfStudy(CurrentDayOfStudy.builder()
                 .createTime(new Date())
@@ -46,7 +46,7 @@ public class BaseQyFeignClientTest {
         log.info("b={}", b);
     }
 
-    @Test
+//    @Test
     public void testGetStudents() {
         Date date = new Date();
         Instant instant = date.toInstant();

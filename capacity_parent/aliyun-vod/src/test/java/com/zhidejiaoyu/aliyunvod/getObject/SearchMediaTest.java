@@ -24,7 +24,7 @@ public class SearchMediaTest {
     @Test
     public void searchMedia() {
         try {
-            SearchMediaResponse searchMediaResponse = SearchMedia.searchMedia();
+            SearchMediaResponse searchMediaResponse = SearchMedia.searchMedia(null);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -33,7 +33,7 @@ public class SearchMediaTest {
 
     @Test
     public void getPlayInfo() throws Exception {
-        SearchMediaResponse searchMediaResponse = SearchMedia.searchMedia();
+        SearchMediaResponse searchMediaResponse = SearchMedia.searchMedia(null);
         List<SearchMediaResponse.Media> mediaList = searchMediaResponse.getMediaList();
         for (SearchMediaResponse.Media media : mediaList) {
             GetPlayInfoResponse playInfo = SearchMedia.getPlayInfo(media.getMediaId());
