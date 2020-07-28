@@ -79,6 +79,7 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
             return ServerResponse.createBySuccess(qaVO);
         }
 
+        this.saveUnknown(question);
         return ServerResponse.createByError(401, "未查询到用户的问题答案！");
     }
 
