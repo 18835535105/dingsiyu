@@ -153,7 +153,7 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
                 qaVO.setAnswer(qaKeywordsInfo.getAnswer());
                 qaVO.setNum(this.getNum(i));
                 qaVOList.add(qaVO);
-            } else {
+            } else if (i + 1 > PageUtil.getEndOffset()) {
                 break;
             }
         }
