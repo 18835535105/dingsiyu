@@ -97,7 +97,7 @@ public class StudentInfoController extends BaseController {
      * 验证原密码是否正确
      *
      * @param session
-     * @param oldPassword   原密码
+     * @param oldPassword 原密码
      * @return
      */
     @PostMapping("/judgeOldPassword")
@@ -255,7 +255,7 @@ public class StudentInfoController extends BaseController {
     /**
      * 获取学生的等级信息
      *
-     * @param stuId 为空时查看当前学生的等级信息；不为空时查看选中的学生的等级信息
+     * @param stuId   为空时查看当前学生的等级信息；不为空时查看选中的学生的等级信息
      * @param session
      * @return
      */
@@ -270,7 +270,7 @@ public class StudentInfoController extends BaseController {
      * 分页获取学生已领取的勋章信息
      *
      * @param session
-     * @param stuId 为空时查看当前学生勋章信息，不为空时查询选中的学生的勋章信息
+     * @param stuId    为空时查看当前学生勋章信息，不为空时查询选中的学生的勋章信息
      * @param pageNum
      * @param pageSize
      * @return
@@ -286,7 +286,7 @@ public class StudentInfoController extends BaseController {
      * 分页获取所有勋章信息
      *
      * @param session
-     * @param stuId 为空时查看当前学生所有勋章信息；否则查看指定学生勋章信息
+     * @param stuId    为空时查看当前学生所有勋章信息；否则查看指定学生勋章信息
      * @param pageNum
      * @param pageSize
      * @return
@@ -302,8 +302,8 @@ public class StudentInfoController extends BaseController {
      * 点击父勋章获取子勋章信息
      *
      * @param session
-     * @param stuId 为空时查看当前学生子勋章信息；否则查看指定学生的子勋章信息
-     * @param medalId   勋章id
+     * @param stuId   为空时查看当前学生子勋章信息；否则查看指定学生的子勋章信息
+     * @param medalId 勋章id
      * @return
      */
     @GetMapping("/getChildMedal")
@@ -328,6 +328,29 @@ public class StudentInfoController extends BaseController {
                                                           @RequestParam(required = false, defaultValue = "1") Integer pageNum,
                                                           @RequestParam(required = false, defaultValue = "18") Integer pageSize) {
         return studentInfoService.getWorship(session, type, pageNum, pageSize);
+    }
+
+    /**
+     * 保存学生金币
+     *
+     * @param openId
+     * @param gold
+     */
+    @PostMapping("/saveGold")
+    public void saveGold(@RequestParam String openId, @RequestParam Integer gold) {
+        studentInfoService.saveGold(openId, gold);
+    }
+
+    /**
+     * 获取学生年级
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/getStudentGradeByOpenId")
+    public String getStudentGradeByOpenId(@RequestParam String openId) {
+        Student student = studentInfoService.getByOpenId(openId);
+        return student.getGrade();
     }
 
 }

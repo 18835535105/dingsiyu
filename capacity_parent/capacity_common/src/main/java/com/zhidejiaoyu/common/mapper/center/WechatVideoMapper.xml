@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.center.WechatVideoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.center.WechatVideo">
+        <id column="id" property="id"/>
+        <result column="grade" property="grade"/>
+        <result column="name" property="name"/>
+        <result column="url" property="url"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    <sql id="base_sql">
+        id, grade, `name`, url, create_time
+    </sql>
+    <select id="selectNextVideo" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from wechat_video
+        where id not in (
+        select wechat_video_id
+        from student_wechat_video
+        where student_uuid = #{userUuid}
+        )
+        and grade = #{grade}
+        order by create_time
+        limit 1
+    </select>
+
+</mapper>

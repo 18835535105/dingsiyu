@@ -122,4 +122,12 @@ public interface StudentInfoService extends BaseService<Student> {
      * @return
      */
     Student getByOpenId(String openId);
+
+    /**
+     * 保存学生金币
+     *
+     * @param openId
+     * @param gold
+     */
+    void saveGold(String openId, Integer gold);
 }

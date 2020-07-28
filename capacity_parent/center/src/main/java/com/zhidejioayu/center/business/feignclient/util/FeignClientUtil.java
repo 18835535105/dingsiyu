@@ -46,6 +46,7 @@ public class FeignClientUtil {
                            Client client,
                            Contract feignContract) {
         builder = Feign.builder()
+                .requestInterceptor(requestTemplate -> requestTemplate.header("feign", "true"))
                 .client(client)
                 .encoder(feignEncoder)
                 .decoder(feignDecoder)
@@ -133,6 +134,17 @@ public class FeignClientUtil {
     public static BaseTeacherInfoFeignClient getBaseTeacherInfoFeignClient(String uuid) {
         ServerConfig serverConfig = ServerConfigUtil.getByUuid(uuid);
         return getTeacherInfoFeignClient(serverConfig.getServerName());
+    }
+
+    /**
+     * 根据学生uuid获取学生信息
+     *
+     * @param uuid
+     * @return
+     */
+    public static BaseStudentFeignClient getBaseStudentFeignClientByUuid(String uuid) {
+        ServerConfig serverConfig = ServerConfigUtil.getByUuid(uuid);
+        return getStudentFeignClient(serverConfig.getServerName());
     }
 
 }

@@ -9,7 +9,7 @@ package com.zhidejiaoyu.common.constant;
 public interface GradeNameConstant {
     String FIRST_GRADE = "一年级";
     String SECOND_GRADE = "二年级";
-    String WRITE_GRADE = "三年级";
+    String THREE_GRADE = "三年级";
     String FOURTH_GRADE = "四年级";
     String FIFTH_GRADE = "五年级";
     String SIXTH_GRADE = "六年级";

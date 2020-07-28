@@ -24,7 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"qa_key_words","qa_key_words_question","qa_question","qa_auto_learn","qa_unknown"};
+        String[] tableName = {"student_wechat_video"};
 
         /*
          * 配置：

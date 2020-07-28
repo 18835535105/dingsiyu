@@ -30,17 +30,36 @@ public class SearchMedia {
     }
 
     /**
-     * 搜索媒体信息
+     * 根据条件搜索媒体信息
      *
      * @return
      * @throws Exception
      */
-    public static SearchMediaResponse searchMedia() throws Exception {
+    public static SearchMediaResponse searchMedia(String match) throws Exception {
         SearchMediaRequest request = new SearchMediaRequest();
         request.setSearchType("video");
-        request.setFields("Title,CoverURL,CateName");
-        request.setPageNo(1);
-        request.setPageSize(50);
+        request.setFields("Title,CoverURL,CateName,MediaId");
+        if (match != null) {
+            request.setMatch(match);
+        }
+        return client.getAcsResponse(request);
+    }
+
+    /**
+     * 根据条件搜索媒体信息
+     *
+     * @return
+     * @throws Exception
+     */
+    public static SearchMediaResponse searchMedia(String match, Integer pageNo, Integer pageSize) throws Exception {
+        SearchMediaRequest request = new SearchMediaRequest();
+        request.setSearchType("video");
+        request.setFields("Title,CoverURL,CateName,MediaId");
+        if (match != null) {
+            request.setMatch(match);
+        }
+        request.setPageNo(pageNo);
+        request.setPageSize(pageSize);
         return client.getAcsResponse(request);
     }
 
