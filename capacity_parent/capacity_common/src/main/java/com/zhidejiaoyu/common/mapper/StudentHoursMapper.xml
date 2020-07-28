@@ -18,7 +18,7 @@
 
     <select id="selectDeatilsByAdminId" parameterType="map" resultMap="BaseResultMap">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from student_hours
         where
         to_days(create_time)=to_days(#{time})
@@ -28,17 +28,15 @@
     </select>
 
     <select id="selectCountByDayTime" parameterType="map" resultType="map">
-        select
-        stu.school_name schoolName,count(distinct hours.student_id) count
+        select stu.school_name                  schoolName,
+               count(distinct hours.student_id) count
         from student_hours hours
-        join
-        student stu
-        on
-        hours.student_id=stu.id
-        where
-        to_days(create_time) >= to_days(#{startDay})
-        and
-        to_days(create_time) &lt;= to_days(#{endTime})
+                 join
+             student stu
+             on
+                 hours.student_id = stu.id
+        where to_days(create_time) >= to_days(#{startDay})
+          and to_days(create_time) &lt;= to_days(#{endTime})
         group by stu.school_name
     </select>
 

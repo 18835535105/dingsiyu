@@ -95,6 +95,16 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
 
     @Override
     public void saveQaAutoStudy(String question, Long questionId) {
+        int count = qaQuestionMapper.countByQuestion(question);
+        if (count > 0) {
+            return;
+        }
+
+        QaVO qaVO = qaAutoLearnMapper.selectByQuestion(question);
+        if (qaVO != null) {
+            return;
+        }
+
         qaAutoLearnMapper.insert(QaAutoLearn.builder()
                 .createTime(new Date())
                 .question(question)
