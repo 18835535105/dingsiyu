@@ -47,7 +47,10 @@ public class GetVo {
      */
     private String studyModel;
     /**
-     * 类型
+     * 类型 <ul>
+     * <li>1:单词</li>
+     * <li>2：句型</li>
+     * </ul>
      */
     private Integer model;
     /**

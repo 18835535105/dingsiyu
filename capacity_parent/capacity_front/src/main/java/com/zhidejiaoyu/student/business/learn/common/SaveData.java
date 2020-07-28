@@ -198,12 +198,15 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 // 如果认识该单词，记为熟词
                 learnExtend.setStatus(1);
                 learnExtend.setFirstIsKnow(1);
-                knownWordsMapper.insert(KnownWords.builder()
-                        .createTime(new Date())
-                        .studentId(studentId)
-                        .wordId(getVo.getWordId())
-                        .build());
-                weekActivityRankOpt.updateWeekActivitySchoolRank(student);
+                if (Objects.equals(getVo.getModel(), 1)) {
+                    knownWordsMapper.insert(KnownWords.builder()
+                            .createTime(new Date())
+                            .studentId(studentId)
+                            .wordId(getVo.getWordId())
+                            .build());
+                    weekActivityRankOpt.updateWeekActivitySchoolRank(student);
+                }
+
             } else {
                 learnExtend.setStatus(0);
                 learnExtend.setFirstIsKnow(0);
@@ -257,7 +260,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             currentLearn.setStudyCount(currentLearn.getStudyCount() + 1);
             // 熟词
             int status = memoryDifficult == 0 ? 1 : 0;
-            if (status == 1) {
+            if (status == 1 && Objects.equals(getVo.getModel(), 1)) {
                 knownWordsMapper.insert(KnownWords.builder()
                         .createTime(new Date())
                         .studentId(studentId)
