@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
 import com.zhidejiaoyu.common.pojo.CourseNew;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -105,4 +106,11 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
      */
     @MapKey("id")
     Map<Long, Map<String, Object>> selectByCourseNews(@Param("courseNews") List<CourseNew> courseNews);
+
+    /**
+     * 根据课程名查询课程id
+     */
+    @Select("select id from course_new where version = #{version} and grade = #{grade} and label = #{label} and delStatus = 1")
+    List<Integer> selectCourse(@Param("version") String version, @Param("grade") String grade,
+                               @Param("label") String label);
 }

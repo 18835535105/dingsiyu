@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.SchoolHoursMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SchoolHours">
+        <id column="id" property="id"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="type" property="type"/>
+        <result column="captain_coin" property="captainCoin"/>
+    </resultMap>
+
+    <sql id="base_sql">
+        id,admin_id,`type`,captain_coin
+    </sql>
+
+    <select id="selectByAdminId" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from school_hours
+        where admin_id=#{adminId}
+    </select>
+    <update id="updateByAdminId" parameterType="map">
+        update school_hours set type=#{type} where admin_id=#{adminId}
+    </update>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from school_hours
+    </select>
+
+
+</mapper>

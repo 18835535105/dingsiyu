@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
@@ -35,6 +36,15 @@ public class PayCard extends Model<PayCard> {
     private Integer cardNum;
 
     private Integer canUse;
+
+    /**
+     * 收货人id
+     */
+    @TableField("goods_user_id")
+    private Integer goodsUserId;
+
+    @TableField("type")
+    private Integer type;
 
     @Override
     protected Serializable pkVal() {

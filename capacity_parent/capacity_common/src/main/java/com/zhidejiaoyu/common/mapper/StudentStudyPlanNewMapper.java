@@ -17,6 +17,8 @@ import java.util.List;
  */
 public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNew> {
 
+
+    List<StudentStudyPlanNew> selectAllByStudentId(@Param("studentId") Long studentId);
     /**
      * 查看数据
      *
@@ -50,4 +52,11 @@ public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNe
      */
     @Delete("delete from student_study_plan_new where student_id = #{studentId}")
     void deleteByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * 根据id删除学生学习信息
+     * @param deleteIds
+     */
+    void deleteByIds(@Param("list") List<Integer> deleteIds);
+
 }

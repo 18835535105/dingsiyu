@@ -31,6 +31,8 @@ public interface SchoolTimeMapper extends BaseMapper<SchoolTime> {
                                                     @Param("month") Integer month, @Param("week") Integer week,
                                                     @Param("gradeList") List<String> gradeList);
 
+
+
     /**
      * 获取当前周的数据
      *

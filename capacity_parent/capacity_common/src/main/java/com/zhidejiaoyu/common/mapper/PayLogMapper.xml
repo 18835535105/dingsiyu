@@ -8,6 +8,7 @@
     <result column="card_no" property="cardNo" jdbcType="VARCHAR" />
     <result column="card_date" property="cardDate" jdbcType="INTEGER" />
     <result column="found_date" property="foundDate" jdbcType="TIMESTAMP" />
+    <result column="operator_id" property="operatorId" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >

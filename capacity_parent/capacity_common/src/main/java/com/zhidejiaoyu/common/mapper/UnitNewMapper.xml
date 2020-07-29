@@ -30,14 +30,52 @@
             #{grade}
         </foreach>)
     </select>
+    <select id="selectMapByGradeListAndVersionAndGrade" resultType="map" parameterType="map">
+        select distinct(u.id) unitId,c.id courseId
+        from course_new c, unit_new u
+        where c.id = u.course_id
+        and c.version = #{version}
+        and c.grade in (
+        <foreach collection="gradeList" item="grade" separator=",">
+            #{grade}
+        </foreach>)
+    </select>
     <select id="selectLessOrEqualsCurrentIdByCourseIdAndUnitId" resultType="java.lang.Long" parameterType="map">
         select distinct(id)
         from unit_new
         where course_id = #{courseId}
           and id &lt;= #{unitId}
     </select>
+    <select id="selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId" resultType="map" parameterType="map">
+        select distinct(id) unitId, course_id courseId
+        from unit_new
+        where course_id = #{courseId}
+          and id &lt;= #{unitId}
+    </select>
+    <select id="selectByIds" parameterType="map" resultType="map">
+        select
+        u.id unitId,cn.grade grade,cn.grade_ext gradeStr,
+        cn.label label,cn.label_ext labelStr, cn.id courseId
+        from unit_new u
+        join course_new cn on u.course_id=cn.id
+        where u.id in (
+        <foreach collection="unitIds" separator="," item="unitId">
+            #{unitId}
+        </foreach>
+        )
+    </select>
     <select id="selectIdsByCourseNames" resultType="java.lang.Long" parameterType="map">
         select distinct (u.id)
+        from unit_new u, course_new c
+        where u.course_id = c.id
+        and c.course_name in (
+        <foreach collection="courseNames" item="courseName" separator=",">
+            #{courseName}
+        </foreach>
+        )
+    </select>
+    <select id="selectIdsMapByCourseNames" resultType="map" parameterType="map">
+        select distinct (u.id) unitId,c.id courseId
         from unit_new u, course_new c
         where u.course_id = c.id
         and c.course_name in (
@@ -134,6 +172,18 @@
         </foreach>
         )
         group by unit_id
+    </select>
+    <select id="selectByCourseIds" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from unit_new
+        where
+        course_id in (
+        <foreach collection="courseIds" separator="," item="courseId">
+            #{courseId}
+        </foreach>
+        )
+        order by id asc
     </select>
 
 </mapper>

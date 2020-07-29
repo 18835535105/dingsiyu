@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -27,6 +28,12 @@ public class PayLog extends Model<PayLog> {
     private Integer cardDate;
 
     private Date foundDate;
+
+    /**
+     * 操作人员id，哪个用户为学生充值的
+     */
+    @TableField("operator_id")
+    private Integer operatorId;
 
     @Override
     protected Serializable pkVal() {

@@ -30,6 +30,15 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
     List<Long> selectByGradeListAndVersionAndGrade(String version, List<String> gradeList);
 
     /**
+     * 获取当前版本、年级的所有单元id
+     *
+     * @param version
+     * @param gradeList
+     * @return
+     */
+    List<Map<String,Long>> selectMapByGradeListAndVersionAndGrade(String version, List<String> gradeList);
+
+    /**
      * 获取当前课程中小于或等于当前单元的所有单元id
      *
      * @param courseId
@@ -37,6 +46,21 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @return
      */
     List<Long> selectLessOrEqualsCurrentIdByCourseIdAndUnitId(@Param("courseId") Long courseId, @Param("unitId") Long unitId);
+    /**
+     * 获取当前课程中小于或等于当前单元的所有单元id
+     *
+     * @param courseId
+     * @param unitId
+     * @return
+     */
+    List<Map<String,Long>> selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(@Param("courseId") Long courseId, @Param("unitId") Long unitId);
+
+    /**
+     * 根据id集合查询id信息
+     * @param unitIds
+     * @return
+     */
+    List<Map<String,Object>> selectByIds(@Param("unitIds") List<Long> unitIds);
 
     /**
      * 查询指定课程名的所有单元id
@@ -45,6 +69,13 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @return
      */
     List<Long> selectIdsByCourseNames(@Param("courseNames") List<String> courseNames);
+    /**
+     * 查询指定课程名的所有单元id
+     *
+     * @param courseNames
+     * @return
+     */
+    List<Map<String,Long>> selectIdsMapByCourseNames(@Param("courseNames") List<String> courseNames);
 
     @MapKey("unitId")
     Map<Long, Map<String, Object>> selectCountByUnitIds(@Param("unitIds") List<Long> unitIds);
@@ -114,4 +145,11 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      */
     @MapKey("unitId")
     Map<Long, Map<Long, Integer>> selectMaxGroupByUnitIsdAndType(@Param("unitIds") List<Long> unitIds, @Param("type") Integer type);
+
+    /**
+     * 根据courseIds查询unit信息
+     * @param courseNewIds
+     * @return
+     */
+    List<UnitNew> selectByCourseIds(@Param("courseIds") List<Long> courseNewIds);
 }
