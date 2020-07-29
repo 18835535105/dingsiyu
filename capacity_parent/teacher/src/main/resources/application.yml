@@ -1,0 +1,43 @@
+spring:
+  profiles:
+    active: dev
+  http:
+    encoding:
+      force: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Chongqing
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 15MB
+  application:
+    name: teacher
+feign:
+  client:
+    config:
+      # 通过 default 进行全局配置
+      default:
+        loggerLevel: full
+        connectTimeout: 10000
+        readTimeout: 10000
+server:
+  tomcat:
+    uri-encoding: utf-8
+    connection-timeout: 30m
+  servlet:
+    session:
+      timeout: 30m
+mybatis:
+  type-aliases-package: com.zhidejiaoyu.common.pojo
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+

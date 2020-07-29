@@ -26,6 +26,7 @@
         <module>course</module>
         <module>spring-boot-admin</module>
         <module>mail</module>
+        <module>teacher</module>
     </modules>
 
 

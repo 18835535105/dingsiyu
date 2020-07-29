@@ -1,0 +1,37 @@
+
+# 开发环境
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://${ip}:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: zdjy
+    password: zdjy
+  redis:
+    host: ${ip}
+    port: 6380
+    password: zdjy
+  cloud:
+    nacos:
+      discovery:
+        server-addr: nacos.duizhang100.cn:8848
+        namespace: a8dd697b-5d6d-4844-bcc7-54a7732644e8
+  zipkin:
+    base-url: http://${ip}:9411/
+    discoveryClientEnabled: false
+  sleuth:
+    sampler:
+      # 抽样率，默认是0.1（10%）
+      probability: 1.0
+server:
+  port: 9098
+
+ip: 123.56.142.84
+logging:
+  level:
+    com:
+      dfdz: debug
+      zhidejiaoyu:
+        common:
+          mapper: debug
+  config: classpath:log4j2-dev.xml
+
