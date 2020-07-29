@@ -193,7 +193,11 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         List<Map<String, Object>> all = simpleStudentExchangePrizeMapper.getAll(null, null, studentId);
         Map<String, Object> resultMap = new HashMap<>();
         Integer resultInteger = simpleStudentExchangePrizeMapper.getAllNumber(studentId);
-       /* resultMap.put("page", page);
+        resultMap.put("page", 0);
+        resultMap.put("row", 0);
+        resultMap.put("total", resultInteger);
+       /*
+        resultMap.put("page", page);
         resultMap.put("row", row);
         resultMap.put("total", total);
         int resultInteger = total - (page - 1) * row;*/
