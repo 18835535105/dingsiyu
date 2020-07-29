@@ -64,18 +64,28 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
             return ServerResponse.createBySuccess(qaVO);
         }
 
+        QaQuestion qaQuestion = qaQuestionMapper.selectByQuestion(question);
+        if (qaQuestion != null) {
+            qaVO = new QaVO();
+            qaVO.setQuestion(qaQuestion.getQuestion());
+            qaVO.setUrl(qaQuestion.getAudioUrl());
+            qaVO.setId(Integer.parseInt(qaQuestion.getId().toString()));
+            qaVO.setAnswer(qaQuestion.getAnswer());
+            return ServerResponse.createBySuccess(qaVO);
+        }
+
         List<Map<String, Object>> qaQuestions = qaQuestionMapper.selectKeyWordsAndQuestion();
-        for (Map<String, Object> qaQuestion : qaQuestions) {
-            String keyWords = String.valueOf(qaQuestion.get("keyWords"));
+        for (Map<String, Object> qaQuestion1 : qaQuestions) {
+            String keyWords = String.valueOf(qaQuestion1.get("keyWords"));
             if (!question.contains(keyWords)) {
                 continue;
             }
 
             qaVO = new QaVO();
-            qaVO.setQuestion(String.valueOf(qaQuestion.get("question")));
-            qaVO.setUrl(String.valueOf(qaQuestion.get("url")));
-            qaVO.setId(Integer.parseInt(String.valueOf(qaQuestion.get("id"))));
-            qaVO.setAnswer(String.valueOf(qaQuestion.get("answer")));
+            qaVO.setQuestion(String.valueOf(qaQuestion1.get("question")));
+            qaVO.setUrl(String.valueOf(qaQuestion1.get("url")));
+            qaVO.setId(Integer.parseInt(String.valueOf(qaQuestion1.get("id"))));
+            qaVO.setAnswer(String.valueOf(qaQuestion1.get("answer")));
             return ServerResponse.createBySuccess(qaVO);
         }
 
