@@ -18,7 +18,9 @@
         on stuprize.prize_id = list.id
         where stuprize.student_id=#{studentId}
         order by stuprize.create_time desc
-        limit #{start} ,#{number}
+        <if test="start!=null">
+            limit #{start} ,#{number}
+        </if>
     </select>
     <delete id="deleteByStudentIds" parameterType="map">
         delete from student_exchange_prize

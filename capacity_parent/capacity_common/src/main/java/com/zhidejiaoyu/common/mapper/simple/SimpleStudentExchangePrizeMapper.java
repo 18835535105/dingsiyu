@@ -19,7 +19,7 @@ import java.util.Map;
 public interface SimpleStudentExchangePrizeMapper extends BaseMapper<StudentExchangePrize> {
 
 
-    List<Map<String,Object>> getAll(@Param("start") int start, @Param("number") int number, @Param("studentId") Long studentId);
+    List<Map<String,Object>> getAll(@Param("start") Integer start, @Param("number") Integer number, @Param("studentId") Long studentId);
 
     @Select("select count(id) from student_exchange_prize where student_id=#{studentId}")
     Integer getAllNumber(Long studentId);

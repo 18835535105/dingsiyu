@@ -186,16 +186,17 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
     }
 
     @Override
-    public ServerResponse<Object> getExchangePrize(int page, int row, HttpSession session) {
+    public ServerResponse<Object> getExchangePrize( HttpSession session) {
         Student student = getStudent(session);
         Long studentId = student.getId();
-        List<Map<String, Object>> all = simpleStudentExchangePrizeMapper.getAll((page - 1) * row, row, studentId);
+        //List<Map<String, Object>> all = simpleStudentExchangePrizeMapper.getAll((page - 1) * row, row, studentId);
+        List<Map<String, Object>> all = simpleStudentExchangePrizeMapper.getAll(null, null, studentId);
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("page", page);
+        Integer resultInteger = simpleStudentExchangePrizeMapper.getAllNumber(studentId);
+       /* resultMap.put("page", page);
         resultMap.put("row", row);
-        Integer total = simpleStudentExchangePrizeMapper.getAllNumber(studentId);
         resultMap.put("total", total);
-        int resultInteger = total - (page - 1) * row;
+        int resultInteger = total - (page - 1) * row;*/
         List<Map<String, Object>> resultList = new ArrayList<>();
         for (Map<String, Object> map : all) {
             Integer state = (Integer) map.get("state");

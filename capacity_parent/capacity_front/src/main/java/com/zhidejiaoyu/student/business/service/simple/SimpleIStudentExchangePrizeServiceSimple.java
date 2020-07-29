@@ -17,7 +17,7 @@ public interface SimpleIStudentExchangePrizeServiceSimple extends SimpleBaseServ
 
     ServerResponse<Object> getList(int page, int number, HttpSession session, int type);
 
-    ServerResponse<Object> getExchangePrize(int page, int number, HttpSession session);
+    ServerResponse<Object> getExchangePrize(HttpSession session);
 
     ServerResponse<Object> addExchangePrize(HttpSession session, Long prizeId);
 

@@ -57,15 +57,13 @@ public class SimpleStudentExchangePrizeController {
     /**
      * 兑奖查询
      *
-     * @param page
-     * @param row
      * @param session
      * @return
      */
-    @GetMapping("getExchangePrize")
+    @GetMapping("/getExchangePrize")
     @ResponseBody
-    public ServerResponse<Object> getExchangePrize(int page, int row, HttpSession session) {
-        return studentExchangePrizeService.getExchangePrize(page, row, session);
+    public ServerResponse<Object> getExchangePrize(HttpSession session) {
+        return studentExchangePrizeService.getExchangePrize(session);
     }
 
     /**
@@ -75,7 +73,7 @@ public class SimpleStudentExchangePrizeController {
      * @param prizeId
      * @return
      */
-    @PostMapping("addExchangePrize")
+    @PostMapping("/addExchangePrize")
     @ResponseBody
     public ServerResponse<Object> addExchangePrize(HttpSession session, Long prizeId) {
         return studentExchangePrizeService.addExchangePrize(session, prizeId);
