@@ -51,6 +51,10 @@ public class Letter extends Model<Letter> {
      */
     private String gifUrl;
 
+    /**
+     * 录音地址
+     */
+    private String audioUrl;
 
     @Override
     protected Serializable pkVal() {

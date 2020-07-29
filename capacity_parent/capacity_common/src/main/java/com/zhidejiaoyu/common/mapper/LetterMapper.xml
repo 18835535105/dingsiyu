@@ -4,31 +4,38 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Letter">
-        <id column="id" property="id" />
-        <result column="big_letter" property="bigLetter" />
-        <result column="lowercase_letters" property="lowercaseLetters" />
-        <result column="unit_id" property="unitId" />
-        <result column="type" property="type" />
-        <result column="gif_url" property="gifUrl" />
+        <id column="id" property="id"/>
+        <result column="big_letter" property="bigLetter"/>
+        <result column="lowercase_letters" property="lowercaseLetters"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="type" property="type"/>
+        <result column="gif_url" property="gifUrl"/>
+        <result column="audio_url" property="audioUrl"/>
     </resultMap>
 
     <sql id="base_sql">
-        id,big_letter,lowercase_letters,unit_id,type,gif_url
+        id,big_letter,lowercase_letters,unit_id,type,gif_url,audio_url
     </sql>
     <sql id="res_sql">
-        letter.id,letter.big_letter,letter.lowercase_letters,letter.unit_id,letter.type,letter.gif_url
+        letter.id,letter.big_letter,letter.lowercase_letters,letter.unit_id,letter.type,letter.gif_url, letter.audio_url
     </sql>
 
     <select id="selLetterCountById" resultType="integer" parameterType="long">
-        select count(distinct letter.big_letter) from letter where unit_id =#{unitId}
+        select count(distinct letter.big_letter)
+        from letter
+        where unit_id = #{unitId}
     </select>
 
     <select id="getByUnitId" parameterType="long" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from letter where unit_id=#{unitId}
+        select
+        <include refid="base_sql"/>
+        from letter where unit_id=#{unitId}
     </select>
 
     <select id="getStudyLetter" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from letter
+        select
+        <include refid="base_sql"/>
+        from letter
         where unit_id=#{unitId}
         <if test="longs!=null and longs.size>0">
             and id not in(
@@ -42,15 +49,20 @@
     </select>
 
     <select id="getAllLetterByUnitId" parameterType="integer" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from letter where unit_id=#{unitId}
+        select
+        <include refid="base_sql"/>
+        from letter where unit_id=#{unitId}
     </select>
 
     <select id="getThreeLetter" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from letter where id &lt;> #{letterId} order by rand() limit 3
+        select
+        <include refid="base_sql"/>
+        from letter where id &lt;> #{letterId} order by rand() limit 3
     </select>
 
     <select id="selPushLetterByUnitIdAndStudent" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="res_sql"></include>
+        select
+        <include refid="res_sql"/>
         from letter letter
         join letter_write letwrite
         on letwrite.letter_id=letter.id
@@ -62,7 +74,9 @@
     </select>
 
     <select id="getAllLetter" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="base_sql"></include> from letter
+        select
+        <include refid="base_sql"/>
+        from letter
     </select>
 
 </mapper>
