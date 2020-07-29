@@ -4,26 +4,32 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.LetterVocabulary">
-        <id column="id" property="id" />
-        <result column="unit_id" property="unitId" />
-        <result column="letter" property="letter" />
-        <result column="major_categories" property="majorCategories" />
-        <result column="subordinate_category" property="subordinateCategory" />
-        <result column="vocabulary" property="vocabulary" />
-        <result column="phonetic_symbol" property="phoneticSymbol" />
-        <result column="syllable" property="syllable" />
+        <id column="id" property="id"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="letter" property="letter"/>
+        <result column="major_categories" property="majorCategories"/>
+        <result column="subordinate_category" property="subordinateCategory"/>
+        <result column="vocabulary" property="vocabulary"/>
+        <result column="phonetic_symbol" property="phoneticSymbol"/>
+        <result column="syllable" property="syllable"/>
+        <result column="mp3_url" property="mp3Url"/>
     </resultMap>
 
     <sql id="base_sql">
-        id,unit_id,letter,major_categories,subordinate_category,vocabulary,phonetic_symbol,syllable
+        id,unit_id,letter,major_categories,subordinate_category,vocabulary,phonetic_symbol,syllable,mp3_url
     </sql>
     <select id="selByUnitIds" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="base_sql"></include> from letter_vocabulary
+        select
+        <include refid="base_sql"/>
+        from letter_vocabulary
         where major_categories=#{major} and subordinate_category=#{subordinate} and unit_id=#{unit}
     </select>
     <select id="selLetterByUnitId" resultType="string" parameterType="map">
-        select letter from letter_vocabulary
-        where major_categories=#{major} and subordinate_category=#{subordinate} and unit_id=#{unit}
+        select letter
+        from letter_vocabulary
+        where major_categories = #{major}
+          and subordinate_category = #{subordinate}
+          and unit_id = #{unit}
         group by letter
     </select>
 </mapper>

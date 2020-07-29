@@ -1,17 +1,14 @@
 package com.zhidejiaoyu.common.pojo;
 
-import com.baomidou.mybatisplus.enums.IdType;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.enums.IdType;
 import com.baomidou.mybatisplus.activerecord.Model;
-import java.io.Serializable;
-
-import com.baomidou.mybatisplus.annotations.Version;
-
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -58,6 +55,12 @@ public class LetterVocabulary extends Model<LetterVocabulary> {
      * 音节
      */
     private String syllable;
+
+    /**
+     * 单词读音地址
+     */
+    @TableField("mp3_url")
+    private String mp3Url;
 
 
     @Override

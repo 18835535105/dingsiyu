@@ -4,8 +4,8 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.LetterUnit">
-        <id column="id" property="id" />
-        <result column="unit_name" property="unitName" />
+        <id column="id" property="id"/>
+        <result column="unit_name" property="unitName"/>
     </resultMap>
 
     <sql id="sql">
@@ -17,7 +17,8 @@
     </sql>
 
     <select id="selSymbolUnit" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include>
+        select
+        <include refid="base_sql"/>
         from letter_unit unit
         join phonetic_symbol symbol
         on unit.id=symbol.unit_id
@@ -35,7 +36,8 @@
     </select>
 
     <select id="selLetterUnit" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include>
+        select
+        <include refid="base_sql"/>
         from letter_unit unit
         join letter letter
         on unit.id=letter.unit_id
@@ -44,14 +46,16 @@
         group by unit.id
     </select>
     <select id="selLetterAllUnit" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include>
+        select
+        <include refid="base_sql"/>
         from letter_unit unit
         join letter letter
         on unit.id=letter.unit_id
         group by unit.id
     </select>
     <select id="selLetterTreasure" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include>
+        select
+        <include refid="base_sql"/>
         from letter_unit unit
         join letter_vocabulary voc
         on unit.id=voc.unit_id

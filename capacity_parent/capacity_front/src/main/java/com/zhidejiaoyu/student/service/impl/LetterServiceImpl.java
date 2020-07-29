@@ -5,7 +5,6 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.memorystrength.TestMemoryStrength;
-import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.LetterService;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +48,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     private PlayerMapper playerMapper;
     @Autowired
     private LetterVocabularyMapper letterVocabularyMapper;
-    @Autowired
-    private BaiduSpeak baiduSpeak;
+
     @Resource
     private TestMemoryStrength testMemoryStrength;
 
@@ -486,7 +484,9 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 if ("字母拼读".equals(major)) {
                     //获取当前单元显示的字母
                     List<String> letters = letterVocabularyMapper.selLetterByUnitId(major, subordinate, unit.getId());
-                    Map<String, List<LetterVocabulary>> collect = letterVocabulary.stream().collect(Collectors.groupingBy(LetterVocabulary::getLetter));
+                    Map<String, List<LetterVocabulary>> collect = letterVocabulary.stream()
+                            .map(l -> l.setMp3Url(GetOssFile.getPublicObjectUrl(l.getMp3Url())))
+                            .collect(Collectors.groupingBy(LetterVocabulary::getLetter));
                     int i = 0;
                     for (String letter : letters) {
                         Map<String, Object> letterMap = new HashMap<>();
@@ -510,6 +510,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                     int lineSize = letterVocabulary.size() % 6 > 0 ? letterVocabulary.size() / 6 + 1 : letterVocabulary.size() / 6;
 
                     for (LetterVocabulary vo : letterVocabulary) {
+                        vo.setMp3Url(GetOssFile.getPublicObjectUrl(vo.getMp3Url()));
                         list.add(vo);
                         total++;
                         if (list.size() % 6 == 0 || letterVocabulary.size() == total) {
