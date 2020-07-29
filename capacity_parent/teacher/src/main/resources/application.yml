@@ -16,7 +16,7 @@ spring:
     multipart:
       max-file-size: 15MB
   application:
-    name: teacher
+    name: teacher1
 feign:
   client:
     config:

@@ -39,7 +39,7 @@ public class FeignClientUtil {
     /**
      * 教师服务请求前缀
      */
-    private static final String TEACHER_CONTEXT_PATH = "teacher";
+    private static final String TEACHER_CONTEXT_PATH = "/teacher";
 
     public FeignClientUtil(Decoder feignDecoder,
                            Encoder feignEncoder,
@@ -60,7 +60,7 @@ public class FeignClientUtil {
      * @return
      */
     public static BaseTeacherInfoFeignClient getTeacherInfoFeignClient(String serverName) {
-        return builder.target(BaseTeacherInfoFeignClient.class, PREFIX + serverName + TEACHER_CONTEXT_PATH);
+        return builder.target(BaseTeacherInfoFeignClient.class, PREFIX + "teacher" + serverName.replace("server", "") + TEACHER_CONTEXT_PATH);
     }
 
     /**
