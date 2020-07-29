@@ -12,10 +12,11 @@
         <result column="vocabulary" property="vocabulary"/>
         <result column="phonetic_symbol" property="phoneticSymbol"/>
         <result column="syllable" property="syllable"/>
+        <result column="mp3_url" property="mp3Url"/>
     </resultMap>
 
     <sql id="base_sql">
-        id,unit_id,letter,major_categories,subordinate_category,vocabulary,phonetic_symbol,syllable
+        id,unit_id,letter,major_categories,subordinate_category,vocabulary,phonetic_symbol,syllable,mp3_url
     </sql>
     <select id="selByUnitIds" resultMap="BaseResultMap" parameterType="map">
         select
