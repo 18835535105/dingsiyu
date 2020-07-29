@@ -39,4 +39,12 @@ public interface QaQuestionMapper extends BaseMapper<QaQuestion> {
      */
     @Select("select count(id) from qa_question where question = #{question} limit 1")
     int countByQuestion(@Param("question") String question);
+
+    /**
+     * 根据问题查询答案
+     *
+     * @param question
+     * @return
+     */
+    QaQuestion selectByQuestion(@Param("question") String question);
 }

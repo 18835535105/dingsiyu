@@ -11,6 +11,9 @@
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
+    <sql id="base_sql">
+        id, question, answer, audio_url, create_time, update_time
+    </sql>
     <select id="selectKeyWordsAndQuestion" resultType="java.util.Map" parameterType="map">
         select qq.id, qq.answer, qkw.key_words keyWords, qq.audio_url url, qq.question
         from qa_question qq,
@@ -18,6 +21,13 @@
              qa_key_words_question qkwq
         where qq.id = qkwq.question_id
           and qkw.id = qkwq.key_words_id
+    </select>
+    <select id="selectByQuestion" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from qa_question
+        where question like concat('%', #{question}, '%')
+        limit 1
     </select>
 
 </mapper>

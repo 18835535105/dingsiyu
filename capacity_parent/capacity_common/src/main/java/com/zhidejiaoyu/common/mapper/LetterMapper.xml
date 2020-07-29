@@ -10,13 +10,14 @@
         <result column="unit_id" property="unitId"/>
         <result column="type" property="type"/>
         <result column="gif_url" property="gifUrl"/>
+        <result column="audio_url" property="audioUrl"/>
     </resultMap>
 
     <sql id="base_sql">
-        id,big_letter,lowercase_letters,unit_id,type,gif_url
+        id,big_letter,lowercase_letters,unit_id,type,gif_url,audio_url
     </sql>
     <sql id="res_sql">
-        letter.id,letter.big_letter,letter.lowercase_letters,letter.unit_id,letter.type,letter.gif_url
+        letter.id,letter.big_letter,letter.lowercase_letters,letter.unit_id,letter.type,letter.gif_url, letter.audio_url
     </sql>
 
     <select id="selLetterCountById" resultType="integer" parameterType="long">
@@ -26,7 +27,9 @@
     </select>
 
     <select id="getByUnitId" parameterType="long" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from letter where unit_id=#{unitId}
+        select
+        <include refid="base_sql"/>
+        from letter where unit_id=#{unitId}
     </select>
 
     <select id="getStudyLetter" parameterType="map" resultMap="BaseResultMap">
@@ -46,7 +49,9 @@
     </select>
 
     <select id="getAllLetterByUnitId" parameterType="integer" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from letter where unit_id=#{unitId}
+        select
+        <include refid="base_sql"/>
+        from letter where unit_id=#{unitId}
     </select>
 
     <select id="getThreeLetter" parameterType="map" resultMap="BaseResultMap">
@@ -57,7 +62,7 @@
 
     <select id="selPushLetterByUnitIdAndStudent" parameterType="map" resultMap="BaseResultMap">
         select
-        <include refid="res_sql"></include>
+        <include refid="res_sql"/>
         from letter letter
         join letter_write letwrite
         on letwrite.letter_id=letter.id

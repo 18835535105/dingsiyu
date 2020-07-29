@@ -5,7 +5,6 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.memorystrength.TestMemoryStrength;
-import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.LetterService;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +46,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     private PlayerMapper playerMapper;
     @Resource
     private LetterVocabularyMapper letterVocabularyMapper;
-    @Resource
-    private BaiduSpeak baiduSpeak;
+
     @Resource
     private TestMemoryStrength testMemoryStrength;
 
@@ -188,6 +186,9 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     public Object getLetterListen(Long unitId, HttpSession session) {
         //查看字母播放器全部数据
         List<Letter> byUnitId = letterMapper.getByUnitId(unitId);
+        byUnitId.forEach(letter -> {
+            letter.setAudioUrl(GetOssFile.getPublicObjectUrl(letter.getAudioUrl()));
+        });
         Map<String, Object> map = new HashMap<>();
         map.put("list", byUnitId);
         map.put("total", byUnitId.size());
@@ -315,6 +316,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         }
         map.put("options", returnList);
         map.put("id", studyLetter.getId());
+        map.put("mp3Url", GetOssFile.getPublicObjectUrl(studyLetter.getAudioUrl()));
         return ServerResponse.createBySuccess(map);
     }
 
@@ -414,6 +416,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 List<Letter> returnLetter = new ArrayList<>();
                 allLetter.forEach(letter -> {
                     letter.setGifUrl(GetOssFile.getPublicObjectUrl(letter.getGifUrl()));
+                    letter.setAudioUrl(GetOssFile.getPublicObjectUrl(letter.getAudioUrl()));
                     returnLetter.add(letter);
                 });
                 Map<String, Object> returnMap = new HashMap<>();
@@ -428,6 +431,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                     Map<String, Object> letterMap = new HashMap<>();
                     letterMap.put("title", letterUnit.getUnitName());
                     letter.setGifUrl(GetOssFile.getPublicObjectUrl(letter.getGifUrl()));
+                    letter.setAudioUrl(GetOssFile.getPublicObjectUrl(letter.getAudioUrl()));
                     letterMap.put("letter", letter);
                     if (i == 0) {
                         letterMap.put("marge", true);
@@ -449,7 +453,9 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 if ("字母拼读".equals(major)) {
                     //获取当前单元显示的字母
                     List<String> letters = letterVocabularyMapper.selLetterByUnitId(major, subordinate, unit.getId());
-                    Map<String, List<LetterVocabulary>> collect = letterVocabulary.stream().collect(Collectors.groupingBy(vo -> vo.getLetter()));
+                    Map<String, List<LetterVocabulary>> collect = letterVocabulary.stream()
+                            .map(l -> l.setMp3Url(GetOssFile.getPublicObjectUrl(l.getMp3Url())))
+                            .collect(Collectors.groupingBy(LetterVocabulary::getLetter));
                     int i = 0;
                     for (String letter : letters) {
                         Map<String, Object> letterMap = new HashMap<>();
@@ -473,6 +479,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                     int lineSize = letterVocabulary.size() % 6 > 0 ? letterVocabulary.size() / 6 + 1 : letterVocabulary.size() / 6;
 
                     for (LetterVocabulary vo : letterVocabulary) {
+                        vo.setMp3Url(GetOssFile.getPublicObjectUrl(vo.getMp3Url()));
                         list.add(vo);
                         total++;
                         if (list.size() % 6 == 0 || letterVocabulary.size() == total) {
@@ -526,7 +533,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         map.put("unitId", unitId);
         map.put("letter", letter.getLowercaseLetters());
         map.put("bigLetter", letter.getBigLetter());
-        map.put("listen", baiduSpeak.getLetterPath(letter.getBigLetter()));
+        map.put("listen", GetOssFile.getPublicObjectUrl(letter.getAudioUrl()));
         map.put("total", countByUnitId);
         map.put("plan", letterWriteCounts + 1);
         return ServerResponse.createBySuccess(map);
