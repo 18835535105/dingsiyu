@@ -8,6 +8,8 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -33,6 +35,30 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
     @Resource
     private CourseService courseService;
 
+    /**
+     * 获取队长币数量
+     * @param adminUUId
+     * @return
+     */
+    @Override
+    public Object getCardNum(String adminUUId) {
+        SysUser user = sysUserMapper.selectByUuid(adminUUId);
+        Map<String, Object> map = new HashMap<>();
+        getCardNum(user.getId(), map);
+        return map;
+    }
+    private void getCardNum(Integer userId, Map<String, Object> map) {
+        SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(userId.longValue());
+        if(schoolHours==null){
+            map.put("captainCoin", 0);
+        }else{
+            if(schoolHours.getCaptainCoin()==null){
+                map.put("captainCoin", 0);
+            }else{
+                map.put("captainCoin", schoolHours.getCaptainCoin());
+            }
+        }
+    }
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object pay(Long studentId, Integer months,String adminUUId) {

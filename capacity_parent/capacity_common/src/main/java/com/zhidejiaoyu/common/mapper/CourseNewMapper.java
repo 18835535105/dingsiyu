@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
+import com.zhidejiaoyu.common.pojo.CourseExample;
 import com.zhidejiaoyu.common.pojo.CourseNew;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -113,4 +114,8 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
     @Select("select id from course_new where version = #{version} and grade = #{grade} and label = #{label} and delStatus = 1")
     List<Integer> selectCourse(@Param("version") String version, @Param("grade") String grade,
                                @Param("label") String label);
+
+    List<CourseNew> selectExperienceCourses();
+
+    List<CourseNew> selectByExample(CourseExample example);
 }

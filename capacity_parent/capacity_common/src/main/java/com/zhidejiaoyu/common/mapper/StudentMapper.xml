@@ -946,5 +946,13 @@ s.uuid,
         where `uuid` = #{uuid}
         limit 1
     </select>
+    <select id="countCanCreate" resultType="java.lang.Integer" parameterType="map">
+        SELECT count(id) c
+        FROM student
+        WHERE `status` = 1
+          and `rank` &lt;= 7
+          and (teacher_id = #{userId}
+            OR teacher_id IN (SELECT teacher_id FROM teacher WHERE school_admin_id = #{userId}))
+    </select>
 
 </mapper>

@@ -30,4 +30,27 @@ public class TeacherServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         return ServerResponse.createBySuccess(sysUser);
     }
+
+    public static String finalRandom(String random, int num) {
+        switch (num) {
+            case 1:
+                random = "00000" + random;
+                break;
+            case 2:
+                random = "0000" + random;
+                break;
+            case 3:
+                random = "000" + random;
+                break;
+            case 4:
+                random = "00" + random;
+                break;
+            case 5:
+                random = "0" + random;
+                break;
+            default:
+                break;
+        }
+        return random;
+    }
 }

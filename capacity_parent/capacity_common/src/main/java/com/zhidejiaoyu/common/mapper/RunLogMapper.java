@@ -167,4 +167,7 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
      * @return
      */
     Date selectFirstLoginTimeByStudentId(@Param("studentId") Long studentId);
+
+    Map<String,Object> selCreateTimeByTypeAndStudentId(@Param("type") int type, @Param("studentId") Long studentId);
+
 }

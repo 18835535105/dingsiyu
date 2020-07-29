@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.common.mapper.simple;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.SimpleStudentUnit;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.vo.SeniorityVo;
 import org.apache.ibatis.annotations.MapKey;
@@ -10,7 +12,7 @@ import org.apache.ibatis.annotations.Update;
 import java.util.List;
 import java.util.Map;
 
-public interface SimpleStudentUnitMapper {
+public interface SimpleStudentUnitMapper extends BaseMapper<SimpleStudentUnit> {
     /**
      * 解锁下一单元
      *
@@ -59,4 +61,12 @@ public interface SimpleStudentUnitMapper {
     int updUnitByStudentIdAndType(@Param("studentId") Long studentId,@Param("type") int type,@Param("unitId") Long unitId);
 
     List<Long> getAllCourseIdByTypeToStudent(@Param("studentId") Long studentId, @Param("type") int type);
+
+    /**
+     * 查询当前学生当前学习信息中含有的type类型
+     * @param student
+     * @return  key:type value:type
+     */
+    @MapKey("type")
+    Map<Integer, Integer> selectTypeMap(@Param("student") Student student);
 }

@@ -179,4 +179,12 @@ public interface StudentUnitMapper extends BaseMapper<StudentUnit> {
             "where  stunit.student_id = #{student_id};")
     int countCapacityTeks(Long id);
 
+    /**
+     * 查询当前学生当前学习信息中含有的type类型
+     * @param student
+     * @return  key:type value:type
+     */
+    @MapKey("type")
+    Map<Integer, Integer> selectTypeMap(@Param("student") Student student);
+
 }

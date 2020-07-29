@@ -22,6 +22,12 @@
         <result column="createtime" property="createtime"/>
         <result column="version" property="version"/>
     </resultMap>
+    <sql id="Base_Column_List">
+        id, account, name, birthday, sex, email, avatar,
+		phone, roleid,
+		deptid, status,
+		createtime, version,uuid
+    </sql>
     <select id="selectByOpenId" resultMap="BaseResultMap" parameterType="map">
         select id, account, name, openid
         from sys_user
@@ -38,6 +44,14 @@
         select *
         from sys_user
         where uuid = #{uuid}
+        limit 1
+    </select>
+    <select id="selectByMaxAccount" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from sys_user
+        where account like concat('%',concat(#{account},'%'))
+        order by id desc
         limit 1
     </select>
 

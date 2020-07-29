@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.UnitNew;
+import com.zhidejiaoyu.common.pojo.UnitOneExample;
 import com.zhidejiaoyu.common.vo.course.UnitStudyStateVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -152,4 +153,8 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @return
      */
     List<UnitNew> selectByCourseIds(@Param("courseIds") List<Long> courseNewIds);
+
+    UnitNew selectFirstByUnitId(Long courseId);
+
+    List<Map<String,Object>> selectByExample(UnitOneExample example);
 }

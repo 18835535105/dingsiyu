@@ -419,6 +419,14 @@
           and `type` = 1
         limit 1
     </select>
+    <select id="selCreateTimeByTypeAndStudentId" parameterType="map" resultType="map">
+        select create_time time
+        from run_log
+        where type = #{type}
+          and operate_user_id = #{studentId}
+        order by id
+        limit 1
+    </select>
     <select id="countLoginCountByStudentIdAndCreateTime" resultType="java.lang.Integer" parameterType="map">
         SELECT count(id)
         FROM run_log

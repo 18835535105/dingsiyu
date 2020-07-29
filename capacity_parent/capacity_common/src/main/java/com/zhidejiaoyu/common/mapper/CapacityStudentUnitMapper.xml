@@ -71,5 +71,8 @@
         </foreach>
         )
     </delete>
-
+    <select id="selectByStudentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select <include refid="base_sql"></include> from capacity_student_unit where student_id=#{studentId} and
+        type=1;
+    </select>
 </mapper>

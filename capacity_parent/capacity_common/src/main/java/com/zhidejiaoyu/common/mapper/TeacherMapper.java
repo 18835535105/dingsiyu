@@ -75,5 +75,11 @@ public interface TeacherMapper extends BaseMapper<Teacher> {
     @Select("select password from teacher where teacher_id = #{id} limit 1")
     String countByTeacherId(@Param("id") Integer id);
 
-
+    /**
+     * 根据校管id获取校管信息
+     *
+     * @param schoolAdminId
+     * @return
+     */
+    Teacher selectSchoolAdminById(@Param("schoolAdminId") Integer schoolAdminId);
 }

@@ -359,4 +359,20 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     Student selectByUuid(@Param("uuid") String uuid);
+
+    /**
+     * 获取当前校区还可生成的体验账号数量
+     *
+     * @param userId
+     * @return
+     */
+    int countCanCreate(@Param("userId") Integer userId);
+
+    /**
+     * 查询最大id对应的记录
+     *
+     * @return
+     */
+    @Select("select * from student where id = (select max(id) from student)")
+    Student selectStudentByMaxId();
 }

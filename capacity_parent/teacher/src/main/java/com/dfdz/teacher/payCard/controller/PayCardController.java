@@ -2,10 +2,7 @@ package com.dfdz.teacher.payCard.controller;
 
 import com.dfdz.teacher.payCard.service.PayCardService;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -51,6 +48,15 @@ public class PayCardController {
         return payCardService.addAllStudent(Arrays.asList(studentIds), type,adminUUID);
     }
 
-
+    /**
+     * 获取充课卡数量
+     *
+     * @return
+     */
+    @GetMapping("/getCardNum")
+    @ResponseBody
+    public Object getCardNum(String adminUUId) {
+        return payCardService.getCardNum(adminUUId);
+    }
 
 }

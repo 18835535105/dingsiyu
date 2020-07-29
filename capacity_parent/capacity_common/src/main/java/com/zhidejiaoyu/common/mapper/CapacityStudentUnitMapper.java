@@ -47,4 +47,6 @@ public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUni
     CapacityStudentUnit selByStudentIdAndType(@Param("studentId") Long id,@Param("type") Integer type);
 
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
+
+    CapacityStudentUnit selectByStudentId(Long studentId);
 }

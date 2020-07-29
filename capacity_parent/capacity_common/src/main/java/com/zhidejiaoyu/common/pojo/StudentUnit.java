@@ -33,6 +33,8 @@ public class StudentUnit extends Model<StudentUnit> {
      */
     private Integer sentenceStatus;
 
+    private int type;
+
 
     @Override
     protected Serializable pkVal() {

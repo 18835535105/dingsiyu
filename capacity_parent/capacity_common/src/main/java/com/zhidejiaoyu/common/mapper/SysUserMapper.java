@@ -37,4 +37,6 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @return
      */
     SysUser selectByUuid(@Param("uuid") String uuid);
+
+    SysUser selectByMaxAccount(@Param("account") String perfix);
 }
