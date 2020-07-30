@@ -101,7 +101,7 @@ public class FeignClientUtil {
      * @return
      */
     public static BaseTeacherPayCardFeignClient getPayCardFeignClient(String serverName) {
-        return builder.target(BaseTeacherPayCardFeignClient.class, PREFIX + serverName+ STUDENT_CONTEXT_PATH);
+        return builder.target(BaseTeacherPayCardFeignClient.class, PREFIX + serverName+ TEACHER_CONTEXT_PATH);
     }
 
     /**
