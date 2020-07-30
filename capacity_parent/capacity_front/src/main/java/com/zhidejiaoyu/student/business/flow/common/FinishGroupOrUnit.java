@@ -9,7 +9,7 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
-import com.zhidejiaoyu.student.business.flow.FlowConstant;
+import com.zhidejiaoyu.common.constant.FlowConstant;
 import com.zhidejiaoyu.student.business.flow.service.impl.FreeFlowServiceImpl;
 import com.zhidejiaoyu.student.business.flow.service.impl.StudyFlowServiceImpl;
 import com.zhidejiaoyu.student.common.redis.PayLogRedisOpt;

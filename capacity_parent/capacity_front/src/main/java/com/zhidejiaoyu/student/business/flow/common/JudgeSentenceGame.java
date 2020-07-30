@@ -3,7 +3,7 @@ package com.zhidejiaoyu.student.business.flow.common;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.flow.FlowConstant;
+import com.zhidejiaoyu.common.constant.FlowConstant;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
 import org.assertj.core.util.Objects;
 import org.springframework.stereotype.Component;

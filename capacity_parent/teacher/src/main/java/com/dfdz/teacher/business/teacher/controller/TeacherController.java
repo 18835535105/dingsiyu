@@ -16,7 +16,7 @@ import javax.annotation.Resource;
  * @date 2020-07-29 10:41:07
  */
 @RestController
-@RequestMapping
+@RequestMapping("/teacher")
 public class TeacherController {
 
     @Resource

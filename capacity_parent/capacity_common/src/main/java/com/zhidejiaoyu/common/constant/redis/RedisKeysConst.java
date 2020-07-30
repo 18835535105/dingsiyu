@@ -247,12 +247,12 @@ public interface RedisKeysConst {
     /**
      * 微信参数
      */
-    public static final String WE_CHAT_PARAM = "WE_CHAT_PARAM";
+    String WE_CHAT_PARAM = "WE_CHAT_PARAM";
 
     /**
      * 个角色拥有的权限
      */
-    public static final String PERMISSION_OF_ROLE = "PERMISSION_OF_ROLE";
+    String PERMISSION_OF_ROLE = "PERMISSION_OF_ROLE";
 
 
     /**
@@ -260,23 +260,23 @@ public interface RedisKeysConst {
      * EXPORTED_IN_TARGET_SECONDS + optId
      * TARGET_SECONDS： EXPORTED_IN_TARGET_SECONDS的过期时间，单位 秒
      */
-    public static final String EXPORTED_IN_TARGET_SECONDS = "exported_in_target_seconds:" + ServerNoConstant.SERVER_NO + ":";
+    String EXPORTED_IN_TARGET_SECONDS = "exported_in_target_seconds:" + ServerNoConstant.SERVER_NO + ":";
 
 
     /**
      * 存储系统中最大的学生账号
      */
-    public static final String MAX_ACCOUNT = "MAX_ACCOUNT";
+    String MAX_ACCOUNT = "MAX_ACCOUNT";
     /**
      * 计入学生第一次登入时间
      */
-    public static final String STUDENT_FIRST_LOGIN_TIME = "STUDENT_FIRST_LOGIN_TIME:" + ServerNoConstant.SERVER_NO;
+    String STUDENT_FIRST_LOGIN_TIME = "STUDENT_FIRST_LOGIN_TIME:" + ServerNoConstant.SERVER_NO;
     /**
      * 记录教师正在分配课程
      */
-    public static final String ADD_STUDENT_STUDY_PLAN = "ADD_STUDENT_STUDY_PLAN:" + ServerNoConstant.SERVER_NO;
+    String ADD_STUDENT_STUDY_PLAN = "ADD_STUDENT_STUDY_PLAN:" + ServerNoConstant.SERVER_NO;
     /**
      * 记录teacher最大账号数值
      */
-    public static final String MAX_TEACHER_ACCOUNT = "MAX_TEACHER_ACCOUNT:";
+    String MAX_TEACHER_ACCOUNT = "MAX_TEACHER_ACCOUNT:";
 }

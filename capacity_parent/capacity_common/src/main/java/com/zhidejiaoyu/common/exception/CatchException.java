@@ -8,6 +8,9 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -69,6 +72,30 @@ public class CatchException {
     }
 
     /**
+     * 拦截参数校验异常
+     */
+    @ExceptionHandler(value = {BindException.class, MethodArgumentNotValidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ServerResponse<Object> bindException(Exception e) {
+        HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
+        packageLogMsg(e, httpServletRequest);
+        BindingResult bindResult = null;
+        if (e instanceof BindException) {
+            bindResult = ((BindException) e).getBindingResult();
+        } else if (e instanceof MethodArgumentNotValidException) {
+            bindResult = ((MethodArgumentNotValidException) e).getBindingResult();
+        }
+
+        if (bindResult != null && bindResult.hasErrors()) {
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), bindResult.getAllErrors().get(0).getDefaultMessage());
+
+        }
+
+        return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "参数异常！");
+    }
+
+    /**
      * 拦截请求超时异常
      *
      * @param e
@@ -88,7 +115,7 @@ public class CatchException {
      * @param e
      * @param request
      */
-    private void packageLogMsg(RuntimeException e, HttpServletRequest request) {
+    private void packageLogMsg(Exception e, HttpServletRequest request) {
         HttpSession session = request.getSession();
         String param = HttpUtil.getParams();
         Object studentObject = session.getAttribute(UserConstant.CURRENT_STUDENT);

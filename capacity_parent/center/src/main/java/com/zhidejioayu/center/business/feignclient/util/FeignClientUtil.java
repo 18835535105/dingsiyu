@@ -137,6 +137,18 @@ public class FeignClientUtil {
     }
 
     /**
+     * 根据教师openId获取教师信息
+     *
+     * @param openId
+     * @return
+     */
+    public static BaseTeacherInfoFeignClient getBaseTeacherInfoFeignClientByOpenId(String openId) {
+        ServerConfig serverConfig = ServerConfigUtil.getServerInfoByTeacherOpenid(openId);
+        return getTeacherInfoFeignClient(serverConfig.getServerName());
+    }
+
+
+    /**
      * 根据学生uuid获取学生信息
      *
      * @param uuid

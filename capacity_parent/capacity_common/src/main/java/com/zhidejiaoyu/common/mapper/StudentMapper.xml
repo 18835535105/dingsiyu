@@ -954,5 +954,44 @@ s.uuid,
           and (teacher_id = #{userId}
             OR teacher_id IN (SELECT teacher_id FROM teacher WHERE school_admin_id = #{userId}))
     </select>
+    <select id="selectStudentManageVO" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_List"/>
+        from student s
+        <where>
+            and s.status &lt;&gt; 3 and s.status &lt;&gt; 4
+            and s.school_name is not null
+            and s.account_time is not null
+            and s.sex is not null
+            and s.role &lt;> 4
+            and s.role &lt;> 5
+            <if test="dto.type == 1">
+                and s.account_time >= now() and s.rank > 7
+            </if>
+            <if test="dto.type == 2">
+                and s.account_time &lt; now()
+            </if>
+            <if test="dto.type == 2">
+                and s.account_time &lt; now() and s.rank &lt;= 7
+            </if>
+            <if test="dto.accountOrStudentName != null and dto.accountOrStudentName != ''">
+                and (s.account like concat('%', #{dto.accountOrStudentName}, '%')
+                or
+                s.student_name like concat('%', #{dto.accountOrStudentName}, '%'))
+            </if>
+            <if test="id != null">
+                and (s.teacher_id = #{id} or s.teacher_id in (select t.teacher_id from teacher t where
+                t.school_admin_id = #{id}))
+            </if>
+            <if test="dto.orderField == null or dto.orderField == ''">
+                order by s.id
+            </if>
+            <if test="dto.orderField == 'accountTime'">
+                order by account_time ${dto.orderWay}
+            </if>
+
+        </where>
+
+    </select>
 
 </mapper>
