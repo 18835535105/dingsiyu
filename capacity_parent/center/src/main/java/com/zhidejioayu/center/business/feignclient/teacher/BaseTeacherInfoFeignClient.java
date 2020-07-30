@@ -1,5 +1,6 @@
 package com.zhidejioayu.center.business.feignclient.teacher;
 
+import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.pojo.SysUser;
 import com.zhidejiaoyu.common.utils.page.PageVo;
@@ -7,6 +8,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.manage.StudentManageVO;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
@@ -28,4 +30,12 @@ public interface BaseTeacherInfoFeignClient {
      */
     @GetMapping("/student/listStudent")
     ServerResponse<PageVo<StudentManageVO>> listStudent(@SpringQueryMap StudentListDto dto);
+
+    /**
+     * 教师后台获取需要编辑的学生信息
+     *
+     * @return
+     */
+    @GetMapping("/student/create/createNewStudent")
+    Object createNewStudent(@RequestBody AddNewStudentDto dto);
 }

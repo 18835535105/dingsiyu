@@ -56,12 +56,6 @@ public interface BaseStudentFeignClient {
     @GetMapping("/student/edit/getEditStudentVoByUuid")
     ServerResponse<EditStudentVo> getEditStudentVoByUuid(@RequestParam String uuid);
 
-    /**
-     * 教师后台获取需要编辑的学生信息
-     *
-     * @return
-     */
-    @GetMapping("/student/create/createNewStudent")
-    Object createNewStudent(@RequestBody AddNewStudentDto dto);
+
 }
 
