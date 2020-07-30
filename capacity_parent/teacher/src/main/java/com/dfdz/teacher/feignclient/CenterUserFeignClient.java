@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "center", path = "/center")
 public interface CenterUserFeignClient {
 
+    /**
+     * 向中台服务器保存学生用户信息
+     * @param businessUserInfo
+     * @param no
+     */
     @GetMapping("/userInfo/user")
     void getUser(@RequestParam BusinessUserInfo businessUserInfo,@RequestParam String no);
 }

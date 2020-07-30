@@ -35,7 +35,7 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object pay(Long studentId, Integer months,String adminUUId) {
+    public Object pay(String studentUUID, Integer months, String adminUUId) {
         if (months == null && months > 0) {
             return ServerResponse.createByError(500, "请添加充课卡");
         }
@@ -44,9 +44,9 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
         SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(user.getId().longValue());
         Map<String, Object> flag = new HashMap<>();
         flag.put("index", 1);
-        Student student = studentMapper.selectById(studentId);
+        Student student = studentMapper.selectByUuid(studentUUID);
         if (!user.getAccount().contains("admin")) {
-            flag = getType(months, Integer.parseInt(schoolHours.getCaptainCoin()), studentId);
+            flag = getType(months, Integer.parseInt(schoolHours.getCaptainCoin()), student.getId());
         }
 
         //判断是否需要添加课程
@@ -67,7 +67,7 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
             updStudent(student, studentTime);
             addPayCard(user, now, student, months, map);
 
-            addPayLog(student, studentTime, now, null,user);
+            addPayLog(student, studentTime, now, null, user);
             return ServerResponse.createBySuccess();
         } else {
             if (index.equals(1)) {
@@ -81,17 +81,17 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
     }
 
     @Override
-    public Object addAllStudent(List<Integer> studentIds, Integer months, String adminUUID) {
+    public Object addAllStudent(List<String> studentIds, Integer months, String adminUUID) {
         SysUser user = sysUserMapper.selectByUuid(adminUUID);
         StringBuilder sb = new StringBuilder();
-        for (Integer studentId : studentIds) {
+        for (String studentId : studentIds) {
             // 查询当前人员拥有的充值卡个数
             SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(user.getId().longValue());
             Map<String, Object> flag = new HashMap<>();
             flag.put("index", 1);
-            Student student = studentMapper.selectById(studentId);
+            Student student = studentMapper.selectByUuid(studentId);
             if (!user.getAccount().contains("admin")) {
-                flag = getType(months, Integer.parseInt(schoolHours.getCaptainCoin()), studentId.longValue());
+                flag = getType(months, Integer.parseInt(schoolHours.getCaptainCoin()), student.getId());
             }
             //判断是否需要添加课程
             getStudentUnit(student);

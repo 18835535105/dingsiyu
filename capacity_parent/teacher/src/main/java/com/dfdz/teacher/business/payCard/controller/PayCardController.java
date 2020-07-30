@@ -21,14 +21,14 @@ public class PayCardController {
     /**
      * 一键充值
      *
-     * @param id   学生id
+     * @param studentUUID   学生uuid
      * @param type 有效期充值天数
      * @return
      */
     @ResponseBody
     @PostMapping("/pay")
-    public Object pay(Long id, Integer type,String adminUUID) {
-        if (id == null) {
+    public Object pay(String studentUUID, Integer type,String adminUUID) {
+        if (studentUUID == null) {
             return ServerResponse.createByError(400, "请选择学生");
         }
         if (type == null) {
@@ -36,12 +36,12 @@ public class PayCardController {
 
         }
         // 如果充值日期不是31天也不是92天，初始化充值日期
-        return payCardService.pay(id, type,adminUUID);
+        return payCardService.pay(studentUUID, type,adminUUID);
     }
 
     @RequestMapping("/addMoreStudent")
     @ResponseBody
-    public Object addMoreStudent(Integer[] studentIds, Integer type,String adminUUID) {
+    public Object addMoreStudent(String[] studentIds, Integer type,String adminUUID) {
         if (studentIds == null || studentIds.length == 0) {
             return ServerResponse.createByError(400, "请添加学生");
         }

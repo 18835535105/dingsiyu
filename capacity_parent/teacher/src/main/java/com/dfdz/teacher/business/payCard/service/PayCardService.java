@@ -6,7 +6,7 @@ import com.zhidejiaoyu.common.pojo.PayCard;
 import java.util.List;
 
 public interface PayCardService extends IService<PayCard> {
-    Object pay(Long id, Integer type,String adminUUID);
+    Object pay(String studentUUID, Integer type,String adminUUID);
 
-    Object addAllStudent(List<Integer> asList, Integer type,String adminUUID);
+    Object addAllStudent(List<String> studentIds, Integer type,String adminUUID);
 }
