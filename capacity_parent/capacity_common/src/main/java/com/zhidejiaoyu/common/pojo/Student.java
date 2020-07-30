@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -95,13 +97,13 @@ public class Student extends Model<Student> {
     /**
      * 学生名
      */
-    @Min(value = 2, message = "学生姓名不能少于2个字符！")
-    @Max(value = 20, message = "学生姓名不能超过20个字符！")
+    @Length(min = 2, max = 20, message = "学生姓名字符长度需在2~20之间！")
     private String studentName;
 
     /**
      * 性别 1：男 2：女
      */
+    @Range(min = 1, max = 2, message = "sex 参数非法！")
     private Integer sex;
 
     /**
@@ -112,7 +114,6 @@ public class Student extends Model<Student> {
     /**
      * 出生日期
      */
-    @Past
     private String birthDate;
 
     /**

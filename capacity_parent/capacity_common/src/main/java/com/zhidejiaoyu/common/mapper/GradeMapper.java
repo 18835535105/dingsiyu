@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.mapper.simple;
+package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Grade;
@@ -11,6 +11,6 @@ import com.zhidejiaoyu.common.pojo.Grade;
  * @author zdjy
  * @since 2018-09-06
  */
-public interface SimpleGradeMapper extends BaseMapper<Grade> {
+public interface GradeMapper extends BaseMapper<Grade> {
 
 }

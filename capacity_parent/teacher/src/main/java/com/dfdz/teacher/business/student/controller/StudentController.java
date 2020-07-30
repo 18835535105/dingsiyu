@@ -2,11 +2,13 @@ package com.dfdz.teacher.business.student.controller;
 
 import com.dfdz.teacher.business.student.service.StudentService;
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
+import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.support.StrKit;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.common.vo.student.manage.StudentManageVO;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
  * @author wuchenxi
  * @date 2020-07-29 15:46:33
  */
@@ -40,6 +41,28 @@ public class StudentController {
     }
 
     /**
+     * 教师后台获取需要编辑的学生信息
+     *
+     * @param uuid 学生uuid
+     * @return
+     */
+    @GetMapping("/edit/getEditStudentVoByUuid")
+    public ServerResponse<EditStudentVo> getEditStudentVoByUuid(@RequestParam String uuid) {
+        return studentService.getEditStudentVoByUuid(uuid);
+    }
+
+    /**
+     * 保存编辑后的学生信息
+     *
+     * @param dto
+     * @return
+     */
+    @PostMapping("/edit/saveStudentInfo")
+    ServerResponse<Object> saveStudentInfo(@RequestBody SaveEditStudentInfoDTO dto) {
+        return studentService.saveStudentInfoAfterEdit(dto);
+    }
+
+    /**
      * 生成学生账号和密码，用于学校教师分配给学生
      *
      * @param dto
@@ -51,7 +74,7 @@ public class StudentController {
         if (StrKit.isEmpty(dto.getSchoolName())) {
             return ServerResponse.createByError(400, "请选择学校名称！");
         }
-        if(dto.getAdminUUID()==null){
+        if (dto.getAdminUUID() == null) {
             return ServerResponse.createByError(400, "未传入管理员id！");
         }
         return studentService.createNewStudent(dto);

@@ -1,28 +1,38 @@
 package com.dfdz.teacher.business.student.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dfdz.teacher.business.course.service.CourseService;
 import com.dfdz.teacher.business.student.service.StudentService;
 import com.dfdz.teacher.business.teacher.service.impl.TeacherServiceImpl;
 import com.dfdz.teacher.common.CommonMethod;
+import com.dfdz.teacher.common.log.factory.LogFactory;
+import com.dfdz.teacher.constant.LogNameConst;
 import com.dfdz.teacher.feignclient.CenterUserFeignClient;
 import com.dfdz.teacher.util.RedisOpt;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.constant.ServerNoConstant;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
+import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
+import com.zhidejiaoyu.common.support.StrKit;
 import com.zhidejiaoyu.common.utils.IdUtil;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.common.vo.student.manage.StudentManageVO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +44,7 @@ import java.util.stream.Collectors;
  * @author wuchenxi
  * @date 2020-07-29 15:49:31
  */
+@Slf4j
 @Service
 public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> implements StudentService {
 
@@ -49,6 +60,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Resource
     private CanCreateStudentCountMapper canCreateStudentCountMapper;
 
+    @Resource
+    private GradeMapper gradeMapper;
 
     @Resource
     private CommonMethod commonMethod;
@@ -64,6 +77,12 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
     @Resource
     private CenterUserFeignClient centerUserFeignClient;
+
+    @Resource
+    private TestRecordMapper testRecordMapper;
+
+    @Resource
+    private CourseService courseService;
 
     @Override
     public ServerResponse<PageVo<StudentManageVO>> listStudent(StudentListDto dto) {
@@ -113,7 +132,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             dto.setPhase("小学");
         }
         // 检查当前校区还可生成多少个账号
-        ServerResponse tip = this.checkCanCreateCount(count, dto.getAdminUUID());
+        ServerResponse<Object> tip = this.checkCanCreateCount(count, dto.getAdminUUID());
         if (!Objects.isNull(tip)) {
             return tip;
         }
@@ -155,6 +174,101 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         map.put("message", "成功");
         map.put("url", "student/account/student/createStudent");
         return map;
+    }
+
+    @Override
+    public ServerResponse<EditStudentVo> getEditStudentVoByUuid(String uuid) {
+
+        Student student = studentMapper.selectByUuid(uuid);
+        Grade grade = null;
+        if (student.getClassId() != null) {
+            grade = gradeMapper.selectById(student.getClassId());
+        }
+
+        EditStudentVo vo = new EditStudentVo();
+        vo.setUuid(student.getUuid());
+        vo.setAccount(student.getAccount());
+        vo.setArea(student.getArea());
+        vo.setBirthDay(student.getBirthDate());
+        vo.setCity(student.getCity());
+        vo.setClassName(grade == null ? "未分班" : grade.getClassName());
+        vo.setGrade(student.getGrade());
+        vo.setMail(student.getMail());
+        vo.setNickName(student.getNickname());
+        vo.setPassword(student.getPassword());
+        vo.setPhone(student.getPatriarchPhone());
+        vo.setProvince(student.getProvince());
+        vo.setQq(student.getQq());
+        vo.setRank(student.getRank());
+        vo.setSchoolName(student.getSchoolName());
+        vo.setSex(student.getSex());
+        vo.setStudentName(student.getStudentName());
+        vo.setWish(student.getWish());
+        vo.setVersion(StrKit.parseParentheses(student.getVersion()));
+        return ServerResponse.createBySuccess(vo);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse<Object> saveStudentInfoAfterEdit(SaveEditStudentInfoDTO dto) {
+
+        Student student = new Student();
+        BeanUtils.copyProperties(dto, student);
+
+        Student oldStudent = studentMapper.selectByUuid(dto.getUuid());
+        student.setUpdateTime(new Date());
+        student.setId(oldStudent.getId());
+        int count = studentMapper.updateById(student);
+
+        if (count == 0) {
+            return ServerResponse.createByError();
+        }
+
+        // 判断学生年级是否修改
+        if (!oldStudent.getGrade().equals(student.getGrade()) || (StringUtil.isNotEmpty(oldStudent.getVersion()) && !oldStudent.getVersion().equals(student.getVersion()))) {
+            Integer integer = testRecordMapper.countByGenreAndStudentId(GenreConstant.TEST_BEFORE_STUDY, student.getId());
+            if (oldStudent.getRank() > 7 && integer > 0) {
+                courseService.deleteStudyUnit(student);
+            }
+        }
+        String phase = this.getPhase(student.getGrade());
+        StudentExpansion expansion = studentExpansionMapper.selectByStudentId(oldStudent.getId());
+        expansion.setPhase(phase);
+        studentExpansionMapper.updateById(expansion);
+
+        SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
+
+        LogFactory.saveLog(sysUser.getId(), LogNameConst.UPDATE_STUDENT, sysUser.getAccount() + " -> " + sysUser.getName()
+                + " 修改学生信息：原信息[" + oldStudent.toString() + "]，修改后信息[" + student.toString() + "]；");
+
+        return ServerResponse.createBySuccess();
+    }
+
+
+    private String getPhase(String grade) {
+        String phase;
+        switch (grade) {
+            case "三年级":
+            case "四年级":
+            case "五年级":
+            case "六年级":
+                phase = "小学";
+                break;
+            case "七年级":
+            case "八年级":
+            case "九年级":
+                phase = "初中";
+                break;
+            case "高一":
+            case "高二":
+            case "高三":
+                phase = "高中";
+                break;
+            default:
+                phase = "小学";
+                break;
+        }
+        return phase;
     }
 
     /**

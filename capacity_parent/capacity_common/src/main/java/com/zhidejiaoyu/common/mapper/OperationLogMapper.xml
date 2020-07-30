@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.OperationLogMapper">
+
+    <!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.OperationLog">
+		<id column="id" property="id" />
+        <result column="logtype" property="logtype" />
+		<result column="logname" property="logname" />
+		<result column="userid" property="userid" />
+		<result column="classname" property="classname" />
+		<result column="method" property="method" />
+		<result column="createtime" property="createtime" />
+		<result column="succeed" property="succeed" />
+		<result column="message" property="message" />
+	</resultMap>
+
+	<select id="getOperationLogs" resultType="map">
+		select * from sys_operation_log where 1 = 1
+		<if test="beginTime != null and beginTime !='' and endTime != null and endTime != ''">
+			and (createTime between CONCAT(#{beginTime},' 00:00:00') and CONCAT(#{endTime},' 23:59:59'))
+		</if>
+		<if test="logName != null and logName !=''">
+			and logname like CONCAT('%',#{logName},'%')
+		</if>
+		<if test="logType != null and logType !=''">
+			and logtype like CONCAT('%',#{logType},'%')
+		</if>
+		<choose>
+			<when test="orderByField != null and orderByField !=''">
+				<choose>
+					<when test="isAsc == true">
+						order by ${orderByField} ASC
+					</when>
+					<otherwise>
+						order by ${orderByField} DESC
+					</otherwise>
+				</choose>
+			</when>
+			<otherwise>
+				order by createtime DESC
+			</otherwise>
+		</choose>
+	</select>
+<!--	<select id="selectCampusLogListVo" resultType="com.zhidejiaoyu.common.vo.campus.CampusLogListVo"-->
+<!--			parameterType="map">-->
+<!--		select s.id, s.createtime updateTime, u.name operator, c.name campus, s.logname logName, s.message studentName-->
+<!--		from sys_operation_log s left join sys_user u on s.userid = u.id-->
+<!--		left join teacher t on t.school_admin_id = u.id-->
+<!--		left join campus c on c.teacher_id = u.id-->
+<!--		<where>-->
+<!--			<if test="userId != null">-->
+<!--			and t.school_admin_id = #{userId}-->
+<!--		</if>-->
+<!--		<if test="campus != null and campus != ''">-->
+<!--			and c.name like concat('%', concat(#{campus}, '%'))-->
+<!--		</if>-->
+<!--		<if test="teacherName != null and teacherName != ''">-->
+<!--			and u.name like concat('%', concat(#{teacherName}, '%'))-->
+<!--		</if>-->
+<!--		and s.logname in ('添加提分版课程','删除提分版课程','添加学生计划','删除学生计划','账号生成')-->
+<!--		</where>-->
+<!--		group by s.id-->
+<!--		order by s.createtime desc-->
+<!--	</select>-->
+<!--    <select id="selectByLogId" resultType="com.zhidejiaoyu.common.vo.campus.CampusLogListVo" parameterType="map">-->
+<!--        select date_format(s.createtime, '%Y-%m-%d %H:%i:%s') updateTime,-->
+<!--               u.name                                         operator,-->
+<!--               s.logname                                      logName,-->
+<!--               s.message                                      studentName-->
+<!--        from sys_operation_log s,-->
+<!--             sys_user u-->
+<!--        where s.userid = u.id-->
+<!--          and s.id = #{logId}-->
+<!--    </select>-->
+
+</mapper>

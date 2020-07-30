@@ -1,11 +1,12 @@
 package com.zhidejioayu.center.business.feignclient.student;
 
-import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.ExportRechargePayResultVO;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author: wuchenxi

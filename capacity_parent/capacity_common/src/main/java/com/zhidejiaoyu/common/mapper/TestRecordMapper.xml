@@ -678,5 +678,11 @@
         )
         group by unit_id
     </select>
+    <select id="countByGenreAndStudentId" resultType="int" parameterType="map">
+        select count(id)
+        from test_record
+        where student_id = #{studentId}
+          and genre = #{genre}
+    </select>
 
 </mapper>

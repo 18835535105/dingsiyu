@@ -413,5 +413,14 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      * @return
      */
     List<TestRecord> selectListByUnitIdsAndGenre(@Param("unitIds") List<Long> unitIds, @Param("studentId") Long studentId, @Param("genre") String genre);
+
+    /**
+     * 统计指定类型的测试学生测试次数
+     *
+     * @param genre
+     * @param studentId
+     * @return
+     */
+    Integer countByGenreAndStudentId(@Param("genre") String genre, @Param("studentId") Long studentId);
 }
 

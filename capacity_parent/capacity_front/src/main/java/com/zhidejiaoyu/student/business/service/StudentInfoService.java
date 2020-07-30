@@ -1,12 +1,11 @@
 package com.zhidejiaoyu.student.business.service;
 
 import com.github.pagehelper.PageInfo;
-import com.zhidejiaoyu.common.vo.student.level.ChildMedalVo;
-import com.zhidejiaoyu.common.vo.student.level.LevelVo;
+import com.zhidejiaoyu.common.dto.EndValidTimeDto;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.dto.EndValidTimeDto;
-import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
+import com.zhidejiaoyu.common.vo.student.level.ChildMedalVo;
+import com.zhidejiaoyu.common.vo.student.level.LevelVo;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
@@ -132,11 +131,4 @@ public interface StudentInfoService extends BaseService<Student> {
      */
     void saveGold(String openId, Integer gold);
 
-    /**
-     * 获取教师后台学生需要编辑的信息
-     *
-     * @param uuid
-     * @return
-     */
-    ServerResponse<EditStudentVo> getEditStudentVoByUuid(String uuid);
 }

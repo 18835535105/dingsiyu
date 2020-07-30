@@ -2,10 +2,12 @@ package com.dfdz.teacher.business.student.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
+import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.common.vo.student.manage.StudentManageVO;
 
 /**
@@ -23,4 +25,20 @@ public interface StudentService extends IService<Student> {
     ServerResponse<PageVo<StudentManageVO>> listStudent(StudentListDto dto);
 
     Object createNewStudent(AddNewStudentDto dto);
+
+    /**
+     * 获取教师后台学生需要编辑的信息
+     *
+     * @param uuid
+     * @return
+     */
+    ServerResponse<EditStudentVo> getEditStudentVoByUuid(String uuid);
+
+    /**
+     * 教师后台保存编辑后的学生信息
+     *
+     * @param dto
+     * @return
+     */
+    ServerResponse<Object> saveStudentInfoAfterEdit(SaveEditStudentInfoDTO dto);
 }
