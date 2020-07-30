@@ -5,6 +5,7 @@ import com.zhidejioayu.center.business.feignclient.qy.BaseQyFeignClient;
 import com.zhidejioayu.center.business.feignclient.smallapp.BaseSmallAppFeignClient;
 import com.zhidejioayu.center.business.feignclient.student.BaseStudentFeignClient;
 import com.zhidejioayu.center.business.feignclient.teacher.BaseTeacherInfoFeignClient;
+import com.zhidejioayu.center.business.feignclient.teacher.BaseTeacherPayCardFeignClient;
 import com.zhidejioayu.center.business.feignclient.wxrobot.BaseWxRobotFeignClient;
 import com.zhidejioayu.center.business.util.ServerConfigUtil;
 import feign.Client;
@@ -94,6 +95,16 @@ public class FeignClientUtil {
     }
 
     /**
+     * 获取指定服务的学生feignClient
+     *
+     * @param serverName
+     * @return
+     */
+    public static BaseTeacherPayCardFeignClient getPayCardFeignClient(String serverName) {
+        return builder.target(BaseTeacherPayCardFeignClient.class, PREFIX + serverName+ STUDENT_CONTEXT_PATH);
+    }
+
+    /**
      * 获取指定服务的微信机器人feignClient
      *
      * @param serverName
@@ -158,5 +169,18 @@ public class FeignClientUtil {
         ServerConfig serverConfig = ServerConfigUtil.getByUuid(uuid);
         return getStudentFeignClient(serverConfig.getServerName());
     }
+
+    /**
+     * 根据学生uuid获取学生信息
+     *
+     * @param uuid
+     * @return
+     */
+    public static BaseTeacherPayCardFeignClient getTeacherPayCardFeignClientByUuid(String uuid) {
+        ServerConfig serverConfig = ServerConfigUtil.getByUuid(uuid);
+        return getPayCardFeignClient(serverConfig.getServerName());
+    }
+
+
 
 }

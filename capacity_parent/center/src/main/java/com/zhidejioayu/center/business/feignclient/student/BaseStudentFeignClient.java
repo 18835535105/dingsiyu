@@ -1,5 +1,6 @@
 package com.zhidejioayu.center.business.feignclient.student;
 
+import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.ExportRechargePayResultVO;
@@ -49,10 +50,18 @@ public interface BaseStudentFeignClient {
     /**
      * 教师后台获取需要编辑的学生信息
      *
-     * @param uuid  学生uuid
+     * @param uuid 学生uuid
      * @return
      */
     @GetMapping("/student/edit/getEditStudentVoByUuid")
     ServerResponse<EditStudentVo> getEditStudentVoByUuid(@RequestParam String uuid);
+
+    /**
+     * 教师后台获取需要编辑的学生信息
+     *
+     * @return
+     */
+    @GetMapping("/student/create/createNewStudent")
+    Object createNewStudent(@RequestBody AddNewStudentDto dto);
 }
 

@@ -18,7 +18,7 @@ public interface CourseFeignClient {
     /**
      * 获取课程数据
      */
-    /**
+    /**[]
      * 根据id获取课程数据信息
      *
      * @param id

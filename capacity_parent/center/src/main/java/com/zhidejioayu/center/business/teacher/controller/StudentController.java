@@ -1,6 +1,8 @@
 package com.zhidejioayu.center.business.teacher.controller;
 
+import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
+import com.zhidejiaoyu.common.support.StrKit;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -10,9 +12,7 @@ import com.zhidejioayu.center.business.feignclient.student.BaseStudentFeignClien
 import com.zhidejioayu.center.business.feignclient.teacher.BaseTeacherInfoFeignClient;
 import com.zhidejioayu.center.business.feignclient.util.FeignClientUtil;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -53,5 +53,16 @@ public class StudentController {
         }
         BaseStudentFeignClient baseStudentFeignClientByUuid = FeignClientUtil.getBaseStudentFeignClientByUuid(uuid);
         return baseStudentFeignClientByUuid.getEditStudentVoByUuid(uuid);
+    }
+
+    /**
+     * 生成学生账号和密码，用于学校教师分配给学生
+     *
+     * @param dto
+     */
+    @PostMapping("/create/createNewStudent")
+    public Object createNewStudent(@Valid AddNewStudentDto dto) {
+        BaseStudentFeignClient baseStudentFeignClientByUuid = FeignClientUtil.getBaseStudentFeignClientByUuid(dto.getAdminUUID());
+        return baseStudentFeignClientByUuid.createNewStudent(dto);
     }
 }
