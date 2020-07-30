@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.service.simple;
+package com.zhidejiaoyu.student.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zhidejiaoyu.common.pojo.Grade;
@@ -11,6 +11,6 @@ import com.zhidejiaoyu.common.pojo.Grade;
  * @author zdjy
  * @since 2018-09-06
  */
-public interface SimpleGradeService extends IService<Grade> {
+public interface GradeService extends IService<Grade> {
 
 }

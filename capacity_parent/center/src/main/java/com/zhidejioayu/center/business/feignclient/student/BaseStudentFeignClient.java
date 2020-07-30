@@ -1,6 +1,7 @@
 package com.zhidejioayu.center.business.feignclient.student;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.ExportRechargePayResultVO;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolResult;
 import org.springframework.web.bind.annotation.*;
@@ -44,5 +45,14 @@ public interface BaseStudentFeignClient {
      */
     @GetMapping("/student/getStudentGradeByOpenId")
     String getStudentGradeByOpenId(@RequestParam String openId);
+
+    /**
+     * 教师后台获取需要编辑的学生信息
+     *
+     * @param uuid  学生uuid
+     * @return
+     */
+    @GetMapping("/student/edit/getEditStudentVoByUuid")
+    ServerResponse<EditStudentVo> getEditStudentVoByUuid(@RequestParam String uuid);
 }
 

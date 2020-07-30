@@ -16,6 +16,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
+import com.zhidejiaoyu.common.support.StrKit;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.DurationUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -24,7 +25,10 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.vo.student.level.LevelVo;
+import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.student.business.service.StudentInfoService;
+import com.zhidejiaoyu.student.business.service.GradeService;
+import com.zhidejiaoyu.student.business.service.StudentExpansionService;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.WorshipRedisOpt;
 import com.zhidejiaoyu.student.common.validTime.GetValidTimeTip;
@@ -91,6 +95,12 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Resource
     private WeekActivityRankOpt weekActivityRankOpt;
 
+    @Resource
+    private GradeService gradeService;
+
+    @Resource
+    private StudentExpansionService studentExpansionService;
+
     @Override
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
@@ -110,7 +120,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         this.firstUpdatePasswordAward(studentInfo, oldPassword, newPassword);
 
         try {
-            int count = studentMapper.updateByPrimaryKeySelective(studentInfo);
+            int count = studentMapper.updateById(studentInfo);
             session.setAttribute(UserConstant.CURRENT_STUDENT, studentInfo);
             return count > 0 ? ServerResponse.createBySuccessMessage(tip)
                     : ServerResponse.createByErrorMessage("信息完善失败！");
@@ -618,6 +628,38 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         GoldLogUtil.saveStudyGoldLog(student.getId(), "观看夺分队长每日复习学习视频", gold);
     }
 
+    @Override
+    public ServerResponse<EditStudentVo> getEditStudentVoByUuid(String uuid) {
+
+        Student student = studentMapper.selectByUuid(uuid);
+        Grade grade = null;
+        if (student.getClassId() != null) {
+            grade = gradeService.getById(student.getClassId());
+        }
+
+        EditStudentVo vo = new EditStudentVo();
+        vo.setUuid(student.getUuid());
+        vo.setAccount(student.getAccount());
+        vo.setArea(student.getArea());
+        vo.setBirthDay(student.getBirthDate());
+        vo.setCity(student.getCity());
+        vo.setClassName(grade == null ? "未分班" : grade.getClassName());
+        vo.setGrade(student.getGrade());
+        vo.setMail(student.getMail());
+        vo.setNickName(student.getNickname());
+        vo.setPassword(student.getPassword());
+        vo.setPhone(student.getPatriarchPhone());
+        vo.setProvince(student.getProvince());
+        vo.setQq(student.getQq());
+        vo.setRank(student.getRank());
+        vo.setSchoolName(student.getSchoolName());
+        vo.setSex(student.getSex());
+        vo.setStudentName(student.getStudentName());
+        vo.setWish(student.getWish());
+        vo.setVersion(StrKit.parseParentheses(student.getVersion()));
+        return ServerResponse.createBySuccess(vo);
+    }
+
     /**
      * 获取已经获取的勋章图片
      *
@@ -710,36 +752,6 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         return childMap;
     }
 
-    /**
-     * 保存学生时长信息
-     *
-     * @param session
-     * @param map
-     * @param loginTime
-     */
-    private void saveDuration(HttpSession session, Map<String, Duration> map, Date loginTime) {
-        map.forEach((key, value) -> {
-            List<Duration> durations = durationMapper.selectByStudentIdAndCourseId(value.getStudentId(), value.getCourseId(),
-                    value.getUnitId(), DateUtil.formatYYYYMMDDHHMMSS(loginTime), Integer.valueOf(key.split(":")[0]));
-            // 如果时长表有本次登录的当前模块时长信息,更新；否则新增时长记录
-            if (durations.size() > 0) {
-                value.setId(durations.get(0).getId());
-                durationMapper.updateById(value);
-            } else {
-                value.setId(null);
-                value.setLoginOutTime(DateUtil.parseYYYYMMDDHHMMSS(new Date()));
-                try {
-                    value.setId(null);
-                    durationMapper.insert(value);
-                } catch (Exception e) {
-                    log.error("保存时长信息出错，当前 key->value => {} -> {}", key, value, e);
-                }
-                map.put(key, value);
-                session.setAttribute(TimeConstant.TOTAL_VALID_TIME, map);
-            }
-        });
-    }
-
     private void toAward(List<Medal> children, Student byWorship, List<Student> list, int[] complete, int[] totalPlan) {
         if (list.size() > 0) {
             Date worshipFirstTime = list.get(0).getWorshipFirstTime();
@@ -762,11 +774,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             // 只有问鼎天下子勋章没有都可领取时才进行勋章点亮操作，如果其子勋章已经全部都能够领取无操作
             if (count != children.size()) {
                 for (int i = 0; i < children.size(); i++) {
-                    if (day < totalPlan[i]) {
-                        complete[i] = day;
-                    } else {
-                        complete[i] = totalPlan[i];
-                    }
+                    complete[i] = Math.min(day, totalPlan[i]);
                 }
                 this.packageOrderMedal(aList, complete, children, awards, totalPlan);
             }

@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.dto.EndValidTimeDto;
+import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.student.business.service.StudentInfoService;
 import com.zhidejiaoyu.student.business.service.simple.SimpleStudentInfoService;
 import lombok.extern.slf4j.Slf4j;
@@ -351,6 +352,17 @@ public class StudentInfoController extends BaseController {
     public String getStudentGradeByOpenId(@RequestParam String openId) {
         Student student = studentInfoService.getByOpenId(openId);
         return student.getGrade();
+    }
+
+    /**
+     * 教师后台获取需要编辑的学生信息
+     *
+     * @param uuid 学生uuid
+     * @return
+     */
+    @GetMapping("/edit/getEditStudentVoByUuid")
+    public ServerResponse<EditStudentVo> getEditStudentVoByUuid(@RequestParam String uuid) {
+        return studentInfoService.getEditStudentVoByUuid(uuid);
     }
 
 }
