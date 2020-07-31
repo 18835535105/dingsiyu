@@ -257,10 +257,12 @@ public class FinishGroupOrUnit {
         LearnNew learnNew = this.judgeHasNextFreeGroup(dto);
 
         // 删除当前学习记录
-        Long learnNewId = dto.getLearnNew().getId();
-        learnExtendMapper.deleteByLearnId(learnNewId);
-        learnNewMapper.deleteById(learnNewId);
-        studentFlowNewMapper.deleteByLearnId(learnNewId);
+        if (dto.getLearnNew() != null) {
+            Long learnNewId = dto.getLearnNew().getId();
+            learnExtendMapper.deleteByLearnId(learnNewId);
+            learnNewMapper.deleteById(learnNewId);
+            studentFlowNewMapper.deleteByLearnId(learnNewId);
+        }
 
         Student student = dto.getStudent();
 
