@@ -23,7 +23,7 @@
 
     <select id="selTeksByUnitIdAndGroup" resultMap="BaseResultMap" parameterType="map">
         select
-        <include refid="teks_base_sql"></include>
+        <include refid="teks_base_sql"/>
         from teks_new teks
         join unit_teks_new unit on teks.id = unit.teks_id
         where
@@ -31,13 +31,17 @@
         and unit.group=#{group}
     </select>
     <select id="getTwentyTeks" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="base_sql"></include> from teks_new order by rand() limit 20
+        select
+        <include refid="base_sql"/>
+        from teks_new order by rand() limit 20
     </select>
 
     <select id="replaceTeks" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="base_sql"></include> from teks_new
+        select
+        <include refid="base_sql"/>
+        from teks_new
         where
-        REPLACE(REPLACE(teks_new, '#', ' '), '$', '')
+        REPLACE(REPLACE(sentence, '#', ' '), '$', '')
         =
         REPLACE(REPLACE(#{sentence},'#', ' '), '$', '')
         limit 1
