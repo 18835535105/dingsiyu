@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.login.controller;
 
+import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 import com.zhidejiaoyu.student.business.controller.BaseController;
@@ -82,10 +83,13 @@ public class LoginController extends BaseController {
         if (session.isNew()) {
             return ServerResponse.createBySuccess();
         }
-        StudyTimeAndMileageVO todayInfo = currentDayOfStudyService.getTodayInfo();
-        if (todayInfo.getMileage() < 4 || todayInfo.getTime() / 60 < 45) {
-            // 小于4个里程或者在线时长小于45分钟不让退出
-            return ServerResponse.createByError(406, "飞行任务还没有完成，请集中注意力，继续飞行！");
+        Object attribute = session.getAttribute(UserConstant.CURRENT_STUDENT);
+        if (attribute != null) {
+            StudyTimeAndMileageVO todayInfo = currentDayOfStudyService.getTodayInfo();
+            if (todayInfo.getMileage() < 4 || todayInfo.getTime() / 60 < 45) {
+                // 小于4个里程或者在线时长小于45分钟不让退出
+                return ServerResponse.createByError(406, "飞行任务还没有完成，请集中注意力，继续飞行！");
+            }
         }
 
         session.invalidate();

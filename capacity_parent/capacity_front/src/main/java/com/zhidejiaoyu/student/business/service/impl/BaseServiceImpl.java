@@ -5,24 +5,28 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
-import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.mapper.LevelMapper;
+import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
+import com.zhidejiaoyu.common.mapper.StudyFlowMapper;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudentExpansion;
+import com.zhidejiaoyu.common.pojo.StudyFlow;
+import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
-import com.zhidejiaoyu.student.common.redis.RedisOpt;
-import com.zhidejiaoyu.student.common.SaveRunLog;
 import com.zhidejiaoyu.student.business.service.BaseService;
+import com.zhidejiaoyu.student.common.SaveRunLog;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.LogManager;
 
 /**
  * @author wuchenxi
