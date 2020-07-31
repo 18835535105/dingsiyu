@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -364,11 +365,13 @@ public interface StudentMapper extends BaseMapper<Student> {
     /**
      * 查询用户列表
      *
+     *
+     * @param page
      * @param dto
      * @param id    学管id
      * @return
      */
-    List<Student> selectStudentManageVO(@Param("dto") StudentListDto dto, @Param("id") Integer id);
+    List<Student> selectStudentManageVO(Page<Student> page, @Param("dto") StudentListDto dto, @Param("id") Integer id);
 
     /**
      * 获取当前校区还可生成的体验账号数量

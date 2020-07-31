@@ -1,5 +1,6 @@
 package com.dfdz.teacher.business.student.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dfdz.teacher.business.course.service.CourseService;
 import com.dfdz.teacher.business.student.service.StudentService;
@@ -9,8 +10,6 @@ import com.dfdz.teacher.common.log.factory.LogFactory;
 import com.dfdz.teacher.constant.LogNameConst;
 import com.dfdz.teacher.feignclient.CenterUserFeignClient;
 import com.dfdz.teacher.util.RedisOpt;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.constant.ServerNoConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
@@ -89,9 +88,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
 
-        PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-        List<Student> students = studentMapper.selectStudentManageVO(dto, sysUser.getId());
-        PageInfo<Student> pageInfo = new PageInfo<>(students);
+        Page<Student> page = new Page<>(dto.getPageNum(), dto.getPageSize());
+        List<Student> students = studentMapper.selectStudentManageVO(page, dto, sysUser.getId());
 
         if (CollectionUtils.isEmpty(students)) {
             PageVo<StudentManageVO> pageVo = PageUtil.packagePage(null, 0L);
@@ -111,7 +109,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             return vo;
         }).collect(Collectors.toList());
 
-        PageVo<StudentManageVO> studentManageVOPageVo = PageUtil.packagePage(collect, pageInfo.getTotal());
+        PageVo<StudentManageVO> studentManageVOPageVo = PageUtil.packagePage(collect, page.getTotal());
         return ServerResponse.createBySuccess(studentManageVOPageVo);
     }
 
@@ -244,31 +242,19 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         return ServerResponse.createBySuccess();
     }
 
-
     private String getPhase(String grade) {
-        String phase;
         switch (grade) {
-            case "三年级":
-            case "四年级":
-            case "五年级":
-            case "六年级":
-                phase = "小学";
-                break;
             case "七年级":
             case "八年级":
             case "九年级":
-                phase = "初中";
-                break;
+                return "初中";
             case "高一":
             case "高二":
             case "高三":
-                phase = "高中";
-                break;
+                return "高中";
             default:
-                phase = "小学";
-                break;
+                return "小学";
         }
-        return phase;
     }
 
     /**
