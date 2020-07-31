@@ -6,7 +6,6 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  * 教师后台修改学生信息保存数据dto
@@ -34,7 +33,7 @@ public class SaveEditStudentInfoDTO {
      */
     private Long classId;
 
-    @Size(min = 6, max = 10, message = "密码长度必须在6~10之间！")
+    @Length(min = 6, max = 10, message = "密码长度必须在6~10之间！")
     private String password;
 
     /**
