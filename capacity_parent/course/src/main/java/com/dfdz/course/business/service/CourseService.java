@@ -47,4 +47,17 @@ public interface CourseService extends IService<CourseNew> {
      * @return
      */
     List<CourseNew> getByIdsGroupByVersion(List<Long> courseIds);
+
+    /**
+     * 获取所有版本
+     *
+     * @param studyParagraph 学段
+     *                       <ul>
+     *                       <li>小学</li>
+     *                       <li>初中</li>
+     *                       <li>高中</li>
+     *                       </ul>
+     * @return
+     */
+    List<String> getAllVersion(String studyParagraph);
 }

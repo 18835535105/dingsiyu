@@ -118,4 +118,19 @@ public class CourseController {
         return courseService.getByCourseNews(courseNews);
     }
 
+    /**
+     * 获取所有版本
+     *
+     * @param studyParagraph 学段
+     *                       <ul>
+     *                       <li>小学</li>
+     *                       <li>初中</li>
+     *                       <li>高中</li>
+     *                       </ul>
+     * @return
+     */
+    @GetMapping("/getAllVersion")
+    public List<String> getAllVersion(@RequestParam(required = false) String studyParagraph) {
+        return courseService.getAllVersion(studyParagraph);
+    }
 }

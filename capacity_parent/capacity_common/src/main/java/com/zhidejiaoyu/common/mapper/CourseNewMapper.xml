@@ -204,6 +204,15 @@
             order by ${orderByClause}
         </if>
     </select>
+    <select id="selectVersionByStudyParagraph" resultType="java.lang.String">
+        select version from course_new
+        <where>
+            <if test="studyParagraph != null and studyParagraph != ''">
+                study_paragraph = #{studyParagraph}
+            </if>
+        </where>
+        group by version
+    </select>
     <sql id="Example_Where_Clause">
         <where>
             <foreach collection="oredCriteria" item="criteria"

@@ -55,4 +55,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
     public List<CourseNew> getByIdsGroupByVersion(List<Long> courseIds) {
         return courseNewMapper.selectByIds(courseIds);
     }
+
+    @Override
+    public List<String> getAllVersion(String studyParagraph) {
+       return courseNewMapper.selectVersionByStudyParagraph(studyParagraph);
+    }
 }

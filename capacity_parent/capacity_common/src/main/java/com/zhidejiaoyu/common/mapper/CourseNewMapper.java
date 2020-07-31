@@ -118,4 +118,12 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
     List<CourseNew> selectExperienceCourses();
 
     List<CourseNew> selectByExample(CourseExample example);
+
+    /**
+     * 根据学段查询版本
+     *
+     * @param studyParagraph 学段
+     * @return
+     */
+    List<String> selectVersionByStudyParagraph(String studyParagraph);
 }
