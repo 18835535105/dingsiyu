@@ -153,12 +153,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
             return newWordsBookVo;
         }).collect(Collectors.toList());
 
-        PageInfo<NewWordsBookVo> newWordsBookVoPageInfo = new PageInfo<>();
-        newWordsBookVoPageInfo.setList(vos);
-        newWordsBookVoPageInfo.setPages(readWordsPageInfo.getPages());
-        newWordsBookVoPageInfo.setTotal(readWordsPageInfo.getTotal());
-
-        return ServerResponse.createBySuccess(PageUtil.packagePage(newWordsBookVoPageInfo));
+        return ServerResponse.createBySuccess(PageUtil.packagePage(vos, readWordsPageInfo.getTotal()));
     }
 
     @Override

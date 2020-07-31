@@ -1,7 +1,6 @@
 package com.zhidejioayu.center.business.wechat.smallapp.serivce.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.PetImageConstant;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
@@ -15,7 +14,6 @@ import com.zhidejioayu.center.business.feignclient.util.FeignClientUtil;
 import com.zhidejioayu.center.business.util.ServerConfigUtil;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeDTO;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.IndexService;
-import com.zhidejioayu.center.business.wechat.smallapp.vo.PrizeVO;
 import com.zhidejioayu.center.business.wechat.smallapp.vo.TotalDataVO;
 import com.zhidejioayu.center.business.wechat.smallapp.vo.index.IndexVO;
 import org.joda.time.DateTime;
@@ -122,12 +120,7 @@ public class IndexServiceImpl extends ServiceImpl<StudentMapper, Student> implem
      * @return
      */
     private ServerResponse<Object> packageDefaultPrize() {
-        PageInfo<PrizeVO> returnPageInfo = new PageInfo<>();
-        returnPageInfo.setTotal(0);
-        returnPageInfo.setList(Collections.emptyList());
-        returnPageInfo.setPages(0);
-
-        return ServerResponse.createBySuccess(PageUtil.packagePage(returnPageInfo));
+        return ServerResponse.createBySuccess(PageUtil.packagePage(Collections.emptyList(), 0L));
     }
 
     @Override

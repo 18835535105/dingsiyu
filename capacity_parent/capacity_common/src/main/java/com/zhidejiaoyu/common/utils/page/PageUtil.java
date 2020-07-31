@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.common.utils.page;
 
-import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import org.apache.commons.lang.StringUtils;
 
@@ -50,20 +49,6 @@ public class PageUtil {
             return Integer.parseInt(request.getParameter(pageSize));
         }
         return 20;
-    }
-
-    /**
-     * 封装响应的分页数据
-     *
-     * @param info
-     * @return
-     */
-    public static <T> PageVo<T> packagePage(PageInfo<T> info) {
-        if (info == null) {
-            return new PageVo<>();
-        }
-
-        return new PageVo<>(info.getList(), info.getPages(), info.getTotal());
     }
 
     /**

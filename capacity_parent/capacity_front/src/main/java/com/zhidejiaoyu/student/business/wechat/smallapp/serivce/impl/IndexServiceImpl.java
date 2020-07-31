@@ -24,7 +24,6 @@ import com.zhidejiaoyu.student.business.wechat.smallapp.vo.index.AdsensesVO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.index.CardVO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.index.IndexVO;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
-import lombok.val;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -160,12 +159,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         List<DurationInfoVO> result = this.packageResultList(durationInfoVos, durationInfos);
 
-        PageInfo<DurationInfoVO> resultPage = new PageInfo<>();
-        resultPage.setTotal(pageInfo.getTotal());
-        resultPage.setPages(pageInfo.getPages());
-        resultPage.setList(result);
-
-        PageVo pageVo = PageUtil.packagePage(resultPage);
+        PageVo pageVo = PageUtil.packagePage(result, pageInfo.getTotal());
         return ServerResponse.createBySuccess(pageVo);
     }
 
@@ -187,12 +181,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 .build())
                 .collect(Collectors.toList());
 
-        PageInfo<PrizeVO> returnPageInfo = new PageInfo<>();
-        returnPageInfo.setTotal(pageInfo.getTotal());
-        returnPageInfo.setList(prizeVos);
-        returnPageInfo.setPages(pageInfo.getPages());
-
-        PageVo pageVo = PageUtil.packagePage(returnPageInfo);
+        PageVo pageVo = PageUtil.packagePage(prizeVos, pageInfo.getTotal());
         return ServerResponse.createBySuccess(pageVo);
     }
 
