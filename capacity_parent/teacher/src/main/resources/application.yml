@@ -33,6 +33,7 @@ server:
     session:
       timeout: 30m
     context-path: /teacher
+  port: 9098
 mybatis:
   type-aliases-package: com.zhidejiaoyu.common.pojo
 

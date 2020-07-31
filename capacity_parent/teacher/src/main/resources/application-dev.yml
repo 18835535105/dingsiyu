@@ -22,8 +22,6 @@ spring:
     sampler:
       # 抽样率，默认是0.1（10%）
       probability: 1.0
-server:
-  port: 9098
 
 ip: 123.56.142.84
 logging:
