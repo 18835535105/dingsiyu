@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
@@ -22,6 +23,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @ServletComponentScan
 @MapperScan(basePackages = {"com.zhidejiaoyu.common.mapper"})
 @EnableRedisHttpSession(redisNamespace = "spring:session:teacher")
+@ComponentScan(basePackages = {"com.zhidejiaoyu.common.config"}, basePackageClasses = {ControllerLogAop.class})
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class})
 public class TeacherApplication {
 

@@ -371,7 +371,7 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @param id    学管id
      * @return
      */
-    List<Student> selectStudentManageVO(Page<Student> page, @Param("dto") StudentListDto dto, @Param("id") Integer id);
+    List<Student> selectStudentManageVO(@Param("page") Page<Student> page, @Param("dto") StudentListDto dto, @Param("id") Integer id);
 
     /**
      * 获取当前校区还可生成的体验账号数量

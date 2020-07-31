@@ -189,11 +189,6 @@
         </dependency>
 
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>com.alibaba.csp</groupId>
 			<artifactId>spring-boot-starter-ahas-sentinel-client</artifactId>
 		</dependency>
