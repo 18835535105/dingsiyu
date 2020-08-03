@@ -21,7 +21,7 @@ public interface SchoolHoursMapper extends BaseMapper<SchoolHours> {
      * @param adminId
      * @return
      */
-    SchoolHours selectByAdminId(@Param("adminId") Long adminId);
+    SchoolHours selectByAdminId(@Param("adminId") Integer adminId);
 
     /**
      * 根据校管id修改课时信息

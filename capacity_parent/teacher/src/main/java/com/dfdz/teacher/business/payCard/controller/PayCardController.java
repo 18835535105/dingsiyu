@@ -2,13 +2,9 @@ package com.dfdz.teacher.business.payCard.controller;
 
 import com.dfdz.teacher.business.payCard.service.PayCardService;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -52,6 +48,15 @@ public class PayCardController {
         return payCardService.addAllStudent(studentIds, type,adminUUID);
     }
 
-
+    /**
+     * 获取学管队长币
+     *
+     * @param openId    学管openId
+     * @return
+     */
+    @GetMapping("/getCapacityCoin")
+    public ServerResponse<Object> getCapacityIcon(@RequestParam String openId) {
+        return payCardService.getCapacityCoin(openId);
+    }
 
 }

@@ -1,14 +1,13 @@
 package com.zhidejioayu.center.business.payCard.controller;
 
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejioayu.center.business.feignclient.teacher.BaseTeacherPayCardFeignClient;
+import com.zhidejioayu.center.business.feignclient.util.FeignClientUtil;
 import com.zhidejioayu.center.business.payCard.service.PayCardService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 
 @RestController
 @RequestMapping("/teacher/payCard")
@@ -20,8 +19,8 @@ public class PayCardController {
     /**
      * 一键充值
      *
-     * @param studentUUID   学生id
-     * @param type 有效期充值天数
+     * @param studentUUID 学生id
+     * @param type        有效期充值天数
      * @return
      */
     @ResponseBody
@@ -41,13 +40,28 @@ public class PayCardController {
 
     @RequestMapping("/addMoreStudent")
     @ResponseBody
-    public Object addMoreStudent(String[] studentIds, Integer type,String adminUUID) {
+    public Object addMoreStudent(String[] studentIds, Integer type, String adminUUID) {
         if (studentIds == null || studentIds.length == 0) {
             return ServerResponse.createByError(400, "请添加学生");
         }
-        if (type == null && type<=0) {
+        if (type == null && type <= 0) {
             return ServerResponse.createByError(400, "请选择充课课时");
         }
-        return payCardService.addAllStudent(studentIds, type,adminUUID);
+        return payCardService.addAllStudent(studentIds, type, adminUUID);
+    }
+
+    /**
+     * 获取学管队长币
+     *
+     * @param openId    学管openId
+     * @return
+     */
+    @GetMapping("/getCapacityCoin")
+    public ServerResponse<Object> getCapacityCoin(String openId) {
+        if(StringUtil.isEmpty(openId)) {
+            return ServerResponse.createByError(400, "openId can't be null!");
+        }
+        BaseTeacherPayCardFeignClient baseTeacherPayCardFeignClientByOpenId = FeignClientUtil.getBaseTeacherPayCardFeignClientByOpenId(openId);
+        return baseTeacherPayCardFeignClientByOpenId.getCapacityCoin(openId);
     }
 }

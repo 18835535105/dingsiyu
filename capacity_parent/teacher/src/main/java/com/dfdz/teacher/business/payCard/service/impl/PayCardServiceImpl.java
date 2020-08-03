@@ -41,7 +41,7 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
         }
         SysUser user = sysUserMapper.selectByUuid(adminUUId);
         // 查询当前人员拥有的充值卡个数
-        SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(user.getId().longValue());
+        SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(user.getId());
         Map<String, Object> flag = new HashMap<>();
         flag.put("index", 1);
         Student student = studentMapper.selectByUuid(studentUUID);
@@ -86,7 +86,7 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
         StringBuilder sb = new StringBuilder();
         for (String studentId : studentIds) {
             // 查询当前人员拥有的充值卡个数
-            SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(user.getId().longValue());
+            SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(user.getId());
             Map<String, Object> flag = new HashMap<>();
             flag.put("index", 1);
             Student student = studentMapper.selectByUuid(studentId);
@@ -128,6 +128,13 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
         return ServerResponse.createBySuccess();
     }
 
+    @Override
+    public ServerResponse<Object> getCapacityCoin(String openId) {
+        SysUser sysUser = sysUserMapper.selectByOpenId(openId);
+        SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(sysUser.getId());
+        return ServerResponse.createBySuccess(schoolHours == null ? 0 : schoolHours.getCaptainCoin());
+    }
+
 
     /**
      * 为学生添加课时
@@ -156,7 +163,7 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
      */
     private void updSchoolHoursIsPay(Integer captainCoins, SysUser user) {
 
-        SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(user.getId().longValue());
+        SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(user.getId());
         Integer captainCoin = Integer.parseInt(schoolHours.getCaptainCoin()) - captainCoins;
         schoolHours.setCaptainCoin(captainCoin.toString());
         schoolHoursMapper.updateById(schoolHours);

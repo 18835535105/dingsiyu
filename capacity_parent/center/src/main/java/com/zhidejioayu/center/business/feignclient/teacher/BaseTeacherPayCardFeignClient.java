@@ -1,5 +1,7 @@
 package com.zhidejioayu.center.business.feignclient.teacher;
 
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,4 +31,13 @@ public interface BaseTeacherPayCardFeignClient {
      */
     @PostMapping("/teacher/payCard/addMoreStudent")
     Object addAllStudent(@RequestBody List<String> studentIds, @RequestParam("type") Integer type, @RequestParam("adminUUID") String adminUUID);
+
+    /**
+     * 获取学管队长币
+     *
+     * @param openId    学管openId
+     * @return
+     */
+    @GetMapping("/payCard/getCapacityCoin")
+    ServerResponse<Object> getCapacityCoin(@RequestParam String openId);
 }

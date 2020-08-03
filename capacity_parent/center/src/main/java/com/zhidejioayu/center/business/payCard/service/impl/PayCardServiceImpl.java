@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 
 @Service
-public class PayCardServicImpl extends ServiceImpl<PayCardMapper, PayCard> implements PayCardService {
+public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> implements PayCardService {
 
     @Override
     public Object pay(String studentUUID, Integer type, String adminUUID) {

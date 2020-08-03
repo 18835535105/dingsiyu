@@ -101,7 +101,7 @@ public class FeignClientUtil {
      * @return
      */
     public static BaseTeacherPayCardFeignClient getPayCardFeignClient(String serverName) {
-        return builder.target(BaseTeacherPayCardFeignClient.class, PREFIX + serverName+ TEACHER_CONTEXT_PATH);
+        return builder.target(BaseTeacherPayCardFeignClient.class, PREFIX + "teacher" + serverName.replace("server", "") + TEACHER_CONTEXT_PATH);
     }
 
     /**
@@ -178,6 +178,17 @@ public class FeignClientUtil {
      */
     public static BaseTeacherPayCardFeignClient getTeacherPayCardFeignClientByUuid(String uuid) {
         ServerConfig serverConfig = ServerConfigUtil.getByUuid(uuid);
+        return getPayCardFeignClient(serverConfig.getServerName());
+    }
+
+    /**
+     * 根据教师openId获取教师信息
+     *
+     * @param openId
+     * @return
+     */
+    public static BaseTeacherPayCardFeignClient getBaseTeacherPayCardFeignClientByOpenId(String openId) {
+        ServerConfig serverConfig = ServerConfigUtil.getServerInfoByTeacherOpenid(openId);
         return getPayCardFeignClient(serverConfig.getServerName());
     }
 
