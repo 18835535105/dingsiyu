@@ -37,9 +37,6 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object pay(String studentUUID, Integer months, String openId) {
-        if (months == null && months > 0) {
-            return ServerResponse.createByError(500, "请添加充课卡");
-        }
         SysUser user = sysUserMapper.selectByOpenId(openId);
         // 查询当前人员拥有的充值卡个数
         SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(user.getId());
@@ -117,11 +114,9 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
                     addPayCard(user, now, student, months, map);
                     addPayLog(student, studentTime, now, null, user);
                 } else {
-                    if (index.equals(1)) {
-                        //为学生添加
-                        addPays(user, now, student, months, studentTime,
-                                Integer.parseInt(flag.get("useCaptainCoin").toString()));
-                    }
+                    //为学生添加
+                    addPays(user, now, student, months, studentTime,
+                            Integer.parseInt(flag.get("useCaptainCoin").toString()));
                 }
             }
         }
@@ -168,8 +163,8 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
     private void updSchoolHoursIsPay(Integer captainCoins, SysUser user) {
 
         SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(user.getId());
-        Integer captainCoin = Integer.parseInt(schoolHours.getCaptainCoin()) - captainCoins;
-        schoolHours.setCaptainCoin(captainCoin.toString());
+        int captainCoin = Integer.parseInt(schoolHours.getCaptainCoin()) - captainCoins;
+        schoolHours.setCaptainCoin(Integer.toString(captainCoin));
         schoolHoursMapper.updateById(schoolHours);
     }
 
@@ -234,14 +229,13 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
      * @param
      */
     private void addPayCard(SysUser user, Date now, Student student, Integer months, Map<String, String> getMap) {
-        StringBuilder build = new StringBuilder();
         StudentHours studentHours = new StudentHours();
         studentHours.setCreateTime(now);
         studentHours.setStudentId(student.getId().intValue());
         studentHours.setAdminId(user.getId());
         studentHours.setType(months + "月课");
         studentHoursMapper.insert(studentHours);
-        getMap.put("cardNos", build.toString());
+        getMap.put("cardNos", "");
     }
 
     /**
@@ -264,9 +258,9 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
      * @return
      */
     private Integer getStudentTime(Student student, Integer months) {
-        Integer time = 30 * months;
+        int time = 30 * months;
         if (student.getAccountTime() != null) {
-            Date accountTime = null;
+            Date accountTime;
             if (System.currentTimeMillis() < student.getAccountTime().getTime()) {
                 accountTime = new Date(student.getAccountTime().getTime() + time * 24 * 60 * 60 * 1000L);
             } else {
@@ -292,7 +286,7 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
         Map<String, Object> map = new HashMap<>();
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(studentId);
         Integer useCaptainCoin = 0;
-        if (expansion.getPhase().equals("小学")) {
+        if (expansion == null || expansion.getPhase().equals("小学")) {
             useCaptainCoin = 300 * months;
             if (captainCoin < useCaptainCoin) {
                 map.put("index", 2);
