@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,6 +45,10 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     private RedisOpt redisOpt;
     @Autowired
     private TestRecordMapper testRecordMapper;
+
+    @Resource
+    private VocabularyMapper vocabularyMapper;
+
 
     @Override
     public Object getSymbolUnit(HttpSession session) {
@@ -166,7 +171,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                             symbolMap2.put("letter", phonetic.getLetter());
                             symbolMap2.put("merge", true);
                             symbolMap2.put("example", lets);
-                            symbolMap2.put("vocabularies", vocabularies);
+                            symbolMap2.put("vocabularies", this.getVocabularies(vocabularies));
                             list.add(symbolMap2);
                             vocabularies = new ArrayList<>();
                             lets = new ArrayList<>();
@@ -175,17 +180,15 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                     symbolMap.put("display", true);
                     symbolMap.put("example", lets);
                     symbolMap.put("vocabularies", vocabularies);
-                    list.add(symbolMap);
                 } else {
                     symbolMap.put("example", split);
                     for (String let : split) {
                         String[] s = let.split(" ");
                         vocabularies.add(s[1].replace("#", ""));
                     }
-                    symbolMap.put("vocabularies", vocabularies);
-                    list.add(symbolMap);
-
+                    symbolMap.put("vocabularies", this.getVocabularies(vocabularies));
                 }
+                list.add(symbolMap);
                 if (isD == 0 && phonetic.getStatus() == 2) {
                     Map<String, Object> sMap = new HashMap<>();
                     sMap.put("title", ".");
@@ -213,6 +216,21 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             capacityStudentUnitMapper.insert(capacityStudentUnit);
         }
         return ServerResponse.createBySuccess(returnList);
+    }
+
+    /**
+     * 组装单词信息
+     *
+     * @param vocabularies
+     * @return
+     */
+    private List<Map<String, String>> getVocabularies(List<String> vocabularies) {
+        if (vocabularies.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Map<String, String>> maps = vocabularyMapper.selectWordAndReadUrlByWords(vocabularies);
+        maps.forEach(m -> m.put("readUrl", GetOssFile.getPublicObjectUrl(m.get("readUrl"))));
+        return maps;
     }
 
     @Override
