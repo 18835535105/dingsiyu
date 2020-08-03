@@ -228,9 +228,22 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         if (vocabularies.isEmpty()) {
             return Collections.emptyList();
         }
+
+        // 单词在数组中的顺序，为了保证音标和单词的顺序能够对应
+        Map<String, Integer> map = new HashMap<>(16);
+        int size = vocabularies.size();
+        for (int i = 0; i < size; i++) {
+            map.put(vocabularies.get(i), i);
+        }
+
         List<Map<String, String>> maps = vocabularyMapper.selectWordAndReadUrlByWords(vocabularies);
-        maps.forEach(m -> m.put("readUrl", GetOssFile.getPublicObjectUrl(m.get("readUrl"))));
-        return maps;
+
+        List<Map<String, String>> returnMap = new ArrayList<>(maps.size());
+        maps.forEach(m -> {
+            m.put("readUrl", GetOssFile.getPublicObjectUrl(m.get("readUrl")));
+            returnMap.add(map.get(m.get("word")), m);
+        });
+        return returnMap;
     }
 
     @Override
