@@ -98,7 +98,6 @@
         <if test="sort==2">
             order by source_power asc
         </if>
-        limit #{start},#{end}
     </select>
     <select id="selectPkNumSortByStudentIds" parameterType="map" resultType="long">
         select
@@ -115,7 +114,6 @@
         <if test="sort==2">
             order by study_power asc
         </if>
-        limit #{start},#{end}
     </select>
 
 </mapper>

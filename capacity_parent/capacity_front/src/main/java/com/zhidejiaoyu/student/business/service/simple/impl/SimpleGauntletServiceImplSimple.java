@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.service.simple.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -22,11 +23,11 @@ import com.zhidejiaoyu.common.vo.GauntletRankVo;
 import com.zhidejiaoyu.common.vo.gauntlet.GauntletSortVo;
 import com.zhidejiaoyu.common.vo.simple.StrengthGameVo;
 import com.zhidejiaoyu.common.vo.simple.StudentGauntletVo;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import com.zhidejiaoyu.student.business.game.service.impl.GameServiceImpl;
 import com.zhidejiaoyu.student.business.service.simple.SimpleIGauntletServiceSimple;
 import com.zhidejiaoyu.student.business.service.simple.SimplePersonalCentreServiceSimple;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
-import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,52 +114,54 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
         long startIndex = (page - 1) * rows;
         Map<String, Object> returnMap = new HashMap<>();
-        returnMap.put("page", page);
-        returnMap.put("rows", rows);
+
         List<Long> studentIds;
         if (type == 2) {
-
-
             // 全国排行（前50名）
             //studentIds = simpleStudentMapper.selectStudentIdByAdminIdOrAll(null);
             //本班排行
-            studentIds = simpleStudentMapper.selectStudentIdByClassIdOrTeacherId(student.getClassId(),student.getTeacherId());
-            returnMap.put("total", studentIds.size() % rows > 0 ? studentIds.size() / rows + 1 : studentIds.size() / rows);
-            studentIds = getRankStudent(vo, studentIds, startIndex, rows);
+            studentIds = simpleStudentMapper.selectStudentIdByClassIdOrTeacherId(student.getClassId(), student.getTeacherId());
         } else {
             // 校区排行（全部学生）
             studentIds = simpleStudentMapper.selectStudentIdByAdminIdOrAll(schoolAdminId);
-
-            returnMap.put("total", studentIds.size() % rows > 0 ? studentIds.size() / rows + 1 : studentIds.size() / rows);
-            studentIds = getRankStudent(vo, studentIds, startIndex, rows);
         }
-        List<StudentGauntletVo> classOrSchoolStudents = new ArrayList<>();
-        getListStudentGauntletVo(classOrSchoolStudents, studentIds);
 
+        PageHelper.startPage(page, rows);
+        List<Long> studentIds1 = getRankStudent(vo, studentIds);
+        PageInfo<Long> pageInfo = new PageInfo<>(studentIds1);
+
+        List<StudentGauntletVo> classOrSchoolStudents = getListStudentGauntletVo(pageInfo.getList());
+
+        returnMap.put("total", pageInfo.getPages());
         returnMap.put("data", classOrSchoolStudents);
+        returnMap.put("page", page);
+        returnMap.put("rows", rows);
+
         return ServerResponse.createBySuccess(returnMap);
     }
 
-    private List<Long> getRankStudent(GauntletSortVo vo, List<Long> studentIds, long startIndex, long endIndex) {
+    private List<Long> getRankStudent(GauntletSortVo vo, List<Long> studentIds) {
         if (vo.getBattle() == null && vo.getPkNum() == null
                 && vo.getSourcePower() == null) {
             vo.setBattle(1);
         }
+
         if (vo.getBattle() != null) {
-            return gauntletMapper.selectSortByStudentId(studentIds, startIndex, endIndex, vo.getBattle());
+           return gauntletMapper.selectSortByStudentId(studentIds, vo.getBattle());
+
         }
         if (vo.getSourcePower() != null) {
-            return simpleStudentExpansionMapper.selectSourcePowerSortByStudentIds(studentIds, startIndex, endIndex, vo.getSourcePower());
+            return  simpleStudentExpansionMapper.selectSourcePowerSortByStudentIds(studentIds, vo.getSourcePower());
         }
         if (vo.getPkNum() != null) {
-            return simpleStudentExpansionMapper.selectPkNumSortByStudentIds(studentIds, startIndex, endIndex, vo.getPkNum());
+            return simpleStudentExpansionMapper.selectPkNumSortByStudentIds(studentIds, vo.getPkNum());
         }
-        return null;
+        return Collections.emptyList();
 
     }
 
-    private void getListStudentGauntletVo(List<StudentGauntletVo> classOrSchoolStudents, List<Long> studentIds) {
-        studentIds.forEach(studentId -> {
+    private List<StudentGauntletVo> getListStudentGauntletVo(List<Long> studentIds) {
+        return studentIds.stream().map(studentId -> {
             StudentGauntletVo vo = new StudentGauntletVo();
             Student student = simpleStudentMapper.selectById(studentId);
             vo.setId(studentId);
@@ -166,8 +169,8 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
             vo.setAccount(student.getAccount());
             vo.setName(student.getNickname());
             getStudentGauntletVo(vo, 2, studentId);
-            classOrSchoolStudents.add(vo);
-        });
+            return vo;
+        }).collect(Collectors.toList());
 
     }
 
@@ -184,7 +187,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         if (pkNum == null) {
             studentGauntletVo.setPkNum(5);
         } else {
-            studentGauntletVo.setPkNum(5 - pkNum > 0 ? 5 - pkNum : 0);
+            studentGauntletVo.setPkNum(Math.max(5 - pkNum, 0));
         }
         //整理挑战数据
         getStudentGauntletVo(studentGauntletVo, 1, student.getId());
@@ -1093,8 +1096,8 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         //查询他人对我发起的总胜利pk次数
         Integer winnerNumberForMe = gauntletMapper.getInformation(studentGauntletVo.getId(), 4);
         StudentExpansion studentExpansion = simpleStudentExpansionMapper.selectByStudentId(studentId);
-        studentGauntletVo.setSourcePower(studentExpansion.getSourcePower() != null ? studentExpansion.getSourcePower() : 0);
-        studentGauntletVo.setStudy(studentExpansion.getStudyPower() != null ? studentExpansion.getStudyPower() : 0);
+        studentGauntletVo.setSourcePower((studentExpansion != null && studentExpansion.getSourcePower() != null) ? studentExpansion.getSourcePower() : 0);
+        studentGauntletVo.setStudy((studentExpansion != null && studentExpansion.getStudyPower() != null) ? studentExpansion.getStudyPower() : 0);
         if (type == 2) {
             Integer pkForMe = gauntletMapper.getCountPkForMe(studentId, studentGauntletVo.getId(), 1);
             pkForMe += gauntletMapper.getCountPkForMe(studentId, studentGauntletVo.getId(), 2);
@@ -1107,7 +1110,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
             }
             getShipController(studentGauntletVo);
         } else {
-            studentGauntletVo.setPkExplain(studentExpansion.getPkExplain());
+            studentGauntletVo.setPkExplain(studentExpansion == null ? 2 : studentExpansion.getPkExplain());
             if (studentExpansion != null) {
                 if (studentExpansion.getIsLook() == 2) {
                     studentGauntletVo.setFirst(true);

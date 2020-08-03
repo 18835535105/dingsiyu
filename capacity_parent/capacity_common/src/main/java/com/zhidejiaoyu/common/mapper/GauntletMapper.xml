@@ -308,7 +308,6 @@
         <if test="sort==2">
             order by count(id) asc
         </if>
-        limit #{start},#{end}
     </select>
 
 

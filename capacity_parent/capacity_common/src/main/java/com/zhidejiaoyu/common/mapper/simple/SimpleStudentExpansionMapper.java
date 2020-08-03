@@ -38,9 +38,7 @@ public interface SimpleStudentExpansionMapper extends BaseMapper<StudentExpansio
 
     List<StudentExpansion> selectAll();
 
-    List<Long> selectSourcePowerSortByStudentIds(@Param("studentIds") List<Long> studentIds, @Param("start") long startIndex,
-                                                 @Param("end") long endIndex, @Param("sort") Integer sort);
+    List<Long> selectSourcePowerSortByStudentIds(@Param("studentIds") List<Long> studentIds, @Param("sort") Integer sort);
 
-    List<Long> selectPkNumSortByStudentIds(@Param("studentIds") List<Long> studentIds, @Param("start") long startIndex,
-                                           @Param("end") long endIndex, @Param("sort") Integer sort);
+    List<Long> selectPkNumSortByStudentIds(@Param("studentIds") List<Long> studentIds, @Param("sort") Integer sort);
 }
