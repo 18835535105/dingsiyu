@@ -121,7 +121,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         String schoolName = dto.getSchoolName();
         String phase = dto.getPhase();
         if (StringUtils.isEmpty(schoolName)) {
-            schoolName = getTeacherExtInfo(dto.getAdminUUID()).getSchool();
+            schoolName = getTeacherExtInfo(dto.getOpenId()).getSchool();
         }
         if (dto.getGrade() == null) {
             dto.setGrade("三年级");
@@ -130,15 +130,16 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             dto.setPhase("小学");
         }
         // 检查当前校区还可生成多少个账号
-        ServerResponse<Object> tip = this.checkCanCreateCount(count, dto.getAdminUUID());
+        ServerResponse<Object> tip = this.checkCanCreateCount(count, dto.getOpenId());
         if (!Objects.isNull(tip)) {
             return tip;
         }
 
         Student student;
         Integer teacherId = null;
-        if (getCurrentUserId(dto.getAdminUUID()) != null) {
-            teacherId = getCurrentUserId(dto.getAdminUUID());
+        SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
+        if (sysUser != null) {
+            teacherId = sysUser.getId();
         }
 
         StringBuilder sb = new StringBuilder("生成账号数量：").append(count).append("；生成账号名称：");
@@ -159,7 +160,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 businessUserInfo.setUserUuid(student.getUuid());
                 centerUserFeignClient.getUser(businessUserInfo, ServerNoConstant.SERVER_NO);
                 this.saveOrUpdateStudentExpansion(phase, student);
-                this.pushExperienceCourses(student, phase);
+                this.pushExperienceCourses(student);
             } catch (Exception e) {
                 log.error("批量生成学生信息失败!", e);
                 throw new ServiceException(500, "服务器异常");
@@ -261,9 +262,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
      * 推送体验版课程
      *
      * @param student
-     * @param phase
      */
-    private void pushExperienceCourses(Student student, String phase) {
+    private void pushExperienceCourses(Student student) {
         // 获取所有体验版课程
         List<CourseNew> experienceCourses = courseNewMapper.selectExperienceCourses();
         // 推送体验版课程
@@ -293,12 +293,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         }
     }
 
-    private Integer getCurrentUserId(String adminUUID) {
-        return sysUserMapper.selectByUuid(adminUUID).getId();
-    }
-
-    private Teacher getTeacherExtInfo(String adminUUID) {
-        SysUser sysUser = sysUserMapper.selectByUuid(adminUUID);
+    private Teacher getTeacherExtInfo(String openId) {
+        SysUser sysUser = sysUserMapper.selectByOpenId(openId);
         return teacherMapper.selectTeacherBySchoolAdminId(sysUser.getId());
     }
 
@@ -347,8 +343,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         return student;
     }
 
-    private ServerResponse<Object> checkCanCreateCount(Integer count, String adminUUID) {
-        CreateStudentServiceImpl.CreateCount canCreateCount = CreateStudentServiceImpl.getCanCreateCount(canCreateStudentCountMapper, studentMapper, sysUserMapper, adminUUID);
+    private ServerResponse<Object> checkCanCreateCount(Integer count, String openId) {
+        CreateStudentServiceImpl.CreateCount canCreateCount = CreateStudentServiceImpl.getCanCreateCount(canCreateStudentCountMapper, studentMapper, sysUserMapper, openId);
         if (count > canCreateCount.getCanCreateCount()) {
             return ServerResponse.createByError(400, "最多还可生成 " + canCreateCount.getCanCreateCount() + " 个账号！");
         }

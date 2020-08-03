@@ -11,10 +11,4 @@ import com.zhidejiaoyu.common.pojo.Student;
  */
 public interface CreateStudentService extends IService<Student> {
 
-    /**
-     * 获取当前校区还可生成招生账号的数量
-     *
-     * @return
-     */
-    Object canCreateCount(String adminId);
 }

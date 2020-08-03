@@ -42,5 +42,8 @@ public class AddNewStudentDto {
      */
     private String grade;
 
-    private String adminUUID;
+    /**
+     * 学管openId
+     */
+    private String openId;
 }

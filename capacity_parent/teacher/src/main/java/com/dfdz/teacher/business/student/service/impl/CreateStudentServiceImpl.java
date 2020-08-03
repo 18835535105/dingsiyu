@@ -32,11 +32,6 @@ public class CreateStudentServiceImpl extends ServiceImpl<StudentMapper, Student
     @Resource
     private SysUserMapper sysUserMapper;
 
-    @Override
-    public Object canCreateCount(String amdinUUID) {
-        return getCanCreateCount(canCreateStudentCountMapper, studentMapper, sysUserMapper, amdinUUID);
-    }
-
     /**
      * 获取当前校区还可生成的体验账号个数和配置中最大可生成体验账号个数
      *
@@ -44,8 +39,8 @@ public class CreateStudentServiceImpl extends ServiceImpl<StudentMapper, Student
      * @param studentMapper
      * @return
      */
-    public static CreateCount getCanCreateCount(CanCreateStudentCountMapper canCreateStudentCountMapper, StudentMapper studentMapper, SysUserMapper sysUserMapper, String amdinUUID) {
-        Integer userId = sysUserMapper.selectByUuid(amdinUUID).getId();
+    public static CreateCount getCanCreateCount(CanCreateStudentCountMapper canCreateStudentCountMapper, StudentMapper studentMapper, SysUserMapper sysUserMapper, String openId) {
+        Integer userId = sysUserMapper.selectByOpenId(openId).getId();
         CanCreateStudentCount canCreateStudentCount = canCreateStudentCountMapper.selectBySchoolAdminId(userId);
 
         int configCount = canCreateStudentCount == null ? 30 : canCreateStudentCount.getCanCreateCount();

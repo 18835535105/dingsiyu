@@ -78,7 +78,7 @@ public class StudentController {
      */
     @PostMapping("/create/createNewStudent")
     public Object createNewStudent(@Valid AddNewStudentDto dto) {
-        BaseTeacherInfoFeignClient baseStudentFeignClientByUuid = FeignClientUtil.getBaseTeacherInfoFeignClientByOpenId(dto.getAdminUUID());
+        BaseTeacherInfoFeignClient baseStudentFeignClientByUuid = FeignClientUtil.getBaseTeacherInfoFeignClientByOpenId(dto.getOpenId());
         return baseStudentFeignClientByUuid.createNewStudent(dto);
     }
 }

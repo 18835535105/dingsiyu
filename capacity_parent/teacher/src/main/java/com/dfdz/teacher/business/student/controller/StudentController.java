@@ -5,7 +5,6 @@ import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
 import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
-import com.zhidejiaoyu.common.support.StrKit;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
@@ -71,12 +70,6 @@ public class StudentController {
     @PostMapping("/create/createNewStudent")
     public Object createNewStudent(@Valid AddNewStudentDto dto) {
         checkPhase(dto.getPhase());
-        if (StrKit.isEmpty(dto.getSchoolName())) {
-            return ServerResponse.createByError(400, "请选择学校名称！");
-        }
-        if (dto.getAdminUUID() == null) {
-            return ServerResponse.createByError(400, "未传入管理员id！");
-        }
         return studentService.createNewStudent(dto);
     }
 
