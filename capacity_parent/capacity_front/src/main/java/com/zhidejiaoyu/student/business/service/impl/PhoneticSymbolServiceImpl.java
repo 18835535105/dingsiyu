@@ -229,21 +229,16 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             return Collections.emptyList();
         }
 
-        // 单词在数组中的顺序，为了保证音标和单词的顺序能够对应
-        Map<String, Integer> map = new HashMap<>(16);
-        int size = vocabularies.size();
-        for (int i = 0; i < size; i++) {
-            map.put(vocabularies.get(i), i);
-        }
-
         List<Map<String, String>> maps = courseFeignClient.getWordAndReadUrlByWords(vocabularies);
 
-        List<Map<String, String>> returnMap = new ArrayList<>(maps.size());
+        Map<String, Map<String, String>> wordMap = new HashMap<>(16);
         maps.forEach(m -> {
             m.put("readUrl", GetOssFile.getPublicObjectUrl(m.get("readUrl")));
-            returnMap.add(map.get(m.get("word")), m);
+            wordMap.put(m.get("word"), m);
         });
-        return returnMap;
+
+        // 根据单词顺序排序
+       return vocabularies.stream().map(wordMap::get).collect(Collectors.toList());
     }
 
     @Override
