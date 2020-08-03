@@ -236,7 +236,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             map.put(vocabularies.get(i), i);
         }
 
-        List<Map<String, String>> maps = vocabularyMapper.selectWordAndReadUrlByWords(vocabularies);
+        List<Map<String, String>> maps = courseFeignClient.getWordAndReadUrlByWords(vocabularies);
 
         List<Map<String, String>> returnMap = new ArrayList<>(maps.size());
         maps.forEach(m -> {
