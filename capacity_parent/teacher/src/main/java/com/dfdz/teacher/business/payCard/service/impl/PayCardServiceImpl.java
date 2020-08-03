@@ -3,6 +3,7 @@ package com.dfdz.teacher.business.payCard.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dfdz.teacher.business.course.service.CourseService;
 import com.dfdz.teacher.business.payCard.service.PayCardService;
+import com.zhidejiaoyu.common.dto.wechat.qy.teacher.PayStudentsDTO;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -35,11 +36,11 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object pay(String studentUUID, Integer months, String adminUUId) {
+    public Object pay(String studentUUID, Integer months, String openId) {
         if (months == null && months > 0) {
             return ServerResponse.createByError(500, "请添加充课卡");
         }
-        SysUser user = sysUserMapper.selectByUuid(adminUUId);
+        SysUser user = sysUserMapper.selectByOpenId(openId);
         // 查询当前人员拥有的充值卡个数
         SchoolHours schoolHours = schoolHoursMapper.selectByAdminId(user.getId());
         Map<String, Object> flag = new HashMap<>();
@@ -81,8 +82,11 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
     }
 
     @Override
-    public Object addAllStudent(List<String> studentIds, Integer months, String adminUUID) {
-        SysUser user = sysUserMapper.selectByUuid(adminUUID);
+    public Object addAllStudent(PayStudentsDTO dto) {
+        String openId = dto.getOpenId();
+        List<String> studentIds = dto.getStudentIds();
+        Integer months = dto.getType();
+        SysUser user = sysUserMapper.selectByOpenId(openId);
         StringBuilder sb = new StringBuilder();
         for (String studentId : studentIds) {
             // 查询当前人员拥有的充值卡个数
