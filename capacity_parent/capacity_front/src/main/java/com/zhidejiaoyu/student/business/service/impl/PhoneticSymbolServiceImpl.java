@@ -1,14 +1,15 @@
 package com.zhidejiaoyu.student.business.service.impl;
 
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.vo.study.phonetic.PhoneticSymbolListenVo;
-import com.zhidejiaoyu.common.vo.study.phonetic.Topic;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.common.redis.RedisOpt;
+import com.zhidejiaoyu.common.vo.study.phonetic.PhoneticSymbolListenVo;
+import com.zhidejiaoyu.common.vo.study.phonetic.Topic;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.service.PhoneticSymbolService;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,8 +49,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     private static final Long maxId = 11L;
 
     @Resource
-    private VocabularyMapper vocabularyMapper;
-
+    private CourseFeignClient courseFeignClient;
 
     @Override
     public Object getSymbolUnit(HttpSession session) {
@@ -228,9 +228,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         if (vocabularies.isEmpty()) {
             return Collections.emptyList();
         }
-        List<Map<String, String>> maps = vocabularyMapper.selectWordAndReadUrlByWords(vocabularies);
-        maps.forEach(m -> m.put("readUrl", GetOssFile.getPublicObjectUrl(m.get("readUrl"))));
-        return maps;
+        return courseFeignClient.getWordAndReadUrlByWords(vocabularies);
     }
 
     @Override

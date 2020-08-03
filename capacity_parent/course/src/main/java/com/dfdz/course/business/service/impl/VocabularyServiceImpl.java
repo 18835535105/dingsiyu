@@ -2,6 +2,7 @@ package com.dfdz.course.business.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dfdz.course.business.service.VocabularyService;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.UnitVocabularyNewMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
@@ -56,6 +57,13 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
     public String getVocabularyChinsesByWordId(String word) {
         Vocabulary vocabulary = vocabularyMapper.selectByWord(word);
         return vocabulary != null ? vocabulary.getWordChinese() : null;
+    }
+
+    @Override
+    public List<Map<String, String>> getWordAndReadUrlByWords(List<String> words) {
+        List<Map<String, String>> maps = vocabularyMapper.selectWordAndReadUrlByWords(words);
+        maps.forEach(m -> m.put("readUrl", GetOssFile.getPublicObjectUrl(m.get("readUrl"))));
+        return maps;
     }
 
 

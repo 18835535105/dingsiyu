@@ -106,6 +106,18 @@ public interface CourseFeignClient {
     String getVocabularyChinsesByWordId(@RequestParam("word") String word);
 
     /**
+     * 查询单词及单词读音
+     *
+     * @param words
+     * @return <ul>
+     * <li>key:word</li>
+     * <li>key:readUrl</li>
+     * </ul>
+     */
+    @GetMapping("/vocabulary/getWordAndReadUrlByWords")
+    List<Map<String, String>> getWordAndReadUrlByWords(@RequestParam List<String> words);
+
+    /**
      * 单词获取数据
      */
     /**

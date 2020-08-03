@@ -5,10 +5,7 @@ import com.zhidejiaoyu.common.pojo.Vocabulary;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/course/vocabulary")
@@ -110,8 +107,24 @@ public class VocabularyController {
      * @param word
      */
     @RequestMapping(value = "/getVocabularyChinsesByWordId", method = RequestMethod.GET)
-    public String getVocabularyChinsesByWordId( String word){
+    public String getVocabularyChinsesByWordId(String word) {
         return vocabularyService.getVocabularyChinsesByWordId(word);
     }
 
+    /**
+     * 查询单词及单词读音
+     *
+     * @param words
+     * @return <ul>
+     * <li>key:word</li>
+     * <li>key:readUrl</li>
+     * </ul>
+     */
+    @GetMapping("/getWordAndReadUrlByWords")
+    public List<Map<String, String>> getWordAndReadUrlByWords(@RequestParam List<String> words) {
+        if (words.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return vocabularyService.getWordAndReadUrlByWords(words);
+    }
 }

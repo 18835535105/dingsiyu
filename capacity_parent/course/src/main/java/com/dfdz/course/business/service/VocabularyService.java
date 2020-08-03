@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface VocabularyService extends IService<Vocabulary> {
 
-    Integer countLearnVocabularyByUnitIdAndGroup(Long unitId,Integer group);
+    Integer countLearnVocabularyByUnitIdAndGroup(Long unitId, Integer group);
 
     List<Long> getWordIdByUnitIdAndGroup(Long unitId, Integer group);
 
@@ -21,4 +21,12 @@ public interface VocabularyService extends IService<Vocabulary> {
     Map<String, Object> selectStudyMap(Long unitId, List<Long> wordIds, Integer type, Integer group);
 
     String getVocabularyChinsesByWordId(String word);
+
+    /**
+     * 查询单词及单词读音
+     *
+     * @param words
+     * @return
+     */
+    List<Map<String, String>> getWordAndReadUrlByWords(List<String> words);
 }
