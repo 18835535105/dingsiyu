@@ -401,4 +401,12 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
                                         @Param("group") Integer group);
 
     List<String> selectChineseByNotVocabularyIds(@Param("wordIds") List<Long> vocabularyIds);
+
+    /**
+     * 查询单词及单词读音地址
+     *
+     * @param words
+     * @return
+     */
+    List<Map<String, String>> selectWordAndReadUrlByWords(@Param("words") List<String> words);
 }

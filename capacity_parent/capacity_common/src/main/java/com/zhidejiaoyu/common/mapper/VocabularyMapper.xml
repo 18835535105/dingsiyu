@@ -836,6 +836,13 @@
         )
         limit 20
     </select>
+    <select id="selectWordAndReadUrlByWords" resultType="java.util.Map" parameterType="map">
+        select word, read_url readUrl from vocabulary where word in (
+        <foreach collection="words" item="word" separator=",">
+            #{word}
+        </foreach>
+        )
+    </select>
 
 
 </mapper>
