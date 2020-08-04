@@ -58,6 +58,16 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
 
     @Override
     public List<String> getAllVersion(String studyParagraph) {
-       return courseNewMapper.selectVersionByStudyParagraph(studyParagraph);
+        return courseNewMapper.selectVersionByStudyParagraph(studyParagraph);
+    }
+
+    @Override
+    public List<Integer> selectCourseIdByVersionAndGradeAndLabel(String version, String grade, String label) {
+        return courseNewMapper.selectCourse(version, grade, label);
+    }
+
+    @Override
+    public List<CourseNew> selectExperienceCourses() {
+        return courseNewMapper.selectExperienceCourses();
     }
 }

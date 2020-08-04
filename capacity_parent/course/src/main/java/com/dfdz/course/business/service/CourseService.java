@@ -60,4 +60,15 @@ public interface CourseService extends IService<CourseNew> {
      * @return
      */
     List<String> getAllVersion(String studyParagraph);
+
+    /**
+     * 使用版本，年级，标签 查看courseId
+     * @param version
+     * @param grade
+     * @param label
+     * @return
+     */
+    List<Integer> selectCourseIdByVersionAndGradeAndLabel(String version, String grade, String label);
+
+    List<CourseNew> selectExperienceCourses();
 }

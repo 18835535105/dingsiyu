@@ -118,6 +118,8 @@ public class CourseController {
         return courseService.getByCourseNews(courseNews);
     }
 
+
+
     /**
      * 获取所有版本
      *
@@ -133,4 +135,22 @@ public class CourseController {
     public List<String> getAllVersion(@RequestParam(required = false) String studyParagraph) {
         return courseService.getAllVersion(studyParagraph);
     }
+
+    /**
+     * 使用版本，年级，标签 查看courseId
+     * @param version
+     * @param grade
+     * @param label
+     * @return
+     */
+    @GetMapping("selectCourseIdByVersionAndGradeAndLabel")
+    public List<Integer> selectCourseIdByVersionAndGradeAndLabel(@RequestParam String version,@RequestParam String grade,@RequestParam String label){
+        return courseService.selectCourseIdByVersionAndGradeAndLabel(version,grade,label);
+    }
+
+    @GetMapping(value = "selectExperienceCourses")
+    public List<CourseNew> selectExperienceCourses(){
+        return courseService.selectExperienceCourses();
+    }
+
 }

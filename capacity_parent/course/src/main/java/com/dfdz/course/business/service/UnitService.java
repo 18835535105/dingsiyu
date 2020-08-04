@@ -20,4 +20,19 @@ public interface UnitService extends IService<UnitNew> {
      * @return
      */
     ServerResponse<Map<Long, Integer>> getMaxGroupByUnitIsdAndType(List<Long> unitIds, Integer type);
+
+    /**
+     * 根据courseIds查询unit信息
+     * @param courseIds
+     * @return
+     */
+    List<UnitNew> getByCourseNews(List<Long> courseIds);
+
+    List<Map<String, Long>> selectMapByGradeListAndVersionAndGrade(String version, List<String> smallGradeList);
+
+    List<Map<String, Long>> selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(Long courseId, Long unitId);
+
+    List<Map<String, Long>> selectIdsMapByCourseNames(List<String> courseNames);
+
+    List<Map<String, Object>> selectMapByIds(List<Long> unitIds);
 }

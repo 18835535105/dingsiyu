@@ -2,6 +2,7 @@ package com.dfdz.teacher.business.course.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dfdz.teacher.business.course.service.CourseService;
+import com.dfdz.teacher.feignclient.CourseFeignClient;
 import com.zhidejiaoyu.common.constant.FlowConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -26,11 +27,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
     @Resource
     private SchoolTimeMapper schoolTimeMapper;
     @Resource
-    private CourseNewMapper courseNewMapper;
-    @Resource
-    private UnitNewMapper unitNewMapper;
-    @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
+    @Resource
+    private CourseFeignClient courseFeignClient;
 
     @Override
     public void deleteStudyUnit(Student student) {
@@ -165,7 +164,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
         if (addList.size() > 0) {
             List<Long> unitIds = new ArrayList<>();
             addList.forEach(map -> unitIds.add(map.get("unitId")));
-            List<Map<String, Object>> maps = unitNewMapper.selectByIds(unitIds);
+            List<Map<String, Object>> maps = courseFeignClient.selectMapByIds(unitIds);
             maps.forEach(map -> {
                 int basePriority = PriorityUtil.getBasePriority(student.getGrade(),
                         map.get("gradeStr") == null || map.get("gradeStr") == "" ? map.get("grade").toString() : map.get("gradeStr").toString(),
@@ -201,23 +200,23 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
     private int getUnitIndex(long courseId, long unitId) {
         List<Long> courseIds = new ArrayList<>();
         //获取当前课程上下册
-        CourseNew courseNew = courseNewMapper.selectById(courseId);
+        CourseNew courseNew = courseFeignClient.getById(courseId);
         courseIds.add(courseNew.getId());
         if (courseNew.getLabel().equals("上册") || courseNew.getLabel().equals("下册")) {
             if (courseNew.getLabel().equals("上册")) {
-                List<Integer> integers = courseNewMapper.selectCourse(courseNew.getVersion(), courseNew.getGrade(), "下册");
+                List<Integer> integers = courseFeignClient.selectCourseIdByVersionAndGradeAndLabel(courseNew.getVersion(), courseNew.getGrade(), "下册");
                 if (integers != null && integers.size() > 0) {
                     courseIds.add(integers.get(0).longValue());
                 }
             }
             if (courseNew.getLabel().equals("下册")) {
-                List<Integer> integers = courseNewMapper.selectCourse(courseNew.getVersion(), courseNew.getGrade(), "上册");
+                List<Integer> integers = courseFeignClient.selectCourseIdByVersionAndGradeAndLabel(courseNew.getVersion(), courseNew.getGrade(), "上册");
                 if (integers != null && integers.size() > 0) {
                     courseIds.add(integers.get(0).longValue());
                 }
             }
         }
-        List<UnitNew> unitNews = unitNewMapper.selectByCourseIds(courseIds);
+        List<UnitNew> unitNews = courseFeignClient.selectByCourseIds(courseIds);
         for (int i = 0; i < unitNews.size(); i++) {
             if (unitNews.get(i).equals(unitId)) {
                 return i + 1;
@@ -264,7 +263,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
      * @return
      */
     private List<Map<String, Long>> getSubjectsResult(SchoolTime schoolTime) {
-        CourseNew courseNew = courseNewMapper.selectById(schoolTime.getCourseId());
+        CourseNew courseNew = courseFeignClient.getById(schoolTime.getCourseId());
         if (courseNew == null) {
             log.debug("未查询到id为"+schoolTime.getCourseId()+"的课程！");
             throw new RuntimeException("未查询到课程！");
@@ -289,7 +288,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
         if (size > 1) {
             List<String> smallGradeList = gradeList.subList(0, size - 1);
             // 当前版本中小于当前年级的所有单元id
-            unitIds.addAll(unitNewMapper.selectMapByGradeListAndVersionAndGrade(courseNew.getVersion(), smallGradeList));
+            unitIds.addAll(courseFeignClient.selectMapByGradeListAndVersionAndGrade(courseNew.getVersion(), smallGradeList));
         }
         // 当前版本中等于当前年级小于或者等于当前单元的所有单元id
         unitIds.addAll(this.getUnitIdsLessThanCurrentUnitId(schoolTime.getCourseId(), schoolTime.getUnitId()));
@@ -305,13 +304,13 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
      * @return
      */
     private List<Map<String, Long>> getUnitIdsLessThanCurrentUnitId(Long courseId, Long unitId) {
-        CourseNew courseNew = courseNewMapper.selectById(courseId);
+        CourseNew courseNew = courseFeignClient.getById(courseId);
         String label = courseNew.getLabel();
         List<String> lessLabels = LabelUtil.getLessThanCurrentLabel(label);
 
         // 说明这个课程只有一个标签
         if (lessLabels.size() == 1 && lessLabels.get(0).equals(label)) {
-            return unitNewMapper.selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(courseId, unitId);
+            return courseFeignClient.selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(courseId, unitId);
         }
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -320,8 +319,8 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
             return stringBuilder.append(courseNew.getVersion()).append("(").append(courseNew.getGrade()).append("-").append(lessLabel).append(")").toString();
         }).collect(Collectors.toList());
 
-        List<Map<String, Long>> resultList = unitNewMapper.selectIdsMapByCourseNames(courseNames);
-        resultList.addAll(unitNewMapper.selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(courseId, unitId));
+        List<Map<String, Long>> resultList = courseFeignClient.selectIdsMapByCourseNames(courseNames);
+        resultList.addAll(courseFeignClient.selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(courseId, unitId));
         return resultList;
     }
 

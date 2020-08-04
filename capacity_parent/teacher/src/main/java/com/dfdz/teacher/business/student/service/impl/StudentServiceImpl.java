@@ -9,6 +9,7 @@ import com.dfdz.teacher.common.CommonMethod;
 import com.dfdz.teacher.common.log.factory.LogFactory;
 import com.dfdz.teacher.constant.LogNameConst;
 import com.dfdz.teacher.feignclient.CenterUserFeignClient;
+import com.dfdz.teacher.feignclient.CourseFeignClient;
 import com.dfdz.teacher.util.RedisOpt;
 import com.zhidejiaoyu.common.constant.ServerNoConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
@@ -72,9 +73,6 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private StudentExpansionMapper studentExpansionMapper;
 
     @Resource
-    private CourseNewMapper courseNewMapper;
-
-    @Resource
     private CenterUserFeignClient centerUserFeignClient;
 
     @Resource
@@ -82,6 +80,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
     @Resource
     private CourseService courseService;
+
+    @Resource
+    private CourseFeignClient courseFeignClient;
 
     @Override
     public ServerResponse<PageVo<StudentManageVO>> listStudent(StudentListDto dto) {
@@ -265,7 +266,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
      */
     private void pushExperienceCourses(Student student) {
         // 获取所有体验版课程
-        List<CourseNew> experienceCourses = courseNewMapper.selectExperienceCourses();
+        List<CourseNew> experienceCourses = courseFeignClient.selectExperienceCourses();
         // 推送体验版课程
         commonMethod.initUnit(student, experienceCourses, null, null);
 

@@ -31,4 +31,29 @@ public class UnitServiceImpl extends ServiceImpl<UnitNewMapper, UnitNew> impleme
         unitIds.forEach(id -> unitGroup.put(id, unitGroupMap.get(id).get("group")));
         return ServerResponse.createBySuccess(unitGroup);
     }
+
+    @Override
+    public List<UnitNew> getByCourseNews(List<Long> courseIds) {
+        return unitNewMapper.selectByCourseIds(courseIds);
+    }
+
+    @Override
+    public List<Map<String, Long>> selectMapByGradeListAndVersionAndGrade(String version, List<String> smallGradeList) {
+        return unitNewMapper.selectMapByGradeListAndVersionAndGrade(version, smallGradeList);
+    }
+
+    @Override
+    public List<Map<String, Long>> selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(Long courseId, Long unitId) {
+        return unitNewMapper.selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(courseId, unitId);
+    }
+
+    @Override
+    public List<Map<String, Long>> selectIdsMapByCourseNames(List<String> courseNames) {
+        return unitNewMapper.selectIdsMapByCourseNames(courseNames);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectMapByIds(List<Long> unitIds) {
+        return unitNewMapper.selectByIds(unitIds);
+    }
 }
