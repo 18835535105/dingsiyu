@@ -33,7 +33,7 @@
         select
         <include refid="base_sql"/>
         from business_user_info
-        where openid = #{openId}
+        where openid like concat('%', #{openId}, '%')
         and (account like 'xg%' or account like 'js%')
         limit 1
     </select>
