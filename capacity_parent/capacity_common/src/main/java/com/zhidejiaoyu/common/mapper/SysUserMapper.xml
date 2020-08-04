@@ -31,7 +31,7 @@
     <select id="selectByOpenId" resultMap="BaseResultMap" parameterType="map">
         select id, account, name, openid
         from sys_user
-        where openid = #{openId}
+        where openid like concat('%', #{openId}, '%')
         limit 1
     </select>
     <select id="selectByAccount" resultMap="BaseResultMap" parameterType="map">
