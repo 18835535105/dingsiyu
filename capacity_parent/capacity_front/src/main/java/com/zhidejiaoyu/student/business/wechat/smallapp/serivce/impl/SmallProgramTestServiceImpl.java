@@ -19,6 +19,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.dto.GetLimitQRCodeDTO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.SmallProgramTestService;
@@ -68,6 +69,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     @Resource
     private WeekActivityRankOpt weekActivityRankOpt;
+    @Resource
+    private CourseFeignClient courseFeignClient;
 
     @Override
     public Object getTest(HttpSession session, String openId) {
@@ -168,7 +171,9 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("studentId", studentId);
         returnMap.put("studentName", student.getNickname());
         returnMap.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
-
+        StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+        CourseNew course = courseFeignClient.getById(studentStudyPlanNew.getCourseId());
+        returnMap.put("courseName",course.getCourseName());
         // 打卡天数（非连续打卡天数）
         int cardDays = clockInMapper.countByStudentId(student.getId());
         returnMap.put("cardDays", cardDays);
