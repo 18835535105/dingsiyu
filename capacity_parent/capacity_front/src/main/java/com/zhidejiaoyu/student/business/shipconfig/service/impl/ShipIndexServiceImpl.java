@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
@@ -25,6 +26,7 @@ import com.zhidejiaoyu.student.business.shipconfig.vo.OtherStudentRankVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.OtherStudentShipIndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.RankVO;
 import com.zhidejiaoyu.student.common.redis.WorshipRedisOpt;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,7 @@ import java.util.stream.Collectors;
  * @author: wuchenxi
  * @date: 2020/2/27 15:29:29
  */
+@Slf4j
 @Service
 public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements ShipIndexService {
 
@@ -245,13 +248,40 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     @Override
-    public ServerResponse<Object> saveMedal(String medalId) {
+    public ServerResponse<Object> saveMedal(String medalId, Integer type) {
 
         Long studentId = getStudentId();
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
-        studentExpansion.setMedalNo(medalId);
+        if (studentExpansion == null) {
+            throw new ServiceException("学生 studentExpansion 信息缺失！");
+        }
+        String medalNo = studentExpansion.getMedalNo();
+        if (StringUtil.isEmpty(medalNo)) {
+            studentExpansion.setMedalNo(medalId);
+            studentExpansionMapper.updateById(studentExpansion);
+            return ServerResponse.createBySuccess();
+        }
+
+        String[] split = medalNo.split(",");
+
+        if (type == 1) {
+            StringBuilder sb = new StringBuilder();
+            for (String s : split) {
+                if (!medalId.equals(s)) {
+                    sb.append(s).append(",");
+                }
+            }
+            studentExpansion.setMedalNo(StringUtils.removeEnd(sb.toString(), ","));
+        } else {
+            if (split.length >= 3) {
+                return ServerResponse.createByError(400, "最多只能选择展示3个勋章！");
+            }
+            studentExpansion.setMedalNo(StringUtils.removeEnd(medalNo, ",") + "," + medalId);
+        }
+
         studentExpansionMapper.updateById(studentExpansion);
         return ServerResponse.createBySuccess();
+
     }
 
     /**
@@ -580,10 +610,12 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         }
 
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
+        int showCount = 0;
         Map<String, String> map = new HashMap<>(16);
         if (studentExpansion != null) {
             String medalNo = studentExpansion.getMedalNo();
             String[] medalNoArr = StringUtil.isEmpty(medalNo) ? new String[0] : medalNo.split(",");
+            showCount = medalNoArr.length;
             for (String s : medalNoArr) {
                 map.put(s, s);
             }
@@ -596,7 +628,12 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             }
         }).collect(Collectors.toList());
 
-        return ServerResponse.createBySuccess(collect);
+        Map<String, Object> returnMap = new HashMap<>(16);
+        // 学生已选择展示的勋章个数
+        returnMap.put("showCount", showCount);
+        returnMap.put("list", collect);
+
+        return ServerResponse.createBySuccess(returnMap);
     }
 
     /**
