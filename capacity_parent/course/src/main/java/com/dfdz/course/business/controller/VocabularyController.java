@@ -149,7 +149,7 @@ public class VocabularyController {
     /**
      * 根据单词id 获取 单词 翻译
      */
-    @RequestMapping(value = "/vocabulary/getVocabularyMapByVocabularys", method = RequestMethod.GET)
+    @GetMapping("/getVocabularyMapByVocabularys")
     public List<Vocabulary> getVocabularyMapByVocabularys(@RequestBody List<Long> vocabularyIds){
         return vocabularyService.getVocabularyMapByVocabularys(vocabularyIds);
     }
