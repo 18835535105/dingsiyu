@@ -8,17 +8,19 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.AwardUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.ship.MedalStatusVO;
+import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.constant.EquipmentTypeConstant;
 import com.zhidejiaoyu.student.business.shipconfig.constant.FileConstant;
 import com.zhidejiaoyu.student.business.shipconfig.dto.ShipConfigInfoDTO;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.util.CalculateUtil;
-import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.OtherStudentRankVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.OtherStudentShipIndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.RankVO;
@@ -565,6 +567,36 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 .successRate(successRate)
                 .radar(this.getRadar(baseValue, stateOfWeek))
                 .build());
+    }
+
+    @Override
+    public ServerResponse<Object> getMedalStatus() {
+
+        Long studentId = super.getStudentId();
+
+        List<MedalStatusVO> vos = medalMapper.selectMedalStatusByStudentId(studentId);
+        if (vos.isEmpty()) {
+            return ServerResponse.createBySuccess(Collections.emptyList());
+        }
+
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
+        Map<String, String> map = new HashMap<>(16);
+        if (studentExpansion != null) {
+            String medalNo = studentExpansion.getMedalNo();
+            String[] medalNoArr = StringUtil.isEmpty(medalNo) ? new String[0] : medalNo.split(",");
+            for (String s : medalNoArr) {
+                map.put(s, s);
+            }
+        }
+
+        List<MedalStatusVO> collect = vos.stream().peek(m -> {
+            m.setImgUrl(GetOssFile.getPublicObjectUrl(m.getImgUrl()));
+            if (map.containsKey(m.getMedalId().toString())) {
+                m.setState(3);
+            }
+        }).collect(Collectors.toList());
+
+        return ServerResponse.createBySuccess(collect);
     }
 
     /**
