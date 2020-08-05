@@ -138,7 +138,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         Date startDate = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
         Date date = new Date();
         Long studentId = student.getId();
-        if (point > PointConstant.EIGHTY) {
+        if (point != 0) {
             TestRecord testRecord = new TestRecord();
             testRecord.setGenre(GenreConstant.SMALLAPP_GENRE);
             testRecord.setStudyModel(StudyModelConstant.SMALLAPP_STUDY_MODEL);
@@ -148,10 +148,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             testRecord.setTestStartTime(startDate);
             returnMap.put("point", point);
             testRecordMapper.insert(testRecord);
-        } else {
-            returnMap.put("point", 0);
         }
-
         int count = clockInMapper.countTodayInfoByStudentId(studentId);
         if (count == 0) {
             this.saveClockIn(studentId);
