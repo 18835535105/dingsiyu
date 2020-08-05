@@ -50,8 +50,6 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     @Resource
     private ErrorLearnLogMapper errorLearnLogMapper;
     @Resource
-    private VocabularyMapper vocabularyMapper;
-    @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
     @Resource
     private TeacherMapper teacherMapper;
@@ -61,7 +59,6 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     private TestRecordMapper testRecordMapper;
     @Resource
     private BaiduSpeak baiduSpeak;
-
     @Resource
     private ClockInMapper clockInMapper;
     @Resource
@@ -78,14 +75,21 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
-        List<Map<String, Object>> maps = errorLearnLogMapper.selectVocabularyByStudentId(student.getId());
-
+        List<Long> voIds = errorLearnLogMapper.selectVocabularyIdByStudentId(student.getId());
+        List<Vocabulary> vos = courseFeignClient.getVocabularyMapByVocabularys(voIds);
+        List<Map<String,Object>> maps=new ArrayList<>();
+        vos.forEach(vo->{
+            Map<String,Object> map=new HashMap<>();
+            map.put("word",vo.getWord());
+            map.put("wordChinese",vo.getWordChinese());
+            map.put("wordId",vo.getId());
+        });
         Map<String, Object> returnMap = new HashMap<>();
         if (maps.size() == 0) {
             //获取优先级最大的单元
             StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(student.getId());
             //获取当前单元的单词
-            List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(studentStudyPlanNew.getUnitId());
+            List<Vocabulary> vocabularies =  courseFeignClient.getVocabularyByUnitId(studentStudyPlanNew.getUnitId());
             vocabularies.forEach(vocabulary -> {
                 Map<String, Object> listMap = new HashMap<>();
                 listMap.put("wordId", vocabulary.getId());
@@ -299,11 +303,10 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     private List<Map<String, Object>> getOptionList(List<Map<String, Object>> getMaps, List<Long> vocabularyIds) {
         //获取干扰项
-        List<String> strings = vocabularyMapper.selectChineseByNotVocabularyIds(vocabularyIds);
+        List<String> strings =  courseFeignClient.selectChineseByNotVocabularyIds(vocabularyIds);
         List<Map<String, Object>> returnList = new ArrayList<>();
         getMaps.forEach(map -> {
             Collections.shuffle(strings);
-
             String wordChinese = map.get("wordChinese").toString();
             List<String> chineses = getAnswer(strings, wordChinese);
             chineses.add(wordChinese);

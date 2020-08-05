@@ -23,5 +23,7 @@ public interface ErrorLearnLogMapper extends BaseMapper<ErrorLearnLog> {
 
     List<Map<String, Object>> selectVocabularyByStudentId(@Param("studentId") Long studentId);
 
+    List<Long> selectVocabularyIdByStudentId(@Param("studentId") Long studentId);
+
     List<ErrorLearnLog> selectVocabularyByStudentIdAndVocabularyIds(@Param("studentId") Long studentId, @Param("vocabularies") List<Long> vocabularyIds);
 }

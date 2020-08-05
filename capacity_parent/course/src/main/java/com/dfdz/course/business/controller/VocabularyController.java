@@ -127,4 +127,30 @@ public class VocabularyController {
         }
         return vocabularyService.getWordAndReadUrlByWords(words);
     }
+
+    /**
+     * 根据单元获取单元全部单词
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/getVocabularyByUnitId")
+    public List<Vocabulary> getVocabularyByUnitId(@RequestParam Long unitId){
+        return vocabularyService.getVocabularyByUnitId(unitId);
+    }
+
+    /**
+     * 获取排除当前数据的中文干扰项
+     */
+    @GetMapping("/selectChineseByNotVocabularyIds")
+    public List<String> selectChineseByNotVocabularyIds(@RequestBody List<Long> vocabularyIds){
+        return vocabularyService.selectChineseByNotVocabularyIds(vocabularyIds);
+    }
+
+    /**
+     * 根据单词id 获取 单词 翻译
+     */
+    @RequestMapping(value = "/vocabulary/getVocabularyMapByVocabularys", method = RequestMethod.GET)
+    public List<Vocabulary> getVocabularyMapByVocabularys(@RequestBody List<Long> vocabularyIds){
+        return vocabularyService.getVocabularyMapByVocabularys(vocabularyIds);
+    }
 }

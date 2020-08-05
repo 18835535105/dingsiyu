@@ -45,7 +45,15 @@
           on log.word_id = voc.id
           where log.type=1
           and log.student_id=#{studentId}
-          order by review_count asc
+          order by log.review_count asc
+          limit 15
+    </select>
+    <select id="selectVocabularyIdByStudentId" parameterType="map" resultType="long">
+        select distinct log.word_id wordId
+          from error_learn_log log
+          where log.type=1
+          and log.student_id=#{studentId}
+          order by log.review_count asc
           limit 15
     </select>
     <select id="selectVocabularyByStudentIdAndVocabularyIds" parameterType="map" resultMap="BaseResultMap">

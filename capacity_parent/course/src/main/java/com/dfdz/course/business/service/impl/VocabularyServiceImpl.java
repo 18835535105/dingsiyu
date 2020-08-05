@@ -66,5 +66,20 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
         return maps;
     }
 
+    @Override
+    public List<Vocabulary> getVocabularyByUnitId(Long unitId) {
+        return vocabularyMapper.selectByUnitId(unitId);
+    }
+
+    @Override
+    public List<String> selectChineseByNotVocabularyIds(List<Long> vocabularyIds) {
+        return vocabularyMapper.selectChineseByNotVocabularyIds(vocabularyIds);
+    }
+
+    @Override
+    public List<Vocabulary> getVocabularyMapByVocabularys(List<Long> vocabularyIds) {
+        return vocabularyMapper.selectByWordIds(vocabularyIds);
+    }
+
 
 }

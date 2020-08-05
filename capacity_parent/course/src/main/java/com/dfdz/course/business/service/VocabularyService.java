@@ -29,4 +29,10 @@ public interface VocabularyService extends IService<Vocabulary> {
      * @return
      */
     List<Map<String, String>> getWordAndReadUrlByWords(List<String> words);
+
+    List<Vocabulary> getVocabularyByUnitId(Long unitId);
+
+    List<String> selectChineseByNotVocabularyIds(List<Long> vocabularyIds);
+
+    List<Vocabulary> getVocabularyMapByVocabularys(List<Long> vocabularyIds);
 }

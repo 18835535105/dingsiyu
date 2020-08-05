@@ -18,7 +18,8 @@ public interface CourseFeignClient {
     /**
      * 获取课程数据
      */
-    /**[]
+    /**
+     * []
      * 根据id获取课程数据信息
      *
      * @param id
@@ -118,6 +119,14 @@ public interface CourseFeignClient {
     List<Map<String, String>> getWordAndReadUrlByWords(@RequestParam List<String> words);
 
     /**
+     * 根据单元获取单元全部单词
+     *
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/vocabulary/getVocabularyByUnitId")
+    List<Vocabulary> getVocabularyByUnitId(@RequestParam Long unitId);
+    /**
      * 单词获取数据
      */
     /**
@@ -176,6 +185,19 @@ public interface CourseFeignClient {
      */
     @GetMapping("/vocabulary/countWordPictureByUnitId/{unitId}/{group}")
     Integer countWordPictureByUnitId(@PathVariable Long unitId, @PathVariable Integer group);
+
+    /**
+     * 获取排除当前数据的中文干扰项
+     */
+    @RequestMapping(value = "/vocabulary/selectChineseByNotVocabularyIds", method = RequestMethod.GET)
+    List<String> selectChineseByNotVocabularyIds(@RequestBody List<Long> vocabularyIds);
+
+
+    /**
+     * 根据单词id 获取 单词 翻译
+     */
+    @RequestMapping(value = "/vocabulary/getVocabularyMapByVocabularys", method = RequestMethod.GET)
+    List<Vocabulary> getVocabularyMapByVocabularys(@RequestBody List<Long> vocabularyIds);
 
     /**
      * 获取单词图鉴下一个学习的数据
