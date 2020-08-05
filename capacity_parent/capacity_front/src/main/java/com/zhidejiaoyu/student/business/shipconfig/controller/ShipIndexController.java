@@ -76,14 +76,15 @@ public class ShipIndexController {
      * 保存学生选择的勋章
      *
      * @param medalId id之间用英文,隔开
+     * @param type 1：卸下；2：展示
      * @return
      */
     @PostMapping("/saveMedal")
-    public ServerResponse<Object> saveMedal(String medalId) {
+    public ServerResponse<Object> saveMedal(String medalId, Integer type) {
         if (StringUtils.isEmpty(medalId)) {
             return ServerResponse.createByError(400, "medalId can't be null!");
         }
-        return shipIndexService.saveMedal(medalId);
+        return shipIndexService.saveMedal(medalId, type);
     }
 
     /**
