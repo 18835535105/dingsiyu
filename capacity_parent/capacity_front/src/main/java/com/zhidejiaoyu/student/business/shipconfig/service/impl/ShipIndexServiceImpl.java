@@ -580,10 +580,12 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         }
 
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
+        int showCount = 0;
         Map<String, String> map = new HashMap<>(16);
         if (studentExpansion != null) {
             String medalNo = studentExpansion.getMedalNo();
             String[] medalNoArr = StringUtil.isEmpty(medalNo) ? new String[0] : medalNo.split(",");
+            showCount = medalNoArr.length;
             for (String s : medalNoArr) {
                 map.put(s, s);
             }
@@ -596,7 +598,12 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             }
         }).collect(Collectors.toList());
 
-        return ServerResponse.createBySuccess(collect);
+        Map<String, Object> returnMap = new HashMap<>(16);
+        // 学生已选择展示的勋章个数
+        returnMap.put("showCount", showCount);
+        returnMap.put("list", collect);
+
+        return ServerResponse.createBySuccess(returnMap);
     }
 
     /**
