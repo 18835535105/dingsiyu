@@ -234,7 +234,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                         currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, fieldId);
                     }
                 }
-                saveErrorLearnLog(getVo.getUnitId(), getVo.getType(), getVo.getEasyOrHard(), getVo.getStudyModel(), learnNew, new Long[]{learnExtend.getWordId()}, null);
+                saveErrorLearnLog(getVo.getUnitId(), getVo.getModel(), getVo.getEasyOrHard(), getVo.getStudyModel(), learnNew, new Long[]{learnExtend.getWordId()}, null);
             }
             int count = learnExtendMapper.insert(learnExtend);
             // 统计初出茅庐勋章
@@ -250,7 +250,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, true, getVo.getType());
             } else {
                 studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, getVo.getType());
-                saveErrorLearnLog(getVo.getUnitId(), getVo.getType(), getVo.getEasyOrHard(), getVo.getStudyModel(), learnNew, new Long[]{learnExtends.get(0).getWordId()}, null);
+                saveErrorLearnLog(getVo.getUnitId(), getVo.getModel(), getVo.getEasyOrHard(), getVo.getStudyModel(), learnNew, new Long[]{learnExtends.get(0).getWordId()}, null);
             }
             // 计算记忆难度
             int memoryDifficult = wordMemoryDifficulty.getMemoryDifficulty(studyCapacity);

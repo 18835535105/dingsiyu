@@ -120,9 +120,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Autowired
     private LetterMapper letterMapper;
 
-    @Autowired
-    private BaiduSpeak baiduSpeak;
-
     @Resource
     private UnitNewMapper unitNewMapper;
     @Resource
@@ -1238,22 +1235,22 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             return 1;
         }
         if (classIfy.equals(1)) {
-            return 3;
+            return 1;
         }
         if (classIfy.equals(2)) {
-            return 4;
+            return 1;
         }
         if (classIfy.equals(3)) {
-            return 5;
+            return 1;
         }
         if (classIfy.equals(4)) {
-            return 7;
+            return 2;
         }
         if (classIfy.equals(5)) {
-            return 8;
+            return 2;
         }
         if (classIfy.equals(6)) {
-            return 10;
+            return 2;
         }
         return 0;
     }
