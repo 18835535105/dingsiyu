@@ -142,7 +142,7 @@ public class VocabularyController {
      * 获取排除当前数据的中文干扰项
      */
     @GetMapping("/selectChineseByNotVocabularyIds")
-    public List<String> selectChineseByNotVocabularyIds(@RequestBody List<Long> vocabularyIds){
+    public List<String> selectChineseByNotVocabularyIds(@RequestParam List<Long> vocabularyIds){
         return vocabularyService.selectChineseByNotVocabularyIds(vocabularyIds);
     }
 
@@ -150,7 +150,7 @@ public class VocabularyController {
      * 根据单词id 获取 单词 翻译
      */
     @GetMapping("/getVocabularyMapByVocabularys")
-    public List<Vocabulary> getVocabularyMapByVocabularys(@RequestBody List<Long> vocabularyIds){
+    public List<Vocabulary> getVocabularyMapByVocabularys(@RequestParam List<Long> vocabularyIds){
         return vocabularyService.getVocabularyMapByVocabularys(vocabularyIds);
     }
 }

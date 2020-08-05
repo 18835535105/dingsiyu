@@ -190,14 +190,14 @@ public interface CourseFeignClient {
      * 获取排除当前数据的中文干扰项
      */
     @RequestMapping(value = "/vocabulary/selectChineseByNotVocabularyIds", method = RequestMethod.GET)
-    List<String> selectChineseByNotVocabularyIds(@RequestBody List<Long> vocabularyIds);
+    List<String> selectChineseByNotVocabularyIds(@RequestParam List<Long> vocabularyIds);
 
 
     /**
      * 根据单词id 获取 单词 翻译
      */
     @RequestMapping(value = "/vocabulary/getVocabularyMapByVocabularys", method = RequestMethod.GET)
-    List<Vocabulary> getVocabularyMapByVocabularys(@RequestBody List<Long> vocabularyIds);
+    List<Vocabulary> getVocabularyMapByVocabularys(@RequestParam List<Long> vocabularyIds);
 
     /**
      * 获取单词图鉴下一个学习的数据
