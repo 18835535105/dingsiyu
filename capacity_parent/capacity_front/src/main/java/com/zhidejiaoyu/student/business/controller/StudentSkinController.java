@@ -2,14 +2,14 @@ package com.zhidejiaoyu.student.business.controller;
 
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.service.StudentSkinService;
 import com.zhidejiaoyu.student.business.service.simple.SimpleStudentSkinServiceSimple;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -24,10 +24,7 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/studentSkin")
 public class StudentSkinController {
 
-    @Autowired
-    private StudentSkinService studentSkinService;
-
-    @Autowired
+    @Resource
     private SimpleStudentSkinServiceSimple simpleStudentSkinServiceSimple;
 
     /**
@@ -80,6 +77,17 @@ public class StudentSkinController {
     @ResponseBody
     public ServerResponse<Object> selUseSkin(HttpSession session) {
         return simpleStudentSkinServiceSimple.selUseSkinById(session);
+    }
+
+    /**
+     * 获取学生正在使用的皮肤url
+     *
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/getUseSkinUrl")
+    public ServerResponse<Object> getUseSkinUrl() {
+        return simpleStudentSkinServiceSimple.getUseSkinUrl();
     }
 
 

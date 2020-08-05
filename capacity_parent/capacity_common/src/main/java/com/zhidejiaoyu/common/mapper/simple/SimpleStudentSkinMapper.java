@@ -39,7 +39,7 @@ public interface SimpleStudentSkinMapper extends BaseMapper<StudentSkin> {
     /**
      * 查询
      */
-    StudentSkin selUseSkinByStudentId(Long studentId);
+    StudentSkin selectUseSkinByStudentId(Long studentId);
 
     /**
      * 根据studentid和skinname查找学生皮肤

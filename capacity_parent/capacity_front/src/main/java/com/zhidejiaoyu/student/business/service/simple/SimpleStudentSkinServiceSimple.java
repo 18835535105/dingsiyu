@@ -58,4 +58,10 @@ public interface SimpleStudentSkinServiceSimple extends SimpleBaseService<Studen
 
     ServerResponse<Object> addStudentSkinByDiamond(HttpSession session, int number, int skinInteger, String imgUrl);
 
+    /**
+     * 获取学生正在使用的皮肤url
+     *
+     * @return
+     */
+    ServerResponse<Object> getUseSkinUrl();
 }
