@@ -190,7 +190,9 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                     .url(GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()))
                     .explain(studentSkin.getSkinName()).build();
         }
-        return null;
+        return IndexVO.Info.builder().id(0L)
+                .url(GetOssFile.getPublicObjectUrl("https://oss.yydz100.com/static/img/draw/theme0.jpg"))
+                .explain("默认皮肤").build();
     }
 
     /**
