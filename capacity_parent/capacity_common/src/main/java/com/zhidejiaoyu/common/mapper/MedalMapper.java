@@ -3,9 +3,9 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Medal;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.vo.ship.MedalStatusVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -92,4 +92,12 @@ public interface MedalMapper extends BaseMapper<Medal> {
      * @return
      */
     List<Medal> selectByParentIds(@Param("parentIds") List<Long> parentIds);
+
+    /**
+     * 获取学生勋章状态
+     *
+     * @param studentId
+     * @return
+     */
+    List<MedalStatusVO> selectMedalStatusByStudentId(@Param("studentId") Long studentId);
 }

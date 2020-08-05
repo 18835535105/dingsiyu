@@ -191,4 +191,14 @@
         )
         order by id asc
     </select>
+    <select id="selectMedalStatusByStudentId" resultType="com.zhidejiaoyu.common.vo.ship.MedalStatusVO"
+            parameterType="map">
+        select m.id medalId, m.marked_words msg, m.child_img_url imgUrl, if(a.get_flag = 1, 1, 2) state
+        from medal m,
+             award a
+        where m.id = a.medal_type
+          and a.type = 3
+          and a.student_id = #{studentId}
+        order by m.id
+    </select>
 </mapper>

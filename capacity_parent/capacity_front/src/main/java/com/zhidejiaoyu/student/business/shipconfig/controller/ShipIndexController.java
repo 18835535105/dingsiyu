@@ -63,6 +63,16 @@ public class ShipIndexController {
     }
 
     /**
+     * 获取学生勋章状态，用于学生选择勋章
+     *
+     * @return
+     */
+    @GetMapping("/getMedalStatus")
+    public ServerResponse<Object> getMedalStatus() {
+        return shipIndexService.getMedalStatus();
+    }
+
+    /**
      * 保存学生选择的勋章
      *
      * @param medalId id之间用英文,隔开

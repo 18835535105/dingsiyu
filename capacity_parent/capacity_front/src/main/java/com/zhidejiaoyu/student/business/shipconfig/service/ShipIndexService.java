@@ -79,4 +79,10 @@ public interface ShipIndexService extends BaseService<Student> {
      */
     ServerResponse<Object> otherIndex(Long studentId);
 
+    /**
+     * 获取学生勋章状态，用于学生选择勋章
+     *
+     * @return
+     */
+    ServerResponse<Object> getMedalStatus();
 }
