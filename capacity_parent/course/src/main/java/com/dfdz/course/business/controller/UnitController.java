@@ -49,7 +49,7 @@ public class UnitController {
      * @return
      */
     @GetMapping(value = "/selectByCourseIds")
-    public List<UnitNew> selectByCourseIds(@RequestBody List<Long> courseIds) {
+    public List<UnitNew> selectByCourseIds(@RequestParam List<Long> courseIds) {
         return unitService.getByCourseNews(courseIds);
     }
 
@@ -84,7 +84,7 @@ public class UnitController {
      * @return
      */
     @GetMapping(value = "/unit/selectIdsMapByCourseNames")
-    public List<Map<String, Long>> selectIdsMapByCourseNames(@RequestBody List<String> courseNames) {
+    public List<Map<String, Long>> selectIdsMapByCourseNames(@RequestParam List<String> courseNames) {
         return unitService.selectIdsMapByCourseNames(courseNames);
     }
 
@@ -94,7 +94,7 @@ public class UnitController {
      * @return
      */
     @RequestMapping(value = "/unit/selectMapByIds", method = RequestMethod.GET)
-    public List<Map<String, Object>> selectMapByIds(@RequestBody List<Long> unitIds){
+    public List<Map<String, Object>> selectMapByIds(@RequestParam List<Long> unitIds){
         return unitService.selectMapByIds(unitIds);
     }
 }

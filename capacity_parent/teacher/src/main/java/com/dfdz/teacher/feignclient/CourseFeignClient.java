@@ -46,7 +46,7 @@ public interface CourseFeignClient {
      * @return
      */
     @RequestMapping(value = "/unit/selectByCourseIds", method = RequestMethod.GET)
-    List<UnitNew> selectByCourseIds(@RequestBody List<Long> courseIds);
+    List<UnitNew> selectByCourseIds(@RequestParam List<Long> courseIds);
 
     /**
      * 查询课程添加单元数据
@@ -75,7 +75,7 @@ public interface CourseFeignClient {
      * @return
      */
     @RequestMapping(value = "/unit/selectIdsMapByCourseNames", method = RequestMethod.GET)
-    List<Map<String, Long>> selectIdsMapByCourseNames(@RequestBody List<String> courseNames);
+    List<Map<String, Long>> selectIdsMapByCourseNames(@RequestParam List<String> courseNames);
 
     /**
      * 使用unitIds获取map
@@ -83,5 +83,5 @@ public interface CourseFeignClient {
      * @return
      */
     @RequestMapping(value = "/unit/selectMapByIds", method = RequestMethod.GET)
-    List<Map<String, Object>> selectMapByIds(@RequestBody List<Long> unitIds);
+    List<Map<String, Object>> selectMapByIds(@RequestParam List<Long> unitIds);
 }
