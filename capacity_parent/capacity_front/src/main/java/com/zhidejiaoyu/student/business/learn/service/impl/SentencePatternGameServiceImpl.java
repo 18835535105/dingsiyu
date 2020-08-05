@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.study.TestPointUtil;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
@@ -38,6 +39,8 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
     private SentenceMapper sentenceMapper;
     @Resource
     private StudentMapper studentMapper;
+    @Resource
+    private BaiduSpeak baiduSpeak;
     @Resource
     private StudentExpansionMapper studentExpansionMapper;
     @Autowired
@@ -100,6 +103,7 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
                 List<String> answers = strings.subList(0, 3);
                 List<String> answersList = new ArrayList<>();
                 String sentence = map.get("sentence").toString().replace("#", " ").replace("$", "");
+                reMap.put("readUrl", baiduSpeak.getSentencePath(map.get("sentence").toString()));
                 answersList.add(sentence);
                 answers.forEach(answer -> answersList.add(answer.replace("#", " ").replace("$", "")));
                 Map<String, Boolean> answerMap = new HashMap<>();
