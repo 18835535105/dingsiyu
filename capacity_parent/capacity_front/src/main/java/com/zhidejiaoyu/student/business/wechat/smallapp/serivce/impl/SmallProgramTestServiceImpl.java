@@ -76,14 +76,17 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
         List<Long> voIds = errorLearnLogMapper.selectVocabularyIdByStudentId(student.getId());
-        List<Vocabulary> vos = courseFeignClient.getVocabularyMapByVocabularys(voIds);
         List<Map<String,Object>> maps=new ArrayList<>();
-        vos.forEach(vo->{
-            Map<String,Object> map=new HashMap<>();
-            map.put("word",vo.getWord());
-            map.put("wordChinese",vo.getWordChinese());
-            map.put("wordId",vo.getId());
-        });
+        if(voIds.size()>0){
+            List<Vocabulary> vos = courseFeignClient.getVocabularyMapByVocabularys(voIds);
+            vos.forEach(vo->{
+                Map<String,Object> map=new HashMap<>();
+                map.put("word",vo.getWord());
+                map.put("wordChinese",vo.getWordChinese());
+                map.put("wordId",vo.getId());
+                maps.add(map);
+            });
+        }
         Map<String, Object> returnMap = new HashMap<>();
         if (maps.size() == 0) {
             //获取优先级最大的单元
