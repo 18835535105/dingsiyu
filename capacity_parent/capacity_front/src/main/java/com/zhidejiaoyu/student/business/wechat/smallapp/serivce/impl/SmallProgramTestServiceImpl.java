@@ -76,14 +76,14 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
         List<Long> voIds = errorLearnLogMapper.selectVocabularyIdByStudentId(student.getId());
-        List<Map<String,Object>> maps=new ArrayList<>();
-        if(voIds.size()>0){
+        List<Map<String, Object>> maps = new ArrayList<>();
+        if (voIds != null && voIds.size() > 0) {
             List<Vocabulary> vos = courseFeignClient.getVocabularyMapByVocabularys(voIds);
-            vos.forEach(vo->{
-                Map<String,Object> map=new HashMap<>();
-                map.put("word",vo.getWord());
-                map.put("wordChinese",vo.getWordChinese());
-                map.put("wordId",vo.getId());
+            vos.forEach(vo -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("word", vo.getWord());
+                map.put("wordChinese", vo.getWordChinese());
+                map.put("wordId", vo.getId());
                 maps.add(map);
             });
         }
@@ -92,7 +92,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             //获取优先级最大的单元
             StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(student.getId());
             //获取当前单元的单词
-            List<Vocabulary> vocabularies =  courseFeignClient.getVocabularyByUnitId(studentStudyPlanNew.getUnitId());
+            List<Vocabulary> vocabularies = courseFeignClient.getVocabularyByUnitId(studentStudyPlanNew.getUnitId());
             vocabularies.forEach(vocabulary -> {
                 Map<String, Object> listMap = new HashMap<>();
                 listMap.put("wordId", vocabulary.getId());
@@ -177,7 +177,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
         CourseNew course = courseFeignClient.getById(studentStudyPlanNew.getCourseId());
-        returnMap.put("courseName",course.getCourseName());
+        returnMap.put("courseName", course.getCourseName());
         // 打卡天数（非连续打卡天数）
         int cardDays = clockInMapper.countByStudentId(student.getId());
         returnMap.put("cardDays", cardDays);
@@ -306,7 +306,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     private List<Map<String, Object>> getOptionList(List<Map<String, Object>> getMaps, List<Long> vocabularyIds) {
         //获取干扰项
-        List<String> strings =  courseFeignClient.selectChineseByNotVocabularyIds(vocabularyIds);
+        List<String> strings = courseFeignClient.selectChineseByNotVocabularyIds(vocabularyIds);
         List<Map<String, Object>> returnList = new ArrayList<>();
         getMaps.forEach(map -> {
             Collections.shuffle(strings);
