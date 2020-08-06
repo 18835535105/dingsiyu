@@ -172,7 +172,8 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 //是否拥有
                 setMap.put("isHave", true);
                 //是否可试用
-                setMap.put("have", false);
+                //have字段为true未使用 false为已使用
+                setMap.put("have", true);
                 Map<String, Object> haveSkinMap = (Map<String, Object>) o;
                 int state = Integer.parseInt(haveSkinMap.get("state").toString());
                 Object endTime = haveSkinMap.get("endTime");
@@ -199,7 +200,6 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 //未拥有皮肤
                 setMap.put("isHave", false);
                 //是否可试用
-                //have字段为false未使用 true为已使用
                 Object o1 = trySkin.get(finalName);
                 if (o1 != null) {
                     Map<String, Object> trySkinMap = (Map<String, Object>) o1;
@@ -210,17 +210,17 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                         setMap.put("use", false);
                     }
                     if (System.currentTimeMillis() < date.getTime()) {
-                        setMap.put("have", false);
+                        setMap.put("have", true);
                         if (state == 1) {
                             setMap.put("use", true);
                         }
                         setMap.put("isUse", true);
                         setMap.put("time", date.getTime() - System.currentTimeMillis());
                     } else {
-                        setMap.put("have", true);
+                        setMap.put("have", false);
                     }
                 } else {
-                    setMap.put("have", true);
+                    setMap.put("have", false);
                     //是否正在使用
                     setMap.put("use", false);
                 }
