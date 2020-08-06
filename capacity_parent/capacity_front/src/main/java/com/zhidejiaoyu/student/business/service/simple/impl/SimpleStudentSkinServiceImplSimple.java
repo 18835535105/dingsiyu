@@ -11,9 +11,9 @@ import com.zhidejiaoyu.common.utils.AwardUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.simple.SimpleConsumeServiceSimple;
 import com.zhidejiaoyu.student.business.service.simple.SimpleStudentSkinServiceSimple;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -28,13 +28,16 @@ import java.util.*;
 @Service
 public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<SimpleStudentSkinMapper, StudentSkin> implements SimpleStudentSkinServiceSimple {
 
-    @Autowired
+    @Resource
     private SimpleStudentSkinMapper simpleStudentSkinMapper;
-    @Autowired
+
+    @Resource
     private SimpleExhumationMapper simpleExhumationMapper;
-    @Autowired
+
+    @Resource
     private SimpleConsumeServiceSimple consumeService;
-    @Autowired
+
+    @Resource
     private SimpleStudentMapper simpleStudentMapper;
 
     /**
@@ -59,21 +62,18 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         } else {
             //判斷擁有皮膚是否已經到期
             if (studentSkin.getEndTime() != null) {
-                Integer integer;
                 if (System.currentTimeMillis() > studentSkin.getEndTime().getTime()) {
                     studentSkin.setEndTime(null);
                     studentSkin.setImgUrl(imgUrl);
                     studentSkin.setState(0);
                     studentSkin.setCreateTime(new Date());
-                    integer = simpleStudentSkinMapper.updUseSkin(studentSkin);
                 } else {
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(studentSkin.getEndTime());
                     //当为使用皮肤時間+30天
                     calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 30);
-                    integer = simpleStudentSkinMapper.updUseSkin(studentSkin);
                 }
-                return integer;
+                return simpleStudentSkinMapper.updUseSkin(studentSkin);
             } else {
                 return 1;
             }
@@ -121,6 +121,18 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
             return ServerResponse.createByError();
         }
         return ServerResponse.createByError();
+    }
+
+    @Override
+    public ServerResponse<Object> getUseSkinUrl() {
+
+        Long studentId = super.getStudentId();
+        StudentSkin studentSkin = simpleStudentSkinMapper.selectUseSkinByStudentId(studentId);
+
+        if (studentSkin != null && studentSkin.getEndTime().getTime() > System.currentTimeMillis()) {
+            return ServerResponse.createBySuccess(GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
+        }
+        return ServerResponse.createBySuccess("https://oss.yydz100.com/static/img/draw/theme0.jpg");
     }
 
     /**
@@ -178,7 +190,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                     }
                 }
                 //是否正在使用
-                setMap.put("use", state == 1 ? true : false);
+                setMap.put("use", state == 1);
                 //合成碎片数量
                 setMap.put("count", 3);
             } else {
@@ -310,7 +322,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                     return ServerResponse.createByError(300, "钻石不足，幸运大转盘等你来获取属于你的幸运大礼！");
                 }
             }
-            StudentSkin aLong = simpleStudentSkinMapper.selUseSkinByStudentId(student.getId());
+            StudentSkin aLong = simpleStudentSkinMapper.selectUseSkinByStudentId(student.getId());
             if (aLong != null) {
                 //当学生使用皮肤不为空则修改已使用皮肤状态
                 StudentSkin skin = new StudentSkin();
@@ -385,7 +397,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         //获取学生信息
         Student student = getStudent(session);
         //根据学生id获取使用的皮肤信息
-        StudentSkin studentSkin = simpleStudentSkinMapper.selUseSkinByStudentId(student.getId());
+        StudentSkin studentSkin = simpleStudentSkinMapper.selectUseSkinByStudentId(student.getId());
         //返回数据放入map集合中
         Map<String, Object> map = new HashMap<>();
         if (studentSkin != null) {

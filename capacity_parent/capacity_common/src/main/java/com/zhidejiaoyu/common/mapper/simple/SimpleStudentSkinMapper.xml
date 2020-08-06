@@ -15,20 +15,21 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-		id, student_id, skin_name, end_time, state, create_time, img_url , type
-	</sql>
+        id, student_id, skin_name, end_time, state, create_time, img_url , type
+    </sql>
 
     <select id="selSkinByStudentId" resultType="map" parameterType="java.lang.Long">
-        select
-        skin_name finalName,state,end_time endTime
-        from student_skin where student_id=#{studentId}
-        and type = 1
-        and
-        (
-        date(end_time) >= date(now())
-        or
-        end_time is null
-        )
+        select skin_name finalName,
+               state,
+               end_time  endTime
+        from student_skin
+        where student_id = #{studentId}
+          and type = 1
+          and (
+                date(end_time) >= date(now())
+                or
+                end_time is null
+            )
         group by finalName
     </select>
 
@@ -54,7 +55,7 @@
         from student_skin where student_id=#{studentId} and (end_time > now() or end_time is null) and state=1
     </select>
 
-    <select id="selUseSkinByStudentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    <select id="selectUseSkinByStudentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
         <include refid="Base_Column_List"/>
         from student_skin where student_id=#{studentId} and state=1
@@ -79,7 +80,12 @@
     </select>
 
     <update id="updUseSkin" parameterType="java.util.Map">
-        update student_skin set state=#{state} , end_time = #{endTime} , img_url=#{imgUrl} , create_time=#{createTime} where id=#{id};
+        update student_skin
+        set state=#{state},
+            end_time = #{endTime},
+            img_url=#{imgUrl},
+            create_time=#{createTime}
+        where id = #{id};
     </update>
 
     <select id="selUseSkinByStudentIdAndName" resultMap="BaseResultMap" parameterType="java.lang.Long">
@@ -89,7 +95,11 @@
     </select>
 
     <select id="selTrySkinAndHaveSkin" resultType="java.util.Map" parameterType="java.lang.Long">
-        select skin_name finalName, state ,end_time endTime from student_skin where student_id=#{id} and type = 2 group by skin_name;
+        select skin_name finalName, state, end_time endTime
+        from student_skin
+        where student_id = #{id}
+          and type = 2
+        group by skin_name;
     </select>
 
 </mapper>
