@@ -49,35 +49,37 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         Long payconfigId = 0L;
         StudentPayConfig studentPayConfig = studentPayConfigMapper.selectByWenXiIdAndDate(openId, date);
         Student student = studentMapper.selectById(studentId);
+        List<PrizeConfig> adminPrizeConfigs = prizeConfigMapper.selectByAdminId(1L);
+        PrizeConfig adminPrizeConfig = adminPrizeConfigs.get(1);
         if (studentPayConfig == null) {
             //获取学校奖品数据
             List<PrizeConfig> prizeConfigs = prizeConfigMapper.selectByAdminId(adminId);
             if (prizeConfigs.size() > 0) {
                 payconfigId = this.getPrize(prizeConfigs).longValue();
-                //获取图片
-                studentPayConfig = new StudentPayConfig()
-                        .setCreateTime(date)
-                        .setPrizeConfigId(payconfigId)
-                        .setWenXinId(openId)
-                        .setObtain("" + date.getTime() + new Random(1000).nextInt())
-                        .setWeChatImgUrl(weChatimgUrl)
-                        .setWeChatName(weChatName)
-                        .setStudentId(studentId);
-                studentPayConfigMapper.insert(studentPayConfig);
-                student.setSystemGold(student.getSystemGold() + 5);
-                studentMapper.updateById(student);
+            } else {
+                payconfigId = adminPrizeConfig.getId();
             }
-
+            studentPayConfig = new StudentPayConfig()
+                    .setCreateTime(date)
+                    .setPrizeConfigId(payconfigId)
+                    .setWenXinId(openId)
+                    .setObtain("" + date.getTime() + new Random(1000).nextInt())
+                    .setWeChatImgUrl(weChatimgUrl)
+                    .setWeChatName(weChatName)
+                    .setStudentId(studentId);
+            studentPayConfigMapper.insert(studentPayConfig);
+            student.setSystemGold(student.getSystemGold() + 5);
+            studentMapper.updateById(student);
         } else {
             payconfigId = studentPayConfig.getPrizeConfigId();
         }
         if (payconfigId > 0) {
             PrizeConfig prizeConfig = prizeConfigMapper.selectById(payconfigId);
-            returnMap.put("prizeName", prizeConfig.getPrizeCount() > 0 ? prizeConfig.getPrizeName() : "谢谢惠顾");
+            returnMap.put("prizeName", prizeConfig.getPrizeCount() > 0 ? prizeConfig.getPrizeName() : "5元优惠卷");
             prizeConfig.setPrizeCount(prizeConfig.getPrizeCount() - 1);
             prizeConfigMapper.updateById(prizeConfig);
         } else {
-            returnMap.put("prizeName", "谢谢惠顾");
+            returnMap.put("prizeName", "5元优惠卷");
         }
 
         JoinSchool joinSchool = joinSchoolMapper.selectByUserId(adminId.intValue());
@@ -92,11 +94,11 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         returnMap.put("adminPhone", sb.toString());
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId.intValue());
         if (shareConfig != null) {
-            returnMap.put("background",GetOssFile.getPublicObjectUrl(shareConfig.getImgUrl()));
+            returnMap.put("background", GetOssFile.getPublicObjectUrl(shareConfig.getImgUrl()));
         } else {
             returnMap.put("background", null);
         }
-        returnMap.put("obtain", studentPayConfig==null?"谢谢参与":studentPayConfig.getObtain());
+        returnMap.put("obtain", studentPayConfig == null ? "谢谢参与" : studentPayConfig.getObtain());
         returnMap.put("campus", teacher.getSchool().replace("体验中心", "校区"));
         return ServerResponse.createBySuccess(returnMap);
     }
@@ -115,7 +117,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
                 .vaildTime(vaildTime)
                 .headPortrait(GetOssFile.getPublicObjectUrl(student.getHeadUrl()))
                 .imgUrl(imgUrl)
-                .learnTime(DateUtil.formatDate(testRecord.getTestEndTime(),DateUtil.YYYYMMDDYEAR))
+                .learnTime(DateUtil.formatDate(testRecord.getTestEndTime(), DateUtil.YYYYMMDDYEAR))
                 .wordCount(wordCount)
                 .weChatList(studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(student.getId()))
                 .point(testRecord.getPoint())
