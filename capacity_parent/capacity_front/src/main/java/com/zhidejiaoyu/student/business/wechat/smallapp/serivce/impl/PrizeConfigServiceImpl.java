@@ -50,7 +50,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         StudentPayConfig studentPayConfig = studentPayConfigMapper.selectByWenXiIdAndDate(openId, date);
         Student student = studentMapper.selectById(studentId);
         List<PrizeConfig> adminPrizeConfigs = prizeConfigMapper.selectByAdminId(1L);
-        PrizeConfig adminPrizeConfig = adminPrizeConfigs.get(1);
+        PrizeConfig adminPrizeConfig = adminPrizeConfigs.get(0);
         if (studentPayConfig == null) {
             //获取学校奖品数据
             List<PrizeConfig> prizeConfigs = prizeConfigMapper.selectByAdminId(adminId);
