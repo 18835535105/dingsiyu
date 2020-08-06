@@ -220,7 +220,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                         setMap.put("have", false);
                     }
                 } else {
-                    setMap.put("have", false);
+                    setMap.put("have", true);
                     //是否正在使用
                     setMap.put("use", false);
                 }
