@@ -172,12 +172,14 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         log.info("定时任务 -> 统计各校区学生充课信息开始。。。");
 
         List<String> serverNames = serverConfigMapper.selectAllServerName();
+        log.info("test1");
         List<ExportRechargePayResultVO> exportRechargePayResultVos = new ArrayList<>();
         serverNames.forEach(serverName -> {
             try {
                 BaseStudentFeignClient studentFeignClient = FeignClientUtil.getStudentFeignClient(serverName);
                 ServerResponse<ExportRechargePayResultVO> exportRechargePayResultVoServerResponse = studentFeignClient.getStudentPayInfo();
                 exportRechargePayResultVos.add(exportRechargePayResultVoServerResponse.getData());
+                log.info("test2");
             } catch (Exception e) {
                 log.error("查询学生需要导出的信息出错！serverName={}", serverName, e);
             }
@@ -191,6 +193,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         List<ExportRechargePayCardCountModel> exportRechargePayCardCountModels = new ArrayList<>();
         List<ExportRechargePayCardModel> exportRechargePayCardModels = new ArrayList<>();
         exportRechargePayResultVos.forEach(exportRechargePayResultVO -> {
+            log.info("test4");
             List<ExportRechargePayCardCountModel> exportRechargePayCardCountModelList = exportRechargePayResultVO.getExportRechargePayCardCountModelList();
             if (!exportRechargePayCardCountModelList.isEmpty()) {
                 exportRechargePayCardCountModels.addAll(exportRechargePayCardCountModelList);
@@ -202,7 +205,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
             }
 
         });
-
+        log.info("test5");
 
         // excel文件名
         String fileName = "充课卡详情表" + System.currentTimeMillis() + ExcelTypeEnum.XLSX.getValue();
@@ -210,14 +213,16 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         ExcelWriterFactory excelWriterFactory = ExcelUtil.writeExcelWithSheetsAndDownload(exportRechargePayCardCountModels, fileName, "学校充课详情", ExportRechargePayCardCountModel.class);
 
         if (CollectionUtils.isNotEmpty(exportRechargePayCardModels)) {
+            log.info("test6");
             excelWriterFactory.write(exportRechargePayCardModels, ExcelUtil.getWriteSheet(2, "学生信息", ExportRechargePayCardModel.class));
             excelWriterFactory.finish();
         }
-
+        log.info("test7");
         this.uploadToOss(fileName);
 
         // 发送邮件
         this.sendEmail(fileName);
+        log.info("test8");
 
         log.info("定时任务 -> 统计各校区学生充课信息完成。");
     }
