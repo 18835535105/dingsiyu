@@ -114,7 +114,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         ReturnAdminVo returnAdminVo = ReturnAdminVo.builder()
                 .adminId(adminId.longValue())
                 .gold(student.getSystemGold().intValue() + student.getOfflineGold().intValue())
-                .vaildTime(vaildTime)
+                .vaildTime(vaildTime != null ? vaildTime / 60 : 0)
                 .headPortrait(GetOssFile.getPublicObjectUrl(student.getHeadUrl()))
                 .imgUrl(imgUrl)
                 .learnTime(DateUtil.formatDate(testRecord.getTestEndTime(), DateUtil.YYYYMMDDYEAR))
