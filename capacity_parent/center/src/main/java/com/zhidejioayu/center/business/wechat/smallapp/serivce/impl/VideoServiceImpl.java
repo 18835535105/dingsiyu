@@ -1,6 +1,7 @@
 package com.zhidejioayu.center.business.wechat.smallapp.serivce.impl;
 
 import com.zhidejiaoyu.common.constant.GradeNameConstant;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.center.BusinessUserInfoMapper;
 import com.zhidejiaoyu.common.mapper.center.StudentWechatVideoMapper;
 import com.zhidejiaoyu.common.mapper.center.WechatVideoMapper;
@@ -60,6 +61,9 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public ServerResponse<Object> getVideo(String openId) {
         BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectStudentInfoByOpenId(openId);
+        if (businessUserInfo == null) {
+            throw new ServiceException("中台服务未查询到openid= " + openId + " 的学生信息！");
+        }
         String userUuid = businessUserInfo.getUserUuid();
         BaseStudentFeignClient baseStudentFeignClientByUuid = FeignClientUtil.getBaseStudentFeignClientByUuid(userUuid);
         String grade = baseStudentFeignClientByUuid.getStudentGradeByOpenId(openId);
