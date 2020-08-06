@@ -90,6 +90,7 @@ public class QyAuthServiceImpl implements QyAuthService {
         String code = httpServletRequest.getParameter("code");
         String userInfoApi = QyApiConstant.getUserInfoApi(code);
         String forObject = restTemplate.getForObject(userInfoApi, String.class);
+        log.info("获取的企业微信用户信息={}", forObject);
         UserInfoVO userInfoVO = JSONObject.parseObject(forObject, UserInfoVO.class);
         if (userInfoVO == null || userInfoVO.getErrcode() != 0) {
             log.error("获取企业微信授权信息失败！msg={}", forObject);
