@@ -41,9 +41,9 @@
         <include refid="base_sql"/>
         from teks_new
         where
-        REPLACE(REPLACE(sentence, '#', ' '), '$', '')
+        REPLACE(REPLACE(REPLACE(sentence, '#', ' '),' ',''), '$', '')
         =
-        REPLACE(REPLACE(#{sentence},'#', ' '), '$', '')
+        REPLACE(REPLACE(REPLACE(#{sentence},'#', ' '),' ',''), '$', '')
         limit 1
     </select>
 
