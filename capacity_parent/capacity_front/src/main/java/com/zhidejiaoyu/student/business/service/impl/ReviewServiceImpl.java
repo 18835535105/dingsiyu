@@ -228,29 +228,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             // 处理结果
             List<TestResultVO> testResults = testResultUtil.getWordTestesForUnit(type, vocabularies.size(), vocabularies, Long.valueOf(unitId));
             return ServerResponse.createBySuccess(testResults);
-        } /*else if (classify >= 4) {
-            List<CapacityReview> reviews = capacityMapper.selectSentenceCapacity(id, unit_id, classify);
-            List<SentenceTranslateVo> vos = new ArrayList<>(reviews.size());
-            if (classify == 4) {
-
-            } else if (classify == 5) {
-
-            } else if (classify == 6) {
-
-            }
-        }*/
-		/*else if() {
-			// 查询记忆追踪需要复习的例句
-			CapacityReview ca = new CapacityReview();
-			ca.setstudentId(id);
-			ca.setUnit_id(Long.valueOf(unit_id));
-			ca.setClassify(classify+"");
-			vocabularies = capacityMapper.selectCapacity(ca);
-
-			// 处理结果
-			List<TestResult> testResults = testResultUtil.getWordTestes(type, vocabularies.size(), vocabularies);
-			return ServerResponse.createBySuccess(testResults);
-		}*/
+        }
         return ServerResponse.createByErrorMessage("选择模块后进行测试!");
     }
 

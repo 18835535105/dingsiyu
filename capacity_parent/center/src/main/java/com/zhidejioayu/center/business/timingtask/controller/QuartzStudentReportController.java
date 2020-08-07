@@ -1,5 +1,6 @@
 package com.zhidejioayu.center.business.timingtask.controller;
 
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.timingtask.service.QuartzStudentReportService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,13 +29,15 @@ public class QuartzStudentReportController {
      * @return
      */
     @GetMapping("/exportStudentWithSchool")
-    public void exportStudentWithSchool() {
+    public ServerResponse<Object> exportStudentWithSchool() {
         quartzStudentReportService.exportStudentWithSchool();
+        return ServerResponse.createBySuccess();
     }
 
     @RequestMapping("/exportStudentPay")
-    public void exportStudentPay() {
+    public ServerResponse<Object> exportStudentPay() {
         quartzStudentReportService.exportStudentPay();
+        return ServerResponse.createBySuccess();
     }
 
 }

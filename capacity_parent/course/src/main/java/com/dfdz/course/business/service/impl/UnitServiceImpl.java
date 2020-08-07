@@ -56,4 +56,19 @@ public class UnitServiceImpl extends ServiceImpl<UnitNewMapper, UnitNew> impleme
     public List<Map<String, Object>> selectMapByIds(List<Long> unitIds) {
         return unitNewMapper.selectByIds(unitIds);
     }
+
+    @Override
+    public List<Long> getUnitIdsByGradeListAndVersionAndGrade(String version, List<String> gradeList) {
+        return unitNewMapper.selectByGradeListAndVersionAndGrade(version, gradeList);
+    }
+
+    @Override
+    public List<Long> getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(Long courseId, Long unitId) {
+        return unitNewMapper.selectLessOrEqualsCurrentIdByCourseIdAndUnitId(courseId, unitId);
+    }
+
+    @Override
+    public List<Long> getUnitIdsByCourseNames(List<String> courseNames) {
+        return unitNewMapper.selectIdsByCourseNames(courseNames);
+    }
 }

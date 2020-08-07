@@ -6,6 +6,7 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.UnitVocabularyNewMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -79,6 +80,11 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
     @Override
     public List<Vocabulary> getVocabularyMapByVocabularys(List<Long> vocabularyIds) {
         return vocabularyMapper.selectByWordIds(vocabularyIds);
+    }
+
+    @Override
+    public List<SubjectsVO> getSubjectsVOByUnitIds(List<Long> unitIds) {
+        return vocabularyMapper.selectSubjectsVOByUnitIds(unitIds);
     }
 
 

@@ -4,6 +4,7 @@ import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.GoldChange;
+import com.zhidejiaoyu.common.constant.FlowConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
@@ -24,7 +25,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.TestResultVo;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
-import com.zhidejiaoyu.common.constant.FlowConstant;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.test.constant.TestConstant;
 import com.zhidejiaoyu.student.business.test.service.BeforeStudyTestService;
@@ -52,15 +53,6 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
     private SchoolTimeMapper schoolTimeMapper;
 
     @Resource
-    private CourseNewMapper courseNewMapper;
-
-    @Resource
-    private UnitNewMapper unitNewMapper;
-
-    @Resource
-    private VocabularyMapper vocabularyMapper;
-
-    @Resource
     private StudentMapper studentMapper;
 
     @Resource
@@ -83,6 +75,9 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
     @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
+
+    @Resource
+    private CourseFeignClient courseFeignClient;
 
     @Override
     public ServerResponse<List<SubjectsVO>> getSubjects() {
@@ -280,10 +275,10 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         testRecord.setPoint(dto.getPoint());
         Long unitId = resultList.get(0).getUnitId();
         testRecord.setUnitId(unitId);
-        testRecord.setCourseId(unitNewMapper.selectById(unitId).getCourseId());
+        testRecord.setCourseId(courseFeignClient.getUnitNewById(unitId).getCourseId());
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
         if (studentExpansion == null) {
-            String phase = courseNewMapper.selectPhaseByUnitId(unitId);
+            String phase = courseFeignClient.getPhaseByUnitId(unitId);
             testRecord.setExplain(phase);
         } else {
             testRecord.setExplain(studentExpansion.getPhase());
@@ -457,7 +452,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * @return
      */
     public Map<Long, Long> getUnitIdAndCourseId(List<Long> unitIds) {
-        List<UnitNew> unitNews = unitNewMapper.selectBatchIds(unitIds);
+        List<UnitNew> unitNews = courseFeignClient.getUnitNewsByIds(unitIds);
         Map<Long, Long> unitIdAndCourseId = new HashMap<>(16);
         unitNews.forEach(unitNew -> unitIdAndCourseId.put(unitNew.getId(), unitNew.getCourseId()));
         return unitIdAndCourseId;
@@ -471,7 +466,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * value:key—->当前单元id；value：当前单元对应的年级或者上下册
      */
     public Map<String, Map<Long, String>> getUnitIdAndGrade(List<Long> unitIds) {
-        List<GradeAndUnitIdDTO> gradeAndUnitIdDTOList = courseNewMapper.selectGradeAndLabelByUnitIds(unitIds);
+        List<GradeAndUnitIdDTO> gradeAndUnitIdDTOList = courseFeignClient.getGradeAndLabelByUnitIds(unitIds);
 
         Map<String, Map<Long, String>> unitIdAndGradeAndLabel = new HashMap<>(16);
 
@@ -497,7 +492,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * @return
      */
     private ServerResponse<List<SubjectsVO>> getSubjectsResult(SchoolTime schoolTime) {
-        CourseNew courseNew = courseNewMapper.selectById(schoolTime.getCourseId());
+        CourseNew courseNew = courseFeignClient.getById(schoolTime.getCourseId());
         if (courseNew == null) {
             log.error("未查询到id为[{}]的课程！", schoolTime.getCourseId());
             throw new ServiceException(500, "未查询到课程！");
@@ -509,7 +504,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         HttpUtil.getHttpSession().setAttribute(TestConstant.TEST_BEFORE_STUDY_UNIT_IDS, unitIds);
 
         // 取题
-        List<SubjectsVO> subjectsVos = vocabularyMapper.selectSubjectsVOByUnitIds(unitIds);
+        List<SubjectsVO> subjectsVos = courseFeignClient.getSubjectsVOByUnitIds(unitIds);
         Map<Long, List<SubjectsVO>> collect = subjectsVos.stream().collect(Collectors.groupingBy(SubjectsVO::getUnitId));
         List<SubjectsVO> result = new ArrayList<>();
 
@@ -517,7 +512,10 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         final int maxSize = 3;
         collect.forEach((unitId, subjectVos) -> {
             Collections.shuffle(subjectVos);
-            List<SubjectsVO> voList = subjectVos.stream().limit(maxSize).collect(Collectors.toList());
+            List<SubjectsVO> voList = subjectVos.stream()
+                    // 去除题目中包含答案的数据
+                    .filter(vo -> StringUtil.isNotEmpty(vo.getWordChinese()) && !vo.getWordChinese().contains(vo.getWord()))
+                    .limit(maxSize).collect(Collectors.toList());
             voList.forEach(vo -> vo.setReadUrl(GetOssFile.getPublicObjectUrl(vo.getReadUrl())));
             result.addAll(voList);
         });
@@ -538,7 +536,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         if (size > 1) {
             List<String> smallGradeList = gradeList.subList(0, size - 1);
             // 当前版本中小于当前年级的所有单元id
-            unitIds.addAll(unitNewMapper.selectByGradeListAndVersionAndGrade(courseNew.getVersion(), smallGradeList));
+            unitIds.addAll(courseFeignClient.getUnitIdsByGradeListAndVersionAndGrade(courseNew.getVersion(), smallGradeList));
         }
         // 当前版本中等于当前年级小于或者等于当前单元的所有单元id
         unitIds.addAll(this.getUnitIdsLessThanCurrentUnitId(schoolTime.getCourseId(), schoolTime.getUnitId()));
@@ -554,13 +552,13 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * @return
      */
     private List<Long> getUnitIdsLessThanCurrentUnitId(Long courseId, Long unitId) {
-        CourseNew courseNew = courseNewMapper.selectById(courseId);
+        CourseNew courseNew = courseFeignClient.getById(courseId);
         String label = courseNew.getLabel();
         List<String> lessLabels = LabelUtil.getLessThanCurrentLabel(label);
 
         // 说明这个课程只有一个标签
         if (lessLabels.size() == 1 && lessLabels.get(0).equals(label)) {
-            return unitNewMapper.selectLessOrEqualsCurrentIdByCourseIdAndUnitId(courseId, unitId);
+            return courseFeignClient.getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(courseId, unitId);
         }
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -569,8 +567,8 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             return stringBuilder.append(courseNew.getVersion()).append("(").append(courseNew.getGrade()).append("-").append(lessLabel).append(")").toString();
         }).collect(Collectors.toList());
 
-        List<Long> resultList = unitNewMapper.selectIdsByCourseNames(courseNames);
-        resultList.addAll(unitNewMapper.selectLessOrEqualsCurrentIdByCourseIdAndUnitId(courseId, unitId));
+        List<Long> resultList = courseFeignClient.getUnitIdsByCourseNames(courseNames);
+        resultList.addAll(courseFeignClient.getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(courseId, unitId));
         return resultList;
     }
 
