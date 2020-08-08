@@ -124,8 +124,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 带有“写”、“课文训练”、nodeId=84的流程都属于难流程
         int easyOrHard = this.getEasyOrHard(dto, modelName);
         dto.setEasyOrHard(easyOrHard);
+        Integer modelType = FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName());
+        dto.setModelType(modelType);
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(),
-                dto.getUnitId(), dto.getEasyOrHard(), FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName()));
+                dto.getUnitId(), dto.getEasyOrHard(), modelType);
         if (learnNew == null) {
             learnNew = initData.saveLearnNew(dto, 1, dto.getModelType());
         }
