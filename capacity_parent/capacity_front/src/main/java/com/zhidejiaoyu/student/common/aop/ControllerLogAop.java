@@ -33,11 +33,11 @@ public class ControllerLogAop {
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         long startTime = System.currentTimeMillis();
         Object proceed = pjp.proceed();
-        printLog(startTime);
+        printLog(startTime, proceed);
         return proceed;
     }
 
-    private void printLog(long startTime) {
+    private void printLog(long startTime, Object proceed) {
         try {
             long maxTime = 2000;
             HttpSession httpSession = HttpUtil.getHttpSession();
@@ -48,9 +48,9 @@ public class ControllerLogAop {
             }
             String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
             if (StringUtils.isNotEmpty(url) && (url.contains("/smallApp") || url.contains("publicAccount") || url.contains("/qy"))) {
-                this.printSmallAppLog(startTime, maxTime, url);
+                this.printSmallAppLog(startTime, maxTime, url, proceed);
             } else {
-                this.printLearnSystemLog(startTime, maxTime, httpSession, url);
+                this.printLearnSystemLog(startTime, maxTime, httpSession, url, proceed);
             }
         } catch (Exception e) {
             log.error("记录 log 出错！ errMsg=[{}]", e.getMessage());
@@ -59,13 +59,13 @@ public class ControllerLogAop {
 
     /**
      * 打印学习系统请求日志
-     *
-     * @param startTime
+     *  @param startTime
      * @param maxTime
      * @param httpSession
      * @param url
+     * @param proceed
      */
-    private void printLearnSystemLog(long startTime, long maxTime, HttpSession httpSession, String url) {
+    private void printLearnSystemLog(long startTime, long maxTime, HttpSession httpSession, String url, Object proceed) {
         Object object = httpSession.getAttribute(UserConstant.CURRENT_STUDENT);
         if (object != null) {
             Student student = (Student) object;
@@ -80,17 +80,22 @@ public class ControllerLogAop {
                         student.getId(), student.getAccount(), student.getStudentName(),
                         url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
             }
+            if (proceed != null) {
+                log.info("响应数据 学生[{} -> {} -> {}] 访问接口：[{}], 响应结果：[{}]",
+                        student.getId(), student.getAccount(), student.getStudentName(),
+                        url, proceed.toString());
+            }
         }
     }
 
     /**
      * 打印小程序请求日志
-     *
-     * @param startTime
+     *  @param startTime
      * @param maxTime
      * @param url
+     * @param proceed
      */
-    private void printSmallAppLog(long startTime, long maxTime, String url) {
+    private void printSmallAppLog(long startTime, long maxTime, String url, Object proceed) {
         long time = System.currentTimeMillis() - startTime;
         if (time > maxTime) {
             log.warn("访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
@@ -99,5 +104,10 @@ public class ControllerLogAop {
             log.info("访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
                     url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
         }
+        if (proceed != null) {
+            log.info("响应数据 访问接口：[{}], 响应结果：[{}]",
+                    url, proceed.toString());
+        }
+
     }
 }
