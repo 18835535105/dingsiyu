@@ -468,12 +468,15 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
      * @param wordCount  当前单元单词总数
      * @return 如果当前单词是本单元最后一个单词，返回 null
      */
-    private ServerResponse<Object> getNextMemoryWord(HttpSession session, Long unitId, Student student, boolean firstStudy,
+    private Object getNextMemoryWord(HttpSession session, Long unitId, Student student, boolean firstStudy,
                                                      Integer plan, Integer wordCount, Integer group, Integer type, String studyModel) {
         if (wordCount - 1 >= plan) {
             // 记录学生开始学习该单词的时间
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
             Vocabulary currentStudyWord = getVocabulary(unitId, student, group, studyModel);
+            if(currentStudyWord==null){
+                return super.toUnitTest();
+            }
             // 查询单词释义
             String wordChinese = courseFeignClient.getWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
             if (type.equals(3)) {
