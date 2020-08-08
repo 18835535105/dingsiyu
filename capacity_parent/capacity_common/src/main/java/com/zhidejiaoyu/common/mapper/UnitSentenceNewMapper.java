@@ -35,7 +35,7 @@ public interface UnitSentenceNewMapper extends BaseMapper<UnitSentenceNew> {
      * @param group
      * @return
      */
-    @Select("SELECT COUNT(id) FROM unit_sentence_new WHERE unit_id = #{unitId} AND `group` = #{group}")
+    @Select("SELECT COUNT(DISTINCT sentence_id) FROM unit_sentence_new WHERE unit_id = #{unitId} AND `group` = #{group}")
     Integer countByUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     String selectSentenceChineseByUnitIdAndSentenceId(@Param("unitId") Long unitId,@Param("sentenceId") Long sentenceId);

@@ -49,10 +49,10 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
      * @param unitId
      * @return
      */
-    @Select("SELECT count(v.id) FROM unit_vocabulary_new uv, vocabulary v WHERE uv.vocabulary_id = v.id AND v.delStatus = 1 and uv.group=#{group} AND recordpicurl IS NOT NULL AND uv.unit_id = #{unitId}")
+    @Select("SELECT count(distinct v.id) FROM unit_vocabulary_new uv, vocabulary v WHERE uv.vocabulary_id = v.id AND v.delStatus = 1 and uv.group=#{group} AND recordpicurl IS NOT NULL AND uv.unit_id = #{unitId}")
     int countWordPictureByUnitId(@Param("unitId") Long unitId, @Param("group") Integer group);
 
-    @Select("select count(id) from unit_vocabulary_new where unit_id=#{unitId} and `group` =#{group}")
+    @Select("select count(distinct vocabulary_id) from unit_vocabulary_new where unit_id=#{unitId} and `group` =#{group}")
     int countByUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     /**
