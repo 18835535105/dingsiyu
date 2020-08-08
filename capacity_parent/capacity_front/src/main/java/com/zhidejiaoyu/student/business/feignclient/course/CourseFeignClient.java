@@ -1,7 +1,9 @@
 package com.zhidejiaoyu.student.business.feignclient.course;
 
+import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,24 @@ public interface CourseFeignClient {
      */
     @GetMapping("/getById/{id}")
     CourseNew getById(@PathVariable Long id);
+
+    /**
+     * 通过单元id查询当前课程所属学段
+     *
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/getPhaseByUnitId/{unitId}")
+    String getPhaseByUnitId(@PathVariable Long unitId);
+
+    /**
+     * 根据单元id查询单元与年级的关系
+     *
+     * @param unitIds
+     * @return
+     */
+    @GetMapping("/getGradeAndLabelByUnitIds")
+    List<GradeAndUnitIdDTO> getGradeAndLabelByUnitIds(@RequestParam List<Long> unitIds);
 
     /**
      * 批量获取课程信息
@@ -89,6 +109,44 @@ public interface CourseFeignClient {
     UnitNew getUnitNewById(@PathVariable Long id);
 
     /**
+     * 查询指定课程名的所有单元id
+     *
+     * @param courseNames
+     * @return
+     */
+    @GetMapping("/unit/getUnitIdsByCourseNames")
+    List<Long> getUnitIdsByCourseNames(@RequestParam List<String> courseNames);
+
+    /**
+     * 批量查询单元信息
+     *
+     * @param unitIds
+     * @return
+     */
+    @GetMapping("/unit/getUnitNewsByIds")
+    List<UnitNew> getUnitNewsByIds(@RequestParam List<Long> unitIds);
+
+    /**
+     * 获取当前版本、年级的所有单元id
+     *
+     * @param version
+     * @param gradeList
+     * @return
+     */
+    @GetMapping("/unit/getUnitIdsByGradeListAndVersionAndGrade")
+    List<Long> getUnitIdsByGradeListAndVersionAndGrade(@RequestParam String version, @RequestParam List<String> gradeList);
+
+    /**
+     * 获取当前课程中小于或等于当前单元的所有单元id
+     *
+     * @param courseId
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/unit/getLessOrEqualsCurrentIdByCourseIdAndUnitId")
+    List<Long> getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(@RequestParam Long courseId, @RequestParam Long unitId);
+
+    /**
      * 根据类型查询单元最大group
      *
      * @param unitIds
@@ -105,6 +163,15 @@ public interface CourseFeignClient {
      */
     @RequestMapping(value = "/vocabulary/getVocabularyChinsesByWordId", method = RequestMethod.GET)
     String getVocabularyChinsesByWordId(@RequestParam("word") String word);
+
+    /**
+     * 获取指定单元下单词摸底测试的测试题
+     *
+     * @param unitIds
+     * @return
+     */
+    @GetMapping("/vocabulary/getSubjectsVOByUnitIds")
+    List<SubjectsVO> getSubjectsVOByUnitIds(@RequestParam List<Long> unitIds);
 
     /**
      * 查询单词及单词读音

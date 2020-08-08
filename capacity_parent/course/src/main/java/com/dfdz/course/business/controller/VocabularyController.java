@@ -2,6 +2,8 @@ package com.dfdz.course.business.controller;
 
 import com.dfdz.course.business.service.VocabularyService;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -130,11 +132,12 @@ public class VocabularyController {
 
     /**
      * 根据单元获取单元全部单词
+     *
      * @param unitId
      * @return
      */
     @GetMapping("/getVocabularyByUnitId")
-    public List<Vocabulary> getVocabularyByUnitId(@RequestParam Long unitId){
+    public List<Vocabulary> getVocabularyByUnitId(@RequestParam Long unitId) {
         return vocabularyService.getVocabularyByUnitId(unitId);
     }
 
@@ -142,7 +145,7 @@ public class VocabularyController {
      * 获取排除当前数据的中文干扰项
      */
     @GetMapping("/selectChineseByNotVocabularyIds")
-    public List<String> selectChineseByNotVocabularyIds(@RequestParam List<Long> vocabularyIds){
+    public List<String> selectChineseByNotVocabularyIds(@RequestParam List<Long> vocabularyIds) {
         return vocabularyService.selectChineseByNotVocabularyIds(vocabularyIds);
     }
 
@@ -150,7 +153,22 @@ public class VocabularyController {
      * 根据单词id 获取 单词 翻译
      */
     @GetMapping("/getVocabularyMapByVocabularys")
-    public List<Vocabulary> getVocabularyMapByVocabularys(@RequestParam List<Long> vocabularyIds){
+    public List<Vocabulary> getVocabularyMapByVocabularys(@RequestParam List<Long> vocabularyIds) {
         return vocabularyService.getVocabularyMapByVocabularys(vocabularyIds);
     }
+
+    /**
+     * 获取指定单元下单词摸底测试的测试题
+     *
+     * @param unitIds
+     * @return
+     */
+    @GetMapping("/getSubjectsVOByUnitIds")
+    public List<SubjectsVO> getSubjectsVOByUnitIds(@RequestParam List<Long> unitIds) {
+        if (CollectionUtils.isEmpty(unitIds)) {
+            return Collections.emptyList();
+        }
+        return vocabularyService.getSubjectsVOByUnitIds(unitIds);
+    }
+
 }

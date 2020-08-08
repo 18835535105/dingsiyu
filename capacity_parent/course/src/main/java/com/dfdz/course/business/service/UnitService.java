@@ -2,7 +2,6 @@ package com.dfdz.course.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zhidejiaoyu.common.pojo.UnitNew;
-import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 import java.util.List;
@@ -35,4 +34,30 @@ public interface UnitService extends IService<UnitNew> {
     List<Map<String, Long>> selectIdsMapByCourseNames(List<String> courseNames);
 
     List<Map<String, Object>> selectMapByIds(List<Long> unitIds);
+
+    /**
+     * 获取当前版本、年级的所有单元id
+     *
+     * @param version
+     * @param gradeList
+     * @return
+     */
+    List<Long> getUnitIdsByGradeListAndVersionAndGrade(String version, List<String> gradeList);
+
+    /**
+     * 获取当前课程中小于或等于当前单元的所有单元id
+     *
+     * @param courseId
+     * @param unitId
+     * @return
+     */
+    List<Long> getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(Long courseId, Long unitId);
+
+    /**
+     * 查询指定课程名的所有单元id
+     *
+     * @param courseNames
+     * @return
+     */
+    List<Long> getUnitIdsByCourseNames(List<String> courseNames);
 }

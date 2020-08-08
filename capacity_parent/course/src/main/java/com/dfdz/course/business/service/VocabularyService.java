@@ -2,6 +2,7 @@ package com.dfdz.course.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 
 import java.util.List;
 import java.util.Map;
@@ -35,4 +36,12 @@ public interface VocabularyService extends IService<Vocabulary> {
     List<String> selectChineseByNotVocabularyIds(List<Long> vocabularyIds);
 
     List<Vocabulary> getVocabularyMapByVocabularys(List<Long> vocabularyIds);
+
+    /**
+     * 获取指定单元下单词的测试题
+     *
+     * @param unitIds
+     * @return
+     */
+    List<SubjectsVO> getSubjectsVOByUnitIds(List<Long> unitIds);
 }

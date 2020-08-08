@@ -1,12 +1,13 @@
 package com.zhidejiaoyu.common.utils.testUtil;
 
-import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.mapper.UnitVocabularyMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.study.CommonMethod;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -723,12 +724,13 @@ public class TestResultUtil implements Serializable {
      * @return map key:单词id；value：单词对象
      */
     private Map<Long, Vocabulary> getTestVocabulary(Integer subjectNum, List<Vocabulary> target) {
-        Map<Long, Vocabulary> map = new LinkedHashMap<>();
-
         Collections.shuffle(target);
-        for (int i = 0; i < subjectNum; i++) {
-            map.put(target.get(i).getId(), target.get(i));
-        }
+
+        Map<Long, Vocabulary> map = new LinkedHashMap<>();
+        target.stream()
+                // 过滤掉题目中含有答案信息的数据
+                .filter(vocabulary -> StringUtil.isNotEmpty(vocabulary.getWordChinese()) && !vocabulary.getWordChinese().contains(vocabulary.getWord()))
+                .limit(subjectNum).forEach(vocabulary -> map.put(vocabulary.getId(), vocabulary));
         return map;
     }
 

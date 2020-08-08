@@ -73,7 +73,7 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
      * @param wordId
      * @return
      */
-    @Select("select word_chinese from unit_vocabulary_new where unit_id=#{unitId} and vocabulary_id =#{wordId}")
+    @Select("select word_chinese from unit_vocabulary_new where unit_id=#{unitId} and vocabulary_id =#{wordId} limit 1")
     String selectWordChineseByUnitIdAndWordId(@Param("unitId") Long unitId, @Param("wordId") Long wordId);
 
     /**

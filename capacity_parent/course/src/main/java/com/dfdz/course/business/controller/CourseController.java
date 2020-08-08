@@ -2,6 +2,7 @@ package com.dfdz.course.business.controller;
 
 import com.dfdz.course.business.service.CourseService;
 import com.dfdz.course.business.service.UnitService;
+import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
 import com.zhidejiaoyu.common.pojo.CourseNew;
 import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.zhidejiaoyu.common.utils.StringUtil;
@@ -153,4 +154,31 @@ public class CourseController {
         return courseService.selectExperienceCourses();
     }
 
+    /**
+     * 通过单元id查询当前课程所属学段
+     *
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/getPhaseByUnitId/{unitId}")
+    public String getPhaseByUnitId(@PathVariable Long unitId) {
+        if (unitId == null) {
+            return "";
+        }
+        return courseService.getPhaseByUnitId(unitId);
+    }
+
+    /**
+     * 根据单元id查询单元与年级的关系
+     *
+     * @param unitIds
+     * @return
+     */
+    @GetMapping("/getGradeAndLabelByUnitIds")
+    public List<GradeAndUnitIdDTO> getGradeAndLabelByUnitIds(@RequestParam List<Long> unitIds) {
+        if (CollectionUtils.isEmpty(unitIds)) {
+            return Collections.emptyList();
+        }
+        return courseService.getGradeAndLabelByUnitIds(unitIds);
+    }
 }

@@ -2,6 +2,7 @@ package com.dfdz.course.business.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dfdz.course.business.service.CourseService;
+import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
 import com.zhidejiaoyu.common.mapper.CourseNewMapper;
 import com.zhidejiaoyu.common.pojo.CourseNew;
 import org.springframework.stereotype.Service;
@@ -69,5 +70,15 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
     @Override
     public List<CourseNew> selectExperienceCourses() {
         return courseNewMapper.selectExperienceCourses();
+    }
+
+    @Override
+    public String getPhaseByUnitId(Long unitId) {
+        return courseNewMapper.selectPhaseByUnitId(unitId);
+    }
+
+    @Override
+    public List<GradeAndUnitIdDTO> getGradeAndLabelByUnitIds(List<Long> unitIds) {
+        return courseNewMapper.selectGradeAndLabelByUnitIds(unitIds);
     }
 }

@@ -1,6 +1,7 @@
 package com.dfdz.course.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
 import com.zhidejiaoyu.common.pojo.CourseNew;
 
 import java.util.List;
@@ -71,4 +72,21 @@ public interface CourseService extends IService<CourseNew> {
     List<Integer> selectCourseIdByVersionAndGradeAndLabel(String version, String grade, String label);
 
     List<CourseNew> selectExperienceCourses();
+
+
+    /**
+     * 通过单元id查询当前课程所属学段
+     *
+     * @param unitId
+     * @return
+     */
+    String getPhaseByUnitId(Long unitId);
+
+    /**
+     * 根据单元id查询单元与年级的关系
+     *
+     * @param unitIds
+     * @return
+     */
+    List<GradeAndUnitIdDTO> getGradeAndLabelByUnitIds(List<Long> unitIds);
 }
