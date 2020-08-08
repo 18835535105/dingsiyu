@@ -51,7 +51,7 @@
             resultType="com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO" parameterType="map">
         select c.grade, u.id unitId, c.grade_ext gradeExt, c.label, c.label_ext
         from course_new c
-        left join unit_new u on c.id = u.course_id and u.id in (
+        join unit_new u on c.id = u.course_id and u.id in (
         <foreach collection="unitIds" item="unitId" separator=",">
             #{unitId}
         </foreach>

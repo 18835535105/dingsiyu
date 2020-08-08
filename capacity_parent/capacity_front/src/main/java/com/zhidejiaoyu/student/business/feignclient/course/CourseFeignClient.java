@@ -45,8 +45,8 @@ public interface CourseFeignClient {
      * @param unitIds
      * @return
      */
-    @GetMapping("/getGradeAndLabelByUnitIds/{unitIds}")
-    List<GradeAndUnitIdDTO> getGradeAndLabelByUnitIds(@PathVariable List<Long> unitIds);
+    @GetMapping("/getGradeAndLabelByUnitIds")
+    List<GradeAndUnitIdDTO> getGradeAndLabelByUnitIds(@RequestParam List<Long> unitIds);
 
     /**
      * 批量获取课程信息

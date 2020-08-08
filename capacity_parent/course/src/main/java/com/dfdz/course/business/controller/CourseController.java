@@ -174,8 +174,8 @@ public class CourseController {
      * @param unitIds
      * @return
      */
-    @GetMapping("/getGradeAndLabelByUnitIds/{unitIds}")
-    public List<GradeAndUnitIdDTO> getGradeAndLabelByUnitIds(@PathVariable List<Long> unitIds) {
+    @GetMapping("/getGradeAndLabelByUnitIds")
+    public List<GradeAndUnitIdDTO> getGradeAndLabelByUnitIds(@RequestParam List<Long> unitIds) {
         if (CollectionUtils.isEmpty(unitIds)) {
             return Collections.emptyList();
         }
