@@ -82,7 +82,7 @@ public class SentenceController {
      * @param group
      * @return
      */
-    @GetMapping("/sentence/selectSentenceAndChineseByUnitIdAndGroup")
+    @GetMapping("/selectSentenceAndChineseByUnitIdAndGroup")
     public List<Map<String, Object>> selectSentenceAndChineseByUnitIdAndGroup(@RequestParam Long unitId, @RequestParam Integer group){
         return sentenceService.selectSentenceAndChineseByUnitIdAndGroup(unitId,group);
     }
