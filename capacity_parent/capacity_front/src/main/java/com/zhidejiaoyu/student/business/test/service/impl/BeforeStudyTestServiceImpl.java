@@ -25,7 +25,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.TestResultVo;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseCourseFeginClient;
 import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -35,6 +35,7 @@ import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,8 +79,8 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
     @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
 
-    @Resource
-    private CourseFeignClient courseFeignClient;
+    @Autowired
+    private CourseCourseFeginClient courseFeignClient;
 
     @Resource
     private UnitFeignClient unitFeignClient;

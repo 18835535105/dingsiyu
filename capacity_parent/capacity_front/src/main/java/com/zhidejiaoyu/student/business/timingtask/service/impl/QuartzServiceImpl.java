@@ -8,7 +8,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseCourseFeginClient;
 import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzService;
@@ -16,6 +16,7 @@ import com.zhidejiaoyu.student.common.redis.AwardRedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -155,8 +156,8 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private UnitFeignClient unitFeignClient;
     @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
-    @Resource
-    private CourseFeignClient courseFeignClient;
+    @Autowired
+    private CourseCourseFeginClient courseFeignClient;
     @Resource
     private SchoolTimeMapper schoolTimeMapper;
     @Resource

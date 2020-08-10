@@ -11,7 +11,7 @@ import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.course.UnitStudyStateVO;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseCourseFeginClient;
 import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.index.dto.UnitInfoDTO;
 import com.zhidejiaoyu.student.business.index.service.IndexCourseInfoService;
@@ -22,6 +22,7 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -67,8 +68,8 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     @Resource
     private TestRecordMapper testRecordMapper;
 
-    @Resource
-    private CourseFeignClient courseFeignClient;
+    @Autowired
+    private CourseCourseFeginClient courseFeignClient;
 
     @Resource
     private LearnNewMapper learnNewMapper;

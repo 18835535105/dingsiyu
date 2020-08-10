@@ -5,7 +5,6 @@ import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.FileConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
@@ -19,7 +18,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseCourseFeginClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.dto.GetLimitQRCodeDTO;
@@ -27,6 +26,7 @@ import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.SmallProgramTest
 import com.zhidejiaoyu.student.business.wechat.smallapp.util.CreateWxQrCodeUtil;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,8 +67,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     @Resource
     private WeekActivityRankOpt weekActivityRankOpt;
-    @Resource
-    private CourseFeignClient courseFeignClient;
+    @Autowired
+    private CourseCourseFeginClient courseFeignClient;
     @Resource
     private VocabularyFeignClient vocabularyFeignClient;
 

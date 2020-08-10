@@ -1,9 +1,11 @@
 package com.zhidejiaoyu.student.business.learn.service.impl;
 
-import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.constant.PetMP3Constant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
-import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.LearnNewMapper;
+import com.zhidejiaoyu.common.mapper.SentenceMapper;
+import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
@@ -11,13 +13,11 @@ import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.learn.vo.GetVo;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
-import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
