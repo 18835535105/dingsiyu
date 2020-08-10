@@ -19,7 +19,7 @@ import java.util.Map;
  * @date: 2020/6/28 15:07:07
  */
 @RestController
-@RequestMapping("/course")
+@RequestMapping("/course/course")
 public class CourseController {
 
     @Resource
@@ -120,7 +120,6 @@ public class CourseController {
     }
 
 
-
     /**
      * 获取所有版本
      *
@@ -139,18 +138,19 @@ public class CourseController {
 
     /**
      * 使用版本，年级，标签 查看courseId
+     *
      * @param version
      * @param grade
      * @param label
      * @return
      */
     @GetMapping("selectCourseIdByVersionAndGradeAndLabel")
-    public List<Integer> selectCourseIdByVersionAndGradeAndLabel(@RequestParam String version,@RequestParam String grade,@RequestParam String label){
-        return courseService.selectCourseIdByVersionAndGradeAndLabel(version,grade,label);
+    public List<Integer> selectCourseIdByVersionAndGradeAndLabel(@RequestParam String version, @RequestParam String grade, @RequestParam String label) {
+        return courseService.selectCourseIdByVersionAndGradeAndLabel(version, grade, label);
     }
 
     @GetMapping(value = "selectExperienceCourses")
-    public List<CourseNew> selectExperienceCourses(){
+    public List<CourseNew> selectExperienceCourses() {
         return courseService.selectExperienceCourses();
     }
 
@@ -183,7 +183,7 @@ public class CourseController {
     }
 
     @GetMapping("/selectGradeByCourseId")
-    public String selectGradeByCourseId(@RequestParam Long courseId){
-        return  courseService.selectGradeByCourseId(courseId);
+    public String selectGradeByCourseId(@RequestParam Long courseId) {
+        return courseService.selectGradeByCourseId(courseId);
     }
 }

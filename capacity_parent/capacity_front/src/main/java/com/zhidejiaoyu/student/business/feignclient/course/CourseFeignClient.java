@@ -1,7 +1,8 @@
 package com.zhidejiaoyu.student.business.feignclient.course;
 
 import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.CourseNew;
+import com.zhidejiaoyu.common.pojo.UnitNew;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  * @author: wuchenxi
  * @date: 2020/6/28 15:12:12
  */
-@FeignClient(name = "course", path = "/course")
+@FeignClient(name = "course", path = "/course/course")
 public interface CourseFeignClient {
 
     /**
