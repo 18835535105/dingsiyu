@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "course", path = "/course/syntaxTopic")
-public interface SyntaxTopicFeignClient {
+public interface SyntaxTopicFeignClient extends CourseFeignClient{
 
     /**
      * 语法获取数据

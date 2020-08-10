@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @FeignClient(name = "course", path = "/course/unit")
-public interface UnitFeignClient {
+public interface UnitFeignClient extends CourseFeignClient {
     /**
      * 查询指定课程名的所有单元id
      *

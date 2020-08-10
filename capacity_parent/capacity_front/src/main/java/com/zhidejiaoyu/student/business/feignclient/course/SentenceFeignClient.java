@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @FeignClient(name = "course", path = "/course/sentence")
-public interface SentenceFeignClient {
+public interface SentenceFeignClient extends CourseFeignClient {
 
     /**
      * 获取句型数据`
