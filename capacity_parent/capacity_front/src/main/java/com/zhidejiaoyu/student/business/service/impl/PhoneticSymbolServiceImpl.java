@@ -7,7 +7,6 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.study.phonetic.PhoneticSymbolListenVo;
 import com.zhidejiaoyu.common.vo.study.phonetic.Topic;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.service.PhoneticSymbolService;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
@@ -50,9 +49,6 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
 
     private static final Long minId = 1L;
     private static final Long maxId = 11L;
-
-    @Resource
-    private CourseFeignClient courseFeignClient;
 
     @Override
     public Object getSymbolUnit(HttpSession session) {

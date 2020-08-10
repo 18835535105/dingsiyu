@@ -42,7 +42,6 @@ import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
@@ -75,8 +74,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private SaveData saveData;
     @Resource
     private VocabularyFeignClient vocabularyFeignClient;
-    @Resource
-    private CourseFeignClient courseFeignClient;
     @Resource
     private UnitFeignClient unitFeignClient;
     @Resource
@@ -785,7 +782,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         //获取干扰项句子 在当前课程下选择
         if (sentences.size() < 4) {
             //获取测试单元所在的课程
-            Long courseId = courseFeignClient.getUnitNewById(unitId).getCourseId();
+            Long courseId = unitFeignClient.selectById(unitId).getCourseId();
             sentenceList = sentenceFeignClient.selectRoundSentence(courseId);
         }
         List<Object> list = testSentenceUtil.resultTestSentence(sentences, sentenceList, type);
@@ -1265,7 +1262,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         boolean isFirst = false;
         Long[] errorWordId = wordUnitTestDTO.getErrorWordId();
         Long[] unitId = wordUnitTestDTO.getUnitId();
-        Long courseId = courseFeignClient.getUnitNewById(unitId[0]).getCourseId();
+        Long courseId = unitFeignClient.selectById(unitId[0]).getCourseId();
         Integer classify = wordUnitTestDTO.getClassify();
         String type = commonMethod.getTestType(wordUnitTestDTO.getClassify());
 

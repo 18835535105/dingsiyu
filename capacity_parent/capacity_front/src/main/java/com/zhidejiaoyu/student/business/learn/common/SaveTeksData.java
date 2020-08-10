@@ -1,17 +1,16 @@
 package com.zhidejiaoyu.student.business.learn.common;
 
-import com.zhidejiaoyu.common.config.RedisConfig;
-import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
-import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
+import com.zhidejiaoyu.common.mapper.LearnNewMapper;
+import com.zhidejiaoyu.common.mapper.TeacherMapper;
+import com.zhidejiaoyu.common.mapper.TestRecordMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.feignclient.course.CenterTeksFeignClient;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.service.TeksService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.TeksServiceImpl;
-import com.zhidejiaoyu.student.common.CurrentDayOfStudyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -37,8 +36,6 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private SaveData saveData;
     @Resource
     private TeacherMapper teacherMapper;
-    @Resource
-    private CourseFeignClient courseFeignClient;
     @Resource
     private CenterTeksFeignClient centerTeksFeignClient;
 

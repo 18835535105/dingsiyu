@@ -9,10 +9,7 @@ import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
-import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
-import com.zhidejiaoyu.student.business.feignclient.course.SyntaxTopicFeignClient;
-import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -30,7 +27,7 @@ public class CurrentDayOfStudyRedisOpt {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
     @Resource
-    private CourseFeignClient courseFeignClient;
+    private UnitFeignClient unitFeignClient;
     @Resource
     private VocabularyFeignClient vocabularyFeignClient;
     @Resource
@@ -82,7 +79,7 @@ public class CurrentDayOfStudyRedisOpt {
     }
 
     public void saveStudyModel(Long studentId, String studyModel, Long unitId) {
-        UnitNew unitNew = courseFeignClient.getUnitNewById(unitId);
+        UnitNew unitNew = unitFeignClient.selectById(unitId);
         studyModel += "-" + unitNew.getJointName();
         Object o = redisTemplate.opsForHash().get(RedisKeysConst.STUDY_MODEL + studentId, 1);
         if (o == null) {
