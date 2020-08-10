@@ -2,9 +2,6 @@ package com.zhidejiaoyu.student.common.redis;
 
 
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
-import com.zhidejiaoyu.common.mapper.SentenceMapper;
-import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
-import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.pojo.UnitNew;
@@ -14,7 +11,6 @@ import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.SyntaxTopicFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
