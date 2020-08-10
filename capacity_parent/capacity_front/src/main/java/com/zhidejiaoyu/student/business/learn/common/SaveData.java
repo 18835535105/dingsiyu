@@ -16,7 +16,6 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.WordCompletionStudyVo;
 import com.zhidejiaoyu.common.vo.WordWriteStudyVo;
 import com.zhidejiaoyu.common.vo.study.MemoryStudyVo;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.learn.vo.GetVo;
 import com.zhidejiaoyu.student.business.service.ErrorLearnLogService;
@@ -73,8 +72,6 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private WordMemoryDifficulty wordMemoryDifficulty;
     @Resource
     private ErrorLearnLogService errorLearnLogService;
-    @Resource
-    private CourseFeignClient courseFeignClient;
     @Resource
     private WeekActivityRankOpt weekActivityRankOpt;
     @Resource

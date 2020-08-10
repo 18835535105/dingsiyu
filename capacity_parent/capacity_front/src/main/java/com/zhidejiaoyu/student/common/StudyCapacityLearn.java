@@ -1,17 +1,15 @@
 package com.zhidejiaoyu.student.common;
 
 import com.zhidejiaoyu.common.constant.session.SessionConstant;
-import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.StudentRestudyUtil;
 import com.zhidejiaoyu.common.study.memorystrength.StudyMemoryStrength;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -21,8 +19,6 @@ import java.util.List;
 @Component
 public class StudyCapacityLearn {
 
-    @Resource
-    private CourseFeignClient courseFeignClient;
     @Resource
     private StudyCapacityMapper studyCapacityMapper;
     @Resource

@@ -12,7 +12,6 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.WordPictorialVo;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
@@ -56,8 +55,6 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
     private LearnExtendMapper learnExtendMapper;
     @Resource
     private WordMemoryDifficulty wordMemoryDifficulty;
-    @Resource
-    private CourseFeignClient courseFeignClient;
     @Resource
     private VocabularyFeignClient vocabularyFeignClient;
 

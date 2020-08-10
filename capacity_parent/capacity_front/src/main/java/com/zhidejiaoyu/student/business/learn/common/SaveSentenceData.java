@@ -1,7 +1,9 @@
 package com.zhidejiaoyu.student.business.learn.common;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
+import com.zhidejiaoyu.common.mapper.LearnNewMapper;
+import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -13,7 +15,6 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
 import com.zhidejiaoyu.student.common.CurrentDayOfStudyUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
@@ -47,8 +48,6 @@ public class SaveSentenceData {
     @Resource
     private CommonMethod commonMethod;
     @Resource
-    private CourseFeignClient courseFeignClient;
-    @Resource
     private SentenceFeignClient sentenceFeignClient;
 
     private static final String SENTENCE = "SENTENCE";
@@ -78,7 +77,7 @@ public class SaveSentenceData {
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
-        Integer sentenceCount = sentenceFeignClient.countSentenceByUnitIdAndGroup(unitId,learnNews.getGroup());
+        Integer sentenceCount = sentenceFeignClient.countSentenceByUnitIdAndGroup(unitId, learnNews.getGroup());
         if (sentenceCount == 0) {
             log.error("单元 {} 下没有例句信息！", unitId);
             return ServerResponse.createByErrorMessage("当前单元下没有例句！");

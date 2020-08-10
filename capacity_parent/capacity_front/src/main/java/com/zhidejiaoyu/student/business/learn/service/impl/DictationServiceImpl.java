@@ -2,13 +2,18 @@ package com.zhidejiaoyu.student.business.learn.service.impl;
 
 import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
+import com.zhidejiaoyu.common.mapper.LearnNewMapper;
+import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
+import com.zhidejiaoyu.common.mapper.VocabularyMapper;
+import com.zhidejiaoyu.common.pojo.LearnNew;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudyCapacity;
+import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.DictationVo;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
@@ -43,8 +48,6 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
     private BaiduSpeak baiduSpeak;
     @Resource
     private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
-    @Resource
-    private CourseFeignClient courseFeignClient;
     @Resource
     private VocabularyFeignClient vocabularyFeignClient;
     @Resource
