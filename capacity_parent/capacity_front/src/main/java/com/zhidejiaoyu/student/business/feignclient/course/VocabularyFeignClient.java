@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.business.feignclient.course;
 
-import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import org.springframework.cloud.openfeign.FeignClient;
