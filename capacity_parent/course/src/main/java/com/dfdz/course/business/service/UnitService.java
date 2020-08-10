@@ -1,6 +1,7 @@
 package com.dfdz.course.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zhidejiaoyu.common.pojo.Unit;
 import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
@@ -60,4 +61,20 @@ public interface UnitService extends IService<UnitNew> {
      * @return
      */
     List<Long> getUnitIdsByCourseNames(List<String> courseNames);
+
+    UnitNew selectById(Long unitId);
+
+    Integer selectMaxUnitIndexByCourseId(Long courseId);
+
+    Integer selectCurrentUnitIndexByUnitId(Long unitId);
+
+    Long selectNextUnitIndexByCourseId(Long courseId, Integer nextUnitIndex);
+
+    Unit selectFirstUnitByCourseId(Long courseId);
+
+    Integer countWordByCourse(Long courseId);
+
+    Map<Long, Map<String, Object>> selectCountByUnitIds(List<Long> unitIds);
+
+    int selectByUnitIdAndCourseId(Long unitId, Long courseId);
 }

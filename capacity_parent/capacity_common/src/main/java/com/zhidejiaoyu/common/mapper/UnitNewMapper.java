@@ -37,7 +37,7 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @param gradeList
      * @return
      */
-    List<Map<String,Long>> selectMapByGradeListAndVersionAndGrade(String version, List<String> gradeList);
+    List<Map<String, Long>> selectMapByGradeListAndVersionAndGrade(String version, List<String> gradeList);
 
     /**
      * 获取当前课程中小于或等于当前单元的所有单元id
@@ -47,6 +47,7 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @return
      */
     List<Long> selectLessOrEqualsCurrentIdByCourseIdAndUnitId(@Param("courseId") Long courseId, @Param("unitId") Long unitId);
+
     /**
      * 获取当前课程中小于或等于当前单元的所有单元id
      *
@@ -54,14 +55,15 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @param unitId
      * @return
      */
-    List<Map<String,Long>> selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(@Param("courseId") Long courseId, @Param("unitId") Long unitId);
+    List<Map<String, Long>> selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(@Param("courseId") Long courseId, @Param("unitId") Long unitId);
 
     /**
      * 根据id集合查询id信息
+     *
      * @param unitIds
      * @return
      */
-    List<Map<String,Object>> selectByIds(@Param("unitIds") List<Long> unitIds);
+    List<Map<String, Object>> selectByIds(@Param("unitIds") List<Long> unitIds);
 
     /**
      * 查询指定课程名的所有单元id
@@ -70,13 +72,23 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @return
      */
     List<Long> selectIdsByCourseNames(@Param("courseNames") List<String> courseNames);
+
+    /**
+     * 查询当前课程下最大的单元index
+     *
+     * @param courseId
+     * @return
+     */
+    @Select("select max(unit_index) from unit_new where course_id=#{courseId}")
+    Integer selectMaxUnitIndexByCourseId(@Param("courseId") Long courseId);
+
     /**
      * 查询指定课程名的所有单元id
      *
      * @param courseNames
      * @return
      */
-    List<Map<String,Long>> selectIdsMapByCourseNames(@Param("courseNames") List<String> courseNames);
+    List<Map<String, Long>> selectIdsMapByCourseNames(@Param("courseNames") List<String> courseNames);
 
     @MapKey("unitId")
     Map<Long, Map<String, Object>> selectCountByUnitIds(@Param("unitIds") List<Long> unitIds);
@@ -149,6 +161,7 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
 
     /**
      * 根据courseIds查询unit信息
+     *
      * @param courseNewIds
      * @return
      */
@@ -156,5 +169,5 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
 
     UnitNew selectFirstByUnitId(Long courseId);
 
-    List<Map<String,Object>> selectByExample(UnitOneExample example);
+    List<Map<String, Object>> selectByExample(UnitOneExample example);
 }

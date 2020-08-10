@@ -2,7 +2,10 @@ package com.dfdz.course.business.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dfdz.course.business.service.UnitService;
+import com.zhidejiaoyu.common.mapper.UnitMapper;
 import com.zhidejiaoyu.common.mapper.UnitNewMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleUnitMapper;
+import com.zhidejiaoyu.common.pojo.Unit;
 import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,8 @@ public class UnitServiceImpl extends ServiceImpl<UnitNewMapper, UnitNew> impleme
 
     @Resource
     private UnitNewMapper unitNewMapper;
+    @Resource
+    private SimpleUnitMapper simpleUnitMapper;
 
     @Override
     public UnitNew getUnitById(Long id) {
@@ -70,5 +75,45 @@ public class UnitServiceImpl extends ServiceImpl<UnitNewMapper, UnitNew> impleme
     @Override
     public List<Long> getUnitIdsByCourseNames(List<String> courseNames) {
         return unitNewMapper.selectIdsByCourseNames(courseNames);
+    }
+
+    @Override
+    public UnitNew selectById(Long unitId) {
+        return unitNewMapper.selectById(unitId);
+    }
+
+    @Override
+    public Integer selectMaxUnitIndexByCourseId(Long courseId) {
+        return unitNewMapper.selectMaxUnitIndexByCourseId(courseId);
+    }
+
+    @Override
+    public Integer selectCurrentUnitIndexByUnitId(Long unitId) {
+        return simpleUnitMapper.selectCurrentUnitIndexByUnitId(unitId);
+    }
+
+    @Override
+    public Long selectNextUnitIndexByCourseId(Long courseId, Integer nextUnitIndex) {
+        return simpleUnitMapper.selectNextUnitIndexByCourseId(courseId, nextUnitIndex);
+    }
+
+    @Override
+    public Unit selectFirstUnitByCourseId(Long courseId) {
+        return simpleUnitMapper.selectFirstUnitByCourseId(courseId);
+    }
+
+    @Override
+    public Integer countWordByCourse(Long courseId) {
+        return simpleUnitMapper.countWordByCourse(courseId);
+    }
+
+    @Override
+    public Map<Long, Map<String, Object>> selectCountByUnitIds(List<Long> unitIds) {
+        return unitNewMapper.selectCountByUnitIds(unitIds);
+    }
+
+    @Override
+    public int selectByUnitIdAndCourseId(Long unitId, Long courseId) {
+        return unitNewMapper.selectByUnitIdAndCourseId(unitId, courseId);
     }
 }

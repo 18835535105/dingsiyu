@@ -5,6 +5,7 @@ import com.dfdz.course.business.service.VocabularyService;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.UnitVocabularyNewMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleVocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
 
     @Resource
     private VocabularyMapper vocabularyMapper;
+
+    @Resource
+    private SimpleVocabularyMapper simpleVocabularyMapper;
 
 
     @Override
@@ -90,6 +94,41 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
     @Override
     public List<String> selectInterferenceTerm(Long unitId, Long vocabularyId, String wordChinese) {
         return unitVocabularyNewMapper.selectInterferenceTerm(unitId, vocabularyId, wordChinese);
+    }
+
+    @Override
+    public List<Vocabulary> selectByUnitId(Long unitId) {
+        return vocabularyMapper.selectByUnitId(unitId);
+    }
+
+    @Override
+    public List<Vocabulary> selectByCourseId(Long courseId) {
+        return vocabularyMapper.selectByCourseId(courseId);
+    }
+
+    @Override
+    public List<Vocabulary> selectByCourseIdWithoutWordIds(Long courseId, List<Vocabulary> rightVocabularies) {
+        return vocabularyMapper.selectByCourseIdWithoutWordIds(courseId, rightVocabularies);
+    }
+
+    @Override
+    public List<Vocabulary> selectByStudentPhase(String version, int flag) {
+        return vocabularyMapper.selectByStudentPhase(version, flag);
+    }
+
+    @Override
+    public List<Vocabulary> getRandomCourseThirty(Long courseId) {
+        return vocabularyMapper.getRandomCourseThirty(courseId);
+    }
+
+    @Override
+    public List<Vocabulary> getStudyParagraphTest(String studyParagraph, String model) {
+        return simpleVocabularyMapper.getStudyParagraphTest(studyParagraph, model);
+    }
+
+    @Override
+    public List<Vocabulary> getTestPaperGenerationAll(long courseId, int typeTwo, String[] unitId) {
+        return simpleVocabularyMapper.getTestPaperGenerationAll(courseId, typeTwo, unitId);
     }
 
 

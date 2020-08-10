@@ -8,6 +8,8 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzService;
 import com.zhidejiaoyu.student.common.redis.AwardRedisOpt;
@@ -87,10 +89,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
     @Resource
     private RankOpt rankOpt;
-
-    @Resource
-    private CourseConfigMapper courseConfigMapper;
-
     @Resource
     private TestRecordMapper testRecordMapper;
     @Resource
@@ -154,11 +152,11 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     @Resource
     private ErrorLearnLogHistoryMapper errorLearnLogHistoryMapper;
     @Resource
-    private UnitNewMapper unitNewMapper;
+    private UnitFeignClient unitFeignClient;
     @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
     @Resource
-    private CourseNewMapper courseNewMapper;
+    private CourseFeignClient courseFeignClient;
     @Resource
     private SchoolTimeMapper schoolTimeMapper;
     @Resource
@@ -531,7 +529,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 List<Long> unitIds = new ArrayList<>();
                 maps.forEach(map -> unitIds.add(Long.parseLong(map.get("unitId").toString())));
                 Map<Long, Map<String, Object>> allUnitStudyCount =
-                        unitNewMapper.selectCountByUnitIds(unitIds);
+                        unitFeignClient.selectCountByUnitIds(unitIds);
                 //获取最大多错误率
                 maps.forEach(map -> {
                     long studyUnit = Long.parseLong(map.get("unitId").toString());
@@ -571,7 +569,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                             //获取学生年级数值
                             Student student = studentMapper.selectById(studentId);
                             //获取课程年级数值
-                            String strGrade = courseNewMapper.selectGradeByCourseId(studentStudyPlanNew.getCourseId());
+                            String strGrade = courseFeignClient.selectGradeByCourseId(studentStudyPlanNew.getCourseId());
                             int number = PriorityUtil.calculateRateOfChange(student.getGrade(), strGrade);
                             studentStudyPlanNew.setErrorLevel(studentStudyPlanNew.getErrorLevel() + number);
                             studentStudyPlanNew.setFinalLevel(studentStudyPlanNew.getFinalLevel() + number);
@@ -732,11 +730,11 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     int number = 0;
                     if (label.contains("上册") || label.contains("全册")) {
                         //查询当前单元之前的本册书单元
-                        number = unitNewMapper.selectByUnitIdAndCourseId(unitId, courseId);
+                        number = unitFeignClient.selectByUnitIdAndCourseId(unitId, courseId);
                     } else if (label.contains("下册")) {
                         //获取上册单元数量
                         number = schoolTimeMapper.selectByGradeAndLabel(grade, "上册", type, userId);
-                        number += unitNewMapper.selectByUnitIdAndCourseId(unitId, courseId);
+                        number += unitFeignClient.selectByUnitIdAndCourseId(unitId, courseId);
                     }
                     //获取数量
                     int addNumber = PriorityUtil.calculateTimeOfChange(number);

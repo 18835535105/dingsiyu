@@ -89,4 +89,6 @@ public interface CourseService extends IService<CourseNew> {
      * @return
      */
     List<GradeAndUnitIdDTO> getGradeAndLabelByUnitIds(List<Long> unitIds);
+
+    String selectGradeByCourseId(Long courseId);
 }

@@ -81,4 +81,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
     public List<GradeAndUnitIdDTO> getGradeAndLabelByUnitIds(List<Long> unitIds) {
         return courseNewMapper.selectGradeAndLabelByUnitIds(unitIds);
     }
+
+    @Override
+    public String selectGradeByCourseId(Long courseId) {
+        return courseNewMapper.selectGradeByCourseId(courseId);
+    }
 }

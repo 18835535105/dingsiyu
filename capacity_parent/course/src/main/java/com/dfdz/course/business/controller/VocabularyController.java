@@ -172,8 +172,60 @@ public class VocabularyController {
     }
 
     @RequestMapping(value = "/selectInterferenceTerm", method = RequestMethod.GET)
-    public List<String> selectInterferenceTerm(@RequestParam Long unitId,@RequestParam Long vocabularyId,@RequestParam String wordChinese){
-        return vocabularyService.selectInterferenceTerm(unitId,vocabularyId,wordChinese);
+    public List<String> selectInterferenceTerm(@RequestParam Long unitId, @RequestParam Long vocabularyId, @RequestParam String wordChinese) {
+        return vocabularyService.selectInterferenceTerm(unitId, vocabularyId, wordChinese);
+    }
+
+    /**
+     * 根据unitId获取Vocabulary信息
+     *
+     * @param unitId
+     * @return
+     */
+    @RequestMapping(value = "/selectByUnitId", method = RequestMethod.GET)
+    public List<Vocabulary> selectByUnitId(@RequestParam Long unitId) {
+        return vocabularyService.selectByUnitId(unitId);
+    }
+
+    /**
+     * 根据courseId获取单词信息
+     *
+     * @param courseId
+     * @return
+     */
+    @RequestMapping(value = "/selectByCourseId", method = RequestMethod.GET)
+    public List<Vocabulary> selectByCourseId(@RequestParam Long courseId) {
+        return vocabularyService.selectByCourseId(courseId);
+    }
+
+    @RequestMapping(value = "/selectByCourseIdWithoutWordIds", method = RequestMethod.GET)
+    public List<Vocabulary> selectByCourseIdWithoutWordIds(@RequestParam Long courseId, @RequestParam List<Vocabulary> rightVocabularies) {
+        return vocabularyService.selectByCourseIdWithoutWordIds(courseId,rightVocabularies);
+    }
+
+    @RequestMapping(value = "/selectByStudentPhase", method = RequestMethod.GET)
+    public List<Vocabulary> selectByStudentPhase(@RequestParam String version,@RequestParam int flag){
+        return vocabularyService.selectByStudentPhase(version,flag);
+    }
+
+    /**
+     * 随机获取30道题
+     * @param courseId
+     * @return
+     */
+    @RequestMapping(value = "/getRandomCourseThirty", method = RequestMethod.GET)
+    public List<Vocabulary> getRandomCourseThirty(@RequestParam Long courseId){
+        return vocabularyService.getRandomCourseThirty(courseId);
+    }
+
+    @RequestMapping(value = "/getStudyParagraphTest", method = RequestMethod.GET)
+    public List<Vocabulary> getStudyParagraphTest(@RequestParam String studyParagraph,@RequestParam String model){
+        return vocabularyService.getStudyParagraphTest(studyParagraph,model);
+    }
+
+    @RequestMapping(value = "/getTestPaperGenerationAll", method = RequestMethod.GET)
+    public List<Vocabulary> getTestPaperGenerationAll(@RequestParam long courseId,@RequestParam int typeTwo,@RequestParam String[] unitId){
+        return vocabularyService.getTestPaperGenerationAll(courseId,typeTwo,unitId);
     }
 
 }

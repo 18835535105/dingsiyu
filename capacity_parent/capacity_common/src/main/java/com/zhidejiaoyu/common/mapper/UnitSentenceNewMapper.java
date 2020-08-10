@@ -43,4 +43,5 @@ public interface UnitSentenceNewMapper extends BaseMapper<UnitSentenceNew> {
     List<Map<String,Object>> selectSentenceAndChineseByUnitIdAndGroup(@Param("unitId") Long unitId,@Param("group") Integer group);
 
     List<Long> selectSentenceIdByUnitIdAndGroup(@Param("unitId") Long unitId,@Param("group") Integer group);
+
 }

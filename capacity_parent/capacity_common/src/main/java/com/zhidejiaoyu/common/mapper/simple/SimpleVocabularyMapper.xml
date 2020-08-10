@@ -470,7 +470,7 @@
         AND v.delStatus = 1
         AND c.delStatus = 1
         AND u.delStatus = 1
-        AND c.version = #{student.version}
+        AND c.version = #{version}
         <if test="flag == 1">
             AND c.grade = '七年级'
         </if>

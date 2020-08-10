@@ -46,4 +46,18 @@ public interface VocabularyService extends IService<Vocabulary> {
     List<SubjectsVO> getSubjectsVOByUnitIds(List<Long> unitIds);
 
     List<String> selectInterferenceTerm(Long unitId, Long vocabularyId, String wordChinese);
+
+    List<Vocabulary> selectByUnitId(Long unitId);
+
+    List<Vocabulary> selectByCourseId(Long courseId);
+
+    List<Vocabulary> selectByCourseIdWithoutWordIds(Long courseId, List<Vocabulary> rightVocabularies);
+
+    List<Vocabulary> selectByStudentPhase(String version, int flag);
+
+    List<Vocabulary> getRandomCourseThirty(Long courseId);
+
+    List<Vocabulary> getStudyParagraphTest(String studyParagraph, String model);
+
+    List<Vocabulary> getTestPaperGenerationAll(long courseId, int typeTwo, String[] unitId);
 }

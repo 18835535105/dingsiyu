@@ -106,7 +106,7 @@ public interface SimpleUnitMapper extends BaseMapper<Unit> {
 	 * @return
 	 */
 	@Select("select COUNT(a.id) from unit_new a JOIN unit_vocabulary_new b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id AND a.course_id = #{course_id} AND c.delStatus = 1")
-	Integer countWordByCourse(String course_id);
+	Integer countWordByCourse(Long course_id);
 
 	@Select("select id from unit_new where course_id = #{courseId} ORDER BY id asc LIMIT 0,1")
 	Integer getMinUnit(@Param("courseId") Integer courseId);

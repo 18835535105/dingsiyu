@@ -42,6 +42,10 @@ import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -67,60 +71,42 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Autowired
     private SentenceMapper sentenceMapper;
-
     @Resource
     private SaveData saveData;
-
-    @Autowired
-    private VocabularyMapper vocabularyMapper;
-
+    @Resource
+    private VocabularyFeignClient vocabularyFeignClient;
+    @Resource
+    private CourseFeignClient courseFeignClient;
+    @Resource
+    private UnitFeignClient unitFeignClient;
+    @Resource
+    private SentenceFeignClient sentenceFeignClient;
     @Autowired
     private StudentMapper studentMapper;
-
     @Autowired
     private TestResultUtil testResultUtil;
-
     @Autowired
     private TestRecordMapper testRecordMapper;
-
-    @Autowired
-    private UnitMapper unitMapper;
-
     @Autowired
     private CommonMethod commonMethod;
-
     @Autowired
     private PetSayUtil petSayUtil;
-
     @Autowired
     private CcieUtil ccieUtil;
-
     @Resource
     private SaveTeksData saveTeksData;
-
     @Autowired
     private TestRecordInfoMapper testRecordInfoMapper;
-
     @Autowired
     private RedisOpt redisOpt;
-
     @Autowired
     private TestSentenceUtil testSentenceUtil;
-
     @Autowired
     private LearnMapper learnMapper;
-
     @Autowired
     private TestGoldUtil testGoldUtil;
-
-    @Autowired
-    private SentenceUnitMapper sentenceUnitMapper;
-
     @Autowired
     private LetterMapper letterMapper;
-
-    @Resource
-    private UnitNewMapper unitNewMapper;
     @Resource
     private LearnNewMapper learnNewMapper;
     @Resource
@@ -160,12 +146,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Long courseId;
         PageHelper.startPage(1, 100);
         if (unitId != null) {
-            UnitNew unitNew = unitNewMapper.selectById(unitId);
+            UnitNew unitNew = unitFeignClient.selectById(unitId);
             courseId = unitNew.getCourseId();
-            vocabularies = vocabularyMapper.selectByCourseId(courseId);
+            vocabularies = vocabularyFeignClient.selectByCourseId(courseId);
         } else {
             courseId = 2751L;
-            vocabularies = vocabularyMapper.selectByCourseId(2751L);
+            vocabularies = vocabularyFeignClient.selectByCourseId(2751L);
         }
         Collections.shuffle(vocabularies);
 
@@ -250,7 +236,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (count > 0) {
             return ServerResponse.createBySuccess(ResponseCode.FORBIDDEN.getCode(), ResponseCode.FORBIDDEN.getMsg());
         }
-        UnitNew unitNew = unitNewMapper.selectById(unitId);
+        UnitNew unitNew = unitFeignClient.selectById(unitId);
         if (unitNew == null) {
             log.warn("学生[{} - {} - {}]没有分配智慧单词学习计划！", student.getId(), student.getAccount(), student.getStudentName());
             return ServerResponse.createByError(301, "学生未分配智能版单词学习计划！");
@@ -260,7 +246,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         // 随机选出20个正确单词信息
         PageHelper.startPage(1, 20);
-        List<Vocabulary> rightVocabularies = vocabularyMapper.selectByUnitId(unitId);
+        List<Vocabulary> rightVocabularies = vocabularyFeignClient.selectByUnitId(unitId);
         Map<String, String> map = this.getWordMap(rightVocabularies);
 
         int size = rightVocabularies.size();
@@ -270,7 +256,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         int errorSize = size * 3;
         long currentCourseId = unitNew.getCourseId();
         PageHelper.startPage(1, errorSize);
-        List<Vocabulary> errorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(currentCourseId, rightVocabularies);
+        List<Vocabulary> errorVocabularies = vocabularyFeignClient.selectByCourseIdWithoutWordIds(currentCourseId, rightVocabularies);
         map.putAll(this.getWordMap(errorVocabularies));
 
         List<Vocabulary> ignore = new ArrayList<>(errorVocabularies);
@@ -279,7 +265,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         // 如果错误单词取值不够用，从当前课程的上一个课程和下一个课程取值
         if (errorVocabularies.size() < errorSize) {
             PageHelper.startPage(1, errorSize - errorVocabularies.size());
-            List<Vocabulary> otherErrorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(currentCourseId + 1, ignore);
+            List<Vocabulary> otherErrorVocabularies = vocabularyFeignClient.selectByCourseIdWithoutWordIds(currentCourseId + 1, ignore);
             if (otherErrorVocabularies.size() > 0) {
                 errorVocabularies.addAll(otherErrorVocabularies);
                 ignore.addAll(otherErrorVocabularies);
@@ -287,7 +273,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             }
             if (otherErrorVocabularies.size() < errorSize) {
                 PageHelper.startPage(1, errorSize - errorVocabularies.size());
-                otherErrorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(currentCourseId - 1, ignore);
+                otherErrorVocabularies = vocabularyFeignClient.selectByCourseIdWithoutWordIds(currentCourseId - 1, ignore);
                 if (otherErrorVocabularies.size() > 0) {
                     errorVocabularies.addAll(otherErrorVocabularies);
                     map.putAll(this.getWordMap(otherErrorVocabularies));
@@ -683,15 +669,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         if ("初中".equals(phase)) {
             // 前往初中预科库查询简单单词
-            vocabularies = vocabularyMapper.selectByStudentPhase(student, 1);
+            vocabularies = vocabularyFeignClient.selectByStudentPhase(student.getVersion(), 1);
             courseName = student.getVersion() + " (七年级)";
         } else {
             // 前往高中预科库查询简单单词
-            vocabularies = vocabularyMapper.selectByStudentPhase(student, 2);
+            vocabularies = vocabularyFeignClient.selectByStudentPhase(student.getVersion(), 2);
             if (vocabularies.size() > 0) {
                 courseName = student.getVersion() + " (高一)";
             } else {
-                vocabularies = vocabularyMapper.selectByStudentPhase(student, 3);
+                vocabularies = vocabularyFeignClient.selectByStudentPhase(student.getVersion(), 3);
                 courseName = student.getVersion() + " (必修一)";
             }
         }
@@ -794,13 +780,13 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1, 2);
         //获取单元句子
-        List<Sentence> sentences = sentenceMapper.selectByUnitIdAndGroup(unitId, learnNew.getGroup());
+        List<Sentence> sentences = sentenceFeignClient.selectByUnitIdAndGroup(unitId, learnNew.getGroup());
         List<Sentence> sentenceList = null;
         //获取干扰项句子 在当前课程下选择
         if (sentences.size() < 4) {
             //获取测试单元所在的课程
-            Long courseId = sentenceUnitMapper.getCourseIdById(unitId.intValue());
-            sentenceList = sentenceMapper.selectRoundSentence(courseId);
+            Long courseId = courseFeignClient.getUnitNewById(unitId).getCourseId();
+            sentenceList = sentenceFeignClient.selectRoundSentence(courseId);
         }
         List<Object> list = testSentenceUtil.resultTestSentence(sentences, sentenceList, type);
         return ServerResponse.createBySuccess(list);
@@ -1279,7 +1265,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         boolean isFirst = false;
         Long[] errorWordId = wordUnitTestDTO.getErrorWordId();
         Long[] unitId = wordUnitTestDTO.getUnitId();
-        Long courseId = unitMapper.selectCourseIdByUnitId(unitId[0]);
+        Long courseId = courseFeignClient.getUnitNewById(unitId[0]).getCourseId();
         Integer classify = wordUnitTestDTO.getClassify();
         String type = commonMethod.getTestType(wordUnitTestDTO.getClassify());
 
@@ -1809,7 +1795,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         // 1.题类型
         String[] type = {"英译汉", "汉译英", "听力理解"};
         // 随机取三十道题
-        List<Vocabulary> vocabularies = vocabularyMapper.getRandomCourseThirty(courseId);
+        List<Vocabulary> vocabularies = vocabularyFeignClient.getRandomCourseThirty(courseId);
 
         // 处理结果
         List<TestResultVO> testResults = testResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, courseId);

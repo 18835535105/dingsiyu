@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.feignclient.course;
 
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -134,5 +135,52 @@ public interface VocabularyFeignClient {
                                        @RequestParam("type") Integer type, @RequestParam("group") Integer group);
 
     @RequestMapping(value = "/selectInterferenceTerm", method = RequestMethod.GET)
-    List<String> selectInterferenceTerm(@RequestParam Long unitId,@RequestParam Long vocabularyId,@RequestParam String wordChinese);
+    List<String> selectInterferenceTerm(@RequestParam Long unitId, @RequestParam Long vocabularyId, @RequestParam String wordChinese);
+
+    /**
+     * 根据unitId获取Vocabulary信息
+     *
+     * @param unitId
+     * @return
+     */
+    @RequestMapping(value = "/selectByUnitId", method = RequestMethod.GET)
+    List<Vocabulary> selectByUnitId(@RequestParam Long unitId);
+
+    /**
+     * 根据courseId获取单词信息
+     *
+     * @param courseId
+     * @return
+     */
+    @RequestMapping(value = "/selectByCourseId", method = RequestMethod.GET)
+    List<Vocabulary> selectByCourseId(@RequestParam Long courseId);
+
+    @RequestMapping(value = "/selectByCourseIdWithoutWordIds", method = RequestMethod.GET)
+    List<Vocabulary> selectByCourseIdWithoutWordIds(@RequestParam Long courseId, @RequestParam List<Vocabulary> rightVocabularies);
+
+    /**
+     * 根据学生学段获取单词信息
+     * <p>初中学段获取当前教材版本的初一单词信息</p>
+     * <p>高中学段获取当前教材版本的高一单词信息</p>
+     *
+     * @param version
+     * @param flag    1:初一教材  2：高一教材 3:必修一教材(年级只有高中的时候）
+     * @return
+     */
+    @RequestMapping(value = "/selectByStudentPhase", method = RequestMethod.GET)
+    List<Vocabulary> selectByStudentPhase(@RequestParam String version,@RequestParam int flag);
+
+    /**
+     * 随机获取30道题
+     * @param courseId
+     * @return
+     */
+    @RequestMapping(value = "/getRandomCourseThirty", method = RequestMethod.GET)
+    List<Vocabulary> getRandomCourseThirty(@RequestParam Long courseId);
+
+    @RequestMapping(value = "/getStudyParagraphTest", method = RequestMethod.GET)
+    List<Vocabulary> getStudyParagraphTest(@RequestParam String studyParagraph,@RequestParam String model);
+
+    @RequestMapping(value = "/getTestPaperGenerationAll", method = RequestMethod.GET)
+    List<Vocabulary> getTestPaperGenerationAll(@RequestParam long courseId,@RequestParam int typeTwo,@RequestParam String[] unitId);
 }

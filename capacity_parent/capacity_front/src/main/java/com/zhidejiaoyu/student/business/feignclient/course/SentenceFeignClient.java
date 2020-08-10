@@ -82,4 +82,20 @@ public interface SentenceFeignClient {
     @GetMapping("/selectSentenceAndChineseByUnitIdAndGroup")
     List<Map<String, Object>> selectSentenceAndChineseByUnitIdAndGroup(@RequestParam Long unitId, @RequestParam Integer group);
 
+    /**
+     * 根据unitId和group获取数据
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @GetMapping("/selectByUnitIdAndGroup")
+    List<Sentence> selectByUnitIdAndGroup(@RequestParam Long unitId,@RequestParam Integer group);
+
+    /**
+     * 根据课程id获取打乱句型信息
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/selectRoundSentence")
+    List<Sentence> selectRoundSentence(@RequestParam Long courseId);
 }

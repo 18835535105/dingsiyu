@@ -107,4 +107,6 @@ public interface CourseFeignClient {
     UnitNew getUnitNewById(@PathVariable Long id);
 
 
+    @GetMapping("/selectGradeByCourseId")
+    String selectGradeByCourseId(@RequestParam Long courseId);
 }

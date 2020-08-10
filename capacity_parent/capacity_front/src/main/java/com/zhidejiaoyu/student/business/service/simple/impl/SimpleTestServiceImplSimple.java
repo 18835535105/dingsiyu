@@ -39,6 +39,8 @@ import com.zhidejiaoyu.common.vo.simple.testVo.SimpleTestResultVO;
 import com.zhidejiaoyu.common.vo.simple.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.vo.simple.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.vo.testVo.SentenceTestResultVO;
+import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.service.simple.SimpleTestServiceSimple;
 import com.zhidejiaoyu.student.business.shipconfig.service.impl.ShipAddEquipmentServiceImpl;
 import com.zhidejiaoyu.student.business.test.service.impl.TestServiceImpl;
@@ -65,9 +67,6 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private SimpleSentenceMapper simpleSentenceMapper;
 
     @Autowired
-    private SimpleVocabularyMapper vocabularyMapper;
-
-    @Autowired
     private StudentMapper studentMapper;
 
     @Autowired
@@ -78,9 +77,6 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
     @Autowired
     private SimpleRunLogMapper runLogMapper;
-
-    @Autowired
-    private SimpleUnitMapper unitMapper;
 
     @Autowired
     private SimpleStudentUnitMapper simpleStudentUnitMapper;
@@ -124,6 +120,12 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     @Resource
     private StudentExpansionMapper studentExpansionMapper;
 
+    @Resource
+    private VocabularyFeignClient vocabularyFeignClient;
+
+    @Resource
+    private UnitFeignClient unitFeignClient;
+
     /**
      * 学前测试/学后测试,从课程取50道题
      * 保存的时候只保存测试记录
@@ -154,10 +156,10 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         List<Vocabulary> vocabularies;
         // 学前测试/学后测试
         if (typeModel != 3) {
-            vocabularies = vocabularyMapper.getRandomCourseThirty(courseId);
+            vocabularies = vocabularyFeignClient.getRandomCourseThirty(courseId);
         } else {
             // 能力值测试
-            vocabularies = vocabularyMapper.getStudyParagraphTest(studyParagraph, "单词");
+            vocabularies = vocabularyFeignClient.getStudyParagraphTest(studyParagraph, "单词");
         }
 
         // 处理结果
@@ -220,12 +222,12 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         if ("初中".equals(phase)) {
             // 前往初中预科库查询简单单词
-            vocabularies = vocabularyMapper.selectByStudentPhase(student, 1);
+            vocabularies = vocabularyFeignClient.selectByStudentPhase(student.getVersion(), 1);
         } else {
             // 前往高中预科库查询简单单词
-            vocabularies = vocabularyMapper.selectByStudentPhase(student, 2);
+            vocabularies = vocabularyFeignClient.selectByStudentPhase(student.getVersion(), 2);
             if (vocabularies.size() == 0) {
-                vocabularies = vocabularyMapper.selectByStudentPhase(student, 3);
+                vocabularies = vocabularyFeignClient.selectByStudentPhase(student.getVersion(), 3);
             }
         }
 
@@ -418,12 +420,12 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      */
     String unlockUnit(Student student, Long courseId, Long unitId, Integer type) {
         // 查看当前课程的最大单元和当前单元的index
-        Integer maxUnitIndex = unitMapper.selectMaxUnitIndexByCourseId(courseId);
-        Integer currentUnitIndex = unitMapper.selectCurrentUnitIndexByUnitId(unitId);
+        Integer maxUnitIndex = unitFeignClient.selectMaxUnitIndexByCourseId(courseId);
+        Integer currentUnitIndex = unitFeignClient.selectCurrentUnitIndexByUnitId(unitId);
         if (currentUnitIndex < maxUnitIndex) {
             // 查询 当前单元index+1 的单元id
             Integer nextUnitIndex = currentUnitIndex + 1;
-            Long wordNextUnitId = unitMapper.selectNextUnitIndexByCourseId(courseId, nextUnitIndex);
+            Long wordNextUnitId = unitFeignClient.selectNextUnitIndexByCourseId(courseId, nextUnitIndex);
 
             // 根据学生id，课程id和下一个单元id开启下个单元
             simpleStudentUnitMapper.updateStatus(student.getId(), courseId, wordNextUnitId, type);
@@ -462,7 +464,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         }
 
         // 获取当前单元下的所有单词
-        List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(unitId);
+        List<Vocabulary> vocabularies = vocabularyFeignClient.selectByUnitId(unitId);
         Integer subjectNum = vocabularies.size();
         String[] type;
         if ("慧记忆".equals(studyModel)) {
@@ -516,7 +518,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         String[] errorWord = wordUnitTestDTO.getErrorWord();
         Long[] errorWordId = wordUnitTestDTO.getErrorWordId();
         Long[] unitId = wordUnitTestDTO.getUnitId();
-        Long courseId = unitMapper.selectCourseIdByUnitId(unitId[0]);
+        Long courseId = unitFeignClient.selectById(unitId[0]).getCourseId();
         Integer classify = wordUnitTestDTO.getClassify();
         String type = simpleCommonMethod.getTestType(wordUnitTestDTO.getClassify());
 
@@ -939,7 +941,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         getLevel(session);
         if (Objects.equals(typeModel, "学后测试")) {
             // 查询当前课程下的其中一个单元
-            Unit unit = unitMapper.selectFirstUnitByCourseId(testRecord.getCourseId());
+            Unit unit = unitFeignClient.selectFirstUnitByCourseId(testRecord.getCourseId());
             if (unit != null) {
                 testRecord.setUnitId(unit.getId());
             }
@@ -964,7 +966,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         vo.setAwardInfo(awardInfo);
         vo.setGold(gold);
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, typeModel,null));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, typeModel, null));
         vo.setTestId(testRecord.getId());
         vo.setEnergy(addEnergy);
         studentMapper.updateById(student);
@@ -1307,7 +1309,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         if (typeOne == 1) {
             // 单词库下的题
-            list = vocabularyMapper.getTestPaperGenerationAll(courseId, typeTwo, unitId);
+            list = vocabularyFeignClient.getTestPaperGenerationAll(courseId, typeTwo, unitId);
         } else {
             // 记忆追踪下的题
             list = simpleSimpleCapacityMapper.getTestPaperGenerationAll(courseId, typeTwo, unitId);
@@ -1357,7 +1359,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         Long plan = learnMapper.learnCourseCountWord(studentId, courseId.toString(), typeToModelStr(type));
         vocabulary.put("plan", plan);
         // 该课程一共多少单词
-        Integer count = unitMapper.countWordByCourse(courseId.toString());
+        Integer count = unitFeignClient.countWordByCourse(courseId);
         vocabulary.put("wordCount", count);
         vocabulary.put("studyNew", false);
 

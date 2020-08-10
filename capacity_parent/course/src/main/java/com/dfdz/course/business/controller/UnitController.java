@@ -1,6 +1,7 @@
 package com.dfdz.course.business.controller;
 
 import com.dfdz.course.business.service.UnitService;
+import com.zhidejiaoyu.common.pojo.Unit;
 import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -75,7 +76,7 @@ public class UnitController {
      * @param unitId
      * @return
      */
-    @GetMapping(value = "/unit/selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId")
+    @GetMapping(value = "/selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId")
     public List<Map<String, Long>> selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(@RequestParam Long courseId, @RequestParam Long unitId) {
         return unitService.selectMapLessOrEqualsCurrentIdByCourseIdAndUnitId(courseId, unitId);
     }
@@ -86,7 +87,7 @@ public class UnitController {
      * @param courseNames
      * @return
      */
-    @GetMapping(value = "/unit/selectIdsMapByCourseNames")
+    @GetMapping(value = "/selectIdsMapByCourseNames")
     public List<Map<String, Long>> selectIdsMapByCourseNames(@RequestParam List<String> courseNames) {
         return unitService.selectIdsMapByCourseNames(courseNames);
     }
@@ -96,7 +97,7 @@ public class UnitController {
      * @param unitIds
      * @return
      */
-    @RequestMapping(value = "/unit/selectMapByIds", method = RequestMethod.GET)
+    @RequestMapping(value = "/selectMapByIds", method = RequestMethod.GET)
     public List<Map<String, Object>> selectMapByIds(@RequestParam List<Long> unitIds){
         return unitService.selectMapByIds(unitIds);
     }
@@ -143,7 +144,7 @@ public class UnitController {
      * @return
      */
     @GetMapping("/getLessOrEqualsCurrentIdByCourseIdAndUnitId")
-    public List<Long> getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(Long courseId, Long unitId) {
+    public List<Long> getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(@RequestParam Long courseId,@RequestParam Long unitId) {
         if (courseId == null || unitId == null) {
             return Collections.emptyList();
         }
@@ -162,5 +163,56 @@ public class UnitController {
             return Collections.emptyList();
         }
         return unitService.getUnitIdsByCourseNames(courseNames);
+    }
+
+    /**
+     * 根据unitId获取unit信息
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/selectById")
+    public UnitNew selectById(@RequestParam Long unitId){
+        return unitService.selectById(unitId);
+    }
+
+    /**
+     * 根据courseId获取最大单元id
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/selectMaxUnitIndexByCourseId")
+    public Integer selectMaxUnitIndexByCourseId(@RequestParam Long courseId){
+        return  unitService.selectMaxUnitIndexByCourseId(courseId);
+    }
+
+
+    @GetMapping("/selectCurrentUnitIndexByUnitId")
+    public Integer selectCurrentUnitIndexByUnitId(@RequestParam Long unitId){
+        return  unitService.selectCurrentUnitIndexByUnitId(unitId);
+    }
+
+    @GetMapping("/selectNextUnitIndexByCourseId")
+    public Long selectNextUnitIndexByCourseId(@RequestParam Long courseId,@RequestParam Integer nextUnitIndex){
+        return  unitService.selectNextUnitIndexByCourseId(courseId,nextUnitIndex);
+    }
+
+    @GetMapping("/selectFirstUnitByCourseId")
+    public Unit selectFirstUnitByCourseId(@RequestParam Long courseId){
+        return  unitService.selectFirstUnitByCourseId(courseId);
+    }
+
+    @GetMapping("/countWordByCourse")
+    public Integer countWordByCourse(@RequestParam Long courseId){
+        return  unitService.countWordByCourse(courseId);
+    }
+
+    @GetMapping("/selectCountByUnitIds")
+    public Map<Long, Map<String, Object>> selectCountByUnitIds(@RequestParam List<Long> unitIds){
+        return  unitService.selectCountByUnitIds(unitIds);
+    }
+
+    @GetMapping("/selectByUnitIdAndCourseId")
+    public int selectByUnitIdAndCourseId(@RequestParam Long unitId,@RequestParam Long courseId){
+        return  unitService.selectByUnitIdAndCourseId(unitId,courseId);
     }
 }

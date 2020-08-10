@@ -181,4 +181,9 @@ public class CourseController {
         }
         return courseService.getGradeAndLabelByUnitIds(unitIds);
     }
+
+    @GetMapping("/selectGradeByCourseId")
+    public String selectGradeByCourseId(@RequestParam Long courseId){
+        return  courseService.selectGradeByCourseId(courseId);
+    }
 }

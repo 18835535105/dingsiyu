@@ -19,4 +19,8 @@ public interface SentenceService extends IService<Sentence> {
     Sentence selectOneWordNotInIdsNew(List<Long> wordIds, Long unitId, Integer group);
 
     List<Map<String, Object>> selectSentenceAndChineseByUnitIdAndGroup(Long unitId, Integer group);
+
+    List<Sentence> selectByUnitIdAndGroup(Long unitId, Integer group);
+
+    List<Sentence> selectRoundSentence(Long courseId);
 }

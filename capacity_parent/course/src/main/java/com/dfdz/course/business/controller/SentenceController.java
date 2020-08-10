@@ -83,8 +83,28 @@ public class SentenceController {
      * @return
      */
     @GetMapping("/sentence/selectSentenceAndChineseByUnitIdAndGroup")
-    List<Map<String, Object>> selectSentenceAndChineseByUnitIdAndGroup(@RequestParam Long unitId, @RequestParam Integer group){
+    public List<Map<String, Object>> selectSentenceAndChineseByUnitIdAndGroup(@RequestParam Long unitId, @RequestParam Integer group){
         return sentenceService.selectSentenceAndChineseByUnitIdAndGroup(unitId,group);
     }
 
+    /**
+     * 根据unitId和group获取数据
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @GetMapping("/selectByUnitIdAndGroup")
+    public List<Sentence> selectByUnitIdAndGroup(@RequestParam Long unitId,@RequestParam Integer group){
+        return sentenceService.selectByUnitIdAndGroup(unitId,group);
+    }
+
+    /**
+     * 根据课程id获取打乱句型信息
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/selectRoundSentence")
+    public List<Sentence> selectRoundSentence(@RequestParam Long courseId){
+        return sentenceService.selectRoundSentence(courseId);
+    }
 }

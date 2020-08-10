@@ -106,11 +106,11 @@ public interface SimpleVocabularyMapper extends BaseMapper<Vocabulary> {
      * <p>初中学段获取当前教材版本的初一单词信息</p>
      * <p>高中学段获取当前教材版本的高一单词信息</p>
      *
-     * @param student
+     * @param version
      * @param flag    1:初一教材  2：高一教材 3:必修一教材(年级只有高中的时候）
      * @return
      */
-    List<Vocabulary> selectByStudentPhase(@Param("student") Student student, @Param("flag") int flag);
+    List<Vocabulary> selectByStudentPhase(@Param("version") String version, @Param("flag") int flag);
 
     Integer countUnitWeek(@Param("studentId") Long studentId, @Param("course_id") Long course_id, @Param("model") int model);
 
