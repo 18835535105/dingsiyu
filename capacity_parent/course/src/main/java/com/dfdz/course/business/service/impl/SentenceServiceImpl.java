@@ -32,4 +32,14 @@ public class SentenceServiceImpl extends ServiceImpl<SentenceMapper, Sentence> i
     public Sentence getReplaceTeks(String sentence) {
         return sentenceMapper.replaceSentence(sentence);
     }
+
+    @Override
+    public Integer countSentenceByUnitIdAndGroup(Long unitId, Integer group) {
+        return unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
+    }
+
+    @Override
+    public Sentence selectOneWordNotInIdsNew(List<Long> wordIds, Long unitId, Integer group) {
+        return sentenceMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
+    }
 }

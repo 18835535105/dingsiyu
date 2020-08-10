@@ -322,6 +322,25 @@ public interface CourseFeignClient {
     List<Long> getSentenceIdsByUnitIdAndGroup(@PathVariable Long unitId, @PathVariable Integer group);
 
     /**
+     * 根据unitId和group查询句型单词总数
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @GetMapping("/sentence/getSentenceIdsByUnitIdAndGroup")
+    Integer countSentenceByUnitIdAndGroup(@RequestParam Long unitId,@RequestParam Integer group);
+
+    /**
+     * 获取句型下一个句型学习信息
+     * @param wordIds
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @GetMapping("/sentence/selectSentenceOneWordNotInIdsNew")
+    Sentence selectSentenceOneWordNotInIdsNew(@RequestParam List<Long> wordIds, @RequestParam Long unitId, @RequestParam Integer group);
+
+    /**
      * 语法获取数据
      */
     /**
@@ -363,6 +382,7 @@ public interface CourseFeignClient {
      */
     @RequestMapping(value = "/centerTeks/replaceTeks", method = RequestMethod.GET)
     TeksNew replaceTeks(@RequestParam("sentence") String sentence);
+
 
 
 }

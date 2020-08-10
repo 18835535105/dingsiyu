@@ -12,4 +12,8 @@ public interface SentenceService extends IService<Sentence> {
     List<Long> getSentenceIdsByUnitIdAndGroup(Long unitId, Integer group);
 
     Sentence getReplaceTeks(String sentence);
+
+    Integer countSentenceByUnitIdAndGroup(Long unitId, Integer group);
+
+    Sentence selectOneWordNotInIdsNew(List<Long> wordIds, Long unitId, Integer group);
 }

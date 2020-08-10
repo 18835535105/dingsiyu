@@ -3,10 +3,7 @@ package com.dfdz.course.business.controller;
 import com.dfdz.course.business.service.SentenceService;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.TeksNew;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -59,5 +56,22 @@ public class SentenceController {
         return sentenceService.getReplaceTeks(sentence);
     }
 
+
+    @GetMapping("/getSentenceIdsByUnitIdAndGroup")
+    public Integer countSentenceByUnitIdAndGroup(@RequestParam Long unitId, @RequestParam Integer group){
+        return sentenceService.countSentenceByUnitIdAndGroup(unitId,group);
+    }
+
+    /**
+     * 获取句型下一个句型学习信息
+     * @param wordIds
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @GetMapping("/selectSentenceOneWordNotInIdsNew")
+    public Sentence selectSentenceOneWordNotInIdsNew(@RequestParam List<Long> wordIds, @RequestParam Long unitId, @RequestParam Integer group){
+        return sentenceService.selectOneWordNotInIdsNew(wordIds,unitId,group);
+    }
 
 }

@@ -38,13 +38,7 @@ public class SaveSentenceData {
     @Resource
     private LearnExtendMapper learnExtendMapper;
     @Resource
-    private UnitSentenceNewMapper unitSentenceNewMapper;
-    @Resource
     private StudyCapacityMapper studyCapacityMapper;
-    @Resource
-    private SaveSentenceData saveSentenceData;
-    @Resource
-    private SentenceMapper sentenceMapper;
     @Resource
     private BaiduSpeak baiduSpeak;
     @Resource
@@ -81,7 +75,7 @@ public class SaveSentenceData {
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
-        Integer sentenceCount = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, learnNews.getGroup());
+        Integer sentenceCount = courseFeignClient.countSentenceByUnitIdAndGroup(unitId,learnNews.getGroup());
         if (sentenceCount == 0) {
             log.error("单元 {} 下没有例句信息！", unitId);
             return ServerResponse.createByErrorMessage("当前单元下没有例句！");
@@ -97,15 +91,15 @@ public class SaveSentenceData {
         if (studyCapacity != null) {
             // 返回达到黄金记忆点的例句信息
             //SentenceTranslate sentenceTranslate = sentenceTranslates.get(0);
-            return saveSentenceData.returnGoldWord(studyCapacity, plan.longValue(), firstStudy, sentenceCount.longValue(), difficulty, studyModel);
+            return this.returnGoldWord(studyCapacity, plan.longValue(), firstStudy, sentenceCount.longValue(), difficulty, studyModel);
         }
         // 获取当前学习进度的下一个例句
-        Sentence sentence = saveSentenceData.getSentence(unitId, student, learnNews.getGroup(), studyModel);
+        Sentence sentence = this.getSentence(unitId, student, learnNews.getGroup(), studyModel);
         if (sentence == null) {
             return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
         }
         if (type == 7) {
-            SentenceTranslateVo sentenceTranslateVo = saveSentenceData.getSentenceTranslateVo(plan.longValue(), firstStudy,
+            SentenceTranslateVo sentenceTranslateVo = this.getSentenceTranslateVo(plan.longValue(), firstStudy,
                     sentenceCount.longValue(), difficulty, sentence);
             sentenceTranslateVo.setStudyNew(true);
             return ServerResponse.createBySuccess(sentenceTranslateVo);
@@ -138,7 +132,7 @@ public class SaveSentenceData {
         SentenceTranslateVo sentenceTranslateVo;
         // 例句翻译
         if (STUDYMODEL1.equals(studyModel)) {
-            Sentence sentence = sentenceMapper.selectByPrimaryKey(studyCapacity.getWordId());
+            Sentence sentence = courseFeignClient.selectSentenceById(studyCapacity.getWordId());
             // 计算当前例句的记忆强度
             double memoryStrength = studyCapacity.getMemoryStrength();
             sentenceTranslateVo = getSentenceTranslateVo(plan, firstStudy, sentenceCount, type, sentence);
@@ -150,7 +144,7 @@ public class SaveSentenceData {
         } else if (STUDYMODEL2.equals(studyModel)) {
             // 例句听力
             // 计算当前例句的记忆强度
-            Sentence sentence = sentenceMapper.selectByPrimaryKey(studyCapacity.getWordId());
+            Sentence sentence = courseFeignClient.selectSentenceById(studyCapacity.getWordId());
             double memoryStrength = studyCapacity.getMemoryStrength();
             sentenceTranslateVo = this.getListenSentenceVo(sentence, firstStudy, plan, memoryStrength, sentenceCount, type);
             sentenceTranslateVo.setCourseId(studyCapacity.getCourseId().intValue());
@@ -159,7 +153,7 @@ public class SaveSentenceData {
         } else if (STUDYMODEL3.equals(studyModel)) {
             // 例句默写
             // 计算当前例句的记忆强度
-            Sentence sentence = sentenceMapper.selectByPrimaryKey(studyCapacity.getWordId());
+            Sentence sentence = courseFeignClient.selectSentenceById(studyCapacity.getWordId());
             double memoryStrength = studyCapacity.getMemoryStrength();
             sentenceTranslateVo = this.getSentenceVo(sentence, firstStudy, plan, memoryStrength, sentenceCount, type);
             return ServerResponse.createBySuccess(sentenceTranslateVo);
@@ -226,6 +220,6 @@ public class SaveSentenceData {
     private Sentence getSentence(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
         List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel, modelType);
-        return sentenceMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
+        return courseFeignClient.selectSentenceOneWordNotInIdsNew(wordIds, unitId, group);
     }
 }
