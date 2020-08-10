@@ -131,7 +131,7 @@ public class RedisOpt {
         String hKey = RedisKeysConst.ALL_COURSE_WITH_STUDENT_IN_TYPE + studentId + ":" + phase;
         List<Map<String, Object>> courseList;
         Object object = getRedisObject(hKey);
-        if (object == null) {
+        if (object == null||object.toString().length()<=2) {
             courseList = getCourses(studentId, phase);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, courseList);
         } else {
