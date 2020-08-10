@@ -26,6 +26,8 @@ import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.TestResultVo;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.test.constant.TestConstant;
 import com.zhidejiaoyu.student.business.test.service.BeforeStudyTestService;
@@ -78,6 +80,12 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
     @Resource
     private CourseFeignClient courseFeignClient;
+
+    @Resource
+    private UnitFeignClient unitFeignClient;
+
+    @Resource
+    private VocabularyFeignClient vocabularyFeignClient;
 
     @Override
     public ServerResponse<List<SubjectsVO>> getSubjects() {
@@ -452,7 +460,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * @return
      */
     public Map<Long, Long> getUnitIdAndCourseId(List<Long> unitIds) {
-        List<UnitNew> unitNews = courseFeignClient.getUnitNewsByIds(unitIds);
+        List<UnitNew> unitNews = unitFeignClient.getUnitNewsByIds(unitIds);
         Map<Long, Long> unitIdAndCourseId = new HashMap<>(16);
         unitNews.forEach(unitNew -> unitIdAndCourseId.put(unitNew.getId(), unitNew.getCourseId()));
         return unitIdAndCourseId;
@@ -504,7 +512,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         HttpUtil.getHttpSession().setAttribute(TestConstant.TEST_BEFORE_STUDY_UNIT_IDS, unitIds);
 
         // 取题
-        List<SubjectsVO> subjectsVos = courseFeignClient.getSubjectsVOByUnitIds(unitIds);
+        List<SubjectsVO> subjectsVos = vocabularyFeignClient.getSubjectsVOByUnitIds(unitIds);
         Map<Long, List<SubjectsVO>> collect = subjectsVos.stream().collect(Collectors.groupingBy(SubjectsVO::getUnitId));
         List<SubjectsVO> result = new ArrayList<>();
 
@@ -536,7 +544,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         if (size > 1) {
             List<String> smallGradeList = gradeList.subList(0, size - 1);
             // 当前版本中小于当前年级的所有单元id
-            unitIds.addAll(courseFeignClient.getUnitIdsByGradeListAndVersionAndGrade(courseNew.getVersion(), smallGradeList));
+            unitIds.addAll(unitFeignClient.getUnitIdsByGradeListAndVersionAndGrade(courseNew.getVersion(), smallGradeList));
         }
         // 当前版本中等于当前年级小于或者等于当前单元的所有单元id
         unitIds.addAll(this.getUnitIdsLessThanCurrentUnitId(schoolTime.getCourseId(), schoolTime.getUnitId()));
@@ -558,7 +566,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
         // 说明这个课程只有一个标签
         if (lessLabels.size() == 1 && lessLabels.get(0).equals(label)) {
-            return courseFeignClient.getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(courseId, unitId);
+            return unitFeignClient.getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(courseId, unitId);
         }
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -567,8 +575,8 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             return stringBuilder.append(courseNew.getVersion()).append("(").append(courseNew.getGrade()).append("-").append(lessLabel).append(")").toString();
         }).collect(Collectors.toList());
 
-        List<Long> resultList = courseFeignClient.getUnitIdsByCourseNames(courseNames);
-        resultList.addAll(courseFeignClient.getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(courseId, unitId));
+        List<Long> resultList = unitFeignClient.getUnitIdsByCourseNames(courseNames);
+        resultList.addAll(unitFeignClient.getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(courseId, unitId));
         return resultList;
     }
 

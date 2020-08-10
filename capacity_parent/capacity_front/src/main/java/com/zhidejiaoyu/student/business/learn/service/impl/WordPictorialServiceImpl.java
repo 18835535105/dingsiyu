@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.WordPictorialVo;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.learn.vo.GetVo;
@@ -57,6 +58,8 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
     private WordMemoryDifficulty wordMemoryDifficulty;
     @Resource
     private CourseFeignClient courseFeignClient;
+    @Resource
+    private VocabularyFeignClient vocabularyFeignClient;
 
     private Integer model = 1;
     private Integer type = 1;
@@ -74,7 +77,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         //获取当前单元下的learnId
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard,1);
         //获取是否有可以学习的单词信息
-        int wordCount = courseFeignClient.countWordPictureByUnitId(unitId, learnNew.getGroup());
+        int wordCount = vocabularyFeignClient.countWordPictureByUnitId(unitId, learnNew.getGroup());
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词图鉴信息！", unitId);
             return ServerResponse.createByErrorMessage("The unit no pictures");
@@ -175,7 +178,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         Long[] wordId=new Long[longs.size()];
         longs.toArray(wordId);
         // 获取新词
-        correct =courseFeignClient.getStudyNewMap(unitId, wordId, type, group);
+        correct =vocabularyFeignClient.getStudyNewMap(unitId, wordId, type, group);
         return correct;
     }
 

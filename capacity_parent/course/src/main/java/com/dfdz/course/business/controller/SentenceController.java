@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/course/sentence")
@@ -72,6 +73,18 @@ public class SentenceController {
     @GetMapping("/selectSentenceOneWordNotInIdsNew")
     public Sentence selectSentenceOneWordNotInIdsNew(@RequestParam List<Long> wordIds, @RequestParam Long unitId, @RequestParam Integer group){
         return sentenceService.selectOneWordNotInIdsNew(wordIds,unitId,group);
+    }
+
+    /**
+     * 根据unitId和group获取游戏数据
+     *
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @GetMapping("/sentence/selectSentenceAndChineseByUnitIdAndGroup")
+    List<Map<String, Object>> selectSentenceAndChineseByUnitIdAndGroup(@RequestParam Long unitId, @RequestParam Integer group){
+        return sentenceService.selectSentenceAndChineseByUnitIdAndGroup(unitId,group);
     }
 
 }

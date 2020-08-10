@@ -23,6 +23,7 @@ import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.sentence.CourseUnitVo;
+import com.zhidejiaoyu.student.business.feignclient.course.CenterTeksFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TeksService;
@@ -147,7 +148,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Resource
     private TestService testService;
     @Resource
-    private CourseFeignClient courseFeignClient;
+    private CenterTeksFeignClient centerTeksFeignClient;
 
 
     @Override
@@ -1053,7 +1054,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<TeksNew> addTeks = null;
         //根据清楚后的语句小于4句时添加
         if (useTeks.size() < 4) {
-            addTeks = courseFeignClient.getTwentyTeks();
+            addTeks = centerTeksFeignClient.getTwentyTeks();
         }
         return getReturnTestTeks(useTeks, addTeks);
     }

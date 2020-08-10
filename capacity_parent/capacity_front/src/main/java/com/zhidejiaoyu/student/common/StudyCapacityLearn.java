@@ -8,6 +8,8 @@ import com.zhidejiaoyu.common.study.StudentRestudyUtil;
 import com.zhidejiaoyu.common.study.memorystrength.StudyMemoryStrength;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,15 +23,16 @@ public class StudyCapacityLearn {
 
     @Resource
     private CourseFeignClient courseFeignClient;
-
     @Resource
     private StudyCapacityMapper studyCapacityMapper;
-
     @Resource
     private StudentRestudyUtil studentRestudyUtil;
-
     @Resource
     private StudyMemoryStrength studyMemoryStrength;
+    @Resource
+    private VocabularyFeignClient vocabularyFeignClient;
+    @Resource
+    private SentenceFeignClient sentenceFeignClient;
 
     /**
      * 保存指定模块的单词学习记录和慧追踪信息
@@ -42,13 +45,13 @@ public class StudyCapacityLearn {
      */
     public StudyCapacity saveCapacityMemory(LearnNew learn, LearnExtend learnExtend, Student student, boolean isKnown, Integer studyModel) {
         if (studyModel < 7) {
-            Vocabulary vocabulary = courseFeignClient.selectVocabularyById(learnExtend.getWordId());
+            Vocabulary vocabulary = vocabularyFeignClient.selectVocabularyById(learnExtend.getWordId());
 //        if (studyModel != 1 && studyModel != 2 && studyModel != 3 && studyModel != 4 && studyModel != 5) {
 //            throw new RuntimeException("studyModel=" + studyModel + " 非法！");
 //        }
             // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
             StudyCapacity capacity = getCapacityInfo(learn, student, studyModel, vocabulary);
-            String wordChinese = courseFeignClient.getWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
+            String wordChinese = vocabularyFeignClient.getWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
             // 封装记忆追踪信息
             if (wordChinese == null) {
                 wordChinese = vocabulary.getWordChinese();
@@ -56,10 +59,10 @@ public class StudyCapacityLearn {
             capacity = packageCapacityInfo(learn, learnExtend, student, isKnown, studyModel, vocabulary, capacity, wordChinese);
             return capacity;
         } else if (studyModel < 11) {
-            Sentence sentence = courseFeignClient.selectSentenceById(learnExtend.getWordId());
+            Sentence sentence = sentenceFeignClient.selectSentenceById(learnExtend.getWordId());
             // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
             StudyCapacity capacity = getCapacityInfo(learn, student, studyModel, sentence);
-            String chinese = courseFeignClient.getSentenceChinsesByUnitIdAndSentenceId(learn.getUnitId(), sentence.getId());
+            String chinese = sentenceFeignClient.getSentenceChinsesByUnitIdAndSentenceId(learn.getUnitId(), sentence.getId());
             capacity = packageCapacityInfo(learn, learnExtend, student, isKnown, studyModel, sentence, capacity, chinese);
             return capacity;
         }

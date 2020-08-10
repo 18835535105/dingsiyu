@@ -44,4 +44,6 @@ public interface VocabularyService extends IService<Vocabulary> {
      * @return
      */
     List<SubjectsVO> getSubjectsVOByUnitIds(List<Long> unitIds);
+
+    List<String> selectInterferenceTerm(Long unitId, Long vocabularyId, String wordChinese);
 }

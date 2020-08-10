@@ -15,7 +15,10 @@ import com.zhidejiaoyu.common.vo.currentdayofstudy.CurrentDayOfStudyVo;
 import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 import com.zhidejiaoyu.common.vo.currentdayofstudy.TodayCurrentDayOfStudyVo;
 import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
+import com.zhidejiaoyu.student.business.feignclient.course.CenterTeksFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import org.springframework.stereotype.Service;
@@ -45,7 +48,13 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
     private CurrentDayOfStudyMapper currentDayOfStudyMapper;
 
     @Resource
-    private CourseFeignClient courseFeignClient;
+    private VocabularyFeignClient vocabularyFeignClient;
+
+    @Resource
+    private SentenceFeignClient sentenceFeignClient;
+
+    @Resource
+    private CenterTeksFeignClient centerTeksFeignClient;
 
     @Override
     public ServerResponse<Object> getCurrentDayOfStudy() {
@@ -199,17 +208,17 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
             List<String> strings = Arrays.asList(split);
             strings.forEach(str -> {
                 Map<String, String> map = new HashMap<>();
-                String voc = courseFeignClient.getVocabularyChinsesByWordId(str);
-                if(voc!=null){
+                String voc = vocabularyFeignClient.getVocabularyChinsesByWordId(str);
+                if (voc != null) {
                     map.put("english", str);
                     map.put("chinese", voc);
-                }else{
-                    TeksNew teks = courseFeignClient.replaceTeks(str);
+                } else {
+                    TeksNew teks = centerTeksFeignClient.replaceTeks(str);
                     if (teks != null) {
                         map.put("english", teks.getSentence().replace("#", " ").replace("$", ""));
                         map.put("chinese", teks.getParaphrase().replace("*", ""));
                     } else {
-                        Sentence sentence = courseFeignClient.getReplaceSentece(str);
+                        Sentence sentence = sentenceFeignClient.getReplaceSentece(str);
                         if (sentence != null) {
                             map.put("english", sentence.getCentreExample().replace("#", " ").replace("$", ""));
                             map.put("chinese", sentence.getCentreTranslate().replace("*", ""));

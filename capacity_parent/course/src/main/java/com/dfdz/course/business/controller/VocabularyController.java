@@ -171,4 +171,9 @@ public class VocabularyController {
         return vocabularyService.getSubjectsVOByUnitIds(unitIds);
     }
 
+    @RequestMapping(value = "/selectInterferenceTerm", method = RequestMethod.GET)
+    public List<String> selectInterferenceTerm(@RequestParam Long unitId,@RequestParam Long vocabularyId,@RequestParam String wordChinese){
+        return vocabularyService.selectInterferenceTerm(unitId,vocabularyId,wordChinese);
+    }
+
 }

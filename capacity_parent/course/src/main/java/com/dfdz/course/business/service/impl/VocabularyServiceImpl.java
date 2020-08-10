@@ -87,5 +87,10 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
         return vocabularyMapper.selectSubjectsVOByUnitIds(unitIds);
     }
 
+    @Override
+    public List<String> selectInterferenceTerm(Long unitId, Long vocabularyId, String wordChinese) {
+        return unitVocabularyNewMapper.selectInterferenceTerm(unitId, vocabularyId, wordChinese);
+    }
+
 
 }

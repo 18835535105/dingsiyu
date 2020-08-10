@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SentenceServiceImpl extends ServiceImpl<SentenceMapper, Sentence> implements SentenceService {
@@ -41,5 +42,10 @@ public class SentenceServiceImpl extends ServiceImpl<SentenceMapper, Sentence> i
     @Override
     public Sentence selectOneWordNotInIdsNew(List<Long> wordIds, Long unitId, Integer group) {
         return sentenceMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectSentenceAndChineseByUnitIdAndGroup(Long unitId, Integer group) {
+        return unitSentenceNewMapper.selectSentenceAndChineseByUnitIdAndGroup(unitId, group);
     }
 }

@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.DictationVo;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.learn.vo.GetVo;
@@ -37,8 +38,6 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
     @Resource
     private StudyCapacityMapper studyCapacityMapper;
     @Resource
-    private UnitVocabularyNewMapper unitVocabularyNewMapper;
-    @Resource
     private VocabularyMapper vocabularyMapper;
     @Resource
     private BaiduSpeak baiduSpeak;
@@ -47,11 +46,13 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
     @Resource
     private CourseFeignClient courseFeignClient;
     @Resource
+    private VocabularyFeignClient vocabularyFeignClient;
+    @Resource
     private RedisOpt redisOpt;
     private Integer type = 4;
     private Integer easyOrHard = 2;
     private String studyModel = "慧听写";
-    private Integer modelType=1;
+    private Integer modelType = 1;
 
 
     @Override
@@ -64,11 +65,11 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
         saveData.judgeIsFirstStudy(session, student);
         // 记录学生开始学习该单词/例句的时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard,1);
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard, 1);
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
-        Integer wordCount = courseFeignClient.countLearnVocabularyByUnitIdAndGroup(unitId, learnNews.getGroup());
+        Integer wordCount = vocabularyFeignClient.countLearnVocabularyByUnitIdAndGroup(unitId, learnNews.getGroup());
         DictationVo vo = new DictationVo();
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词信息！", unitId);
@@ -78,7 +79,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
             return super.toUnitTest();
         }
         //获取单词id
-        List<Long> wordIdByUnitIdAndGroup = courseFeignClient.getWordIdByUnitIdAndGroup(unitId, learnNews.getGroup());
+        List<Long> wordIdByUnitIdAndGroup = vocabularyFeignClient.getWordIdByUnitIdAndGroup(unitId, learnNews.getGroup());
         StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, wordIdByUnitIdAndGroup);
         // 1. 查询智能听写记忆追踪中是否有需要复习的单词
         Vocabulary vocabulary;

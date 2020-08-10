@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.study.phonetic.PhoneticSymbolListenVo;
 import com.zhidejiaoyu.common.vo.study.phonetic.Topic;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.service.PhoneticSymbolService;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,8 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     private RedisOpt redisOpt;
     @Autowired
     private TestRecordMapper testRecordMapper;
+    @Resource
+    private VocabularyFeignClient vocabularyFeignClient;
 
     private static final Long minId = 1L;
     private static final Long maxId = 11L;
@@ -229,7 +232,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             return Collections.emptyList();
         }
 
-        List<Map<String, String>> maps = courseFeignClient.getWordAndReadUrlByWords(vocabularies);
+        List<Map<String, String>> maps = vocabularyFeignClient.getWordAndReadUrlByWords(vocabularies);
 
         Map<String, Map<String, String>> wordMap = new HashMap<>(16);
         maps.forEach(m -> {

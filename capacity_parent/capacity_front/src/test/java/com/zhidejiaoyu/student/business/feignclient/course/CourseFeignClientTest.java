@@ -28,6 +28,12 @@ public class CourseFeignClientTest {
 
     @Resource
     private CourseFeignClient courseFeignClient;
+    @Resource
+    private UnitFeignClient unitFeignClient;
+    @Resource
+    private VocabularyFeignClient vocabularyFeignClient;
+    @Resource
+    private CenterTeksFeignClient centerTeksFeignClient;
 
     @Test
     public void testGetById() {
@@ -37,7 +43,7 @@ public class CourseFeignClientTest {
 
     @Test
     public void selTeksByUnitIdAndGroup() {
-        List<TeksNew> teksNews = courseFeignClient.selTeksByUnitIdAndGroup(101033L, 1);
+        List<TeksNew> teksNews = centerTeksFeignClient.selTeksByUnitIdAndGroup(101033L, 1);
         log.info("teksNews={}", teksNews.toString());
     }
 
@@ -59,7 +65,7 @@ public class CourseFeignClientTest {
     public void getUnitIdsByCourseNames() {
         ArrayList<String> longs = new ArrayList<>();
         longs.add("人教版(七年级-下册)");
-        List<Long> unitIdsByCourseNames = courseFeignClient.getUnitIdsByCourseNames(longs);
+        List<Long> unitIdsByCourseNames = unitFeignClient.getUnitIdsByCourseNames(longs);
         log.info("unitIdsByCourseNames={}", unitIdsByCourseNames.toString());
     }
 
@@ -67,7 +73,7 @@ public class CourseFeignClientTest {
     public void getUnitNewsByIds() {
         ArrayList<Long> longs = new ArrayList<>();
         longs.add(101257L);
-        List<UnitNew> unitNewsByIds = courseFeignClient.getUnitNewsByIds(longs);
+        List<UnitNew> unitNewsByIds = unitFeignClient.getUnitNewsByIds(longs);
         log.info("unitNewsByIds={}", unitNewsByIds.toString());
     }
 
@@ -75,13 +81,13 @@ public class CourseFeignClientTest {
     public void getUnitIdsByGradeListAndVersionAndGrade() {
         ArrayList<String> longs = new ArrayList<>();
         longs.add("七年级");
-        List<Long> list = courseFeignClient.getUnitIdsByGradeListAndVersionAndGrade("人教版", longs);
+        List<Long> list = unitFeignClient.getUnitIdsByGradeListAndVersionAndGrade("人教版", longs);
         log.info("list={}", list.toString());
     }
 
     @Test
     public void getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId() {
-        List<Long> list = courseFeignClient.getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(9489L, 101806L);
+        List<Long> list = unitFeignClient.getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(9489L, 101806L);
         log.info("list={}", list.toString());
     }
 
@@ -89,7 +95,7 @@ public class CourseFeignClientTest {
     public void getSubjectsVOByUnitIds() {
         ArrayList<Long> longs = new ArrayList<>();
         longs.add(101257L);
-        List<SubjectsVO> subjectsVOByUnitIds = courseFeignClient.getSubjectsVOByUnitIds(longs);
+        List<SubjectsVO> subjectsVOByUnitIds = vocabularyFeignClient.getSubjectsVOByUnitIds(longs);
         log.info("subjectsVOByUnitIds={}", subjectsVOByUnitIds.toString());
     }
 }

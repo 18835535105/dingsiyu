@@ -20,6 +20,7 @@ import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.dto.GetLimitQRCodeDTO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.SmallProgramTestService;
@@ -68,6 +69,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     private WeekActivityRankOpt weekActivityRankOpt;
     @Resource
     private CourseFeignClient courseFeignClient;
+    @Resource
+    private VocabularyFeignClient vocabularyFeignClient;
 
     @Override
     public Object getTest(HttpSession session, String openId) {
@@ -78,7 +81,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         List<Long> voIds = errorLearnLogMapper.selectVocabularyIdByStudentId(student.getId());
         List<Map<String, Object>> maps = new ArrayList<>();
         if (voIds != null && voIds.size() > 0) {
-            List<Vocabulary> vos = courseFeignClient.getVocabularyMapByVocabularys(voIds);
+            List<Vocabulary> vos = vocabularyFeignClient.getVocabularyMapByVocabularys(voIds);
             vos.forEach(vo -> {
                 Map<String, Object> map = new HashMap<>();
                 map.put("word", vo.getWord());
@@ -92,7 +95,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             //获取优先级最大的单元
             StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(student.getId());
             //获取当前单元的单词
-            List<Vocabulary> vocabularies = courseFeignClient.getVocabularyByUnitId(studentStudyPlanNew.getUnitId());
+            List<Vocabulary> vocabularies = vocabularyFeignClient.getVocabularyByUnitId(studentStudyPlanNew.getUnitId());
             vocabularies.forEach(vocabulary -> {
                 Map<String, Object> listMap = new HashMap<>();
                 listMap.put("wordId", vocabulary.getId());
@@ -304,7 +307,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     private List<Map<String, Object>> getOptionList(List<Map<String, Object>> getMaps, List<Long> vocabularyIds) {
         //获取干扰项
-        List<String> strings = courseFeignClient.selectChineseByNotVocabularyIds(vocabularyIds);
+        List<String> strings = vocabularyFeignClient.selectChineseByNotVocabularyIds(vocabularyIds);
         List<Map<String, Object>> returnList = new ArrayList<>();
         getMaps.forEach(map -> {
             Collections.shuffle(strings);

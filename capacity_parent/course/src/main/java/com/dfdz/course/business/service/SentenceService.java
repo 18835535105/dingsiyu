@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.TeksNew;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SentenceService extends IService<Sentence> {
     String selectSentenceChineseByUnitIdAndSentenceId(Long unitId, Long sentenceId);
@@ -16,4 +17,6 @@ public interface SentenceService extends IService<Sentence> {
     Integer countSentenceByUnitIdAndGroup(Long unitId, Integer group);
 
     Sentence selectOneWordNotInIdsNew(List<Long> wordIds, Long unitId, Integer group);
+
+    List<Map<String, Object>> selectSentenceAndChineseByUnitIdAndGroup(Long unitId, Integer group);
 }

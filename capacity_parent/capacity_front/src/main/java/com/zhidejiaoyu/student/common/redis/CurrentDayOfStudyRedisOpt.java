@@ -10,6 +10,9 @@ import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.SyntaxTopicFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -28,6 +31,12 @@ public class CurrentDayOfStudyRedisOpt {
     private RedisTemplate<String, Object> redisTemplate;
     @Resource
     private CourseFeignClient courseFeignClient;
+    @Resource
+    private VocabularyFeignClient vocabularyFeignClient;
+    @Resource
+    private SentenceFeignClient sentenceFeignClient;
+    @Resource
+    private SyntaxTopicFeignClient syntaxTopicFeignClient;
 
 
     /**
@@ -138,7 +147,7 @@ public class CurrentDayOfStudyRedisOpt {
             Integer integer = Integer.parseInt(key.toString());
             if (integer != null && integer > 3) {
                 if (type.equals(1)) {
-                    Vocabulary vocabulary = courseFeignClient.selectVocabularyById(integer.longValue());
+                    Vocabulary vocabulary = vocabularyFeignClient.selectVocabularyById(integer.longValue());
                     if (vocabulary != null) {
                         Map<String, Object> map = new HashMap<>();
                         map.put("english", vocabulary.getWord());
@@ -147,7 +156,7 @@ public class CurrentDayOfStudyRedisOpt {
                     }
                 }
                 if (type.equals(2)) {
-                    Sentence sentence = courseFeignClient.selectSentenceById(integer.longValue());
+                    Sentence sentence = sentenceFeignClient.selectSentenceById(integer.longValue());
                     if (sentence != null) {
                         Map<String, Object> map = new HashMap<>();
                         map.put("english", sentence.getCentreExample().replace("#", " ").replace("$", ""));
@@ -177,19 +186,19 @@ public class CurrentDayOfStudyRedisOpt {
             Integer integer = Integer.parseInt(key.toString());
             if (integer != null && integer > 3) {
                 if (type.equals(1)) {
-                    Vocabulary vocabulary = courseFeignClient.selectVocabularyById(integer.longValue());
+                    Vocabulary vocabulary = vocabularyFeignClient.selectVocabularyById(integer.longValue());
                     if (vocabulary != null) {
                         stringBuilder.append(vocabulary.getWord()).append("##");
                     }
                 }
                 if (type.equals(2)) {
-                    Sentence sentence = courseFeignClient.selectSentenceById(integer.longValue());
+                    Sentence sentence = sentenceFeignClient.selectSentenceById(integer.longValue());
                     if (sentence != null) {
                         stringBuilder.append(sentence.getCentreExample().replace("#", " ").replace("$", "")).append("##");
                     }
                 }
                 if (type.equals(3)) {
-                    SyntaxTopic syntaxTopic = courseFeignClient.selectSyntaxTopicById(integer.longValue());
+                    SyntaxTopic syntaxTopic = syntaxTopicFeignClient.selectSyntaxTopicById(integer.longValue());
                     if (syntaxTopic != null) {
                         stringBuilder.append(syntaxTopic.getTopic() + ":" + syntaxTopic.getAnswer()).append("##");
                     }

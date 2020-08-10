@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.course.UnitStudyStateVO;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.index.dto.UnitInfoDTO;
 import com.zhidejiaoyu.student.business.index.service.IndexCourseInfoService;
 import com.zhidejiaoyu.student.business.index.vo.course.CourseInfoVO;
@@ -71,6 +72,9 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     @Resource
     private LearnNewMapper learnNewMapper;
+
+    @Resource
+    private UnitFeignClient unitFeignClient;
 
     static {
         MAPPING.put(GradeNameConstant.FIRST_GRADE, "one");
@@ -159,7 +163,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             return ServerResponse.createBySuccess(vos);
         }
 
-        ServerResponse<Map<Long, Integer>> maxGroupResponse = courseFeignClient.getMaxGroupByUnitIsdAndType(unitIds, type);
+        ServerResponse<Map<Long, Integer>> maxGroupResponse = unitFeignClient.getMaxGroupByUnitIsdAndType(unitIds, type);
         if (maxGroupResponse.getStatus() != ResponseCode.SUCCESS.getCode()) {
             return ServerResponse.createByError(maxGroupResponse.getStatus(), maxGroupResponse.getMsg());
         }

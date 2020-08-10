@@ -11,6 +11,8 @@ import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.learn.vo.GetVo;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -34,8 +36,6 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
     @Resource
     private LearnNewMapper learnNewMapper;
     @Resource
-    private UnitSentenceNewMapper unitSentenceNewMapper;
-    @Resource
     private SentenceMapper sentenceMapper;
     @Resource
     private StudentMapper studentMapper;
@@ -43,6 +43,8 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
     private BaiduSpeak baiduSpeak;
     @Resource
     private StudentExpansionMapper studentExpansionMapper;
+    @Resource
+    private SentenceFeignClient sentenceFeignClient;
     @Autowired
     private PetSayUtil petSayUtil;
     private Integer modelType = 2;
@@ -64,7 +66,7 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
             group = learnNews.getGroup();
         }
         //获取题目
-        List<Map<String, Object>> lookMaps = unitSentenceNewMapper.selectSentenceAndChineseByUnitIdAndGroup(unitId, group);
+        List<Map<String, Object>> lookMaps = sentenceFeignClient.selectSentenceAndChineseByUnitIdAndGroup(unitId, group);
         if (lookMaps.size() > 0) {
             if (lookMaps.size() < 5) {
                 getMaps.addAll(lookMaps);
