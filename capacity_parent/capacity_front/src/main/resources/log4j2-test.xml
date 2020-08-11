@@ -60,7 +60,7 @@
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1"/>
-                <SizeBasedTriggeringPolicy size="10MB"/>
+                <SizeBasedTriggeringPolicy size="1MB"/>
             </Policies>
             <DefaultRolloverStrategy max="20"/>
         </RollingFile>
