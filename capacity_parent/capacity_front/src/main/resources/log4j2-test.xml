@@ -70,7 +70,10 @@
     <loggers>
 
         <logger name="com.zhidejiaoyu" level="info" additivity="false">
-<!--            <AppenderRef ref="FileLog"/>-->
+            <AppenderRef ref="FileLog"/>
+            <AppenderRef ref="RollingFileInfo"/>
+            <AppenderRef ref="RollingFileWarn"/>
+            <AppenderRef ref="RollingFileError"/>
         </logger>
 
         <!-- Logger 节点用来单独指定 package 包下的 class 的日志输出格式等信息 -->
