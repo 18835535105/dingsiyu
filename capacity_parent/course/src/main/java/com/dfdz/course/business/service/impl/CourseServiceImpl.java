@@ -86,4 +86,14 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
     public String selectGradeByCourseId(Long courseId) {
         return courseNewMapper.selectGradeByCourseId(courseId);
     }
+
+    @Override
+    public List<Map<String, Object>> selectIdAndVersionByStudentIdByPhase(Long studentId, String phase) {
+        return courseNewMapper.selectIdAndVersionByStudentIdByPhase(studentId, phase);
+    }
+
+    @Override
+    public Map<Long, Map<Long, Object>> selectUnitsWordSum(long courseId) {
+        return courseNewMapper.selectUnitsWordSum(courseId);
+    }
 }

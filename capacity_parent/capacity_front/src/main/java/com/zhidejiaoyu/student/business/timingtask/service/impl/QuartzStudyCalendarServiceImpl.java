@@ -6,6 +6,8 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseCourseFeginClient;
+import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzStudyCalendarService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -59,13 +61,6 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
 
     @Resource
     private LearnHistoryMapper learnHistoryMapper;
-
-    @Resource
-    private CourseNewMapper courseNewMapper;
-
-    @Resource
-    private UnitNewMapper unitNewMapper;
-
     @Resource
     private LearningDetailsMapper learningDetailsMapper;
     @Resource
@@ -78,6 +73,10 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     private SchoolGoldFactoryMapper schoolGoldFactoryMapper;
     @Resource
     private StudentMapper studentMapper;
+    @Resource
+    private CourseCourseFeginClient courseCourseFeginClient;
+    @Resource
+    private UnitFeignClient unitFeignClient;
 
     /**
      * 每天 0：02 分执行
@@ -179,10 +178,8 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
                     value.setValidTime(validTime == null ? 0 : Long.parseLong(validTime.toString()));
                     value.setOnlineTime(onlineTime == null ? 0 : Long.parseLong(onlineTime.toString()));
                     value.setLearningModel(Integer.parseInt(learningModel.toString()));
-
-                    CourseNew courseNew = courseNewMapper.selectById(value.getCourseId());
-                    UnitNew unitNew = unitNewMapper.selectById(value.getUnitId());
-
+                    CourseNew courseNew = courseCourseFeginClient.getById(value.getCourseId());
+                    UnitNew unitNew = unitFeignClient.selectById(value.getUnitId());
                     value.setCourseName(courseNew.getCourseName());
                     value.setUnitName(unitNew.getUnitName());
                     value.setCreateTime(now);

@@ -23,4 +23,6 @@ public interface SentenceService extends IService<Sentence> {
     List<Sentence> selectByUnitIdAndGroup(Long unitId, Integer group);
 
     List<Sentence> selectRoundSentence(Long courseId);
+
+    List<Sentence> selectByUnitId(Long unitId);
 }

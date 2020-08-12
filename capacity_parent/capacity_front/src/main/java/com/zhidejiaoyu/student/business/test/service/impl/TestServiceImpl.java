@@ -68,8 +68,6 @@ import java.util.*;
 @Service
 public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecord> implements TestService {
 
-    @Autowired
-    private SentenceMapper sentenceMapper;
     @Resource
     private SaveData saveData;
     @Resource
@@ -1701,7 +1699,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(getStudentId(session), unitId, easyOrHard, 2);
         // 获取当前单元下其中一个例句
-        List<Sentence> sentences = sentenceMapper.selectByUnitIdAndGroup(unitId, learnNew.getGroup());
+        List<Sentence> sentences = sentenceFeignClient.selectByUnitIdAndGroup(unitId, learnNew.getGroup());
         List<SentenceTranslateVo> sentenceTestResults = testResultUtil.getSentenceTestResults(sentences, MathUtil.getRandom(4, 6), type);
         return ServerResponse.createBySuccess(sentenceTestResults);
     }

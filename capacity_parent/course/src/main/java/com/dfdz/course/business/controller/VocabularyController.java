@@ -228,4 +228,35 @@ public class VocabularyController {
         return vocabularyService.getTestPaperGenerationAll(courseId,typeTwo,unitId);
     }
 
+    /**
+     * 根据unitId和group获取单词数据
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @RequestMapping(value = "/selectByUnitIdAndGroup", method = RequestMethod.GET)
+    public List<Vocabulary> selectByUnitIdAndGroup(@RequestParam Long unitId,@RequestParam Integer group){
+        return vocabularyService.selectByUnitIdAndGroup(unitId,group);
+    }
+
+    /**
+     * 根据单元id获取单元单词数量
+     * @param unitId
+     * @return
+     */
+    @RequestMapping(value = "/countByUnitId", method = RequestMethod.GET)
+    public long countByUnitId(@RequestParam Long unitId){
+        return vocabularyService.countByUnitId(unitId);
+    }
+
+    /**
+     * 跟据courseId获取单元单词数量
+     * @param courseId
+     * @return
+     */
+    @RequestMapping(value = "/countAllCountWordByCourse", method = RequestMethod.GET)
+    public int countAllCountWordByCourse(@RequestParam Long courseId){
+        return vocabularyService.countAllCountWordByCourse(courseId);
+    }
+
 }

@@ -186,4 +186,14 @@ public class CourseController {
     public String selectGradeByCourseId(@RequestParam Long courseId) {
         return courseService.selectGradeByCourseId(courseId);
     }
+
+    @RequestMapping(value = "/selectIdAndVersionByStudentIdByPhase", method = RequestMethod.GET)
+    public List<Map<String, Object>> selectIdAndVersionByStudentIdByPhase(@RequestParam Long studentId,@RequestParam String phase){
+        return courseService.selectIdAndVersionByStudentIdByPhase(studentId,phase);
+    }
+
+    @RequestMapping(value = "/selectUnitsWordSum", method = RequestMethod.GET)
+    public Map<Long, Map<Long, Object>> selectUnitsWordSum(@RequestParam long courseId){
+        return courseService.selectUnitsWordSum(courseId);
+    }
 }

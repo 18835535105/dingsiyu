@@ -2,7 +2,6 @@ package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
 import com.zhidejiaoyu.common.constant.GoldLogReasonConstant;
 import com.zhidejiaoyu.common.constant.redis.WeekActivityRedisKeysConst;
-import com.zhidejiaoyu.common.mapper.KnownWordsMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.mapper.WeekActivityConfigMapper;
@@ -56,9 +55,6 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
 
     @Resource
     private WeekActivityRankService weekActivityRankService;
-
-    @Resource
-    private KnownWordsMapper knownWordsMapper;
 
     /**
      * 同服务器排行名次与奖励的金币对应关系，校区排名奖励金币数是该奖励的一半

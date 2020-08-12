@@ -4,6 +4,9 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseCourseFeginClient;
+import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.shipconfig.service.impl.ShipAddEquipmentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -27,23 +30,21 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisOpt {
 
-    @Resource
-    private UnitVocabularyNewMapper unitVocabularyNewMapper;
-
-    @Autowired
-    private VocabularyMapper vocabularyMapper;
 
     @Autowired
     private LevelMapper levelMapper;
 
     @Autowired
-    private SentenceMapper sentenceMapper;
-
-    @Autowired
     private PhoneticSymbolMapper phoneticSymbolMapper;
 
     @Resource
-    private CourseNewMapper courseNewMapper;
+    private SentenceFeignClient sentenceFeignClient;
+
+    @Resource
+    private CourseCourseFeginClient courseCourseFeginClient;
+
+    @Resource
+    private VocabularyFeignClient vocabularyFeignClient;
 
     @Resource
     private StudentExpansionMapper studentExpansionMapper;
@@ -53,9 +54,6 @@ public class RedisOpt {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
-    private RunLogMapper runLogMapper;
 
     @Resource
     private StudentEquipmentMapper studentEquipmentMapper;
@@ -131,7 +129,7 @@ public class RedisOpt {
         String hKey = RedisKeysConst.ALL_COURSE_WITH_STUDENT_IN_TYPE + studentId + ":" + phase;
         List<Map<String, Object>> courseList;
         Object object = getRedisObject(hKey);
-        if (object == null||object.toString().length()<=2) {
+        if (object == null || object.toString().length() <= 2) {
             courseList = getCourses(studentId, phase);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, courseList);
         } else {
@@ -156,7 +154,7 @@ public class RedisOpt {
      * @return
      */
     private List<Map<String, Object>> getCourses(Long studentId, String phase) {
-        List<Map<String, Object>> courseList = courseNewMapper.selectIdAndVersionByStudentIdByPhase(studentId, phase);
+        List<Map<String, Object>> courseList = courseCourseFeginClient.selectIdAndVersionByStudentIdByPhase(studentId, phase);
         if (courseList.size() > 0) {
             courseList.forEach(c -> {
                 if (c.get("version") != null && c.get("version").toString().contains("冲刺版")) {
@@ -181,14 +179,14 @@ public class RedisOpt {
         Object object = getRedisObject(unitWordSumKey);
         Map<Long, Map<Long, Object>> unitWordSum;
         if (object == null) {
-            unitWordSum = courseNewMapper.selectUnitsWordSum(courseId);
+            unitWordSum = courseCourseFeginClient.selectUnitsWordSum(courseId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, unitWordSumKey, unitWordSum);
         } else {
             try {
                 unitWordSum = (Map<Long, Map<Long, Object>>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], courseId=[{}], error=[{}]", object, courseId, e.getMessage());
-                unitWordSum = courseNewMapper.selectUnitsWordSum(courseId);
+                unitWordSum = courseCourseFeginClient.selectUnitsWordSum(courseId);
                 log.error("重新查询数据：unitWordSum=[{}]", unitWordSum);
             }
         }
@@ -207,14 +205,14 @@ public class RedisOpt {
         Object object = getRedisObject(wordCountKey);
         long wordCount;
         if (object == null) {
-            wordCount = unitVocabularyNewMapper.countByUnitId(unitId);
+            wordCount = vocabularyFeignClient.countByUnitId(unitId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, wordCountKey, wordCount);
         } else {
             try {
                 wordCount = (int) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
-                wordCount = unitVocabularyNewMapper.countByUnitId(unitId);
+                wordCount = vocabularyFeignClient.countByUnitId(unitId);
                 log.error("重新查询结果：wordCount=[{}]", wordCount);
             }
         }
@@ -239,14 +237,14 @@ public class RedisOpt {
         Object object = getRedisHashObject(hKey);
         int count;
         if (object == null) {
-            count = unitVocabularyNewMapper.countAllCountWordByCourse(courseId);
+            count = vocabularyFeignClient.countAllCountWordByCourse(courseId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, count);
         } else {
             try {
                 count = (int) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], courseId=[{}], error=[{}]", object, courseId, e.getMessage());
-                count = unitVocabularyNewMapper.countAllCountWordByCourse(courseId);
+                count = vocabularyFeignClient.countAllCountWordByCourse(courseId);
                 log.error("重新查询结果：count=[{}]", count);
             }
         }
@@ -264,14 +262,14 @@ public class RedisOpt {
         List<Vocabulary> vocabularies;
         Object object = getRedisHashObject(hKey);
         if (object == null) {
-            vocabularies = vocabularyMapper.selectByUnitId(unitId);
+            vocabularies = vocabularyFeignClient.selectByUnitId(unitId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, vocabularies);
         } else {
             try {
                 vocabularies = (List<Vocabulary>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
-                vocabularies = vocabularyMapper.selectByUnitId(unitId);
+                vocabularies = vocabularyFeignClient.selectByUnitId(unitId);
             }
         }
         return vocabularies;
@@ -288,14 +286,14 @@ public class RedisOpt {
         List<Vocabulary> vocabularies;
         Object object = getRedisHashObject(hKey);
         if (object == null) {
-            vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId, group);
+            vocabularies = vocabularyFeignClient.selectByUnitIdAndGroup(unitId, group);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, vocabularies);
         } else {
             try {
                 vocabularies = (List<Vocabulary>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
-                vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId, group);
+                vocabularies = vocabularyFeignClient.selectByUnitIdAndGroup(unitId, group);
             }
         }
         return vocabularies;
@@ -306,14 +304,14 @@ public class RedisOpt {
         List<Vocabulary> vocabularies;
         Object object = getRedisHashObject(hKey);
         if (object == null) {
-            vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId, group);
+            vocabularies = vocabularyFeignClient.selectByUnitIdAndGroup(unitId, group);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, vocabularies);
         } else {
             try {
                 vocabularies = (List<Vocabulary>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
-                vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId, group);
+                vocabularies = vocabularyFeignClient.selectByUnitIdAndGroup(unitId, group);
             }
         }
         return vocabularies;
@@ -330,13 +328,13 @@ public class RedisOpt {
         List<Sentence> sentences;
         Object redisObject = getRedisHashObject(hKey);
         if (redisObject == null) {
-            sentences = sentenceMapper.selectByUnitId(unitId);
+            sentences = sentenceFeignClient.selectByUnitId(unitId);
         } else {
             try {
                 sentences = (List<Sentence>) redisObject;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", redisObject, unitId, e.getMessage());
-                sentences = sentenceMapper.selectByUnitId(unitId);
+                sentences = sentenceFeignClient.selectByUnitId(unitId);
             }
         }
         return sentences;

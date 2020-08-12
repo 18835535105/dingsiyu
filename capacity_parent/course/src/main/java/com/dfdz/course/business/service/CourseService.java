@@ -91,4 +91,8 @@ public interface CourseService extends IService<CourseNew> {
     List<GradeAndUnitIdDTO> getGradeAndLabelByUnitIds(List<Long> unitIds);
 
     String selectGradeByCourseId(Long courseId);
+
+    List<Map<String, Object>> selectIdAndVersionByStudentIdByPhase(Long studentId, String phase);
+
+    Map<Long, Map<Long, Object>> selectUnitsWordSum(long courseId);
 }
