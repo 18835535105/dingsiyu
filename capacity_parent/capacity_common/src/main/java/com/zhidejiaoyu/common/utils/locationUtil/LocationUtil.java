@@ -3,13 +3,15 @@ package com.zhidejiaoyu.common.utils.locationUtil;
 import com.alibaba.csp.ahas.shaded.com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 /**
  * 定位工具
+ * <ul>
+ *     <li> 腾讯地图，接口地址：https://lbs.qq.com/webservice_v1/guide-gcoder.html</li>
+ * </ul>
  *
  * @author wuchenxi
  * @date 2019-05-25
@@ -24,17 +26,14 @@ public class LocationUtil {
     /**
      * 根据经纬度精确定位
      */
-    @Value("${tencent.map.url}")
-    private String mapUrl;
+    private static final String mapUrl = "https://apis.map.qq.com/ws/geocoder/v1/";
 
-    @Value("${tencent.map.key}")
-    private String mapKey;
+    private static final String mapKey = "UGPBZ-SVC6X-O3W43-TYLAQ-CVERH-OFF65";
 
-    @Value("${tencent.distance.url}")
-    private String distanceUrl;
-
-    @Value("${tencent.location.url}")
-    private String locationUrl;
+    /**
+     * 腾讯 ip 定位
+     */
+    private static final String locationUrl = "https://apis.map.qq.com/ws/location/v1/ip";
 
     /**
      * 响应码
