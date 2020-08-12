@@ -11,6 +11,7 @@ import com.zhidejiaoyu.student.business.service.StudentInfoService;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.service.QyFlyService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.FlyOfStudyService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.IndexService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,7 @@ import java.util.Objects;
  * @author: wuchenxi
  * @date: 2020/6/16 13:52:52
  */
+@Slf4j
 @RestController
 @RequestMapping("/qy/fly")
 public class QyFlyController {
@@ -134,9 +136,10 @@ public class QyFlyController {
         Student student = studentInfoService.getByUuid(uuid);
         if (Objects.equals(DateUtil.formatYYYYMMDD(new Date()), date)) {
             // 查询当天的数据
+            log.info("查询当天的数据，date={}", date);
             return currentDayOfStudyService.getCurrentDayOfStudy(student.getId());
         }
-
+        log.info("查询指定日期的数据， date={}", date);
         return currentDayOfStudyService.getCurrentDayOfStudyWithDate(student.getId(), date);
 
     }
