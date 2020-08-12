@@ -7,7 +7,6 @@ import com.zhidejiaoyu.common.vo.read.WordInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,20 +28,15 @@ import java.util.stream.Collectors;
 @Component
 public class YouDaoTranslate {
 
-    @Value("${youdao.appKey}")
-    private String appKey;
+    private static final String appKey = "22e4622be137dac9";
 
-    @Value("${youdao.from}")
-    private String from;
+    private static final String from = "EN";
 
-    @Value("${youdao.to}")
-    private String to;
+    private static final String to = "zh-CHS";
 
-    @Value("${youdao.youdaoUrl}")
-    private String youdaoUrl;
+    private static final String youdaoUrl = "https://openapi.youdao.com/api";
 
-    @Value("${youdao.md5Key}")
-    private String md5Key;
+    private static final String md5Key = "OsGxRcsnty1MGvnGEOPPRGM8DK2dAAka";
 
     @Resource
     private BaiduSpeak baiduSpeak;
