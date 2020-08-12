@@ -917,7 +917,6 @@ s.uuid,
         <include refid="more_table_List"/>
         from student s
         join teacher t on s.teacher_id = t.teacher_id and t.school_admin_id = #{userId} and s.status &lt;> 3
-        and s.account_time >= now()
         <if test="dto.accountOrName != null">
             and (s.account like concat('%', #{dto.accountOrName}, '%') or s.student_name like concat('%',
             #{dto.accountOrName}, '%'))
@@ -928,7 +927,6 @@ s.uuid,
         from
         student s
         join teacher t on s.teacher_id = t.school_admin_id and t.school_admin_id = #{userId} and s.status &lt;> 3
-        and s.account_time >= now()
         <if test="dto.accountOrName != null">
             and (s.account like concat('%', #{dto.accountOrName}, '%') or s.student_name like concat('%',
             #{dto.accountOrName}, '%'))

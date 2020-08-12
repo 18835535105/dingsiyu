@@ -4,9 +4,7 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.mapper.center.WeChatMapper;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.pojo.center.WeChat;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -110,7 +108,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenreAndStudyModel(student.getId(), GenreConstant.SMALLAPP_GENRE, StudyModelConstant.SMALLAPP_STUDY_MODEL);
         String imgUrl = shareConfigMapper.selectImgByAdminId(adminId);
         Long vaildTime = durationMapper.selectTotalValidTimeByStudentId(student.getId());
-        int wordCount = learnNewMapper.countLearnedWordCount(student.getId());
+        Integer wordCount = learnNewMapper.countLearnedWordCount(student.getId());
         ReturnAdminVo returnAdminVo = ReturnAdminVo.builder()
                 .adminId(adminId.longValue())
                 .gold(student.getSystemGold().intValue() + student.getOfflineGold().intValue())
@@ -118,7 +116,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
                 .headPortrait(GetOssFile.getPublicObjectUrl(student.getHeadUrl()))
                 .imgUrl(imgUrl)
                 .learnTime(DateUtil.formatDate(testRecord.getTestEndTime(), DateUtil.YYYYMMDDYEAR))
-                .wordCount(wordCount)
+                .wordCount(wordCount == null ? 0 : wordCount)
                 .weChatList(studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(student.getId()))
                 .point(testRecord.getPoint())
                 .studentId(student.getId())

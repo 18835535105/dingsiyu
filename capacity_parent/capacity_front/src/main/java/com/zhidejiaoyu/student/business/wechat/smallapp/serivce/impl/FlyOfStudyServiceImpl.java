@@ -60,11 +60,11 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
         Long totalValidTime = durationMapper.countTotalValidTime(studentId);
         Long totalOnlineTime = durationMapper.countTotalOnlineTime(student);
 
-        int wordCount = learnNewMapper.countLearnedWordCount(studentId);
-        int sentenceCount = learnNewMapper.countLearnedSentenceCount(studentId);
-        int syntaxCount = learnNewMapper.countLearnedSyntaxCount(studentId);
-        int textCount = learnNewMapper.countLearnedTextCount(studentId);
-        int testCount = testRecordMapper.countTotalSubjects(studentId);
+        Integer wordCount = learnNewMapper.countLearnedWordCount(studentId);
+        Integer sentenceCount = learnNewMapper.countLearnedSentenceCount(studentId);
+        Integer syntaxCount = learnNewMapper.countLearnedSyntaxCount(studentId);
+        Integer textCount = learnNewMapper.countLearnedTextCount(studentId);
+        Integer testCount = testRecordMapper.countTotalSubjects(studentId);
 
         Date firstPay = payLogMapper.selectFirstPayTimeByStudentId(student.getId());
         Integer loginCount = runLogMapper.countLoginCountByStudentId(studentId);
@@ -75,11 +75,11 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
                 .firstLoginTime(firstPay == null ? "无" : DateUtil.formatYYYYMMDD(firstPay))
                 .totalOnlineTime(totalOnlineTime == null ? 0 : totalOnlineTime)
                 .totalValidTime(totalValidTime == null ? 0 : totalValidTime)
-                .wordCount(wordCount)
-                .sentenceCount(sentenceCount)
-                .syntaxCount(syntaxCount)
-                .textCount(textCount)
-                .testCount(testCount)
+                .wordCount(wordCount == null ? 0 : wordCount)
+                .sentenceCount(sentenceCount == null ? 0: sentenceCount)
+                .syntaxCount(syntaxCount == null ? 0 : syntaxCount)
+                .textCount(textCount == null ? 0 : textCount)
+                .testCount(testCount == null ? 0 : testCount)
                 .loginCount(loginCount)
                 .build());
     }
