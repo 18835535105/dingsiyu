@@ -129,6 +129,7 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         vo.setSentence(getReturnList(sentence));
         String errorSyntax = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SYNTAX, studentId, 3);
         vo.setSyntax(getReturnList(errorSyntax));
+        vo.setText(Collections.emptyList());
 
         CurrentDayOfStudy currentDayOfStudy = currentDayOfStudyMapper.selectByStudentIdAndCreateTime(studentId, DateUtil.formatDate(new Date(), DateUtil.YYYYMMDD));
         if (currentDayOfStudy != null) {
