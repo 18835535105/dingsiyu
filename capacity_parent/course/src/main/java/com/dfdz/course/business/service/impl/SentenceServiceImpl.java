@@ -51,11 +51,16 @@ public class SentenceServiceImpl extends ServiceImpl<SentenceMapper, Sentence> i
 
     @Override
     public List<Sentence> selectByUnitIdAndGroup(Long unitId, Integer group) {
-        return sentenceMapper.selectByUnitIdAndGroup(unitId,group);
+        return sentenceMapper.selectByUnitIdAndGroup(unitId, group);
     }
 
     @Override
     public List<Sentence> selectRoundSentence(Long courseId) {
         return sentenceMapper.selectRoundSentence(courseId);
+    }
+
+    @Override
+    public List<Sentence> selectByUnitId(Long unitId) {
+        return sentenceMapper.selectByUnitId(unitId);
     }
 }

@@ -60,4 +60,10 @@ public interface VocabularyService extends IService<Vocabulary> {
     List<Vocabulary> getStudyParagraphTest(String studyParagraph, String model);
 
     List<Vocabulary> getTestPaperGenerationAll(long courseId, int typeTwo, String[] unitId);
+
+    List<Vocabulary> selectByUnitIdAndGroup(Long unitId, Integer group);
+
+    long countByUnitId(Long unitId);
+
+    int countAllCountWordByCourse(Long courseId);
 }

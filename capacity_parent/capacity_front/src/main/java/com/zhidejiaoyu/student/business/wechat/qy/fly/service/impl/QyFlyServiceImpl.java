@@ -62,7 +62,7 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
         List<SearchStudentVO> collect = students.stream().map(student -> SearchStudentVO.builder()
                 .studentId(student.getId())
                 .uuid(student.getUuid())
-                .studentName(StringUtil.isEmpty(student.getStudentName()) ? "默认昵称" : student.getStudentName())
+                .studentName(StringUtil.isEmpty(student.getStudentName()) ? "默认姓名" : student.getStudentName())
                 .canSubmit(finalMap.get(student.getId()) == null || finalMap.get(student.getId()).get("count") == 0)
                 .build()).collect(Collectors.toList());
 

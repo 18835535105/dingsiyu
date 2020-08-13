@@ -68,7 +68,7 @@ public class StudentController {
      */
     @ResponseBody
     @PostMapping("/create/createNewStudent")
-    public Object createNewStudent(@Valid AddNewStudentDto dto) {
+    public Object createNewStudent(@RequestBody AddNewStudentDto dto) {
         checkPhase(dto.getPhase());
         return studentService.createNewStudent(dto);
     }

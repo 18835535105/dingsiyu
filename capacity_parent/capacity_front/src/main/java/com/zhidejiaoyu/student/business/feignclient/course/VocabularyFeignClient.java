@@ -182,4 +182,29 @@ public interface VocabularyFeignClient extends CourseFeignClient {
 
     @RequestMapping(value = "/getTestPaperGenerationAll", method = RequestMethod.GET)
     List<Vocabulary> getTestPaperGenerationAll(@RequestParam long courseId,@RequestParam int typeTwo,@RequestParam String[] unitId);
+
+    /**
+     * 根据unitId和group获取单词数据
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @RequestMapping(value = "/selectByUnitIdAndGroup", method = RequestMethod.GET)
+    List<Vocabulary> selectByUnitIdAndGroup(@RequestParam Long unitId,@RequestParam Integer group);
+
+    /**
+     * 根据单元id获取单元单词数量
+     * @param unitId
+     * @return
+     */
+    @RequestMapping(value = "/countByUnitId", method = RequestMethod.GET)
+    long countByUnitId(@RequestParam Long unitId);
+
+    /**
+     * 跟据courseId获取单元单词数量
+     * @param courseId
+     * @return
+     */
+    @RequestMapping(value = "/countAllCountWordByCourse", method = RequestMethod.GET)
+    int countAllCountWordByCourse(@RequestParam Long courseId);
 }

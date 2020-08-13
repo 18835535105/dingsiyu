@@ -144,12 +144,12 @@ public class CourseController {
      * @param label
      * @return
      */
-    @GetMapping("selectCourseIdByVersionAndGradeAndLabel")
+    @GetMapping("/selectCourseIdByVersionAndGradeAndLabel")
     public List<Integer> selectCourseIdByVersionAndGradeAndLabel(@RequestParam String version, @RequestParam String grade, @RequestParam String label) {
         return courseService.selectCourseIdByVersionAndGradeAndLabel(version, grade, label);
     }
 
-    @GetMapping(value = "selectExperienceCourses")
+    @GetMapping(value = "/selectExperienceCourses")
     public List<CourseNew> selectExperienceCourses() {
         return courseService.selectExperienceCourses();
     }
@@ -185,5 +185,15 @@ public class CourseController {
     @GetMapping("/selectGradeByCourseId")
     public String selectGradeByCourseId(@RequestParam Long courseId) {
         return courseService.selectGradeByCourseId(courseId);
+    }
+
+    @RequestMapping(value = "/selectIdAndVersionByStudentIdByPhase", method = RequestMethod.GET)
+    public List<Map<String, Object>> selectIdAndVersionByStudentIdByPhase(@RequestParam Long studentId,@RequestParam String phase){
+        return courseService.selectIdAndVersionByStudentIdByPhase(studentId,phase);
+    }
+
+    @RequestMapping(value = "/selectUnitsWordSum", method = RequestMethod.GET)
+    public Map<Long, Map<Long, Object>> selectUnitsWordSum(@RequestParam long courseId){
+        return courseService.selectUnitsWordSum(courseId);
     }
 }

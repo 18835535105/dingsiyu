@@ -9,10 +9,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.common.vo.student.manage.StudentManageVO;
 import org.springframework.cloud.openfeign.SpringQueryMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 教师服务
@@ -37,9 +34,8 @@ public interface BaseTeacherInfoFeignClient {
     /**
      * 教师后台获取需要编辑的学生信息
      *
-     *
      * @param openId
-     * @param uuid  学生uuid
+     * @param uuid   学生uuid
      * @return
      */
     @GetMapping("/student/edit/getEditStudentVoByUuid")
@@ -59,6 +55,14 @@ public interface BaseTeacherInfoFeignClient {
      *
      * @return
      */
-    @GetMapping("/student/create/createNewStudent")
+    @PostMapping("/student/create/createNewStudent")
     Object createNewStudent(@RequestBody AddNewStudentDto dto);
+
+    /**
+     * 教师后台获取需要编辑的学生信息
+     *
+     * @return
+     */
+    @GetMapping("/student/createStudentCount/canCreateCount")
+    Object canCreateCount(@RequestParam String openId);
 }

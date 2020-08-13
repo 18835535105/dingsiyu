@@ -11,4 +11,5 @@ import com.zhidejiaoyu.common.pojo.Student;
  */
 public interface CreateStudentService extends IService<Student> {
 
+    Object canCreateCount(String openId);
 }

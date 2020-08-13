@@ -67,6 +67,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private CommonMethod commonMethod;
 
     @Resource
+    private CourseNewMapper courseNewMapper;
+
+    @Resource
     private RedisOpt redisOpt;
 
     @Resource
@@ -159,7 +162,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 businessUserInfo.setAccount(student.getAccount());
                 businessUserInfo.setPassword(student.getPassword());
                 businessUserInfo.setUserUuid(student.getUuid());
-                centerUserFeignClient.getUser(businessUserInfo, ServerNoConstant.SERVER_NO);
+                businessUserInfo.setNo(dto.getServerNo());
+                centerUserFeignClient.getUser(businessUserInfo);
                 this.saveOrUpdateStudentExpansion(phase, student);
                 this.pushExperienceCourses(student);
             } catch (Exception e) {
@@ -168,12 +172,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             }
         }
         //super.saveLog(LogNameConst.CREATE_ACCOUNT, sb.toString());
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("code", 200);
-        map.put("message", "成功");
-        map.put("url", "student/account/student/createStudent");
-        return map;
+        return ServerResponse.createBySuccess();
     }
 
     @Override
@@ -266,7 +265,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
      */
     private void pushExperienceCourses(Student student) {
         // 获取所有体验版课程
-        List<CourseNew> experienceCourses = courseFeignClient.selectExperienceCourses();
+        List<CourseNew> experienceCourses = courseNewMapper.selectExperienceCourses();
         // 推送体验版课程
         commonMethod.initUnit(student, experienceCourses, null, null);
 

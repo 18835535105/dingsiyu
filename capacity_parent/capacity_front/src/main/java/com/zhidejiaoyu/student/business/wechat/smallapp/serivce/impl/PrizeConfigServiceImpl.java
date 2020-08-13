@@ -73,11 +73,11 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         }
         if (payconfigId > 0) {
             PrizeConfig prizeConfig = prizeConfigMapper.selectById(payconfigId);
-            returnMap.put("prizeName", prizeConfig.getPrizeCount() > 0 ? prizeConfig.getPrizeName() : "5元优惠卷");
+            returnMap.put("prizeName", prizeConfig.getPrizeCount() > 0 ? prizeConfig.getPrizeName() : "5元优惠券");
             prizeConfig.setPrizeCount(prizeConfig.getPrizeCount() - 1);
             prizeConfigMapper.updateById(prizeConfig);
         } else {
-            returnMap.put("prizeName", "5元优惠卷");
+            returnMap.put("prizeName", "5元优惠券");
         }
 
         JoinSchool joinSchool = joinSchoolMapper.selectByUserId(adminId.intValue());

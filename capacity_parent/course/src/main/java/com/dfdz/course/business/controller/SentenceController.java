@@ -107,4 +107,14 @@ public class SentenceController {
     public List<Sentence> selectRoundSentence(@RequestParam Long courseId){
         return sentenceService.selectRoundSentence(courseId);
     }
+
+    /**
+     * 根据unitId获取句型信息
+     * @param unitId
+     * @return
+     */
+    @RequestMapping(value = "/selectByUnitId", method = RequestMethod.GET)
+    public List<Sentence> selectByUnitId(@RequestParam Long unitId){
+        return sentenceService.selectByUnitId(unitId);
+    }
 }

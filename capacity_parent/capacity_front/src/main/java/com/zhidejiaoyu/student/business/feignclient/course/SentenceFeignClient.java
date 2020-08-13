@@ -98,4 +98,12 @@ public interface SentenceFeignClient extends CourseFeignClient {
      */
     @GetMapping("/selectRoundSentence")
     List<Sentence> selectRoundSentence(@RequestParam Long courseId);
+
+    /**
+     * 根据unitId获取句型信息
+     * @param unitId
+     * @return
+     */
+    @RequestMapping(value = "/selectByUnitId", method = RequestMethod.GET)
+    List<Sentence> selectByUnitId(@RequestParam Long unitId);
 }

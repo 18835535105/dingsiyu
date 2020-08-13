@@ -131,5 +131,20 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
         return simpleVocabularyMapper.getTestPaperGenerationAll(courseId, typeTwo, unitId);
     }
 
+    @Override
+    public List<Vocabulary> selectByUnitIdAndGroup(Long unitId, Integer group) {
+        return vocabularyMapper.selectByUnitIdAndGroup(unitId, group);
+    }
+
+    @Override
+    public long countByUnitId(Long unitId) {
+        return unitVocabularyNewMapper.countByUnitId(unitId);
+    }
+
+    @Override
+    public int countAllCountWordByCourse(Long courseId) {
+        return unitVocabularyNewMapper.countAllCountWordByCourse(courseId);
+    }
+
 
 }
