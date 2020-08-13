@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.pojo.CanCreateStudentCount;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Teacher;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -60,7 +61,7 @@ public class CreateStudentServiceImpl extends ServiceImpl<StudentMapper, Student
         Integer userId = sysUserMapper.selectByOpenId(openId).getId();
         Teacher teacher = teacherMapper.selectSchoolAdminById(userId);
         canCreateCount.setSchoolName(teacher.getSchool());
-        return canCreateCount;
+        return ServerResponse.createBySuccess(canCreateCount);
     }
 
     @Data
