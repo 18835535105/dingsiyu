@@ -1,6 +1,7 @@
 package com.dfdz.teacher.common;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.dfdz.teacher.feignclient.CourseFeignClient;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.SimpleStudentUnitMapper;
@@ -296,7 +297,7 @@ public class CommonMethod {
         courses.forEach(course -> courseIds.add(course.getId()));
 
         UnitOneExample unitExample = new UnitOneExample();
-        unitExample.createCriteria().andCourseIdIn(courseIds).andDelstatusEqualTo(1);
+        unitExample.createCriteria().andCourseIdIn(courseIds);
         unitExample.setOrderByClause("unit.course_id asc,unit.id asc");
         return unitNewMapper.selectByExample(unitExample);
     }
