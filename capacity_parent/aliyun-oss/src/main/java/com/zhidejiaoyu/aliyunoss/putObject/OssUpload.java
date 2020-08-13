@@ -2,6 +2,7 @@ package com.zhidejiaoyu.aliyunoss.putObject;
 
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSSException;
+import com.aliyun.oss.ServiceException;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.aliyun.oss.OSS;
 import lombok.extern.slf4j.Slf4j;
@@ -117,8 +118,12 @@ public class OssUpload {
     private static String getFileName(MultipartFile file, String fileName) {
         // 文件后缀名
         String suffix = "";
-        if (Objects.requireNonNull(file.getOriginalFilename()).length() > 0) {
-            suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+        String originalFilename = file.getOriginalFilename();
+        if (Objects.requireNonNull(originalFilename).length() > 0) {
+            if (!originalFilename.contains(".")) {
+                throw new ServiceException("文件名没有后缀！");
+            }
+            suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
 
         if (fileName != null && fileName.trim().length() > 0) {

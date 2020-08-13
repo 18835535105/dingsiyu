@@ -16,9 +16,19 @@ import java.util.Map;
 @FeignClient(name = "course", path = "/course/course")
 public interface CourseFeignClient {
 
+
+    @RequestMapping(value = "/selectIdAndVersionByStudentIdByPhase", method = RequestMethod.GET)
+    List<Map<String, Object>> selectIdAndVersionByStudentIdByPhase(@RequestParam Long studentId, @RequestParam String phase);
+
     /**
-     * 获取课程数据
+     * 查询课程下各个单元单词数
+     *
+     * @param courseId
+     * @return
      */
+    @RequestMapping(value = "/selectUnitsWordSum", method = RequestMethod.GET)
+    Map<Long, Map<Long, Object>> selectUnitsWordSum(@RequestParam long courseId);
+
     /**
      * []
      * 根据id获取课程数据信息
@@ -110,4 +120,41 @@ public interface CourseFeignClient {
 
     @GetMapping("/selectGradeByCourseId")
     String selectGradeByCourseId(@RequestParam Long courseId);
+
+    /**
+     * 根据id获取当前课程的年级
+     *
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/getGradeById")
+    String getGradeById(@RequestParam Long courseId);
+
+    /**
+     * 根据单元id查询课程信息
+     *
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/getByUnitId")
+    CourseNew getByUnitId(@RequestParam Long unitId);
+
+    /**
+     * 获取版本下所有课程id
+     *
+     * @param version
+     * @return
+     */
+    @GetMapping("/getIdsByVersion")
+    List<Long> getIdsByVersion(@RequestParam String version);
+
+    /**
+     * 从课程ids中过滤出指定学段的课程id
+     *
+     * @param phase
+     * @param courseIds
+     * @return
+     */
+    @GetMapping("/getIdsByPhaseAndIds")
+    List<Long> getIdsByPhaseAndIds(@RequestParam String phase, @RequestParam List<Long> courseIds);
 }

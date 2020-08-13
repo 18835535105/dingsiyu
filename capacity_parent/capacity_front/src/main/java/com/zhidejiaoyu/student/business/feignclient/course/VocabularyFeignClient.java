@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @FeignClient(name = "course", path = "/course/vocabulary")
-public interface VocabularyFeignClient extends CourseFeignClient {
+public interface VocabularyFeignClient {
     /**
      * 根据单词查询中文翻译
      *
@@ -167,10 +167,11 @@ public interface VocabularyFeignClient extends CourseFeignClient {
      * @return
      */
     @RequestMapping(value = "/selectByStudentPhase", method = RequestMethod.GET)
-    List<Vocabulary> selectByStudentPhase(@RequestParam String version,@RequestParam int flag);
+    List<Vocabulary> selectByStudentPhase(@RequestParam String version, @RequestParam int flag);
 
     /**
      * 随机获取30道题
+     *
      * @param courseId
      * @return
      */
@@ -178,22 +179,24 @@ public interface VocabularyFeignClient extends CourseFeignClient {
     List<Vocabulary> getRandomCourseThirty(@RequestParam Long courseId);
 
     @RequestMapping(value = "/getStudyParagraphTest", method = RequestMethod.GET)
-    List<Vocabulary> getStudyParagraphTest(@RequestParam String studyParagraph,@RequestParam String model);
+    List<Vocabulary> getStudyParagraphTest(@RequestParam String studyParagraph, @RequestParam String model);
 
     @RequestMapping(value = "/getTestPaperGenerationAll", method = RequestMethod.GET)
-    List<Vocabulary> getTestPaperGenerationAll(@RequestParam long courseId,@RequestParam int typeTwo,@RequestParam String[] unitId);
+    List<Vocabulary> getTestPaperGenerationAll(@RequestParam long courseId, @RequestParam int typeTwo, @RequestParam String[] unitId);
 
     /**
      * 根据unitId和group获取单词数据
+     *
      * @param unitId
      * @param group
      * @return
      */
     @RequestMapping(value = "/selectByUnitIdAndGroup", method = RequestMethod.GET)
-    List<Vocabulary> selectByUnitIdAndGroup(@RequestParam Long unitId,@RequestParam Integer group);
+    List<Vocabulary> selectByUnitIdAndGroup(@RequestParam Long unitId, @RequestParam Integer group);
 
     /**
      * 根据单元id获取单元单词数量
+     *
      * @param unitId
      * @return
      */
@@ -202,6 +205,7 @@ public interface VocabularyFeignClient extends CourseFeignClient {
 
     /**
      * 跟据courseId获取单元单词数量
+     *
      * @param courseId
      * @return
      */

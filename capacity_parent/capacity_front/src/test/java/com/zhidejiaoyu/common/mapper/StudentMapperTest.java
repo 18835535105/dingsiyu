@@ -1,9 +1,13 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.BaseTest;
+import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
+import com.zhidejiaoyu.common.pojo.Student;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 @Slf4j
 public class StudentMapperTest extends BaseTest {
@@ -25,5 +29,11 @@ public class StudentMapperTest extends BaseTest {
     public void countBySchoolAdminId() {
         int i = studentMapper.countBySchoolAdminId(299);
         log.info("i={}", i);
+    }
+
+    @Test
+    public void selectByTeacherIdOrSchoolAdminId() {
+        List<Student> students = studentMapper.selectByTeacherIdOrSchoolAdminId(561, new SearchStudentDTO());
+        log.info("student={}", students.toString());
     }
 }

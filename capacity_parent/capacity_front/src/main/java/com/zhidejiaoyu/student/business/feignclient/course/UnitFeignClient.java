@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @FeignClient(name = "course", path = "/course/unit")
-public interface UnitFeignClient extends CourseFeignClient {
+public interface UnitFeignClient {
     /**
      * 查询指定课程名的所有单元id
      *
@@ -62,6 +62,7 @@ public interface UnitFeignClient extends CourseFeignClient {
 
     /**
      * 根据unitId获取unit信息
+     *
      * @param unitId
      * @return
      */
@@ -70,6 +71,7 @@ public interface UnitFeignClient extends CourseFeignClient {
 
     /**
      * 根据courseId获取最大单元index
+     *
      * @param courseId
      * @return
      */
@@ -80,7 +82,7 @@ public interface UnitFeignClient extends CourseFeignClient {
     Integer selectCurrentUnitIndexByUnitId(@RequestParam Long unitId);
 
     @GetMapping("/selectNextUnitIndexByCourseId")
-    Long selectNextUnitIndexByCourseId(@RequestParam Long courseId,@RequestParam Integer nextUnitIndex);
+    Long selectNextUnitIndexByCourseId(@RequestParam Long courseId, @RequestParam Integer nextUnitIndex);
 
     @GetMapping("/selectFirstUnitByCourseId")
     Unit selectFirstUnitByCourseId(@RequestParam Long courseId);
@@ -92,5 +94,33 @@ public interface UnitFeignClient extends CourseFeignClient {
     Map<Long, Map<String, Object>> selectCountByUnitIds(@RequestParam List<Long> unitIds);
 
     @GetMapping("/selectByUnitIdAndCourseId")
-    int selectByUnitIdAndCourseId(@RequestParam Long unitId,@RequestParam Long courseId);
+    int selectByUnitIdAndCourseId(@RequestParam Long unitId, @RequestParam Long courseId);
+
+    /**
+     * 获取当前课程下语法的下个单元
+     *
+     * @param unitId
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/getNextSyntaxUnitByCourseId")
+    UnitNew getNextSyntaxUnitByCourseId(@RequestParam Long unitId, @RequestParam Long courseId);
+
+    /**
+     * 获取当前课程下语法最大单元
+     *
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/getSyntaxMaxUnitByCourseId")
+    UnitNew getSyntaxMaxUnitByCourseId(@RequestParam Long courseId);
+
+    /**
+     * 根据jointname查询语法单元
+     *
+     * @param jointName
+     * @return
+     */
+    @GetMapping("/getSyntaxUnitLikeJointName")
+    UnitNew getSyntaxUnitLikeJointName(String jointName);
 }

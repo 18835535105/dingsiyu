@@ -29,16 +29,31 @@
         <include refid="base_sql"/>
         from course_config
         where user_id = #{adminId}
-          and `type` = #{type}
-          and course_id=#{courseId}
-          limit 1
+        and `type` = #{type}
+        and course_id=#{courseId}
+        limit 1
     </select>
-    <select id="selectByUserIdAndTypeAndOneKeyLearn" resultMap="BaseResultMap" parameterType="map">
+    <select id="selectByUserIdAndTypeAnd" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
         from course_config
         where user_id = #{userId}
         and `type` = #{type}
+    </select>
+    <select id="selectCourseIdsByUserIdAndType" resultType="java.lang.Long" parameterType="map">
+        select course_id
+        from course_config
+        where user_id = #{userId}
+          and `type` = #{type}
+        group by course_id
+    </select>
+    <select id="selectCourseIdsByUserIdAndTYpeAndOneKeyLearn" resultType="java.lang.Long" parameterType="map">
+        select course_id
+        from course_config
+        where user_id = #{userId}
+          and `type` = #{type}
+          and one_key_learn = #{oneKeyLearn}
+        group by course_id
     </select>
     <select id="selectByUserId" parameterType="map" resultType="long">
         select
@@ -65,5 +80,6 @@
         and config.one_key_learn=2
         and config.study_model like concat('%','1','%')
     </select>
+
 
 </mapper>

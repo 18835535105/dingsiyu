@@ -23,7 +23,7 @@ public interface CourseConfigMapper extends BaseMapper<CourseConfig> {
      * @param type
      * @return
      */
-    List<CourseConfig> selectByUserIdAndTypeAndOneKeyLearn(@Param("userId") Long userId, @Param("type") int type);
+    List<CourseConfig> selectByUserIdAndTypeAnd(@Param("userId") Long userId, @Param("type") int type);
 
     List<Long> selectByUserId(@Param("userId") Long userId, @Param("gradeList") List<String> gradeList);
 
@@ -34,5 +34,23 @@ public interface CourseConfigMapper extends BaseMapper<CourseConfig> {
      */
     int countByUserIdAndType(@Param("userId") Long userId, @Param("type") int type);
 
-    CourseConfig selectByTypeAndUserIdAndCourseId(@Param("type") int type,@Param("adminId") Long adminId,@Param("courseId") Long courseId);
+    CourseConfig selectByTypeAndUserIdAndCourseId(@Param("type") int type, @Param("adminId") Long adminId, @Param("courseId") Long courseId);
+
+    /**
+     * 查询配置的课程id
+     *
+     * @param userId
+     * @param type
+     * @return
+     */
+    List<Long> selectCourseIdsByUserIdAndType(@Param("userId") Long userId, @Param("type") int type);
+
+    /**
+     * 查询指定用户配置的
+     * @param userId
+     * @param type
+     * @param oneKeyLearn
+     * @return
+     */
+    List<Long> selectCourseIdsByUserIdAndTYpeAndOneKeyLearn(@Param("userId") Integer userId, @Param("type") int type, @Param("oneKeyLearn") int oneKeyLearn);
 }

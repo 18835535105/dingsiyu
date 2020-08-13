@@ -6,7 +6,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseCourseFeginClient;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzStudyCalendarService;
 import lombok.extern.slf4j.Slf4j;
@@ -73,10 +73,13 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     private SchoolGoldFactoryMapper schoolGoldFactoryMapper;
     @Resource
     private StudentMapper studentMapper;
-    @Resource
-    private CourseCourseFeginClient courseCourseFeginClient;
+    private final CourseFeignClient courseFeignClient;
     @Resource
     private UnitFeignClient unitFeignClient;
+
+    public QuartzStudyCalendarServiceImpl(CourseFeignClient courseFeignClient) {
+        this.courseFeignClient = courseFeignClient;
+    }
 
     /**
      * 每天 0：02 分执行
@@ -178,7 +181,7 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
                     value.setValidTime(validTime == null ? 0 : Long.parseLong(validTime.toString()));
                     value.setOnlineTime(onlineTime == null ? 0 : Long.parseLong(onlineTime.toString()));
                     value.setLearningModel(Integer.parseInt(learningModel.toString()));
-                    CourseNew courseNew = courseCourseFeginClient.getById(value.getCourseId());
+                    CourseNew courseNew = courseFeignClient.getById(value.getCourseId());
                     UnitNew unitNew = unitFeignClient.selectById(value.getUnitId());
                     value.setCourseName(courseNew.getCourseName());
                     value.setUnitName(unitNew.getUnitName());

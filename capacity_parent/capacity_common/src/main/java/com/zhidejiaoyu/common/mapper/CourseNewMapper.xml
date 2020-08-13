@@ -213,6 +213,14 @@
         </where>
         group by version
     </select>
+    <select id="selectIdsByPhaseAndIds" resultType="java.lang.Long" parameterType="map">
+        select id from course_new where study_paragraph = #{phase}
+        and id in (
+        <foreach collection="courseIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
     <sql id="Example_Where_Clause">
         <where>
             <foreach collection="oredCriteria" item="criteria"

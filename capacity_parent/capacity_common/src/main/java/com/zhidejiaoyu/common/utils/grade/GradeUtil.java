@@ -1,6 +1,8 @@
 package com.zhidejiaoyu.common.utils.grade;
 
 import com.zhidejiaoyu.common.constant.GradeNameConstant;
+import com.zhidejiaoyu.common.exception.ServiceException;
+import lombok.NonNull;
 
 import java.util.*;
 
@@ -65,16 +67,57 @@ public class GradeUtil {
     private static Map<String, String[]> VERSION_GRADE;
 
     /**
-     * 版本名与年级数据嘴硬（不区分学段）
+     * 版本名与年级数据对应（不区分学段）
      */
     private static Map<String, String[]> ALL_PHASE_VERSION_GRADE;
+
+    /**
+     * 比当前年级高一个年级的年级名称，key:当前年级；value：下一年级
+     */
+    private static final Map<String, String> HIGHER_GRADE;
+
+    /**
+     * 将年级转换为对应的数字表示
+     */
+    private static final Map<String, Integer> GRADE_TO_NUM;
 
     static {
         initVersionGrade();
 
         initAllPhaseVersionGrade();
-    }
 
+        HIGHER_GRADE = new HashMap<>(16);
+        HIGHER_GRADE.put("一年级", "二年级");
+        HIGHER_GRADE.put("二年级", "三年级");
+        HIGHER_GRADE.put("三年级", "四年级");
+        HIGHER_GRADE.put("四年级", "五年级");
+        HIGHER_GRADE.put("五年级", "六年级");
+        HIGHER_GRADE.put("六年级", "七年级");
+        HIGHER_GRADE.put("初中", "初中");
+        HIGHER_GRADE.put("七年级", "八年级");
+        HIGHER_GRADE.put("八年级", "九年级");
+        HIGHER_GRADE.put("九年级", "高一");
+        HIGHER_GRADE.put("高一", "高二");
+        HIGHER_GRADE.put("高二", "高三");
+        HIGHER_GRADE.put("高三", "高三");
+        HIGHER_GRADE.put("高中", "高中");
+
+        GRADE_TO_NUM = new HashMap<>(16);
+        GRADE_TO_NUM.put("一年级", 1);
+        GRADE_TO_NUM.put("二年级", 2);
+        GRADE_TO_NUM.put("三年级", 3);
+        GRADE_TO_NUM.put("四年级", 4);
+        GRADE_TO_NUM.put("五年级", 5);
+        GRADE_TO_NUM.put("六年级", 6);
+        GRADE_TO_NUM.put("初中", 9);
+        GRADE_TO_NUM.put("七年级", 7);
+        GRADE_TO_NUM.put("八年级", 8);
+        GRADE_TO_NUM.put("九年级", 9);
+        GRADE_TO_NUM.put("高一", 10);
+        GRADE_TO_NUM.put("高二", 11);
+        GRADE_TO_NUM.put("高三", 12);
+        GRADE_TO_NUM.put("高中", 12);
+    }
 
 
     /**
@@ -95,6 +138,20 @@ public class GradeUtil {
     }
 
     /**
+     * 获取比当前年级高一个年级的年级集合（不区分学段），比如当前年级是8年级，获取1~9年级集合
+     *
+     * @param version
+     * @param grade
+     * @return
+     */
+    public static List<String> highThanCurrentAllPhase(String version, String grade) {
+        if (HIGHER_GRADE.containsKey(grade)) {
+            grade = HIGHER_GRADE.get(grade);
+        }
+        return smallThanCurrentAllPhase(version, grade);
+    }
+
+    /**
      * 获取小于或等于当前年级的年级集合（不区分学段），比如当前年级是8年级，获取1~8年级集合
      *
      * @param version
@@ -106,7 +163,7 @@ public class GradeUtil {
         // 人教版特殊年级处理
         if (Objects.equals(REN_JIAO_BAN_VERSION, version)) {
             if (Objects.equals(grade, GradeNameConstant.SENIOR_ONE) || Objects.equals(grade, GradeNameConstant.SENIOR_TWO) || Objects.equals(grade, GradeNameConstant.SENIOR_THREE)) {
-                grade =GradeNameConstant.HIGH;
+                grade = GradeNameConstant.HIGH;
             }
         }
 
@@ -127,6 +184,31 @@ public class GradeUtil {
             }
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * 年级比较
+     *
+     * @param grade1 年级1
+     * @param grade2 年级2
+     * @return <ul>
+     * <li>>0：grade1>grade2</li>
+     * <li><=0：grade1<=grade2</li>
+     * </ul>
+     */
+    public static int compareGrade(@NonNull String grade1, @NonNull String grade2) {
+        Integer num1 = GRADE_TO_NUM.get(grade1);
+        Integer num2 = GRADE_TO_NUM.get(grade2);
+
+        if (num1 == null) {
+            throw new ServiceException(grade1 + " 年级参数非法！");
+        }
+
+        if (num2 == null) {
+            throw new ServiceException(grade2 + " 年级参数非法！");
+        }
+
+        return num1 - num2;
     }
 
     private static void initAllPhaseVersionGrade() {
@@ -181,5 +263,6 @@ public class GradeUtil {
 
     public static void main(String[] args) {
         System.out.println(GradeUtil.smallThanCurrentAllPhase("人教版", "高三"));
+        System.out.println(GradeUtil.highThanCurrentAllPhase("人教版(PEP)", "七年级"));
     }
 }

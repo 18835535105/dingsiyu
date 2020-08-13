@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @FeignClient(name = "course", path = "/course/sentence")
-public interface SentenceFeignClient extends CourseFeignClient {
+public interface SentenceFeignClient {
 
     /**
      * 获取句型数据`
@@ -84,15 +84,17 @@ public interface SentenceFeignClient extends CourseFeignClient {
 
     /**
      * 根据unitId和group获取数据
+     *
      * @param unitId
      * @param group
      * @return
      */
     @GetMapping("/selectByUnitIdAndGroup")
-    List<Sentence> selectByUnitIdAndGroup(@RequestParam Long unitId,@RequestParam Integer group);
+    List<Sentence> selectByUnitIdAndGroup(@RequestParam Long unitId, @RequestParam Integer group);
 
     /**
      * 根据课程id获取打乱句型信息
+     *
      * @param courseId
      * @return
      */
@@ -101,6 +103,7 @@ public interface SentenceFeignClient extends CourseFeignClient {
 
     /**
      * 根据unitId获取句型信息
+     *
      * @param unitId
      * @return
      */

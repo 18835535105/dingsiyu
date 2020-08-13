@@ -2,7 +2,6 @@ package com.dfdz.course.business.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dfdz.course.business.service.UnitService;
-import com.zhidejiaoyu.common.mapper.UnitMapper;
 import com.zhidejiaoyu.common.mapper.UnitNewMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleUnitMapper;
 import com.zhidejiaoyu.common.pojo.Unit;
@@ -115,5 +114,20 @@ public class UnitServiceImpl extends ServiceImpl<UnitNewMapper, UnitNew> impleme
     @Override
     public int selectByUnitIdAndCourseId(Long unitId, Long courseId) {
         return unitNewMapper.selectByUnitIdAndCourseId(unitId, courseId);
+    }
+
+    @Override
+    public UnitNew getNextSyntaxUnitByCourseId(Long unitId, Long courseId) {
+        return unitNewMapper.selectNextSyntaxUnitByCourseId(unitId, courseId);
+    }
+
+    @Override
+    public UnitNew getSyntaxMaxUnitByCourseId(Long courseId) {
+        return unitNewMapper.selectSyntaxMaxUnitByCourseId(courseId);
+    }
+
+    @Override
+    public UnitNew getSyntaxUnitLikeJointName(String jointName) {
+        return unitNewMapper.selectSyntaxUnitLikeJointName(jointName);
     }
 }
