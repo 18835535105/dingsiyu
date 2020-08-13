@@ -37,9 +37,8 @@ public interface BaseTeacherInfoFeignClient {
     /**
      * 教师后台获取需要编辑的学生信息
      *
-     *
      * @param openId
-     * @param uuid  学生uuid
+     * @param uuid   学生uuid
      * @return
      */
     @GetMapping("/student/edit/getEditStudentVoByUuid")
@@ -59,6 +58,14 @@ public interface BaseTeacherInfoFeignClient {
      *
      * @return
      */
-    @GetMapping("/student/create/createNewStudent")
+    @PostMapping("/student/create/createNewStudent")
     Object createNewStudent(@RequestBody AddNewStudentDto dto);
+
+    /**
+     * 教师后台获取需要编辑的学生信息
+     *
+     * @return
+     */
+    @GetMapping("/student/createStudentCount/canCreateCount")
+    Object canCreateCount(@RequestParam String openId);
 }

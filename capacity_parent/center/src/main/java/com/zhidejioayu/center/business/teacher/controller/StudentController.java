@@ -81,4 +81,16 @@ public class StudentController {
         BaseTeacherInfoFeignClient baseStudentFeignClientByUuid = FeignClientUtil.getBaseTeacherInfoFeignClientByOpenId(dto.getOpenId());
         return baseStudentFeignClientByUuid.createNewStudent(dto);
     }
+
+    /**
+     * 生成学生账号和密码，用于学校教师分配给学生
+     *
+     * @param openId
+     */
+    @GetMapping("/create/createStudentCount")
+    public Object createNewStudent(@RequestParam String openId) {
+        BaseTeacherInfoFeignClient baseStudentFeignClientByUuid = FeignClientUtil.getBaseTeacherInfoFeignClientByOpenId(openId);
+        return baseStudentFeignClientByUuid.canCreateCount(openId);
+    }
+
 }
