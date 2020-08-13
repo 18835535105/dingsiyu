@@ -916,6 +916,7 @@ s.uuid,
         from
         student where (teacher_id = #{userId}
         or teacher_id in (select teacher_id from teacher where school_admin_id =#{userId}))
+        and account_time is not null
         and `status`&lt;>3
         <if test="dto.accountOrName != null">
             and (account like concat('%', #{dto.accountOrName}, '%') or student_name like
