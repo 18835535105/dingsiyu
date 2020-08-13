@@ -46,4 +46,6 @@ public class AddNewStudentDto {
      * 学管openId
      */
     private String openId;
+
+    private String serverNo;
 }

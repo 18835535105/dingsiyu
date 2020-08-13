@@ -3,6 +3,8 @@ package com.zhidejioayu.center.business.teacher.controller;
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
 import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
+import com.zhidejiaoyu.common.mapper.center.BusinessUserInfoMapper;
+import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -10,9 +12,11 @@ import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.common.vo.student.manage.StudentManageVO;
 import com.zhidejioayu.center.business.feignclient.teacher.BaseTeacherInfoFeignClient;
 import com.zhidejioayu.center.business.feignclient.util.FeignClientUtil;
+import com.zhidejioayu.center.business.util.ServerConfigUtil;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 
 /**
@@ -23,6 +27,9 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/teacher/student")
 public class StudentController {
+
+    @Resource
+    private BusinessUserInfoMapper businessUserInfoMapper;
 
     /**
      * 获取学生列表
@@ -79,6 +86,8 @@ public class StudentController {
     @PostMapping("/create/createNewStudent")
     public Object createNewStudent(@Valid AddNewStudentDto dto) {
         BaseTeacherInfoFeignClient baseStudentFeignClientByUuid = FeignClientUtil.getBaseTeacherInfoFeignClientByOpenId(dto.getOpenId());
+        ServerConfig serverConfig = ServerConfigUtil.getServerInfoByTeacherOpenid(dto.getOpenId());
+        dto.setServerNo(serverConfig.getServerNo());
         return baseStudentFeignClientByUuid.createNewStudent(dto);
     }
 

@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.dto.student.SaveStudentInfoToCenterDTO;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 import com.zhidejioayu.center.business.redis.UserInfoRedisOpt;
 import com.zhidejioayu.center.business.userinfo.service.UserInfoService;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -58,8 +59,8 @@ public class UserInfoController {
     }
 
     @GetMapping("/user")
-    public void getUser(BusinessUserInfo businessUserInfo, String no) {
-        userInfoService.getUser(businessUserInfo, no);
+    public void getUser(@SpringQueryMap BusinessUserInfo businessUserInfo) {
+        userInfoService.getUser(businessUserInfo, businessUserInfo.getNo());
         userInfoRedisOpt.saveUserInfoToCenterServer(businessUserInfo.getUserUuid());
     }
 }

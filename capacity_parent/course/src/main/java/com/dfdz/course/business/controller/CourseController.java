@@ -144,12 +144,12 @@ public class CourseController {
      * @param label
      * @return
      */
-    @GetMapping("selectCourseIdByVersionAndGradeAndLabel")
+    @GetMapping("/selectCourseIdByVersionAndGradeAndLabel")
     public List<Integer> selectCourseIdByVersionAndGradeAndLabel(@RequestParam String version, @RequestParam String grade, @RequestParam String label) {
         return courseService.selectCourseIdByVersionAndGradeAndLabel(version, grade, label);
     }
 
-    @GetMapping(value = "selectExperienceCourses")
+    @GetMapping(value = "/selectExperienceCourses")
     public List<CourseNew> selectExperienceCourses() {
         return courseService.selectExperienceCourses();
     }

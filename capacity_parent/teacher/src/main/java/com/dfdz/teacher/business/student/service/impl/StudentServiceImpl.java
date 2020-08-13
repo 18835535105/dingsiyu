@@ -159,7 +159,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 businessUserInfo.setAccount(student.getAccount());
                 businessUserInfo.setPassword(student.getPassword());
                 businessUserInfo.setUserUuid(student.getUuid());
-                centerUserFeignClient.getUser(businessUserInfo, ServerNoConstant.SERVER_NO);
+                businessUserInfo.setNo(dto.getServerNo());
+                centerUserFeignClient.getUser(businessUserInfo);
                 this.saveOrUpdateStudentExpansion(phase, student);
                 this.pushExperienceCourses(student);
             } catch (Exception e) {

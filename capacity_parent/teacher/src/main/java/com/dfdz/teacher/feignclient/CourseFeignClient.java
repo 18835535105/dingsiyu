@@ -21,7 +21,7 @@ public interface CourseFeignClient {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/getById/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/course/getById/{id}", method = RequestMethod.GET)
     CourseNew getById(@PathVariable Long id);
 
     /**
@@ -32,11 +32,11 @@ public interface CourseFeignClient {
      * @param label
      * @return
      */
-    @RequestMapping(value = "selectCourseIdByVersionAndGradeAndLabel", method = RequestMethod.GET)
+    @RequestMapping(value = "/course/selectCourseIdByVersionAndGradeAndLabel", method = RequestMethod.GET)
     List<Integer> selectCourseIdByVersionAndGradeAndLabel(@RequestParam String version, @RequestParam String grade, @RequestParam String label);
 
 
-    @RequestMapping(value = "selectExperienceCourses", method = RequestMethod.GET)
+    @RequestMapping(value = "/course/selectExperienceCourses", method = RequestMethod.GET)
     List<CourseNew> selectExperienceCourses();
 
     /**
