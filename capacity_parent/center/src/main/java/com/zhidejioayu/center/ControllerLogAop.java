@@ -1,10 +1,7 @@
 package com.zhidejioayu.center;
 
-import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -33,11 +30,11 @@ public class ControllerLogAop {
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         long startTime = System.currentTimeMillis();
         Object proceed = pjp.proceed();
-        printLog(startTime);
+        printLog(startTime, proceed);
         return proceed;
     }
 
-    private void printLog(long startTime) {
+    private void printLog(long startTime, Object proceed) {
         try {
             long maxTime = 2000;
             HttpSession httpSession = HttpUtil.getHttpSession();
@@ -47,32 +44,12 @@ public class ControllerLogAop {
                 return;
             }
             String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
-            if (StringUtils.isNotEmpty(url) && (url.contains("/wechat"))) {
-                this.printSmallAppLog(startTime, maxTime, url);
-            } else {
-                this.printLearnSystemLog(startTime, maxTime, httpSession, url);
+            this.printSmallAppLog(startTime, maxTime, url);
+            if (proceed != null) {
+                log.info(" 响应数据 访问接口：[{}], param=[{}], result=[{}]", url, HttpUtil.getParams(), proceed.toString());
             }
         } catch (Exception e) {
             log.error("记录 log 出错！ errMsg=[{}]", e.getMessage());
-        }
-    }
-
-    /**
-     * 打印学习系统请求日志
-     *
-     * @param startTime
-     * @param maxTime
-     * @param httpSession
-     * @param url
-     */
-    private void printLearnSystemLog(long startTime, long maxTime, HttpSession httpSession, String url) {
-        Object object = httpSession.getAttribute(UserConstant.CURRENT_STUDENT);
-        if (object != null) {
-            Student student = (Student) object;
-            long time = System.currentTimeMillis() - startTime;
-            log.info("学生[{} -> {} -> {}] 访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
-                    student.getId(), student.getAccount(), student.getStudentName(),
-                    url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
         }
     }
 

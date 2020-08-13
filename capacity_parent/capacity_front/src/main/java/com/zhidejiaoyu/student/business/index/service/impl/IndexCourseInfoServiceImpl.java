@@ -172,30 +172,9 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         vos.forEach(vo -> {
             if (collect.containsKey(vo.getUnitId())) {
                 List<LearnHistory> histories1 = collect.get(vo.getUnitId());
-                Stream<LearnHistory> learnHistoryStream = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 1);
-                if (learnHistoryStream.count() == 0) {
-                    // 说明正常难度还没学习
-                    vo.setEasyState(3);
-                }
+                packageEasyState(maxGroup, vo, histories1);
 
-                LearnHistory easyHistory = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 1)
-                        .max(Comparator.comparing(LearnHistory::getGroup))
-                        .orElse(new LearnHistory());
-                if (Objects.equals(easyHistory.getGroup(), maxGroup.get(vo.getUnitId()))) {
-                    vo.setEasyState(1);
-                }
-
-                Stream<LearnHistory> learnHistoryStream1 = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 2);
-                if (learnHistoryStream1.count() == 0) {
-                    // 说明进阶难度还没学习
-                    vo.setHardState(3);
-                }
-                LearnHistory hardHistory = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 2)
-                        .max(Comparator.comparing(LearnHistory::getGroup))
-                        .orElse(new LearnHistory());
-                if (Objects.equals(hardHistory.getGroup(), maxGroup.get(vo.getUnitId()))) {
-                    vo.setHardState(1);
-                }
+                packageHardSate(maxGroup, vo, histories1);
 
             } else if (learnNewCollect.containsKey(vo.getUnitId())) {
                 // 查看学习记录中是否有当前单元记录
@@ -215,6 +194,36 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             }
         });
         return ServerResponse.createBySuccess(vos);
+    }
+
+    private void packageHardSate(Map<Long, Integer> maxGroup, UnitStudyStateVO vo, List<LearnHistory> histories1) {
+        Stream<LearnHistory> learnHistoryStream = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 2);
+        LearnHistory hardHistory = learnHistoryStream
+                .max(Comparator.comparing(LearnHistory::getGroup))
+                .orElse(new LearnHistory());
+        if (Objects.equals(hardHistory.getGroup(), maxGroup.get(vo.getUnitId()))) {
+            vo.setHardState(1);
+            return;
+        }
+        long count = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 2).count();
+        if (count > 0) {
+            vo.setHardState(2);
+        }
+    }
+
+    private void packageEasyState(Map<Long, Integer> maxGroup, UnitStudyStateVO vo, List<LearnHistory> histories1) {
+        LearnHistory easyHistory = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 1)
+                .max(Comparator.comparing(LearnHistory::getGroup))
+                .orElse(new LearnHistory());
+        if (Objects.equals(easyHistory.getGroup(), maxGroup.get(vo.getUnitId()))) {
+            vo.setEasyState(1);
+            return;
+        }
+        long count = histories1.stream().filter(learnHistory -> learnHistory.getEasyOrHard() == 1).count();
+        if (count > 0) {
+            vo.setEasyState(2);
+        }
+
     }
 
     /**

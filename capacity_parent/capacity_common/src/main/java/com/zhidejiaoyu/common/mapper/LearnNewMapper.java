@@ -83,7 +83,7 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      * @param studentId
      * @return
      */
-    int countLearnedWordCount(@Param("studentId") Long studentId);
+    Integer countLearnedWordCount(@Param("studentId") Long studentId);
 
     /**
      * 统计学生学习的所有句型数（去重）
@@ -91,7 +91,7 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      * @param studentId
      * @return
      */
-    int countLearnedSentenceCount(@Param("studentId") Long studentId);
+    Integer countLearnedSentenceCount(@Param("studentId") Long studentId);
 
     /**
      * 统计学生学习的所有语法数（去重）
@@ -99,7 +99,7 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      * @param studentId
      * @return
      */
-    int countLearnedSyntaxCount(@Param("studentId") Long studentId);
+    Integer countLearnedSyntaxCount(@Param("studentId") Long studentId);
 
     /**
      * 统计学生学习的所有课文数（去重）
@@ -107,7 +107,7 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      * @param studentId
      * @return
      */
-    int countLearnedTextCount(@Param("studentId") Long studentId);
+    Integer countLearnedTextCount(@Param("studentId") Long studentId);
 
     /**
      * 统计学生指定日期范围内学习的单词数

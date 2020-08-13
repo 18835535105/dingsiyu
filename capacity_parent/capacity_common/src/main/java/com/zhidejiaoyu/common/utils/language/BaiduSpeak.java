@@ -6,7 +6,6 @@ import com.zhidejiaoyu.common.pojo.Vocabulary;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -22,11 +21,12 @@ import java.util.Map;
 @Component
 public class BaiduSpeak {
 
-    @Value("${baidu}")
-    private String baidu;
+    private static final String baidu = "https://fanyi.baidu.com/gettts?lan=en&spd=3&source=web&text=";
 
-    @Value("${youdao.create}")
-    private String youdao;
+    /**
+     * 有道语音合成
+     */
+    private static final String youdao = "https://dict.youdao.com/dictvoice?type=2&audio=";
 
     @Autowired
     private VocabularyMapper vocabularyMapper;
