@@ -177,12 +177,8 @@
         where un.course_id = cn.id and sutn.unit_id = un.id
         and (
         <foreach collection="courseNews" item="courseNew" separator="or">
-            cn.grade = #{courseNew.grade} or cn.grade_ext = #{courseNew.grade}
-        </foreach>
-        )
-        and (
-        <foreach collection="courseNews" item="courseNew" separator="or">
-            cn.label = #{courseNew.label} or cn.label_ext = #{courseNew.label}
+            ((cn.grade = #{courseNew.grade} or cn.grade_ext = #{courseNew.grade})
+            and (cn.label = #{courseNew.label} or cn.label_ext = #{courseNew.label}))
         </foreach>
         )
         group by cn.id
