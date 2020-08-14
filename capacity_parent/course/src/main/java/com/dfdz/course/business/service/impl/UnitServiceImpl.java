@@ -116,4 +116,10 @@ public class UnitServiceImpl extends ServiceImpl<UnitNewMapper, UnitNew> impleme
     public int selectByUnitIdAndCourseId(Long unitId, Long courseId) {
         return unitNewMapper.selectByUnitIdAndCourseId(unitId, courseId);
     }
+
+    @Override
+    public Map<Long, Map<String, Object>> selectUnitNameByUnitIds(List<Long> unitIds) {
+        unitNewMapper.selectUnitNameByUnitIds(unitIds);
+        return null;
+    }
 }

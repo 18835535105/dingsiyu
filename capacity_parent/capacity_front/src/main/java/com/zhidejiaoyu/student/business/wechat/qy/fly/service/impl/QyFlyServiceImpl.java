@@ -3,27 +3,25 @@ package com.zhidejiaoyu.student.business.wechat.qy.fly.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.common.dto.student.StudentStudyPlanListDto;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
-import com.zhidejiaoyu.common.mapper.CurrentDayOfStudyMapper;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
-import com.zhidejiaoyu.common.mapper.SysUserMapper;
-import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.SysUser;
+import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseCourseFeginClient;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.service.QyFlyService;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.vo.SearchStudentVO;
+import com.zhidejiaoyu.student.business.wechat.qy.fly.vo.StudentStudyPlanListVo;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +39,46 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
 
     @Resource
     private CurrentDayOfStudyMapper currentDayOfStudyMapper;
+
+    @Resource
+    private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
+
+    @Resource
+    private CourseCourseFeginClient courseCourseFeginClient;
+
+    @Resource
+    private UnitFeignClient unitFeignClient;
+
+    @Override
+    public ServerResponse<Map<String, Object>> getStudentStudyPlan(StudentStudyPlanListDto dto) {
+        Student student = studentMapper.selectByUuid(dto.getUuid());
+        PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
+        List<StudentStudyPlanNew> studentStudyPlanNews = studentStudyPlanNewMapper.selectStudyPlanByStudentIdAndPage(student.getId());
+        PageInfo<StudentStudyPlanNew> pageInfo = new PageInfo<>(studentStudyPlanNews);
+        Map<String, Object> map = new HashMap<>();
+        map.put("studentName", student.getStudentName());
+        map.put("studentAccount", student.getAccount());
+        List<StudentStudyPlanListVo> list = new ArrayList<>();
+        if (studentStudyPlanNews.size() > 0) {
+            List<Long> unitIds = new ArrayList<>();
+            studentStudyPlanNews.forEach(plan -> {
+                unitIds.add(plan.getUnitId());
+            });
+            CourseNew course = courseCourseFeginClient.getById(studentStudyPlanNews.get(0).getCourseId());
+            Map<Long, Map<String, Object>> longMapMap = unitFeignClient.selectUnitNameByUnitIds(unitIds);
+            map.put("courseName", course.getVersion());
+            studentStudyPlanNews.forEach(plan -> {
+                list.add(StudentStudyPlanListVo.builder()
+                        .unitName(longMapMap.get(plan.getUnitId()).get("unitName").toString())
+                        .model(plan.getEasyOrHard() == 1 ? "正常" : "进阶")
+                        .finalLevel(plan.getFinalLevel().toString())
+                        .build());
+            });
+            PageVo<StudentStudyPlanListVo> page = PageUtil.packagePage(list, pageInfo.getTotal());
+            map.put("list", page);
+        }
+        return ServerResponse.createBySuccess(map);
+    }
 
 
     @Override

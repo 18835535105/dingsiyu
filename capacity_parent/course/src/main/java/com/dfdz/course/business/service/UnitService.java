@@ -77,4 +77,6 @@ public interface UnitService extends IService<UnitNew> {
     Map<Long, Map<String, Object>> selectCountByUnitIds(List<Long> unitIds);
 
     int selectByUnitIdAndCourseId(Long unitId, Long courseId);
+
+    Map<Long, Map<String, Object>> selectUnitNameByUnitIds(List<Long> unitIds);
 }

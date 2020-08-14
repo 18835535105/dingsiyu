@@ -1,5 +1,6 @@
 package com.zhidejioayu.center.business.feignclient.qy;
 
+import com.zhidejiaoyu.common.dto.student.StudentStudyPlanListDto;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.pojo.SysUser;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: wuchenxi
@@ -57,6 +59,15 @@ public interface BaseQyFeignClient {
      */
     @GetMapping("/qy/fly/getStudents")
     ServerResponse<Object> getStudents(@SpringQueryMap SearchStudentDTO searchStudentDTO);
+
+    /**
+     * 获取学生学习进度信息
+     *
+     * @param dto
+     * @return
+     */
+    @GetMapping("/qy/fly/getStudentStudyPlan")
+    public ServerResponse<Map<String, Object>> getStudentStudyPlan(@SpringQueryMap StudentStudyPlanListDto dto);
 
     /**
      * 通过账号获取学管信息

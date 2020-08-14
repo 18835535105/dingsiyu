@@ -10,6 +10,8 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.common.vo.student.manage.StudentManageVO;
 
+import java.util.Map;
+
 /**
  * @author: wuchenxi
  * @date: 2020/7/29 15:48:48
@@ -24,6 +26,12 @@ public interface StudentService extends IService<Student> {
      */
     ServerResponse<PageVo<StudentManageVO>> listStudent(StudentListDto dto);
 
+    /**
+     * 创建学生
+     *
+     * @param dto
+     * @return
+     */
     Object createNewStudent(AddNewStudentDto dto);
 
     /**
@@ -41,4 +49,6 @@ public interface StudentService extends IService<Student> {
      * @return
      */
     ServerResponse<Object> saveStudentInfoAfterEdit(SaveEditStudentInfoDTO dto);
+
+
 }

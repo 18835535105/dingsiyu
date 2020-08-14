@@ -1,6 +1,9 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zhidejiaoyu.common.dto.student.StudentListDto;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
@@ -19,6 +22,7 @@ public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNe
 
 
     List<StudentStudyPlanNew> selectAllByStudentId(@Param("studentId") Long studentId);
+
     /**
      * 查看数据
      *
@@ -55,8 +59,12 @@ public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNe
 
     /**
      * 根据id删除学生学习信息
+     *
      * @param deleteIds
      */
     void deleteByIds(@Param("list") List<Integer> deleteIds);
+
+    List<StudentStudyPlanNew> selectStudyPlanByStudentIdAndPage(@Param("studentId") Long studentId);
+
 
 }

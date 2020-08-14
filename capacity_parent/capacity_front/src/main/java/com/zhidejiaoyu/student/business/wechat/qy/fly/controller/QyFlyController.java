@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.business.wechat.qy.fly.controller;
 
+import com.zhidejiaoyu.common.dto.student.StudentListDto;
+import com.zhidejiaoyu.common.dto.student.StudentStudyPlanListDto;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -13,6 +15,7 @@ import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.FlyOfStudyServic
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.IndexService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -89,6 +93,11 @@ public class QyFlyController {
         return qyFlyService.getStudents(dto);
     }
 
+
+    @GetMapping("/getStudentStudyPlan")
+    public ServerResponse<Map<String, Object>> getStudentStudyPlan(@SpringQueryMap StudentStudyPlanListDto dto) {
+        return qyFlyService.getStudentStudyPlan(dto);
+    }
 
     /**
      * 飞行记录学习总览
