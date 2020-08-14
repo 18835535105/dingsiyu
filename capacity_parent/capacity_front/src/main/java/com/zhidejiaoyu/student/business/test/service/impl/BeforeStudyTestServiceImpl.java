@@ -36,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -219,7 +220,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
     @Override
     @GoldChangeAnnotation
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.SERIALIZABLE)
     public ServerResponse<Object> saveSubjects(SaveSubjectsDTO dto) {
         HttpSession httpSession = HttpUtil.getHttpSession();
         Student student = super.getStudent(httpSession);
