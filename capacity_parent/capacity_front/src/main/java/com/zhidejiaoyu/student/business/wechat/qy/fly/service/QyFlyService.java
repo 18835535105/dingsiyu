@@ -1,12 +1,15 @@
 package com.zhidejiaoyu.student.business.wechat.qy.fly.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zhidejiaoyu.common.dto.student.StudentListDto;
+import com.zhidejiaoyu.common.dto.student.StudentStudyPlanListDto;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: wuchenxi
@@ -21,6 +24,14 @@ public interface QyFlyService extends IService<CurrentDayOfStudy> {
      * @return
      */
     ServerResponse<Object> getStudents(SearchStudentDTO dto);
+
+    /**
+     * 获取学生学习计划列表
+     *
+     * @param dto
+     * @return
+     */
+    ServerResponse<Map<String, Object>> getStudentStudyPlan(StudentStudyPlanListDto dto);
 
     /**
      * 校验学生今天智慧飞行记录是否已经上传

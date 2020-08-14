@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.business.wechat.qy.fly.controller;
 
+import com.zhidejiaoyu.common.dto.student.StudentListDto;
+import com.zhidejiaoyu.common.dto.student.StudentStudyPlanListDto;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -11,7 +13,9 @@ import com.zhidejiaoyu.student.business.service.StudentInfoService;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.service.QyFlyService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.FlyOfStudyService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.IndexService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -28,6 +33,7 @@ import java.util.Objects;
  * @author: wuchenxi
  * @date: 2020/6/16 13:52:52
  */
+@Slf4j
 @RestController
 @RequestMapping("/qy/fly")
 public class QyFlyController {
@@ -88,6 +94,11 @@ public class QyFlyController {
     }
 
 
+    @GetMapping("/getStudentStudyPlan")
+    public ServerResponse<Map<String, Object>> getStudentStudyPlan(@SpringQueryMap StudentStudyPlanListDto dto) {
+        return qyFlyService.getStudentStudyPlan(dto);
+    }
+
     /**
      * 飞行记录学习总览
      *
@@ -134,9 +145,10 @@ public class QyFlyController {
         Student student = studentInfoService.getByUuid(uuid);
         if (Objects.equals(DateUtil.formatYYYYMMDD(new Date()), date)) {
             // 查询当天的数据
+            log.info("查询当天的数据，date={}", date);
             return currentDayOfStudyService.getCurrentDayOfStudy(student.getId());
         }
-
+        log.info("查询指定日期的数据， date={}", date);
         return currentDayOfStudyService.getCurrentDayOfStudyWithDate(student.getId(), date);
 
     }

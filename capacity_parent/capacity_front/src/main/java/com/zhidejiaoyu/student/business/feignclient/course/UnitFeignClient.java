@@ -62,6 +62,7 @@ public interface UnitFeignClient  {
 
     /**
      * 根据unitId获取unit信息
+     *
      * @param unitId
      * @return
      */
@@ -70,6 +71,7 @@ public interface UnitFeignClient  {
 
     /**
      * 根据courseId获取最大单元index
+     *
      * @param courseId
      * @return
      */
@@ -80,7 +82,7 @@ public interface UnitFeignClient  {
     Integer selectCurrentUnitIndexByUnitId(@RequestParam Long unitId);
 
     @GetMapping("/selectNextUnitIndexByCourseId")
-    Long selectNextUnitIndexByCourseId(@RequestParam Long courseId,@RequestParam Integer nextUnitIndex);
+    Long selectNextUnitIndexByCourseId(@RequestParam Long courseId, @RequestParam Integer nextUnitIndex);
 
     @GetMapping("/selectFirstUnitByCourseId")
     Unit selectFirstUnitByCourseId(@RequestParam Long courseId);
@@ -92,5 +94,8 @@ public interface UnitFeignClient  {
     Map<Long, Map<String, Object>> selectCountByUnitIds(@RequestParam List<Long> unitIds);
 
     @GetMapping("/selectByUnitIdAndCourseId")
-    int selectByUnitIdAndCourseId(@RequestParam Long unitId,@RequestParam Long courseId);
+    int selectByUnitIdAndCourseId(@RequestParam Long unitId, @RequestParam Long courseId);
+
+    @GetMapping("/selectUnitNameByUnitIds")
+    Map<Long, Map<String, Object>> selectUnitNameByUnitIds(@RequestParam List<Long> unitIds);
 }

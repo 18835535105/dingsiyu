@@ -35,7 +35,7 @@ public class StudentController {
      * @return
      */
     @GetMapping("/listStudent")
-    ServerResponse<PageVo<StudentManageVO>> listStudent(@SpringQueryMap StudentListDto dto) {
+    public ServerResponse<PageVo<StudentManageVO>> listStudent(@SpringQueryMap StudentListDto dto) {
         return studentService.listStudent(dto);
     }
 

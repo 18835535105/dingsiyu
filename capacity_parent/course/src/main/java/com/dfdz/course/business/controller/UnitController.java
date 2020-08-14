@@ -215,4 +215,9 @@ public class UnitController {
     public int selectByUnitIdAndCourseId(@RequestParam Long unitId,@RequestParam Long courseId){
         return  unitService.selectByUnitIdAndCourseId(unitId,courseId);
     }
+
+    @GetMapping("/selectUnitNameByUnitIds")
+    public Map<Long, Map<String, Object>> selectUnitNameByUnitIds(@RequestParam List<Long> unitIds){
+        return  unitService.selectUnitNameByUnitIds(unitIds);
+    }
 }
