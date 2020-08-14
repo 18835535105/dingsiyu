@@ -77,7 +77,7 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
         List<Map<String, Object>> qaQuestions = qaQuestionMapper.selectKeyWordsAndQuestion();
         for (Map<String, Object> qaQuestion1 : qaQuestions) {
             String keyWords = String.valueOf(qaQuestion1.get("keyWords"));
-            if (!question.contains(keyWords)) {
+            if (!question.contains(keyWords) && !keyWords.contains(question)) {
                 continue;
             }
 
@@ -136,7 +136,7 @@ public class QaServiceImpl extends ServiceImpl<QaQuestionMapper, QaQuestion> imp
         List<QaKeywordsInfo> qaKeywordsInfos = new ArrayList<>();
         qaQuestions.forEach(qaQuestion -> {
             String keyWords = String.valueOf(qaQuestion.get("keyWords"));
-            if (!question.contains(keyWords)) {
+            if (!question.contains(keyWords) && !keyWords.contains(question)) {
                 return;
             }
             int id = Integer.parseInt(String.valueOf(qaQuestion.get("id")));
