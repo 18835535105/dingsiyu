@@ -531,7 +531,39 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             voList.forEach(vo -> vo.setReadUrl(GetOssFile.getPublicObjectUrl(vo.getReadUrl())));
             result.addAll(voList);
         });
+
+        try {
+            // 初始化一条数据，防止学生摸底测试之后取不到数据报错
+            this.initStudentStudyPlanNew(unitIds);
+        } catch (Exception e) {
+            log.error("获取摸底测试题，初始化优先级失败！不影响程序运行！", e);
+        }
+
         return ServerResponse.createBySuccess(result);
+    }
+
+    private void initStudentStudyPlanNew(List<Long> unitIds) {
+        StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(super.getStudentId());
+        if (studentStudyPlanNew == null) {
+            Long unitId = unitIds.get(0);
+            CourseNew courseNew1 = courseFeignClient.getByUnitId(unitId);
+            studentStudyPlanNewMapper.insert(StudentStudyPlanNew.builder()
+                    .studentId(super.getStudentId())
+                    .complete(1)
+                    .courseId(courseNew1.getId())
+                    .currentStudyCount(1)
+                    .errorLevel(0)
+                    .group(0)
+                    .timeLevel(0)
+                    .totalStudyCount(1)
+                    .updateTime(new Date())
+                    .easyOrHard(4)
+                    .baseLevel(0)
+                    .flowId(FlowConstant.BEFORE_GROUP_GAME_EASY)
+                    .finalLevel(0)
+                    .unitId(unitId)
+                    .build());
+        }
     }
 
     /**

@@ -2,9 +2,8 @@ package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -59,7 +58,7 @@ public class StudentStudyPlanNew extends Model<StudentStudyPlanNew> {
      */
     private Long flowId;
     /**
-     * 难易类型：1：简单类型；2：难类型
+     * 难易类型：1：简单类型；2：难类型；3：金币试卷；4：生成的临时优先级，防止摸底测试后有时候系统异常
      */
     private Integer easyOrHard;
     /**
