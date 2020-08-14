@@ -124,35 +124,57 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
-        List<Long> courseIds = null;
+        List<Long> courseIds;
 
         // 判断学校有没有为学生单独配置课程，如果有单独配置，取学生配置的课程和校区配置的自由学习课程
         int count = courseConfigMapper.countByUserIdAndType(student.getId(), 2);
         if (count > 0) {
+            if (log.isDebugEnabled()) {
+                log.debug("学生有单独配置的自由学习课程！");
+            }
             courseIds = courseConfigMapper.selectCourseIdsByUserIdAndType(student.getId(), 2);
-            List<Long> configCourseIds = courseConfigMapper.selectCourseIdsByUserIdAndTYpeAndOneKeyLearn(schoolAdminId, 1, 2);
+            List<Long> configCourseIds = courseConfigMapper.selectCourseIdsByUserIdAndTypeAndOneKeyLearn(schoolAdminId, 1, 2);
             if (CollectionUtils.isNotEmpty(configCourseIds)) {
-                courseIds.addAll(configCourseIds);
-            } else {
-                configCourseIds = courseConfigMapper.selectCourseIdsByUserIdAndTYpeAndOneKeyLearn(1, 1, 2);
-                if (CollectionUtils.isNotEmpty(configCourseIds)) {
-                    courseIds.addAll(configCourseIds);
+                if (log.isDebugEnabled()) {
+                    log.debug("校区有单独配置的自由学习课程！");
                 }
+                courseIds.addAll(configCourseIds);
             }
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("学生没有单独配置的自由学习课程！");
+            }
             // 查询一键学习半年后需要学习的全部课程
-            List<SchoolTime> schoolTimes = this.getSchoolTimes(schoolAdminId);
-            if (CollectionUtils.isNotEmpty(schoolTimes)) {
-                courseIds = schoolTimes.stream().map(SchoolTime::getCourseId).collect(Collectors.toList());
-            } else {
-                schoolTimes = this.getSchoolTimes(1);
-                if (CollectionUtils.isNotEmpty(schoolTimes)) {
-                    courseIds = schoolTimes.stream().map(SchoolTime::getCourseId).collect(Collectors.toList());
+            courseIds = this.getSchoolTimeCourseIds(schoolAdminId, student.getGrade());
+            if (CollectionUtils.isEmpty(courseIds) && Objects.equals(student.getGrade(), GradeNameConstant.SENIOR_THREE)) {
+                courseIds = this.getSchoolTimeCourseIds(schoolAdminId, "高二");
+            }
+            if (CollectionUtils.isNotEmpty(courseIds)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("校区有单独配置的一键学习课程！");
                 }
+                // 查询校区配置的自由学习课程
+                List<CourseConfig> courseConfigs = courseConfigMapper.selectList(new LambdaQueryWrapper<CourseConfig>().eq(CourseConfig::getUserId, schoolAdminId)
+                        .eq(CourseConfig::getOneKeyLearn, 2));
+                if (CollectionUtils.isNotEmpty(courseConfigs)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("校区有单独配置的自由学习课程！");
+                    }
+                    Map<Long, Long> map = new HashMap<>(16);
+                    courseIds.forEach(id -> map.put(id, id));
+                    courseIds.addAll(courseConfigs.stream()
+                            .filter(courseConfig -> !map.containsKey(courseConfig.getCourseId()))
+                            .map(CourseConfig::getCourseId).collect(Collectors.toList()));
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("校区没有单独配置的课程！");
+                }
+                courseIds = this.getSchoolTimeCourseIds(1, student.getGrade());
             }
         }
 
-        if (courseIds != null) {
+        if (CollectionUtils.isNotEmpty(courseIds)) {
             courseIds = courseFeignClient.getIdsByPhaseAndIds(studentExpansion.getPhase(), courseIds);
             if (CollectionUtils.isNotEmpty(courseIds)) {
                 return this.packageCourse(student, courseIds, type, courseId);
@@ -162,14 +184,52 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         throw new ServiceException("未查询到学生的自由学习课程！");
     }
 
-    private List<SchoolTime> getSchoolTimes(Integer userId) {
+    private List<Long> getSchoolTimeCourseIds(Integer userId, String grade) {
+        if (Objects.equals(grade, GradeNameConstant.SENIOR_THREE)) {
+            int count = schoolTimeMapper.countByGrade(grade);
+            if (count == 0) {
+                // 没有配置高三的内容，取高一高二所有内容
+                List<SchoolTime> schoolTimes = schoolTimeMapper.selectList(new LambdaQueryWrapper<SchoolTime>()
+                        .eq(SchoolTime::getUserId, userId)
+                        .in(SchoolTime::getGrade, "高一", "高二"));
+                if (CollectionUtils.isNotEmpty(schoolTimes)) {
+                    List<Long> collect = schoolTimes.stream().map(SchoolTime::getCourseId).collect(Collectors.toList());
+                    Set<Long> set = new HashSet<>(collect);
+                    return new ArrayList<>(set);
+                }
+            }
+        }
+
         int i = new DateTime().monthOfYear().get();
         int month = new DateTime().plusMonths(6).monthOfYear().get();
-        return schoolTimeMapper.selectList(new LambdaQueryWrapper<SchoolTime>()
-                .eq(SchoolTime::getUserId, userId)
-                .le(SchoolTime::getMonth, i >= 6 ? 12 : month)
-                .groupBy(SchoolTime::getCourseId)
-                .orderByDesc(SchoolTime::getMonth));
+        List<SchoolTime> schoolTimes = schoolTimeMapper.selectAfterSixMonth(userId, grade, i >= 6 ? 12 : month);
+
+        List<SchoolTime> schoolTimes1 = null;
+        if (CollectionUtils.isNotEmpty(schoolTimes)) {
+            schoolTimes1 = schoolTimeMapper.selectNextByUserIdAndId(userId, schoolTimes.get(schoolTimes.size() - 1).getId());
+        }
+
+        List<Long> courseIds = schoolTimes.stream().map(SchoolTime::getCourseId).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(schoolTimes1)) {
+            return courseIds;
+        }
+
+        // 把非本年级可以半年后学习的课程添加进来
+        for (SchoolTime schoolTime : schoolTimes1) {
+            if (schoolTime.getMonth() == 12) {
+                courseIds.add(schoolTime.getCourseId());
+                break;
+            }
+
+            if (schoolTime.getMonth() > month) {
+                break;
+            }
+
+            courseIds.add(schoolTime.getCourseId());
+        }
+
+        Set<Long> set = new HashSet<>(courseIds);
+        return new ArrayList<>(set);
     }
 
 
@@ -366,7 +426,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         // 判断配置的课程中是否有学生所在的版本
         long count = canStudyCourseNews.stream().filter(courseNew -> Objects.equals(student.getVersion(), courseNew.getVersion())).count();
         String grade = student.getGrade();
-        List<Long> smallCourseIds = this.getSmallCourseIds(courseId, count, versionVos, grade, type, courseNews);
+        List<Long> smallCourseIds = this.getSmallCourseIds(courseId, count, versionVos, type, courseNews);
 
         // 其他年级
         List<CourseVO> previousGrade = new ArrayList<>();
@@ -406,14 +466,15 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      * 获取最终页面被选中的版本信息（只展示有课程信息的版本）
      *
      * @param courseId
-     * @param count
+     * @param count      配置的课程中含有有学生所在的版本个数
      * @param versionVos
-     * @param grade      学生所在年级
      * @param type       学习模块
      * @param courseNews
      * @return
      */
-    private List<Long> getSmallCourseIds(Long courseId, long count, List<VersionVO> versionVos, String grade, Integer type, List<CourseNew> courseNews) {
+    private List<Long> getSmallCourseIds(Long courseId, long count, List<VersionVO> versionVos, Integer type, List<CourseNew> courseNews) {
+        Map<Long, Long> courseIdMap = new HashMap<>(16);
+        courseNews.forEach(courseNew -> courseIdMap.put(courseNew.getId(), courseNew.getId()));
         List<VersionVO> versionVOList = new ArrayList<>();
         List<Long> smallCourseIds = new ArrayList<>();
         if (courseId == null) {
@@ -430,16 +491,19 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                     if (CollectionUtils.isEmpty(courseIds)) {
                         return;
                     }
+
                     /*
                     如果有学生所在的版本，将学生所在版本置为默认选中版本
                     如果没有学生所在版本，将第一个有课程信息的版本置为选中版本
                      */
                     boolean flag = (count == 0 && CollectionUtils.isEmpty(smallCourseIds)) || versionVO.getSelected();
                     if (flag) {
-                        smallCourseIds.addAll(courseIds);
+                        courseIds.forEach(id -> {
+                            if (courseIdMap.containsKey(id)) {
+                                smallCourseIds.add(id);
+                            }
+                        });
                     }
-                }
-                if (CollectionUtils.isNotEmpty(gradeList)) {
                     versionVOList.add(versionVO);
                 }
             });
@@ -461,7 +525,14 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                             .filter(courseNew -> Objects.equals(courseNew.getVersion(), finalTargetVersion))
                             .map(CourseNew::getGrade).collect(Collectors.toList());
 
-                    smallCourseIds.addAll(courseFeignClient.getByGradeListAndVersionAndGrade(finalTargetVersion, gradeList, type));
+                    List<Long> courseIds = courseFeignClient.getByGradeListAndVersionAndGrade(finalTargetVersion, gradeList, type);
+                    if (CollectionUtils.isNotEmpty(courseIds)) {
+                        courseIds.forEach(id -> {
+                            if (courseIdMap.containsKey(id)) {
+                                smallCourseIds.add(id);
+                            }
+                        });
+                    }
                     return;
                 }
 
@@ -470,6 +541,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                         .map(CourseNew::getGrade).collect(Collectors.toList());
 
                 if (CollectionUtils.isNotEmpty(gradeList)) {
+                    versionVOList.add(versionVO);
                     // 当前版本中小于或等于当前年级的所有课程id
                     List<Long> courseIds = courseFeignClient.getByGradeListAndVersionAndGrade(version, gradeList, type);
                     if (CollectionUtils.isEmpty(courseIds)) {

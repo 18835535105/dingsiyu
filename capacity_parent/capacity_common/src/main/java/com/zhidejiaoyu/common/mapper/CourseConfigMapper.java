@@ -20,10 +20,10 @@ public interface CourseConfigMapper extends BaseMapper<CourseConfig> {
      * 查询用户指定的配置信息
      *
      * @param userId
-     * @param type
+     * @param type  1:一键学习；2：自由学习
      * @return
      */
-    List<CourseConfig> selectByUserIdAndTypeAnd(@Param("userId") Long userId, @Param("type") int type);
+    List<CourseConfig> selectByUserIdAndType(@Param("userId") Long userId, @Param("type") int type);
 
     List<Long> selectByUserId(@Param("userId") Long userId, @Param("gradeList") List<String> gradeList);
 
@@ -52,5 +52,5 @@ public interface CourseConfigMapper extends BaseMapper<CourseConfig> {
      * @param oneKeyLearn
      * @return
      */
-    List<Long> selectCourseIdsByUserIdAndTYpeAndOneKeyLearn(@Param("userId") Integer userId, @Param("type") int type, @Param("oneKeyLearn") int oneKeyLearn);
+    List<Long> selectCourseIdsByUserIdAndTypeAndOneKeyLearn(@Param("userId") Integer userId, @Param("type") int type, @Param("oneKeyLearn") int oneKeyLearn);
 }

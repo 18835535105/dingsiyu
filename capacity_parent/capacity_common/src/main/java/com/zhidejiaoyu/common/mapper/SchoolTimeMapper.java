@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.SchoolTime;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,6 @@ public interface SchoolTimeMapper extends BaseMapper<SchoolTime> {
                                                     @Param("gradeList") List<String> gradeList);
 
 
-
     /**
      * 获取当前周的数据
      *
@@ -53,5 +53,33 @@ public interface SchoolTimeMapper extends BaseMapper<SchoolTime> {
 
     Integer selectCountByStudentId(@Param("studentId") Long studentId);
 
-    int selectByGradeAndLabel(@Param("grade") String grade,@Param("label") String label,@Param("type") int type,@Param("userId") Long userId);
+    int selectByGradeAndLabel(@Param("grade") String grade, @Param("label") String label, @Param("type") int type, @Param("userId") Long userId);
+
+    /**
+     * 查询半年后可以学习的所有课程
+     *
+     * @param userId
+     * @param grade
+     * @param month
+     * @return
+     */
+    List<SchoolTime> selectAfterSixMonth(@Param("userId") Integer userId, @Param("grade") String grade, @Param("month") int month);
+
+    /**
+     * 查询当前计划的下一个计划
+     *
+     * @param userId
+     * @param id     当前校区时间id
+     * @return
+     */
+    List<SchoolTime> selectNextByUserIdAndId(@Param("userId") Integer userId, @Param("id") Long id);
+
+    /**
+     * 查看是否配置了当前年级的课程
+     *
+     * @param grade
+     * @return
+     */
+    @Select("select count(id) from school_time where grade = #{grade}")
+    int countByGrade(@Param("grade") String grade);
 }

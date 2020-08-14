@@ -33,7 +33,7 @@
         and course_id=#{courseId}
         limit 1
     </select>
-    <select id="selectByUserIdAndTypeAnd" resultMap="BaseResultMap" parameterType="map">
+    <select id="selectByUserIdAndType" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
         from course_config
@@ -47,7 +47,7 @@
           and `type` = #{type}
         group by course_id
     </select>
-    <select id="selectCourseIdsByUserIdAndTYpeAndOneKeyLearn" resultType="java.lang.Long" parameterType="map">
+    <select id="selectCourseIdsByUserIdAndTypeAndOneKeyLearn" resultType="java.lang.Long" parameterType="map">
         select course_id
         from course_config
         where user_id = #{userId}

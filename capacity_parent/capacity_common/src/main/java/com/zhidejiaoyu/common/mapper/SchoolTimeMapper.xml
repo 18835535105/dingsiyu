@@ -58,7 +58,7 @@
                `time`.user_id                                                                       userId,
                if(course.grade_ext = null or course.grade_ext = '', course.grade_ext, course.grade) grade,
                if(course.label_ext = null or course.label_ext = '', course.label_ext, course.label) label,
-                `time`.`grade`                                                                       timeGrade,
+               `time`.`grade`                                                                       timeGrade,
                `time`.type                                                                          `type`
         from school_time `time`
                  join course_new course on course.id = `time`.course_id
@@ -95,6 +95,28 @@
           and (course.label = #{label} or course.label_ext = #{label})
           and type = #{type}
           and user_id = #{userId}
+    </select>
+    <select id="selectAfterSixMonth" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from school_time
+        where id &lt;= (
+        select max(id)
+        from school_time
+        where user_id = #{userId}
+        and grade = #{grade}
+        and month &lt;= #{month}
+        ) and user_id = #{userId}
+        order by id
+
+    </select>
+    <select id="selectNextByUserIdAndId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from school_time
+        where user_id = #{userId}
+        and id > #{id}
+        order by id
     </select>
 
 </mapper>
