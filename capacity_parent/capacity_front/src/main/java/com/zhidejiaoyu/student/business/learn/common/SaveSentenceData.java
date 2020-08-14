@@ -202,7 +202,7 @@ public class SaveSentenceData {
         SentenceTranslateVo sentenceTranslateVo = getSentenceTranslateVos(plan, firstStudy, sentenceCount, sentence, memoryStrength);
         CurrentDayOfStudyUtil.saveSessionCurrent(SENTENCE, sentenceTranslateVo.getId());
         sentenceTranslateVo.setStudyNew(false);
-        testResultUtil.getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getTranslateDisturb(), type);
+        testResultUtil.getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getCentreExample(), type);
         return sentenceTranslateVo;
     }
 
