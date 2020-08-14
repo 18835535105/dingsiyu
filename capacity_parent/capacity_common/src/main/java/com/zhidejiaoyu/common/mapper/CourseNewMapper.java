@@ -126,4 +126,22 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
      * @return
      */
     List<String> selectVersionByStudyParagraph(String studyParagraph);
+
+    /**
+     * 获取当前版本下所有课程id
+     *
+     * @param version
+     * @return
+     */
+    @Select("select id from course_new where version = #{version}")
+    List<Long> selectIdsByVersion(@Param("version") String version);
+
+    /**
+     * 查询学段中的课程id
+     *
+     * @param phase
+     * @param courseIds
+     * @return
+     */
+    List<Long> selectIdsByPhaseAndIds(@Param("phase") String phase, @Param("courseIds") List<Long> courseIds);
 }

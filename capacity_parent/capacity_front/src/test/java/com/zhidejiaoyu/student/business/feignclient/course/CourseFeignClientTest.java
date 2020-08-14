@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.Assert;
@@ -26,12 +27,15 @@ import java.util.List;
 @SpringBootTest(classes = ZdjyFrontApplication.class)
 public class CourseFeignClientTest {
 
-    @Resource
+    @Autowired
     private CourseFeignClient courseFeignClient;
+
     @Resource
     private UnitFeignClient unitFeignClient;
+
     @Resource
     private VocabularyFeignClient vocabularyFeignClient;
+
     @Resource
     private CenterTeksFeignClient centerTeksFeignClient;
 

@@ -94,11 +94,12 @@ public class UnitController {
 
     /**
      * 使用unitIds获取map
+     *
      * @param unitIds
      * @return
      */
     @RequestMapping(value = "/selectMapByIds", method = RequestMethod.GET)
-    public List<Map<String, Object>> selectMapByIds(@RequestParam List<Long> unitIds){
+    public List<Map<String, Object>> selectMapByIds(@RequestParam List<Long> unitIds) {
         return unitService.selectMapByIds(unitIds);
     }
 
@@ -144,7 +145,7 @@ public class UnitController {
      * @return
      */
     @GetMapping("/getLessOrEqualsCurrentIdByCourseIdAndUnitId")
-    public List<Long> getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(@RequestParam Long courseId,@RequestParam Long unitId) {
+    public List<Long> getLessOrEqualsCurrentUnitIdByCourseIdAndUnitId(@RequestParam Long courseId, @RequestParam Long unitId) {
         if (courseId == null || unitId == null) {
             return Collections.emptyList();
         }
@@ -167,53 +168,89 @@ public class UnitController {
 
     /**
      * 根据unitId获取unit信息
+     *
      * @param unitId
      * @return
      */
     @GetMapping("/selectById")
-    public UnitNew selectById(@RequestParam Long unitId){
+    public UnitNew selectById(@RequestParam Long unitId) {
         return unitService.selectById(unitId);
     }
 
     /**
      * 根据courseId获取最大单元id
+     *
      * @param courseId
      * @return
      */
     @GetMapping("/selectMaxUnitIndexByCourseId")
-    public Integer selectMaxUnitIndexByCourseId(@RequestParam Long courseId){
-        return  unitService.selectMaxUnitIndexByCourseId(courseId);
+    public Integer selectMaxUnitIndexByCourseId(@RequestParam Long courseId) {
+        return unitService.selectMaxUnitIndexByCourseId(courseId);
     }
 
 
     @GetMapping("/selectCurrentUnitIndexByUnitId")
-    public Integer selectCurrentUnitIndexByUnitId(@RequestParam Long unitId){
-        return  unitService.selectCurrentUnitIndexByUnitId(unitId);
+    public Integer selectCurrentUnitIndexByUnitId(@RequestParam Long unitId) {
+        return unitService.selectCurrentUnitIndexByUnitId(unitId);
     }
 
     @GetMapping("/selectNextUnitIndexByCourseId")
-    public Long selectNextUnitIndexByCourseId(@RequestParam Long courseId,@RequestParam Integer nextUnitIndex){
-        return  unitService.selectNextUnitIndexByCourseId(courseId,nextUnitIndex);
+    public Long selectNextUnitIndexByCourseId(@RequestParam Long courseId, @RequestParam Integer nextUnitIndex) {
+        return unitService.selectNextUnitIndexByCourseId(courseId, nextUnitIndex);
     }
 
     @GetMapping("/selectFirstUnitByCourseId")
-    public Unit selectFirstUnitByCourseId(@RequestParam Long courseId){
-        return  unitService.selectFirstUnitByCourseId(courseId);
+    public Unit selectFirstUnitByCourseId(@RequestParam Long courseId) {
+        return unitService.selectFirstUnitByCourseId(courseId);
     }
 
     @GetMapping("/countWordByCourse")
-    public Integer countWordByCourse(@RequestParam Long courseId){
-        return  unitService.countWordByCourse(courseId);
+    public Integer countWordByCourse(@RequestParam Long courseId) {
+        return unitService.countWordByCourse(courseId);
     }
 
     @GetMapping("/selectCountByUnitIds")
-    public Map<Long, Map<String, Object>> selectCountByUnitIds(@RequestParam List<Long> unitIds){
-        return  unitService.selectCountByUnitIds(unitIds);
+    public Map<Long, Map<String, Object>> selectCountByUnitIds(@RequestParam List<Long> unitIds) {
+        return unitService.selectCountByUnitIds(unitIds);
     }
 
     @GetMapping("/selectByUnitIdAndCourseId")
-    public int selectByUnitIdAndCourseId(@RequestParam Long unitId,@RequestParam Long courseId){
-        return  unitService.selectByUnitIdAndCourseId(unitId,courseId);
+    public int selectByUnitIdAndCourseId(@RequestParam Long unitId, @RequestParam Long courseId) {
+        return unitService.selectByUnitIdAndCourseId(unitId, courseId);
+    }
+
+    /**
+     * 获取当前课程下语法的下个单元
+     *
+     * @param unitId
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/getNextSyntaxUnitByCourseId")
+    public UnitNew getNextSyntaxUnitByCourseId(@RequestParam Long unitId, @RequestParam Long courseId) {
+        return unitService.getNextSyntaxUnitByCourseId(unitId, courseId);
+    }
+
+    /**
+     * 获取当前课程下语法最大单元
+     *
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/getSyntaxMaxUnitByCourseId")
+    public UnitNew getSyntaxMaxUnitByCourseId(@RequestParam Long courseId) {
+        return unitService.getSyntaxMaxUnitByCourseId(courseId);
+    }
+
+    /**
+     * 根据jointname查询语法单元
+     *
+     * @param jointName
+     * @return
+     */
+    @GetMapping("/getSyntaxUnitLikeJointName")
+    public UnitNew getSyntaxUnitLikeJointName(String jointName) {
+        return unitService.getSyntaxUnitLikeJointName(jointName);
     }
 
     @GetMapping("/selectUnitNameByUnitIds")

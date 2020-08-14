@@ -70,7 +70,7 @@ public class CourseController {
      * @return
      */
     @GetMapping("/getByIdsGroupByVersion")
-    List<CourseNew> getByIdsGroupByVersion(@RequestParam List<Long> courseIds) {
+    public List<CourseNew> getByIdsGroupByVersion(@RequestParam List<Long> courseIds) {
         if (CollectionUtils.isEmpty(courseIds)) {
             return Collections.emptyList();
         }
@@ -188,12 +188,64 @@ public class CourseController {
     }
 
     @RequestMapping(value = "/selectIdAndVersionByStudentIdByPhase", method = RequestMethod.GET)
-    public List<Map<String, Object>> selectIdAndVersionByStudentIdByPhase(@RequestParam Long studentId,@RequestParam String phase){
-        return courseService.selectIdAndVersionByStudentIdByPhase(studentId,phase);
+    public List<Map<String, Object>> selectIdAndVersionByStudentIdByPhase(@RequestParam Long studentId, @RequestParam String phase) {
+        return courseService.selectIdAndVersionByStudentIdByPhase(studentId, phase);
     }
 
     @RequestMapping(value = "/selectUnitsWordSum", method = RequestMethod.GET)
-    public Map<Long, Map<Long, Object>> selectUnitsWordSum(@RequestParam long courseId){
+    public Map<Long, Map<Long, Object>> selectUnitsWordSum(@RequestParam long courseId) {
         return courseService.selectUnitsWordSum(courseId);
+    }
+
+    /**
+     * 根据id获取当前课程的年级
+     *
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/getGradeById")
+    public String getGradeById(@RequestParam Long courseId) {
+        CourseNew courseNew = courseService.getById(courseId);
+        if (courseNew == null) {
+            return "";
+        }
+        return courseNew.getGrade();
+    }
+
+    /**
+     * 根据单元id查询课程信息
+     *
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/getByUnitId")
+    public CourseNew getByUnitId(@RequestParam Long unitId) {
+        return courseService.getByUnitId(unitId);
+    }
+
+    /**
+     * 获取版本下所有课程id
+     *
+     * @param version
+     * @return
+     */
+    @GetMapping("/getIdsByVersion")
+    public List<Long> getIdsByVersion(@RequestParam String version) {
+        return courseService.getIdsByVersion(version);
+    }
+
+    /**
+     * 从课程ids中过滤出指定学段的课程id
+     *
+     * @param phase
+     * @param courseIds
+     * @return
+     */
+    @GetMapping("/getIdsByPhaseAndIds")
+    List<Long> getIdsByPhaseAndIds(@RequestParam String phase, @RequestParam List<Long> courseIds) {
+        if (StringUtil.isEmpty(phase) || CollectionUtils.isEmpty(courseIds)) {
+            return Collections.emptyList();
+        }
+        return courseService.getIdsByPhaseAndIds(phase, courseIds);
     }
 }

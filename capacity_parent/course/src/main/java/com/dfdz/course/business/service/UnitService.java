@@ -78,5 +78,11 @@ public interface UnitService extends IService<UnitNew> {
 
     int selectByUnitIdAndCourseId(Long unitId, Long courseId);
 
+    UnitNew getNextSyntaxUnitByCourseId(Long unitId, Long courseId);
+
+    UnitNew getSyntaxMaxUnitByCourseId(Long courseId);
+
+    UnitNew getSyntaxUnitLikeJointName(String jointName);
+
     Map<Long, Map<String, Object>> selectUnitNameByUnitIds(List<Long> unitIds);
 }

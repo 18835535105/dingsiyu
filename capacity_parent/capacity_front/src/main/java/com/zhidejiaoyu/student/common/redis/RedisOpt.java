@@ -4,7 +4,7 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseCourseFeginClient;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.SentenceFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
 import com.zhidejiaoyu.student.business.shipconfig.service.impl.ShipAddEquipmentServiceImpl;
@@ -40,8 +40,7 @@ public class RedisOpt {
     @Resource
     private SentenceFeignClient sentenceFeignClient;
 
-    @Resource
-    private CourseCourseFeginClient courseCourseFeginClient;
+    private final CourseFeignClient courseFeignClient;
 
     @Resource
     private VocabularyFeignClient vocabularyFeignClient;
@@ -59,6 +58,10 @@ public class RedisOpt {
     private StudentEquipmentMapper studentEquipmentMapper;
 
     private static RedisTemplate<String, Object> staticRedisTemplate;
+
+    public RedisOpt(CourseFeignClient courseFeignClient) {
+        this.courseFeignClient = courseFeignClient;
+    }
 
     @PostConstruct
     public void init() {
@@ -154,7 +157,7 @@ public class RedisOpt {
      * @return
      */
     private List<Map<String, Object>> getCourses(Long studentId, String phase) {
-        List<Map<String, Object>> courseList = courseCourseFeginClient.selectIdAndVersionByStudentIdByPhase(studentId, phase);
+        List<Map<String, Object>> courseList = courseFeignClient.selectIdAndVersionByStudentIdByPhase(studentId, phase);
         if (courseList.size() > 0) {
             courseList.forEach(c -> {
                 if (c.get("version") != null && c.get("version").toString().contains("冲刺版")) {
@@ -179,14 +182,14 @@ public class RedisOpt {
         Object object = getRedisObject(unitWordSumKey);
         Map<Long, Map<Long, Object>> unitWordSum;
         if (object == null) {
-            unitWordSum = courseCourseFeginClient.selectUnitsWordSum(courseId);
+            unitWordSum = courseFeignClient.selectUnitsWordSum(courseId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, unitWordSumKey, unitWordSum);
         } else {
             try {
                 unitWordSum = (Map<Long, Map<Long, Object>>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], courseId=[{}], error=[{}]", object, courseId, e.getMessage());
-                unitWordSum = courseCourseFeginClient.selectUnitsWordSum(courseId);
+                unitWordSum = courseFeignClient.selectUnitsWordSum(courseId);
                 log.error("重新查询数据：unitWordSum=[{}]", unitWordSum);
             }
         }

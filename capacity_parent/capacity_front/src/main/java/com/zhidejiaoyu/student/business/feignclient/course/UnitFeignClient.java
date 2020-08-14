@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @FeignClient(name = "course", path = "/course/unit")
-public interface UnitFeignClient  {
+public interface UnitFeignClient {
     /**
      * 查询指定课程名的所有单元id
      *
@@ -95,6 +95,34 @@ public interface UnitFeignClient  {
 
     @GetMapping("/selectByUnitIdAndCourseId")
     int selectByUnitIdAndCourseId(@RequestParam Long unitId, @RequestParam Long courseId);
+
+    /**
+     * 获取当前课程下语法的下个单元
+     *
+     * @param unitId
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/getNextSyntaxUnitByCourseId")
+    UnitNew getNextSyntaxUnitByCourseId(@RequestParam Long unitId, @RequestParam Long courseId);
+
+    /**
+     * 获取当前课程下语法最大单元
+     *
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/getSyntaxMaxUnitByCourseId")
+    UnitNew getSyntaxMaxUnitByCourseId(@RequestParam Long courseId);
+
+    /**
+     * 根据jointname查询语法单元
+     *
+     * @param jointName
+     * @return
+     */
+    @GetMapping("/getSyntaxUnitLikeJointName")
+    UnitNew getSyntaxUnitLikeJointName(String jointName);
 
     @GetMapping("/selectUnitNameByUnitIds")
     Map<Long, Map<String, Object>> selectUnitNameByUnitIds(@RequestParam List<Long> unitIds);

@@ -8,7 +8,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseCourseFeginClient;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzService;
@@ -157,7 +157,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
     @Autowired
-    private CourseCourseFeginClient courseFeignClient;
+    private CourseFeignClient courseFeignClient;
     @Resource
     private SchoolTimeMapper schoolTimeMapper;
     @Resource
