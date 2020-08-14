@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @FeignClient(name = "course", path = "/course/centerTeks")
-public interface CenterTeksFeignClient extends CourseFeignClient {
+public interface CenterTeksFeignClient {
 
     /**
      * 课文获取数据

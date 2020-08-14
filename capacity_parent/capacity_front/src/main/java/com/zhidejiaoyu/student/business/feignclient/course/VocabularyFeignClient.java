@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @FeignClient(name = "course", path = "/course/vocabulary")
-public interface VocabularyFeignClient extends CourseFeignClient {
+public interface VocabularyFeignClient {
     /**
      * 根据单词查询中文翻译
      *
