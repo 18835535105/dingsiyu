@@ -5,13 +5,15 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.dto.student.StudentStudyPlanListDto;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
-import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.CurrentDayOfStudyMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
+import com.zhidejiaoyu.common.mapper.StudentStudyPlanNewMapper;
+import com.zhidejiaoyu.common.mapper.SysUserMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.feignclient.course.CourseCourseFeginClient;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.service.QyFlyService;
@@ -43,11 +45,14 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
     @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
 
-    @Resource
-    private CourseCourseFeginClient courseCourseFeginClient;
+    private final CourseFeignClient courseFeignClient;
 
     @Resource
     private UnitFeignClient unitFeignClient;
+
+    public QyFlyServiceImpl(CourseFeignClient courseFeignClient) {
+        this.courseFeignClient = courseFeignClient;
+    }
 
     @Override
     public ServerResponse<Map<String, Object>> getStudentStudyPlan(StudentStudyPlanListDto dto) {
@@ -64,7 +69,7 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
             studentStudyPlanNews.forEach(plan -> {
                 unitIds.add(plan.getUnitId());
             });
-            CourseNew course = courseCourseFeginClient.getById(studentStudyPlanNews.get(0).getCourseId());
+            CourseNew course = courseFeignClient.getById(studentStudyPlanNews.get(0).getCourseId());
             Map<Long, Map<String, Object>> longMapMap = unitFeignClient.selectUnitNameByUnitIds(unitIds);
             map.put("courseName", course.getVersion());
             studentStudyPlanNews.forEach(plan -> {
