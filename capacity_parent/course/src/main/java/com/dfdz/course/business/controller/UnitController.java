@@ -252,4 +252,9 @@ public class UnitController {
     public UnitNew getSyntaxUnitLikeJointName(String jointName) {
         return unitService.getSyntaxUnitLikeJointName(jointName);
     }
+
+    @GetMapping("/selectUnitNameByUnitIds")
+    public Map<Long, Map<String, Object>> selectUnitNameByUnitIds(@RequestParam List<Long> unitIds){
+        return  unitService.selectUnitNameByUnitIds(unitIds);
+    }
 }

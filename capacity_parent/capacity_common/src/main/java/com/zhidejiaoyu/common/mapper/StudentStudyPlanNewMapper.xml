@@ -27,7 +27,8 @@
     </sql>
 
     <select id="selectAllByStudentId" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include>
+        select
+        <include refid="base_sql"></include>
         from student_study_plan_new
         where student_id=#{studentId}
     </select>
@@ -62,6 +63,14 @@
         </foreach>
         )
         )
+    </select>
+
+    <select id="selectStudyPlanByStudentIdAndPage" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"/>
+        from student_study_plan_new
+        where student_id = #{studentId}
+        order by final_level desc, id
     </select>
 
     <select id="selectMaxFinalLevelByLimit" parameterType="map" resultMap="BaseResultMap">

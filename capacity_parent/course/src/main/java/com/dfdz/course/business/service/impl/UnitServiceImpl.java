@@ -130,4 +130,10 @@ public class UnitServiceImpl extends ServiceImpl<UnitNewMapper, UnitNew> impleme
     public UnitNew getSyntaxUnitLikeJointName(String jointName) {
         return unitNewMapper.selectSyntaxUnitLikeJointName(jointName);
     }
+
+    @Override
+    public Map<Long, Map<String, Object>> selectUnitNameByUnitIds(List<Long> unitIds) {
+        unitNewMapper.selectUnitNameByUnitIds(unitIds);
+        return null;
+    }
 }

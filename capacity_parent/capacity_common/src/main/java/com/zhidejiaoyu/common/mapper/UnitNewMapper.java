@@ -170,4 +170,7 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
     UnitNew selectFirstByUnitId(Long courseId);
 
     List<Map<String, Object>> selectByExample(UnitOneExample example);
+
+    @MapKey("unitId")
+    Map<Long, Map<String, Object>>  selectUnitNameByUnitIds(@Param("unitIds") List<Long> unitIds);
 }

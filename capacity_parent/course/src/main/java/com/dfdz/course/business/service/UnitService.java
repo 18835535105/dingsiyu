@@ -83,4 +83,6 @@ public interface UnitService extends IService<UnitNew> {
     UnitNew getSyntaxMaxUnitByCourseId(Long courseId);
 
     UnitNew getSyntaxUnitLikeJointName(String jointName);
+
+    Map<Long, Map<String, Object>> selectUnitNameByUnitIds(List<Long> unitIds);
 }
