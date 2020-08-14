@@ -177,12 +177,8 @@
         where un.course_id = cn.id and sutn.unit_id = un.id
         and (
         <foreach collection="courseNews" item="courseNew" separator="or">
-            cn.grade = #{courseNew.grade} or cn.grade_ext = #{courseNew.grade}
-        </foreach>
-        )
-        and (
-        <foreach collection="courseNews" item="courseNew" separator="or">
-            cn.label = #{courseNew.label} or cn.label_ext = #{courseNew.label}
+            ((cn.grade = #{courseNew.grade} or cn.grade_ext = #{courseNew.grade})
+            and (cn.label = #{courseNew.label} or cn.label_ext = #{courseNew.label}))
         </foreach>
         )
         group by cn.id
@@ -212,6 +208,14 @@
             </if>
         </where>
         group by version
+    </select>
+    <select id="selectIdsByPhaseAndIds" resultType="java.lang.Long" parameterType="map">
+        select id from course_new where study_paragraph = #{phase}
+        and id in (
+        <foreach collection="courseIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
     </select>
     <sql id="Example_Where_Clause">
         <where>

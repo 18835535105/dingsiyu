@@ -1,15 +1,18 @@
 package com.zhidejiaoyu.student.business.flow.common;
 
+import com.zhidejiaoyu.common.constant.FlowConstant;
 import com.zhidejiaoyu.common.constant.session.SessionConstant;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.grade.GradeUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
-import com.zhidejiaoyu.common.constant.FlowConstant;
+import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
+import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.flow.service.impl.FreeFlowServiceImpl;
 import com.zhidejiaoyu.student.business.flow.service.impl.StudyFlowServiceImpl;
 import com.zhidejiaoyu.student.common.redis.PayLogRedisOpt;
@@ -68,13 +71,7 @@ public class FinishGroupOrUnit {
     private LearnHistoryMapper learnHistoryMapper;
 
     @Resource
-    private CourseNewMapper courseNewMapper;
-
-    @Resource
     private PayLogRedisOpt payLogRedisOpt;
-
-    @Resource
-    private UnitNewMapper unitNewMapper;
 
     @Resource
     private UnitTestStoreMapper unitTestStoreMapper;
@@ -84,6 +81,15 @@ public class FinishGroupOrUnit {
 
     @Resource
     private SyntaxUnitTopicNewMapper syntaxUnitTopicNewMapper;
+
+    private final CourseFeignClient courseFeignClient;
+
+    @Resource
+    private UnitFeignClient unitFeignClient;
+
+    public FinishGroupOrUnit(CourseFeignClient courseFeignClient) {
+        this.courseFeignClient = courseFeignClient;
+    }
 
     /**
      * 一键学习，学习完当前group
@@ -154,7 +160,7 @@ public class FinishGroupOrUnit {
     private FlowVO toSyntaxFlow(NodeDto dto, boolean isEasy) {
         if (dto.getLastUnit()) {
             // 说明当前课程的单元已学习到最后一个单元，获取当前课程下个语法单元节点
-            UnitNew unitNew = unitNewMapper.selectNextSyntaxUnitByCourseId(dto.getUnitId(), dto.getCourseId());
+            UnitNew unitNew = unitFeignClient.getNextSyntaxUnitByCourseId(dto.getUnitId(), dto.getCourseId());
             if (unitNew != null) {
                 StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(isEasy ? FlowConstant.SYNTAX_GAME : FlowConstant.SYNTAX_WRITE);
                 return this.getSyntaxFlowVo(NodeDto.builder()
@@ -176,7 +182,7 @@ public class FinishGroupOrUnit {
                 return null;
             }
 
-            UnitNew maxUnitNew = unitNewMapper.selectSyntaxMaxUnitByCourseId(dto.getCourseId());
+            UnitNew maxUnitNew = unitFeignClient.getSyntaxMaxUnitByCourseId(dto.getCourseId());
 
             boolean isLastUnit = Objects.equals(dto.getUnitId(), maxUnitNew.getId());
 
@@ -221,12 +227,12 @@ public class FinishGroupOrUnit {
     }
 
     private UnitNew getSyntaxUnit(NodeDto dto) {
-        CourseNew courseNew = courseNewMapper.selectById(dto.getCourseId());
+        CourseNew courseNew = courseFeignClient.getById(dto.getCourseId());
         if (courseNew == null) {
             return null;
         }
 
-        UnitNew unitNew = unitNewMapper.selectById(dto.getUnitId());
+        UnitNew unitNew = unitFeignClient.selectById(dto.getUnitId());
         String grade = courseNew.getGrade();
         String label = courseNew.getLabel();
         String jointNameLike = "(" +
@@ -235,7 +241,7 @@ public class FinishGroupOrUnit {
                 (StringUtils.isEmpty(label) ? courseNew.getLabelExt() : label) +
                 ")-" +
                 unitNew.getUnitName();
-        return unitNewMapper.selectSyntaxUnitLikeJointName(jointNameLike);
+        return unitFeignClient.getSyntaxUnitLikeJointName(jointNameLike);
     }
 
     /**
@@ -303,13 +309,19 @@ public class FinishGroupOrUnit {
      * @return
      */
     public ServerResponse<Object> finishFreeUnit(NodeDto dto, Student student) {
-        if (Objects.equals(dto.getStudyFlowNew().getFlowName(), FlowConstant.FLOW_SIX)) {
+
+        // 判断当前学习课程年级是不是大于学生年级，如果大于学生年级，不操作优先级表；否则正常执行以下逻辑
+        String courseGrade = courseFeignClient.getGradeById(dto.getCourseId());
+
+        if (GradeUtil.compareGrade(courseGrade, student.getGrade()) > 0
+                || Objects.equals(dto.getStudyFlowNew().getFlowName(), FlowConstant.FLOW_SIX)) {
             return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
         }
+
         Integer easyOrHard = dto.getEasyOrHard();
         StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), dto.getUnitId(), easyOrHard);
         if (studentStudyPlanNew == null) {
-            CourseNew courseNew = courseNewMapper.selectByUnitId(dto.getUnitId());
+            CourseNew courseNew = courseFeignClient.getByUnitId(dto.getUnitId());
             // 说明当前课程还没有优先级，初始化当前课程的优先级
             String grade = StringUtils.isNotEmpty(courseNew.getGrade()) ? courseNew.getGrade() : courseNew.getGradeExt();
             String label = StringUtils.isNotEmpty(courseNew.getLabel()) ? courseNew.getLabel() : courseNew.getLabelExt();
@@ -530,7 +542,7 @@ public class FinishGroupOrUnit {
      * @param maxFinalLevel
      */
     private void updateLevel(NodeDto dto, StudentStudyPlanNew maxFinalLevel) {
-        CourseNew currentCourse = courseNewMapper.selectById(maxFinalLevel.getCourseId());
+        CourseNew currentCourse = courseFeignClient.getById(maxFinalLevel.getCourseId());
         String gradeExt = currentCourse.getGradeExt();
         String currentGrade = StringUtils.isNotBlank(gradeExt) ? gradeExt : currentCourse.getGrade();
         PriorityUtil.finishUnitUpdateErrorLevel(maxFinalLevel, dto.getStudent().getGrade(), currentGrade);
