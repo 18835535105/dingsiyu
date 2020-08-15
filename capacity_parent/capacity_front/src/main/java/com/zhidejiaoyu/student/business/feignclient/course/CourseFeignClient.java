@@ -27,7 +27,7 @@ public interface CourseFeignClient {
      * @return
      */
     @RequestMapping(value = "/selectUnitsWordSum", method = RequestMethod.GET)
-    Map<Long, Map<Long, Object>> selectUnitsWordSum(@RequestParam long courseId);
+    Map<Long, Map<String, Object>> selectUnitsWordSum(@RequestParam long courseId);
 
     /**
      * []

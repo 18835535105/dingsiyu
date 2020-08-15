@@ -549,7 +549,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<SimpleC
         Map<Long, Map<Long, Object>> learnWordSum = simpleStudentMapper.learnUnitsWordSum(studentId, courseId);
 
         // 获取课程下每个单元单词总量
-        Map<Long, Map<Long, Object>> unitWordSum = redisOpt.getWordCountWithUnitInCourse(courseId);
+        Map<Long, Map<String, Object>> unitWordSum = redisOpt.getWordCountWithUnitInCourse(courseId);
 
         boolean state = true;
         try {
@@ -603,7 +603,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<SimpleC
      * @param unit         当前单元信息 b.id, b.unit_name, a.word_status
      */
     private void judgeAnew(int type, Map<Long, Map<Long, Object>> map, Map<Long, Map<Long, Object>> unitTest,
-                           Map<Long, Map<Long, Object>> learnWordSum, Map<Long, Map<Long, Object>> unitWordSum,
+                           Map<Long, Map<Long, Object>> learnWordSum, Map<Long, Map<String, Object>> unitWordSum,
                            Map<String, Object> unit) {
         long atUnitId = (long) unit.get("id");
         if (map.containsKey(atUnitId)) {
@@ -617,8 +617,8 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<SimpleC
                 // 5:词汇考点; 7:语法辨析;
                 if (type == 5 || type == 7) {
                     // 单元已学 == 单元全部单词
-                    if (learnWordSum != null && unitWordSum != null && unitWordSum.containsKey(atUnitId + "") && learnWordSum.containsKey(atUnitId)
-                            && Long.valueOf(unitWordSum.get(atUnitId + "").get("sum").toString()) <= Long.valueOf(learnWordSum.get(atUnitId).get("sum").toString())) {
+                    if (learnWordSum != null && unitWordSum != null && unitWordSum.containsKey(atUnitId) && learnWordSum.containsKey(atUnitId)
+                            && Long.valueOf(unitWordSum.get(atUnitId).get("sum").toString()) <= Long.valueOf(learnWordSum.get(atUnitId).get("sum").toString())) {
                         unit.put("anew", true);
                     }
                 }
