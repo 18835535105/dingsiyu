@@ -93,7 +93,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
     }
 
     @Override
-    public Map<Long, Map<Long, Object>> selectUnitsWordSum(long courseId) {
+    public Map<Long, Map<String, Object>> selectUnitsWordSum(long courseId) {
         return courseNewMapper.selectUnitsWordSum(courseId);
     }
 

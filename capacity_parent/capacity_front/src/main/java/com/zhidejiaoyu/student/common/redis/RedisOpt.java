@@ -177,16 +177,17 @@ public class RedisOpt {
      * @param courseId
      * @return
      */
-    public Map<Long, Map<Long, Object>> getWordCountWithUnitInCourse(long courseId) {
+    public Map<Long, Map<String, Object>> getWordCountWithUnitInCourse(long courseId) {
         String unitWordSumKey = RedisKeysConst.WORD_COUNT_WITH_UNIT_IN_COURSE + courseId;
         Object object = getRedisObject(unitWordSumKey);
-        Map<Long, Map<Long, Object>> unitWordSum;
+        Map<Long, Map<String, Object>> unitWordSum;
         if (object == null) {
             unitWordSum = courseFeignClient.selectUnitsWordSum(courseId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, unitWordSumKey, unitWordSum);
         } else {
             try {
-                unitWordSum = (Map<Long, Map<Long, Object>>) object;
+                //unitWordSum =
+                unitWordSum =   (Map<Long, Map<String, Object>>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], courseId=[{}], error=[{}]", object, courseId, e.getMessage());
                 unitWordSum = courseFeignClient.selectUnitsWordSum(courseId);

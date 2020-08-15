@@ -97,7 +97,7 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
      * @return
      */
     @MapKey("id")
-    Map<Long, Map<Long, Object>> selectUnitsWordSum(Long courseId);
+    Map<Long, Map<String, Object>> selectUnitsWordSum(Long courseId);
 
     /**
      * 获取语法数据

@@ -193,7 +193,7 @@ public class CourseController {
     }
 
     @RequestMapping(value = "/selectUnitsWordSum", method = RequestMethod.GET)
-    public Map<Long, Map<Long, Object>> selectUnitsWordSum(@RequestParam long courseId) {
+    public Map<Long, Map<String, Object>> selectUnitsWordSum(@RequestParam long courseId) {
         return courseService.selectUnitsWordSum(courseId);
     }
 
