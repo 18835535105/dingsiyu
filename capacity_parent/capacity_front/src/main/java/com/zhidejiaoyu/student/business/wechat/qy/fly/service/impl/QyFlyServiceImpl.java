@@ -106,6 +106,7 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
                 .studentId(student.getId())
                 .uuid(student.getUuid())
                 .studentName(StringUtil.isEmpty(student.getStudentName()) ? "默认姓名" : student.getStudentName())
+                .account(student.getAccount())
                 .canSubmit(finalMap.get(student.getId()) == null || finalMap.get(student.getId()).get("count") == 0)
                 .build()).collect(Collectors.toList());
 

@@ -28,4 +28,6 @@ public class SearchStudentVO implements Serializable {
      */
     private Boolean canSubmit;
 
+    private String account;
+
 }
