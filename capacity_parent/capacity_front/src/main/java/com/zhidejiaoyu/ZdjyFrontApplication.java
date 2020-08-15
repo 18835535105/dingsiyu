@@ -37,7 +37,7 @@ import static org.springframework.boot.SpringApplication.run;
 @EnableFeignClients
 @ServletComponentScan
 @MapperScan(basePackages = {"com.zhidejiaoyu.common.mapper"})
-@EnableRedisHttpSession(redisNamespace = "spring:session:student")
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 7200, redisNamespace = "spring:session:student")
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class})
 public class ZdjyFrontApplication {
 
@@ -69,7 +69,6 @@ public class ZdjyFrontApplication {
             }
         }
     }
-
 
 
 }
