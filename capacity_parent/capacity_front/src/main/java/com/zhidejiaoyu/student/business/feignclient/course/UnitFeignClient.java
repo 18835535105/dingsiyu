@@ -122,7 +122,7 @@ public interface UnitFeignClient {
      * @return
      */
     @GetMapping("/getSyntaxUnitLikeJointName")
-    UnitNew getSyntaxUnitLikeJointName(String jointName);
+    UnitNew getSyntaxUnitLikeJointName(@RequestParam String jointName);
 
     @GetMapping("/selectUnitNameByUnitIds")
     Map<Long, Map<String, Object>> selectUnitNameByUnitIds(@RequestParam List<Long> unitIds);
