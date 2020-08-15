@@ -156,7 +156,7 @@
         GROUP BY b.id
     </select>
     <select id="selectUnitsWordSum" resultType="java.util.Map" parameterType="map">
-        select a.id AS id, count(distinct b.vocabulary_id) AS sum
+        select a.id AS id, count(distinct b.vocabulary_id) AS `sum`
         from unit_new a,
              unit_vocabulary_new b,
              vocabulary c
