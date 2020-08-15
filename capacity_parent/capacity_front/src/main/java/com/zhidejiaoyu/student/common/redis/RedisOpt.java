@@ -186,8 +186,8 @@ public class RedisOpt {
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, unitWordSumKey, unitWordSum);
         } else {
             try {
-                //unitWordSum = (Map<Long, Map<String, Object>>) object;
-                unitWordSum =  courseFeignClient.selectUnitsWordSum(courseId);
+                //unitWordSum =
+                unitWordSum =   (Map<Long, Map<String, Object>>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], courseId=[{}], error=[{}]", object, courseId, e.getMessage());
                 unitWordSum = courseFeignClient.selectUnitsWordSum(courseId);
