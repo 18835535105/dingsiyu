@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Grade;
+import com.zhidejiaoyu.common.pojo.SysUser;
 
 /**
  * <p>
@@ -13,4 +14,5 @@ import com.zhidejiaoyu.common.pojo.Grade;
  */
 public interface GradeMapper extends BaseMapper<Grade> {
 
+    Grade selectByTeacherId(Long teacherId);
 }

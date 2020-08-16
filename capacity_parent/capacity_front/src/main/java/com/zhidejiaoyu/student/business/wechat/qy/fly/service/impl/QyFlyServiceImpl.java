@@ -5,10 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.dto.student.StudentStudyPlanListDto;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
-import com.zhidejiaoyu.common.mapper.CurrentDayOfStudyMapper;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
-import com.zhidejiaoyu.common.mapper.StudentStudyPlanNewMapper;
-import com.zhidejiaoyu.common.mapper.SysUserMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
@@ -46,6 +43,12 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
 
     private final CourseFeignClient courseFeignClient;
+
+    @Resource
+    private TeacherMapper teacherMapper;
+
+    @Resource
+    private GradeMapper gradeMapper;
 
     @Resource
     private UnitFeignClient unitFeignClient;
@@ -92,7 +95,11 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
 
         PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
-        List<Student> students = studentMapper.selectByTeacherIdOrSchoolAdminId(sysUser.getId(), dto);
+        Grade grade = gradeMapper.selectByTeacherId(sysUser.getId().longValue());
+
+        List<Student> students;
+        students = getStudens(sysUser, grade, dto);
+
         PageInfo<Student> pageInfo = new PageInfo<>(students);
 
         // 查询学生当天是否已经上传了飞行记录
@@ -112,6 +119,15 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
 
         PageVo<SearchStudentVO> page = PageUtil.packagePage(collect, pageInfo.getTotal());
         return ServerResponse.createBySuccess(page);
+    }
+
+    private List<Student> getStudens(SysUser sysUser, Grade grade, SearchStudentDTO dto) {
+        if (sysUser.getAccount().contains("xg") || grade != null) {
+            return studentMapper.selectByTeacherIdOrSchoolAdminId(sysUser.getId(), dto);
+        } else {
+            Integer teacherId = teacherMapper.selectSchoolAdminIdByTeacherId(sysUser.getId().longValue());
+            return studentMapper.selectByTeacherIdOrSchoolAdminId(teacherId, dto);
+        }
     }
 
     @Override

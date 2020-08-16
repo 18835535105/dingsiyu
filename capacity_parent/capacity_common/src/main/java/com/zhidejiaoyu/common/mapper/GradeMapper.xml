@@ -4,9 +4,21 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Grade">
-        <id column="id" property="id" />
-        <result column="teacher_id" property="teacherId" />
-        <result column="class_name" property="className" />
+        <id column="id" property="id"/>
+        <result column="teacher_id" property="teacherId"/>
+        <result column="class_name" property="className"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id,teacher_id,class_name
+    </sql>
+
+    <select id="selectByTeacherId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from grade
+        where
+        teacher_id = #{teacherId}
+    </select>
 
 </mapper>
