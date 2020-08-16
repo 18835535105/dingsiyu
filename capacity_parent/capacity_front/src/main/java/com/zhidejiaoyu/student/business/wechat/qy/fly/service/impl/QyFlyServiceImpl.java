@@ -96,10 +96,7 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
 
         PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
         Grade grade = gradeMapper.selectByTeacherId(sysUser.getId().longValue());
-
-        List<Student> students;
-        students = getStudens(sysUser, grade, dto);
-
+        List<Student> students = getStudens(sysUser, grade, dto);
         PageInfo<Student> pageInfo = new PageInfo<>(students);
 
         // 查询学生当天是否已经上传了飞行记录
