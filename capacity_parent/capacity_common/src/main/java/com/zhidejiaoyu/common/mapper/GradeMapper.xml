@@ -19,6 +19,7 @@
         from grade
         where
         teacher_id = #{teacherId}
+        limit 1
     </select>
 
 </mapper>
