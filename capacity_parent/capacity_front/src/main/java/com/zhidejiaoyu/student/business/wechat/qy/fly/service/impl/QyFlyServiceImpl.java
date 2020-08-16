@@ -93,9 +93,8 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
     public ServerResponse<Object> getStudents(SearchStudentDTO dto) {
 
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
-
-        PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
         Grade grade = gradeMapper.selectByTeacherId(sysUser.getId().longValue());
+        PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
         List<Student> students = getStudens(sysUser, grade, dto);
         PageInfo<Student> pageInfo = new PageInfo<>(students);
 
