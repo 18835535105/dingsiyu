@@ -116,7 +116,7 @@ public class QyAuthServiceImpl implements QyAuthService {
                 return loginUrl + "/#/?state=1";
             }
         }
-        return url + "/#/?openId=" + openId;
+        return url + "\\/#/?openId=" + openId;
     }
 
     public String getOpenId(HttpServletRequest httpServletRequest) {
