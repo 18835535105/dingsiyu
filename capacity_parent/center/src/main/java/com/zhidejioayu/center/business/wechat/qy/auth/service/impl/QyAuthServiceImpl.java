@@ -118,9 +118,8 @@ public class QyAuthServiceImpl implements QyAuthService {
         }
 
         // 如果有该参数
-        String trim = httpServletRequest.getParameter("need_trim");
-        if (trim != null) {
-            return url + "?openId=" + openId;
+        if (url.contains("need_trim")) {
+            return url.split("need_trim")[0] + "?openId=" + openId;
         }
 
         return url + "/#/?openId=" + openId;
