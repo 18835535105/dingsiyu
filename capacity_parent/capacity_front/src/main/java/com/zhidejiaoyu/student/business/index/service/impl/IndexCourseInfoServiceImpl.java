@@ -146,14 +146,17 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                 log.debug("学生没有单独配置的自由学习课程！");
             }
             // 查询一键学习半年后需要学习的全部课程
-            courseIds = this.getSchoolTimeCourseIds(schoolAdminId, student.getGrade());
-            if (CollectionUtils.isEmpty(courseIds) && Objects.equals(student.getGrade(), GradeNameConstant.SENIOR_THREE)) {
-                courseIds = this.getSchoolTimeCourseIds(schoolAdminId, "高二");
-            }
-            if (CollectionUtils.isNotEmpty(courseIds)) {
+            Integer schoolTimeCount = schoolTimeMapper.selectCount(new LambdaQueryWrapper<SchoolTime>().eq(SchoolTime::getUserId, schoolAdminId));
+            if (schoolTimeCount != null && schoolTimeCount > 0) {
                 if (log.isDebugEnabled()) {
                     log.debug("校区有单独配置的一键学习课程！");
                 }
+
+                courseIds = this.getSchoolTimeCourseIds(schoolAdminId, student.getGrade());
+                if (CollectionUtils.isEmpty(courseIds) && Objects.equals(student.getGrade(), GradeNameConstant.SENIOR_THREE)) {
+                    courseIds = this.getSchoolTimeCourseIds(schoolAdminId, "高二");
+                }
+
                 // 查询校区配置的自由学习课程
                 List<CourseConfig> courseConfigs = courseConfigMapper.selectList(new LambdaQueryWrapper<CourseConfig>().eq(CourseConfig::getUserId, schoolAdminId)
                         .eq(CourseConfig::getOneKeyLearn, 2));
