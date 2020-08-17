@@ -912,7 +912,7 @@ s.uuid,
                  where teacher_id in (select teacher_id from teacher where school_admin_id = 299)) t
     </select>
     <select id="selectByTeacherIdOrSchoolAdminId" resultMap="BaseResultMap" parameterType="map">
-        select id, student_name, uuid
+        select id, student_name, uuid,account
         from
         student where (teacher_id = #{userId}
         or teacher_id in (select teacher_id from teacher where school_admin_id =#{userId}))
