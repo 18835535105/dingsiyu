@@ -139,9 +139,9 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
     /**
      * 查询学段中的课程id
      *
-     * @param phase
+     * @param phaseArr
      * @param courseIds
      * @return
      */
-    List<Long> selectIdsByPhaseAndIds(@Param("phase") String phase, @Param("courseIds") List<Long> courseIds);
+    List<Long> selectIdsByPhasesAndIds(@Param("phaseArr") List<String> phaseArr, @Param("courseIds") List<Long> courseIds);
 }

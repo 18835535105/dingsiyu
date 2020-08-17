@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
+import com.zhidejiaoyu.common.utils.grade.GradeUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -175,13 +176,32 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         }
 
         if (CollectionUtils.isNotEmpty(courseIds)) {
-            courseIds = courseFeignClient.getIdsByPhaseAndIds(studentExpansion.getPhase(), courseIds);
-            if (CollectionUtils.isNotEmpty(courseIds)) {
-                return this.packageCourse(student, courseIds, type, courseId);
+            // 查询小于当前年级的所有课程
+            List<Long> finalCourseIds = new ArrayList<>(courseFeignClient.getIdsByPhasesAndIds(this.getPhaseList(studentExpansion), courseIds));
+            // 查询当前学段正常应该学习的课程
+            finalCourseIds.addAll(courseFeignClient.getIdsByPhasesAndIds(Collections.singletonList(studentExpansion.getPhase()), courseIds));
+            if (CollectionUtils.isNotEmpty(finalCourseIds)) {
+                return this.packageCourse(student, finalCourseIds, type, courseId);
             }
         }
 
         throw new ServiceException("未查询到学生的自由学习课程！");
+    }
+
+    /**
+     * 获取小于当前学段的所有学段
+     *
+     * @param studentExpansion
+     * @return
+     */
+    private List<String> getPhaseList(StudentExpansion studentExpansion) {
+        String phase = studentExpansion.getPhase();
+
+        if (Objects.equals(phase, "高中")) {
+            return Arrays.asList("小学", "初中");
+        }
+
+        return Collections.singletonList("小学");
     }
 
     private List<Long> getSchoolTimeCourseIds(Integer userId, String grade) {
@@ -189,9 +209,10 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             int count = schoolTimeMapper.countByGrade(grade);
             if (count == 0) {
                 // 没有配置高三的内容，取高一高二所有内容
+                List<String> gradeList = GradeUtil.smallThanCurrentGrade(grade);
                 List<SchoolTime> schoolTimes = schoolTimeMapper.selectList(new LambdaQueryWrapper<SchoolTime>()
                         .eq(SchoolTime::getUserId, userId)
-                        .in(SchoolTime::getGrade, "高一", "高二"));
+                        .in(SchoolTime::getGrade, gradeList));
                 if (CollectionUtils.isNotEmpty(schoolTimes)) {
                     return schoolTimes.stream().map(SchoolTime::getCourseId).distinct().collect(Collectors.toList());
                 }
@@ -200,10 +221,15 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
         int i = new DateTime().monthOfYear().get();
         int month = new DateTime().plusMonths(6).monthOfYear().get();
+
         List<SchoolTime> schoolTimes = schoolTimeMapper.selectAfterSixMonth(userId, grade, i >= 6 ? 12 : month);
 
         SchoolTime schoolTime = schoolTimeMapper.selectNextByUserIdAndId(userId, schoolTimes.get(schoolTimes.size() - 1).getId());
 
+        List<String> gradeList = GradeUtil.smallThanCurrentGrade(grade);
+        // 查询小于当前年级的所以课程计划
+        List<SchoolTime> smallSchoolTimes = schoolTimeMapper.selectSmallThanCurrentGrade(userId, gradeList);
+        schoolTimes.addAll(smallSchoolTimes);
         List<Long> courseIds = schoolTimes.stream().map(SchoolTime::getCourseId).distinct().collect(Collectors.toList());
         if (schoolTime == null) {
             return courseIds;
@@ -525,7 +551,6 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                         .map(CourseNew::getGrade).collect(Collectors.toList());
 
                 if (CollectionUtils.isNotEmpty(gradeList)) {
-                    versionVOList.add(versionVO);
                     // 当前版本中小于或等于当前年级的所有课程id
                     List<Long> courseIds = courseFeignClient.getByGradeListAndVersionAndGrade(version, gradeList, type);
                     if (CollectionUtils.isEmpty(courseIds)) {

@@ -82,4 +82,13 @@ public interface SchoolTimeMapper extends BaseMapper<SchoolTime> {
      */
     @Select("select count(id) from school_time where grade = #{grade}")
     int countByGrade(@Param("grade") String grade);
+
+    /**
+     * 查询指定年级的课程计划
+     *
+     * @param userId
+     * @param gradeList
+     * @return
+     */
+    List<SchoolTime> selectSmallThanCurrentGrade(@Param("userId") Integer userId, @Param("gradeList") List<String> gradeList);
 }

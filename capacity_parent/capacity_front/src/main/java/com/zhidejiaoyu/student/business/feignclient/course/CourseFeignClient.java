@@ -151,10 +151,10 @@ public interface CourseFeignClient {
     /**
      * 从课程ids中过滤出指定学段的课程id
      *
-     * @param phase
+     * @param phaseList
      * @param courseIds
      * @return
      */
-    @GetMapping("/getIdsByPhaseAndIds")
-    List<Long> getIdsByPhaseAndIds(@RequestParam String phase, @RequestParam List<Long> courseIds);
+    @GetMapping("/getIdsByPhasesAndIds")
+    List<Long> getIdsByPhasesAndIds(@RequestParam List<String> phaseList, @RequestParam List<Long> courseIds);
 }

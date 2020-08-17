@@ -209,8 +209,12 @@
         </where>
         group by version
     </select>
-    <select id="selectIdsByPhaseAndIds" resultType="java.lang.Long" parameterType="map">
-        select id from course_new where study_paragraph = #{phase}
+    <select id="selectIdsByPhasesAndIds" resultType="java.lang.Long" parameterType="map">
+        select id from course_new where study_paragraph in(
+        <foreach collection="phaseArr" item="phase" separator=",">
+            #{phase}
+        </foreach>
+        )
         and id in (
         <foreach collection="courseIds" item="id" separator=",">
             #{id}

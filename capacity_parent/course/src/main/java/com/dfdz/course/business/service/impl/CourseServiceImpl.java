@@ -103,8 +103,8 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
     }
 
     @Override
-    public List<Long> getIdsByPhaseAndIds(String phase, List<Long> courseIds) {
-        return courseNewMapper.selectIdsByPhaseAndIds(phase, courseIds);
+    public List<Long> getIdsByPhaseAndIds(List<String> phase, List<Long> courseIds) {
+        return courseNewMapper.selectIdsByPhasesAndIds(phase, courseIds);
     }
 
     @Override

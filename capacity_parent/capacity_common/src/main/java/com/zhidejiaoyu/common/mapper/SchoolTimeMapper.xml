@@ -120,5 +120,14 @@
         order by id
         limit 1
     </select>
+    <select id="selectSmallThanCurrentGrade" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from school_time where user_id = #{userId} and grade in (
+        <foreach collection="gradeList" item="grade" separator=",">
+            #{grade}
+        </foreach>
+        )
+    </select>
 
 </mapper>

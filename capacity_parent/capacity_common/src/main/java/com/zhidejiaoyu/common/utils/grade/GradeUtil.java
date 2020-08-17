@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.utils.grade;
 import com.zhidejiaoyu.common.constant.GradeNameConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import lombok.NonNull;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;
 
@@ -175,6 +176,26 @@ public class GradeUtil {
         return getGradeList(grade, ALL_PHASE_VERSION_GRADE.get(grade));
     }
 
+    /**
+     * 小于或者等于当前年级的所有年级
+     *
+     * @param grade 年级
+     * @return 如果没有查询到小于指定年级的年级数据，返回当前年级
+     */
+    public static List<String> smallThanCurrentGrade(String grade) {
+        List<String> gradeList = new ArrayList<>();
+        for (String s : NORMAL_GRADE) {
+            if (Objects.equals(s, grade)) {
+                return gradeList;
+            }
+            gradeList.add(s);
+        }
+        if (CollectionUtils.isEmpty(gradeList)) {
+            gradeList.add(grade);
+        }
+        return gradeList;
+    }
+
     private static List<String> getGradeList(String grade, String[] gradeArr) {
         List<String> gradeList = new ArrayList<>();
         for (String s : gradeArr) {
@@ -262,7 +283,10 @@ public class GradeUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println(GradeUtil.smallThanCurrentAllPhase("人教版", "高三"));
-        System.out.println(GradeUtil.highThanCurrentAllPhase("人教版(PEP)", "七年级"));
+//        System.out.println(GradeUtil.smallThanCurrentAllPhase("人教版", "高三"));
+//        System.out.println(GradeUtil.highThanCurrentAllPhase("人教版(PEP)", "七年级"));
+        System.out.println(GradeUtil.smallThanCurrentGrade("高三").toString());
+        System.out.println(GradeUtil.smallThanCurrentGrade("九年级").toString());
+        System.out.println(GradeUtil.smallThanCurrentGrade("六年级").toString());
     }
 }

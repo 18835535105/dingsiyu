@@ -237,15 +237,15 @@ public class CourseController {
     /**
      * 从课程ids中过滤出指定学段的课程id
      *
-     * @param phase
+     * @param phaseList
      * @param courseIds
      * @return
      */
-    @GetMapping("/getIdsByPhaseAndIds")
-    List<Long> getIdsByPhaseAndIds(@RequestParam String phase, @RequestParam List<Long> courseIds) {
-        if (StringUtil.isEmpty(phase) || CollectionUtils.isEmpty(courseIds)) {
+    @GetMapping("/getIdsByPhasesAndIds")
+    List<Long> getIdsByPhaseAndIds(@RequestParam List<String> phaseList, @RequestParam List<Long> courseIds) {
+        if (CollectionUtils.isEmpty(phaseList) || CollectionUtils.isEmpty(courseIds)) {
             return Collections.emptyList();
         }
-        return courseService.getIdsByPhaseAndIds(phase, courseIds);
+        return courseService.getIdsByPhaseAndIds(phaseList, courseIds);
     }
 }
