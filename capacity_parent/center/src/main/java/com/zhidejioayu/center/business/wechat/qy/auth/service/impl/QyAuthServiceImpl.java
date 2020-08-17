@@ -116,7 +116,14 @@ public class QyAuthServiceImpl implements QyAuthService {
                 return loginUrl + "/#/?state=1";
             }
         }
-        return url + "\\/#/?openId=" + openId;
+
+        // 如果有该参数
+        String trim = httpServletRequest.getParameter("need_trim");
+        if (trim != null) {
+            return url + "?openId=" + openId;
+        }
+
+        return url + "/#/?openId=" + openId;
     }
 
     public String getOpenId(HttpServletRequest httpServletRequest) {
