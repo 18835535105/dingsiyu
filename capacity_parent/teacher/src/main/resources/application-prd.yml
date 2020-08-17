@@ -74,11 +74,6 @@ server:
 logging:
   config: classpath:log4j2-prd.xml
 
-# 需要执行定时任务的服务器ip和端口
-quartz:
-  ip: ${ip}
-  port: 9082
-
 # sentinel配置
 ahas:
   namespace: prd

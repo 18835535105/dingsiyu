@@ -67,7 +67,7 @@ feign:
         readTimeout: 10000
 
 server:
-  port: 9082
+  port: 9084
   tomcat:
     max-threads: 512
     min-spare-threads: 20
@@ -81,7 +81,7 @@ adminDomin: https://admin.duizhang100.cn/dept
 # 需要执行定时任务的服务器ip和端口
 quartz:
   ip: ${ip}
-  port: 9082
+  port: 9084
 
 # sentinel配置
 ahas:
