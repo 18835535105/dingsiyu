@@ -69,19 +69,15 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
         List<StudentStudyPlanListVo> list = new ArrayList<>();
         if (studentStudyPlanNews.size() > 0) {
             List<Long> unitIds = new ArrayList<>();
-            studentStudyPlanNews.forEach(plan -> {
-                unitIds.add(plan.getUnitId());
-            });
+            studentStudyPlanNews.forEach(plan -> unitIds.add(plan.getUnitId()));
             CourseNew course = courseFeignClient.getById(studentStudyPlanNews.get(0).getCourseId());
             Map<Long, Map<String, Object>> longMapMap = unitFeignClient.selectUnitNameByUnitIds(unitIds);
             map.put("courseName", course.getVersion());
-            studentStudyPlanNews.forEach(plan -> {
-                list.add(StudentStudyPlanListVo.builder()
-                        .unitName(longMapMap.get(plan.getUnitId()).get("unitName").toString())
-                        .model(plan.getEasyOrHard() == 1 ? "正常" : "进阶")
-                        .finalLevel(plan.getFinalLevel().toString())
-                        .build());
-            });
+            studentStudyPlanNews.forEach(plan -> list.add(StudentStudyPlanListVo.builder()
+                    .unitName(longMapMap.get(plan.getUnitId()).get("unitName").toString())
+                    .model(plan.getEasyOrHard() == 1 ? "正常" : "进阶")
+                    .finalLevel(plan.getFinalLevel().toString())
+                    .build()));
             PageVo<StudentStudyPlanListVo> page = PageUtil.packagePage(list, pageInfo.getTotal());
             map.put("list", page);
         }
@@ -94,8 +90,17 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
 
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
         Grade grade = gradeMapper.selectByTeacherId(sysUser.getId().longValue());
-        PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
-        List<Student> students = getStudens(sysUser, grade, dto);
+
+        List<Student> students;
+        if (sysUser.getAccount().contains("xg") || grade != null) {
+            PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
+            students = studentMapper.selectByTeacherIdOrSchoolAdminId(sysUser.getId(), dto);
+        } else {
+            Integer teacherId = teacherMapper.selectSchoolAdminIdByTeacherId(sysUser.getId().longValue());
+            PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
+            students = studentMapper.selectByTeacherIdOrSchoolAdminId(teacherId, dto);
+        }
+
         PageInfo<Student> pageInfo = new PageInfo<>(students);
 
         // 查询学生当天是否已经上传了飞行记录
@@ -115,15 +120,6 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
 
         PageVo<SearchStudentVO> page = PageUtil.packagePage(collect, pageInfo.getTotal());
         return ServerResponse.createBySuccess(page);
-    }
-
-    private List<Student> getStudens(SysUser sysUser, Grade grade, SearchStudentDTO dto) {
-        if (sysUser.getAccount().contains("xg") || grade != null) {
-            return studentMapper.selectByTeacherIdOrSchoolAdminId(sysUser.getId(), dto);
-        } else {
-            Integer teacherId = teacherMapper.selectSchoolAdminIdByTeacherId(sysUser.getId().longValue());
-            return studentMapper.selectByTeacherIdOrSchoolAdminId(teacherId, dto);
-        }
     }
 
     @Override
