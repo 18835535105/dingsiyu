@@ -53,6 +53,7 @@
             #{studentId}
         </foreach>
         )
+        and to_days(card_time)=to_days(#{date})
     </select>
     <select id="selectByStudentAccount" resultType="com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.DailyStateVO">
         select s.account,
