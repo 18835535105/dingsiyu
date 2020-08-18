@@ -121,8 +121,24 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     @Override
     public ServerResponse<Object> getStudyCourse(Integer type, Long courseId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
-        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
 
+        List<Long> courseIds = this.getCourseIds(type, student);
+
+        if (CollectionUtils.isNotEmpty(courseIds)) {
+            StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+            // 查询小于当前年级的所有课程
+            List<Long> finalCourseIds = new ArrayList<>(courseFeignClient.getIdsByPhasesAndIds(this.getPhaseList(studentExpansion), courseIds));
+            // 查询当前学段正常应该学习的课程
+            finalCourseIds.addAll(courseFeignClient.getIdsByPhasesAndIds(Collections.singletonList(studentExpansion.getPhase()), courseIds));
+            if (CollectionUtils.isNotEmpty(finalCourseIds)) {
+                return this.packageCourse(student, finalCourseIds, type, courseId);
+            }
+        }
+
+        throw new ServiceException("未查询到学生的自由学习课程！");
+    }
+
+    private List<Long> getCourseIds(Integer type, Student student) {
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
         List<Long> courseIds;
@@ -141,54 +157,55 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                 }
                 courseIds.addAll(configCourseIds);
             }
-        } else {
+            return courseIds;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("学生没有单独配置的自由学习课程！");
+        }
+        // 查询一键学习半年后需要学习的全部课程
+        Integer schoolTimeCount = schoolTimeMapper.selectCount(new LambdaQueryWrapper<SchoolTime>().eq(SchoolTime::getUserId, schoolAdminId));
+        if (schoolTimeCount == null || schoolTimeCount == 0) {
+            // 说明校区没有配置学习时间，查询校区的课程配置
+            List<CourseConfig> courseConfigs = courseConfigMapper.selectByUserIdAndType((long) schoolAdminId, 1);
+            courseConfigs.addAll(courseConfigMapper.selectByUserIdAndType((long) schoolAdminId, 2));
+            courseIds = courseConfigs.stream().filter(courseConfig -> courseConfig.getStudyModel().contains(String.valueOf(type))).map(CourseConfig::getCourseId).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(courseIds)) {
+                return courseIds;
+            }
+        }
+
+        if (schoolTimeCount != null && schoolTimeCount > 0) {
+            // 校区配置了学习时间
             if (log.isDebugEnabled()) {
-                log.debug("学生没有单独配置的自由学习课程！");
+                log.debug("校区有单独配置的一键学习课程！");
             }
-            // 查询一键学习半年后需要学习的全部课程
-            Integer schoolTimeCount = schoolTimeMapper.selectCount(new LambdaQueryWrapper<SchoolTime>().eq(SchoolTime::getUserId, schoolAdminId));
-            if (schoolTimeCount != null && schoolTimeCount > 0) {
-                if (log.isDebugEnabled()) {
-                    log.debug("校区有单独配置的一键学习课程！");
-                }
 
-                courseIds = this.getSchoolTimeCourseIds(schoolAdminId, student.getGrade());
-                if (CollectionUtils.isEmpty(courseIds) && Objects.equals(student.getGrade(), GradeNameConstant.SENIOR_THREE)) {
-                    courseIds = this.getSchoolTimeCourseIds(schoolAdminId, "高二");
-                }
-
-                // 查询校区配置的自由学习课程
-                List<CourseConfig> courseConfigs = courseConfigMapper.selectList(new LambdaQueryWrapper<CourseConfig>().eq(CourseConfig::getUserId, schoolAdminId)
-                        .eq(CourseConfig::getOneKeyLearn, 2));
-                if (CollectionUtils.isNotEmpty(courseConfigs)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("校区有单独配置的自由学习课程！");
-                    }
-                    Map<Long, Long> map = new HashMap<>(16);
-                    courseIds.forEach(id -> map.put(id, id));
-                    courseIds.addAll(courseConfigs.stream()
-                            .filter(courseConfig -> !map.containsKey(courseConfig.getCourseId()))
-                            .map(CourseConfig::getCourseId).collect(Collectors.toList()));
-                }
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("校区没有单独配置的课程！");
-                }
-                courseIds = this.getSchoolTimeCourseIds(1, student.getGrade());
+            courseIds = this.getSchoolTimeCourseIds(schoolAdminId, student.getGrade());
+            if (CollectionUtils.isEmpty(courseIds) && Objects.equals(student.getGrade(), GradeNameConstant.SENIOR_THREE)) {
+                courseIds = this.getSchoolTimeCourseIds(schoolAdminId, "高二");
             }
+
+            // 查询校区配置的自由学习课程
+            List<CourseConfig> courseConfigs = courseConfigMapper.selectList(new LambdaQueryWrapper<CourseConfig>().eq(CourseConfig::getUserId, schoolAdminId)
+                    .eq(CourseConfig::getOneKeyLearn, 2));
+            if (CollectionUtils.isNotEmpty(courseConfigs)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("校区有单独配置的自由学习课程！");
+                }
+                Map<Long, Long> map = new HashMap<>(16);
+                courseIds.forEach(id -> map.put(id, id));
+                courseIds.addAll(courseConfigs.stream()
+                        .filter(courseConfig -> !map.containsKey(courseConfig.getCourseId()))
+                        .map(CourseConfig::getCourseId).collect(Collectors.toList()));
+            }
+            return courseIds;
         }
 
-        if (CollectionUtils.isNotEmpty(courseIds)) {
-            // 查询小于当前年级的所有课程
-            List<Long> finalCourseIds = new ArrayList<>(courseFeignClient.getIdsByPhasesAndIds(this.getPhaseList(studentExpansion), courseIds));
-            // 查询当前学段正常应该学习的课程
-            finalCourseIds.addAll(courseFeignClient.getIdsByPhasesAndIds(Collections.singletonList(studentExpansion.getPhase()), courseIds));
-            if (CollectionUtils.isNotEmpty(finalCourseIds)) {
-                return this.packageCourse(student, finalCourseIds, type, courseId);
-            }
+        if (log.isDebugEnabled()) {
+            log.debug("校区没有单独配置的课程！");
         }
-
-        throw new ServiceException("未查询到学生的自由学习课程！");
+        return this.getSchoolTimeCourseIds(1, student.getGrade());
     }
 
     /**
