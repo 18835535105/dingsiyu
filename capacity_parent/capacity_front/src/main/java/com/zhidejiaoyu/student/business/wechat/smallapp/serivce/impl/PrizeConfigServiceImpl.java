@@ -90,7 +90,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         }
         Teacher teacher = teacherMapper.selectTeacherBySchoolAdminId(adminId.intValue());
         returnMap.put("adminPhone", sb.toString());
-        ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId.intValue());
+        ShareConfig shareConfig = shareConfigMapper.selectByAdminId(1);
         if (shareConfig != null) {
             returnMap.put("background", GetOssFile.getPublicObjectUrl(shareConfig.getImgUrl()));
         } else {
