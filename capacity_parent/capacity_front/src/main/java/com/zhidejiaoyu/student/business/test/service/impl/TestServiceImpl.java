@@ -421,7 +421,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
                 Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
                 student.setSystemGold(student.getSystemGold() + doubleGoldCount);
-                testRecord.setAwardGold(goldCount + doubleGoldCount.intValue());
+                testRecord.setAwardGold(doubleGoldCount.intValue());
             }
         }
         TestResultVo vo = new TestResultVo();
@@ -894,7 +894,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
                 Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
                 student.setSystemGold(student.getSystemGold() + doubleGoldCount);
-                testRecord.setAwardGold(goldCount + doubleGoldCount.intValue());
+                testRecord.setAwardGold(doubleGoldCount.intValue());
             }
         }
         Learn learn = new Learn();
