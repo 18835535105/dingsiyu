@@ -384,7 +384,7 @@
     </select>
 
     <select id="selectValidTimeByStudentIds" resultType="map" parameterType="map">
-        SELECT valid_time validTime,student_id studentId
+        SELECT count(valid_time) validTime,student_id studentId
         FROM duration
         WHERE
         student_id in (
