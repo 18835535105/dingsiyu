@@ -85,6 +85,12 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private CourseService courseService;
 
     @Resource
+    private SchoolTimeMapper schoolTimeMapper;
+
+    @Resource
+    private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
+
+    @Resource
     private CourseFeignClient courseFeignClient;
 
     @Override
@@ -183,7 +189,6 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         if (student.getClassId() != null) {
             grade = gradeMapper.selectById(student.getClassId());
         }
-
         EditStudentVo vo = new EditStudentVo();
         vo.setUuid(student.getUuid());
         vo.setAccount(student.getAccount());
@@ -203,8 +208,27 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         vo.setSex(student.getSex());
         vo.setStudentName(student.getStudentName());
         vo.setWish(student.getWish());
-        vo.setVersion(StrKit.parseParentheses(student.getVersion()));
+        vo.setVersion(getStudentVersion(student));
         return ServerResponse.createBySuccess(vo);
+    }
+
+    private String getStudentVersion(Student student) {
+        StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(student.getId());
+        if (studentStudyPlanNew != null) {
+            CourseNew course = courseFeignClient.getById(studentStudyPlanNew.getCourseId());
+            return course.getVersion();
+        } else {
+            Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
+            SchoolTime schoolTime = schoolTimeMapper.selectByUserIdAndGrade(schoolAdminId, student.getGrade() == null ? "三年级" : student.getGrade());
+            if (schoolTime != null) {
+                CourseNew course = courseFeignClient.getById(schoolTime.getCourseId());
+                return course.getVersion();
+            } else {
+                SchoolTime schoolTime1 = schoolTimeMapper.selectByUserIdAndGrade(1, student.getGrade() == null ? "三年级" : student.getGrade());
+                CourseNew course = courseFeignClient.getById(schoolTime1.getCourseId());
+                return course.getVersion();
+            }
+        }
     }
 
     @Override

@@ -17,6 +17,14 @@
     <sql id="base_sql">
         id, user_id, grade, unit_id, course_id, `month`, week, `type`, update_time
     </sql>
+    <select id="selectByUserIdAndGrade" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from school_time
+        where user_id = #{userId}
+        and grade=#{grade}
+        limit 1
+    </select>
     <select id="selectByUserIdAndTypeAndMonthAndWeek" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
