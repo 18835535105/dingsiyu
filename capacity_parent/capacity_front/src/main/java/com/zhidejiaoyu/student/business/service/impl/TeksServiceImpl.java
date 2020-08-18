@@ -764,15 +764,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
         getLevel(session);
         double gold = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
-        if (student.getBonusExpires() != null) {
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-        }
         // 封装响应数据
         Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord, model, group);
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
         studentMapper.updateById(student);
         int insert = testRecordMapper.insert(testRecord);
-
+        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
         if (insert > 0) {
             Learn learn = new Learn();
             learn.setType(1);
