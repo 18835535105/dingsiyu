@@ -26,7 +26,7 @@ import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.CcieUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
-import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
@@ -98,8 +98,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private TestSentenceUtil testSentenceUtil;
     @Autowired
     private LearnMapper learnMapper;
-    @Autowired
-    private TestGoldUtil testGoldUtil;
     @Autowired
     private LetterMapper letterMapper;
     @Resource
@@ -207,9 +205,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             } else {
                 awardEnergy = awardGold = 3;
             }
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
             student.setEnergy(awardEnergy);
-            studentMapper.updateById(student);
+
+            awardGold = GoldUtil.addStudentGold(student, awardGold);
+
             GoldLogUtil.saveStudyGoldLog(student.getId(), GenreConstant.BEFORE_LEARN_GAME_TEST, awardGold);
         }
 
@@ -328,18 +327,19 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (integer == null || integer <= 0) {
             integer = 0;
         }
+        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
+                testRecord.getStudyModel(), testRecord.getGenre(), null);
+        int energy = getEnergy(student, testRecord.getPoint(), number);
         //获取历史最高分
         int goldCount = 0;
         if (point > integer) {
             goldCount = GoldChange.getWordUnitTestGold(student, point);
             this.saveLog(student, goldCount, null, "字母单元闯关测试");
-            if (student.getBonusExpires() != null) {
-                if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                    Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
-                    student.setSystemGold(student.getSystemGold() + doubleGoldCount);
-                    testRecord.setAwardGold(doubleGoldCount.intValue());
-                }
-            }
+
+            Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
+            goldCount = GoldUtil.canAddGold(student, doubleGoldCount);
+            student.setSystemGold(student.getSystemGold() + doubleGoldCount);
+            testRecord.setAwardGold(doubleGoldCount.intValue());
         }
 
         testRecord.setAwardGold(goldCount);
@@ -347,9 +347,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         TestResultVo vo = new TestResultVo();
         vo.setGold(goldCount);
         vo.setPetUrl(GetOssFile.getPublicObjectUrl(student.getPartUrl()));
-        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
-                testRecord.getStudyModel(), testRecord.getGenre(), null);
-        int energy = getEnergy(student, testRecord.getPoint(), number);
+
         vo.setEnergy(energy);
         testRecordMapper.insert(testRecord);
         getMessage(student, vo, testRecord, point, 100);
@@ -1613,7 +1611,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             }
 
         }
-        return testGoldUtil.addGold(student, goldCount);
+        return GoldUtil.canAddGold(student, goldCount);
     }
 
     private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point) {

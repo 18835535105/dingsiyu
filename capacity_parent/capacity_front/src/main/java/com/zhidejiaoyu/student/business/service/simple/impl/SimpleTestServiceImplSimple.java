@@ -21,10 +21,9 @@ import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.PictureUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
-import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
@@ -115,7 +114,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private SimpleCcieUtil simpleCcieUtil;
 
     @Autowired
-    private TestGoldUtil testGoldUtil;
+    private GoldUtil goldUtil;
 
     @Resource
     private StudentExpansionMapper studentExpansionMapper;
@@ -391,7 +390,6 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             goldCount = 30;
             this.saveLog(student, goldCount, null, "游戏测试");
         }
-        studentMapper.updateById(student);
 
         return goldCount;
     }
@@ -667,21 +665,20 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      * @param model           测试模块
      */
     private int saveLog(Student student, int goldCount, WordUnitTestDTO wordUnitTestDTO, String model) {
+        Double gold = StudentGoldAdditionUtil.getGoldAddition(student, goldCount);
+        int canAddGold = GoldUtil.addStudentGold(student, gold);
 
-        double gold = goldCount;
-        gold = StudentGoldAdditionUtil.getGoldAddition(student, gold);
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
         String msg;
         if (model == null) {
             msg = "id为：" + student.getId() + "的学生在" + simpleCommonMethod.getTestType(wordUnitTestDTO.getClassify())
-                    + " 模块下的单元闯关测试中首次闯关成功，获得#" + gold + "#枚金币";
-            GoldLogUtil.saveStudyGoldLog(student.getId(), GenreConstant.UNIT_TEST, (int) gold);
+                    + " 模块下的单元闯关测试中首次闯关成功，获得#" + canAddGold + "#枚金币";
+            GoldLogUtil.saveStudyGoldLog(student.getId(), GenreConstant.UNIT_TEST, canAddGold);
         } else {
-            msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + gold + "#枚金币";
-            GoldLogUtil.saveStudyGoldLog(student.getId(), model, (int) gold);
+            msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + canAddGold + "#枚金币";
+            GoldLogUtil.saveStudyGoldLog(student.getId(), model, canAddGold);
         }
         log.info(msg);
-        return (int) Math.floor(gold);
+        return canAddGold;
     }
 
     /**
@@ -701,7 +698,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             return 0;
         }
         int goldCount = getGoldCount(wordUnitTestDTO, student, point);
-        return testGoldUtil.addGold(student, goldCount);
+        return GoldUtil.canAddGold(student, goldCount);
     }
 
     /**
@@ -1115,7 +1112,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             return 0;
         }
 
-        return testGoldUtil.addGold(student, gold);
+        return GoldUtil.canAddGold(student, gold);
     }
 
     private Integer getMaxPoint(TestRecord testRecord, Student student) {

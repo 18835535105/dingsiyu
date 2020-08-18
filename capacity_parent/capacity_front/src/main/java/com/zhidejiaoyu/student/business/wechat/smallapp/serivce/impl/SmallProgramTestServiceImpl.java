@@ -13,8 +13,8 @@ import com.zhidejiaoyu.common.mapper.center.WeChatMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.pojo.center.WeChat;
 import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -210,10 +210,9 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
         // 金币加成
         Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, awardGold);
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldAddition));
-        studentMapper.updateById(student);
+        int canAddGold = GoldUtil.addStudentGold(student, goldAddition);
 
-        GoldLogUtil.saveStudyGoldLog(studentId, GenreConstant.SMALLAPP_GENRE, (int) Math.floor(goldAddition));
+        GoldLogUtil.saveStudyGoldLog(studentId, GenreConstant.SMALLAPP_GENRE, canAddGold);
     }
 
     /**

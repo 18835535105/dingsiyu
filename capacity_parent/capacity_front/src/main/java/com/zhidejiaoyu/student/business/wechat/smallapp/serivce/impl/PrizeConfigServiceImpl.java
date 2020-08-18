@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.PrizeConfigService;
@@ -66,8 +67,8 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
                     .setWeChatName(weChatName)
                     .setStudentId(studentId);
             studentPayConfigMapper.insert(studentPayConfig);
-            student.setSystemGold(student.getSystemGold() + 5);
-            studentMapper.updateById(student);
+
+            GoldUtil.addStudentGold(student, 5);
         } else {
             payconfigId = studentPayConfig.getPrizeConfigId();
         }

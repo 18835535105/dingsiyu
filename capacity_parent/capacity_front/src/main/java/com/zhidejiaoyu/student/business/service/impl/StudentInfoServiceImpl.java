@@ -20,6 +20,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.DurationUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.level.ChildMedalVo;
@@ -612,8 +613,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Transactional(rollbackFor = Exception.class)
     public void saveGold(String openId, Integer gold) {
         Student student = studentMapper.selectByOpenId(openId);
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-        studentMapper.updateById(student);
+        gold = GoldUtil.addStudentGold(student, gold);
 
         GoldLogUtil.saveStudyGoldLog(student.getId(), "观看夺分队长每日复习学习视频", gold);
     }

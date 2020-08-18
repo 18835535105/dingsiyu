@@ -13,11 +13,10 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.TestPointUtil;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.CalculateTimeUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
-import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
@@ -131,9 +130,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Autowired
     private PetSayUtil petSayUtil;
-
-    @Autowired
-    private TestGoldUtil testGoldUtil;
 
     @Autowired
     private TeksCourseMapper teksCourseMapper;
@@ -763,11 +759,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         testRecord.setQuantity(testRecord.getErrorCount() + testRecord.getRightCount());
 
         getLevel(session);
-        double gold = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
         // 封装响应数据
         Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord, model, group);
-        studentMapper.updateById(student);
+
+        double gold = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
+        GoldUtil.addStudentGold(student, gold);
         int insert = testRecordMapper.insert(testRecord);
         if (insert > 0) {
             Learn learn = new Learn();
@@ -806,7 +802,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 goldCount = getGoldCount(classify, student, testRecord.getPoint(), testRecord.getStudyModel());
             }
         }
-        return testGoldUtil.addGold(student, goldCount);
+        return GoldUtil.canAddGold(student, goldCount);
     }
 
     private int getGoldCount(Integer classify, Student student, int point, String model) {
@@ -837,8 +833,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
      * @param model     测试模块
      */
     private void saveLog(Student student, int goldCount, Integer classify, String model) {
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
-        studentMapper.updateByPrimaryKeySelective(student);
+        goldCount = GoldUtil.addStudentGold(student, goldCount);
         String msg;
         String reason;
         if (classify != null) {
