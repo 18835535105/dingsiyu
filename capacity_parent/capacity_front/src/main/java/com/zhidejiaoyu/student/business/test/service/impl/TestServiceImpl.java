@@ -23,10 +23,9 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.TestPointUtil;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.CcieUtil;
-import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
@@ -334,12 +333,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         int goldCount = 0;
         if (point > integer) {
             goldCount = GoldChange.getWordUnitTestGold(student, point);
-            this.saveLog(student, goldCount, null, "字母单元闯关测试");
-
             Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
-            goldCount = GoldUtil.canAddGold(student, doubleGoldCount);
-            student.setSystemGold(student.getSystemGold() + doubleGoldCount);
-            testRecord.setAwardGold(doubleGoldCount.intValue());
+            goldCount = this.saveLog(student, Integer.parseInt(doubleGoldCount.toString()), null, "字母单元闯关测试");
+
         }
 
         testRecord.setAwardGold(goldCount);
@@ -351,7 +347,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setEnergy(energy);
         testRecordMapper.insert(testRecord);
         getMessage(student, vo, testRecord, point, 100);
-        studentMapper.updateById(student);
         return ServerResponse.createBySuccess(vo);
     }
 
@@ -414,27 +409,25 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (integer < point) {
             goldCount = GoldChange.getWordUnitTestGold(student, point);
         }
-        this.saveLog(student, goldCount, null, "字母学后测试");
-        if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
-                student.setSystemGold(student.getSystemGold() + doubleGoldCount);
-                testRecord.setAwardGold(doubleGoldCount.intValue());
-            }
-        }
-        TestResultVo vo = new TestResultVo();
-        vo.setGold(goldCount);
+
         //获取测试有效次数
         int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
                 testRecord.getStudyModel(), testRecord.getGenre(), null);
         int energy = getEnergy(student, testRecord.getPoint(), number);
+        Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
+        int canAddGold = this.saveLog(student, Integer.parseInt(doubleGoldCount.toString()), null, "字母学后测试");
+
+        testRecord.setAwardGold(canAddGold);
+
+        TestResultVo vo = new TestResultVo();
+        vo.setGold(goldCount);
+
         vo.setEnergy(energy);
         vo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
         getMessage(student, vo, testRecord, point, 100);
 
         testRecord.setAwardGold(goldCount);
         testRecordMapper.insert(testRecord);
-        studentMapper.updateById(student);
         return ServerResponse.createBySuccess(vo);
     }
 
@@ -457,8 +450,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             if (point >= 60) {
                 gold = 5;
                 energy = 2;
-                this.saveLog(student, gold, null, "阅读测试");
-                studentMapper.updateById(student);
+                student.setEnergy(student.getEnergy() == null ? energy : student.getEnergy() + energy);
+                gold = this.saveLog(student, gold, null, "阅读测试");
             }
         }
         TestResultVo vo = new TestResultVo();
@@ -841,20 +834,29 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     public ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
 
         Student student = getStudent(session);
-        TestRecord testRecord;
-        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "闯关测试", 1, 3);
+        Long courseId = wordUnitTestDTO.getCourseId();
+        Long unitId = wordUnitTestDTO.getUnitId()[0];
+        String studyModelAndGenre = "课文测试";
+
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), unitId, student, "闯关测试", 1, 3);
         wordUnitTestDTO.setClassify(9);
 
         // 判断当前单元是不是首次进行测试
         boolean isFirst = false;
         TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
-                wordUnitTestDTO.getUnitId()[0], "课文测试", "课文测试");
+                unitId, studyModelAndGenre, studyModelAndGenre);
         if (testRecordOld == null) {
             isFirst = true;
         }
 
+
+        Integer group = getGroup(unitId, student.getId(), 1, 3);
+        // 获取测试有效次数
+        int number = testRecordMapper.selCount(student.getId(), courseId, unitId, studyModelAndGenre, studyModelAndGenre, group);
+        int energy = getEnergy(wordUnitTestDTO, student, number);
         int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld, true);
-        testRecord = new TestRecord();
+
+        TestRecord testRecord = new TestRecord();
         if (testRecordOld == null) {
             // 首次测试大于或等于80分，超过历史最高分次数 +1
             if (wordUnitTestDTO.getPoint() >= PointConstant.EIGHTY) {
@@ -865,8 +867,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         } else {
             testRecord.setBetterCount(testRecordOld.getBetterCount());
         }
-        testRecord.setCourseId(wordUnitTestDTO.getCourseId());
-        testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
+        testRecord.setCourseId(courseId);
+        testRecord.setUnitId(unitId);
         testRecord.setPoint(wordUnitTestDTO.getPoint());
         int rightCount = 0;
         int errorCount = 0;
@@ -879,7 +881,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setErrorCount(errorCount);
         testRecord.setRightCount(rightCount);
         testRecord.setQuantity(errorCount + rightCount);
-        testRecord.setGenre("课文测试");
+        testRecord.setGenre(studyModelAndGenre);
         testRecord.setStudentId(student.getId());
         Date date = new Date();
         saveTestRecordTime(testRecord, session, date);
@@ -887,31 +889,36 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
         }
         testRecord.setAwardGold(goldCount);
-        testRecord.setStudyModel("课文测试");
-        if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
-                student.setSystemGold(student.getSystemGold() + doubleGoldCount);
-                testRecord.setAwardGold(doubleGoldCount.intValue());
-            }
-        }
+        testRecord.setStudyModel(studyModelAndGenre);
+
         Learn learn = new Learn();
         learn.setLearnTime(new Date());
         learn.setUpdateTime(new Date());
-        learn.setCourseId(wordUnitTestDTO.getCourseId());
-        learn.setUnitId(wordUnitTestDTO.getUnitId()[0]);
+        learn.setCourseId(courseId);
+        learn.setUnitId(unitId);
         learn.setType(1);
         learn.setStudyModel(testRecord.getStudyModel());
         learn.setStudentId(student.getId());
         Long aLong = learnMapper.selTeksLearn(learn);
-        Integer group = getGroup(wordUnitTestDTO.getUnitId()[0], student.getId(), 1, 3);
+
         if (aLong != null) {
             learn.setId(aLong);
             learnMapper.updTeksLearn(learn);
         } else {
             learnMapper.insert(learn);
         }
-        return getObjectServerResponse(session, wordUnitTestDTO, student, testRecord, group);
+
+        Map<String, Object> resultMap = new HashMap<>(16);
+        resultMap.put("energy", energy);
+        resultMap.put("gold", testRecord.getAwardGold());
+        getTestRecord(student, testRecord, wordUnitTestDTO.getPoint(), resultMap, null);
+
+        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
+        return ServerResponse.createBySuccess(resultMap);
+    }
+
+    private int getEnergy(WordUnitTestDTO wordUnitTestDTO, Student student, int number) {
+        return getEnergy(student, wordUnitTestDTO.getPoint(), number);
     }
 
     @Override
@@ -942,22 +949,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     public Integer getGroup(Long unitId, Long studentId, Integer easyOrHard, Integer type) {
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard, type);
         return learnNew.getGroup();
-    }
-
-
-    private ServerResponse<Object> getObjectServerResponse(HttpSession session, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord, Integer group) {
-        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
-        Integer point = wordUnitTestDTO.getPoint();
-
-        Map<String, Object> resultMap = new HashMap<>(16);
-        //获取测试有效次数
-        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
-                testRecord.getStudyModel(), testRecord.getGenre(), group);
-        resultMap.put("energy", getEnergy(student, wordUnitTestDTO.getPoint(), number));
-        resultMap.put("gold", testRecord.getAwardGold());
-        getTestRecord(student, testRecord, point, resultMap, null);
-        studentMapper.updateById(student);
-        return ServerResponse.createBySuccess(resultMap);
     }
 
     private void getTestRecord(Student student, TestRecord testRecord, Integer point, Map<String, Object> resultMap, TeksTestResultVo testResultVo) {
@@ -1083,6 +1074,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             //saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
             //保存错误信息
             saveError(unitId[0], errorWordId, student, classify, model);
+            // 获取需要奖励的能量值
+            addEnergy = getEnergy(student, point, 0);
             goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, false);
 
             testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
@@ -1090,8 +1083,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             /*//获取测试有效次数
             int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
                     testRecord.getStudyModel(), testRecord.getGenre());*/
-            // 获取需要奖励的能量值
-            addEnergy = getEnergy(student, point, 0);
+
         }
 
         String msg;
@@ -1127,10 +1119,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 this.saveTestDetail(testDetail, testRecord.getId(), classify, student);
             }
         }
-
-        Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount);
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), doubleGoldCount));
-        studentMapper.updateById(student);
 
         vo.setMsg(msg);
         if (classify == 3 || classify == 6) {
@@ -1265,8 +1253,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Integer point = wordUnitTestDTO.getPoint();
         Integer group = getGroup(wordUnitTestDTO.getUnitId()[0], student.getId(), 1, 2);
         //获取测试有效次数
-        int number = testRecordMapper.selCount(student.getId(), courseId, unitId[0],
-                type, "句子测试", group);
+        int number = testRecordMapper.selCount(student.getId(), courseId, unitId[0], type, "句子测试", group);
         // 获取需要奖励的能量值
         int addEnergy = getEnergy(student, point, number);
 
@@ -1314,7 +1301,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
         ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
-        studentMapper.updateById(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         getLevel(session);
         return ServerResponse.createBySuccess(vo);
@@ -1467,8 +1453,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @param wordUnitTestDTO
      * @param model           测试模块
      */
-    private void saveLog(Student student, int goldCount, WordUnitTestDTO wordUnitTestDTO, String model) {
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
+    private int saveLog(Student student, int goldCount, WordUnitTestDTO wordUnitTestDTO, String model) {
+        goldCount = GoldUtil.addStudentGold(student, goldCount);
         String msg;
         if (wordUnitTestDTO != null) {
             msg = "id为：" + student.getId() + "的学生在[" + commonMethod.getTestType(wordUnitTestDTO.getClassify())
@@ -1486,6 +1472,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             }
         }
         log.info(msg);
+        return goldCount;
     }
 
     @Override
@@ -1504,6 +1491,17 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         Integer point = dto.getPoint();
 
+        //获取测试有效次数
+        int number = testRecordMapper.selCount(student.getId(), null, dto.getUnitId(),
+                StudyModelConstant.PHONETIC_SYMBOL_TEST, GenreConstant.UNIT_TEST, null);
+        int energy = super.getEnergy(student, point, number);
+
+        WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
+        wordUnitTestDTO.setClassify(11);
+        wordUnitTestDTO.setUnitId(new Long[]{dto.getUnitId()});
+        wordUnitTestDTO.setPoint(point);
+        Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, true);
+
         testRecord = new TestRecord();
         testRecord.setStudentId(student.getId());
         testRecord.setUnitId(dto.getUnitId());
@@ -1517,28 +1515,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setErrorCount(dto.getErrorCount());
         testRecord.setRightCount(dto.getRightCount());
         testRecord.setStudyModel(StudyModelConstant.PHONETIC_SYMBOL_TEST);
-
-        WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
-        wordUnitTestDTO.setClassify(11);
-        wordUnitTestDTO.setUnitId(new Long[]{dto.getUnitId()});
-        wordUnitTestDTO.setPoint(point);
-        Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, true);
-
         testRecord.setAwardGold(goldCount);
         TestResultVo vo = new TestResultVo();
         String message = getMessage(student, vo, testRecord, point, PointConstant.EIGHTY);
         testRecord.setExplain(message);
-
-        vo.setMsg(message);
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, GenreConstant.UNIT_TEST, null));
-        vo.setGold(getBonusGold(student, goldCount));
-        //获取测试有效次数
-        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
-                testRecord.getStudyModel(), testRecord.getGenre(), null);
-        vo.setEnergy(super.getEnergy(student, point, number));
-
         testRecordMapper.insert(testRecord);
-        studentMapper.updateById(student);
+
         getLevel(session);
 
         // 将学生学习记录置为已学习状态
@@ -1547,25 +1529,11 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
 
+        vo.setMsg(message);
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, GenreConstant.UNIT_TEST, null));
+        vo.setGold(goldCount);
+        vo.setEnergy(energy);
         return ServerResponse.createBySuccess(vo);
-    }
-
-    /**
-     * 获取加成后的金币
-     *
-     * @param student
-     * @param goldCount
-     * @return
-     */
-    private Integer getBonusGold(Student student, Integer goldCount) {
-        if (student.getBonusExpires() != null) {
-            Double v = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
-            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                student.setSystemGold(student.getSystemGold() + v);
-                goldCount = v.intValue();
-            }
-        }
-        return goldCount;
     }
 
     /**
@@ -1609,9 +1577,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 testRecord.setBetterCount(betterCount);
                 goldCount = getGoldCount(wordUnitTestDTO, student, point);
             }
-
         }
-        return GoldUtil.canAddGold(student, goldCount);
+        Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount);
+        return GoldUtil.addStudentGold(student, doubleGoldCount);
     }
 
     private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point) {

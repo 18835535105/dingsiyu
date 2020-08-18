@@ -43,7 +43,7 @@ public class SimpleConsumeServiceImplSimple extends SimpleBaseServiceImpl<Simple
         Student student = super.getStudent(session);
         if (type == 1) {
             Consume consume = getConsume("金币消耗", type, number, student.getId().intValue(), 2);
-            Integer result = simpleConsumeMapper.insert(consume);
+            int result = simpleConsumeMapper.insert(consume);
             if (result > 0) {
                 student.setSystemGold(student.getSystemGold() - number);
                 student.setOfflineGold(student.getOfflineGold() + number);
@@ -56,7 +56,7 @@ public class SimpleConsumeServiceImplSimple extends SimpleBaseServiceImpl<Simple
             }
         } else if (type == 2) {
             Consume consume = getConsume("钻石消耗", type, number, student.getId().intValue(), 2);
-            Integer result = simpleConsumeMapper.insert(consume);
+            int result = simpleConsumeMapper.insert(consume);
             if (result > 0) {
                 Integer diamond = student.getDiamond();
                 student.setDiamond(diamond - number);
