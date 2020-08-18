@@ -147,7 +147,12 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             }
             // 查询一键学习半年后需要学习的全部课程
             Integer schoolTimeCount = schoolTimeMapper.selectCount(new LambdaQueryWrapper<SchoolTime>().eq(SchoolTime::getUserId, schoolAdminId));
-            if (schoolTimeCount != null && schoolTimeCount > 0) {
+            if (schoolTimeCount == null || schoolTimeCount == 0) {
+                // 查询校区的课程配置
+                List<CourseConfig> courseConfigs = courseConfigMapper.selectByUserIdAndType((long) schoolAdminId, 1);
+                courseConfigs.addAll(courseConfigMapper.selectByUserIdAndType((long) schoolAdminId, 2));
+                courseIds = courseConfigs.stream().filter(courseConfig -> courseConfig.getStudyModel().contains(String.valueOf(type))).map(CourseConfig::getCourseId).collect(Collectors.toList());
+            } else if (schoolTimeCount > 0) {
                 if (log.isDebugEnabled()) {
                     log.debug("校区有单独配置的一键学习课程！");
                 }
