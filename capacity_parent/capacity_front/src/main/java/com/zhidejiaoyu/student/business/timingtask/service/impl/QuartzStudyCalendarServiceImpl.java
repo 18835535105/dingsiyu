@@ -375,6 +375,7 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     private void getStudentGold(Long studentId, Double gold, String msg) {
         Student student = studentMapper.selectById(studentId);
         student.setSystemGold(student.getSystemGold() + gold);
+        studentMapper.updateById(student);
         GoldLog goldLog = new GoldLog();
         goldLog.setCreateTime(new Date());
         goldLog.setType(1);
