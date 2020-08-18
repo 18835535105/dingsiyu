@@ -91,4 +91,6 @@ public interface SchoolTimeMapper extends BaseMapper<SchoolTime> {
      * @return
      */
     List<SchoolTime> selectSmallThanCurrentGrade(@Param("userId") Integer userId, @Param("gradeList") List<String> gradeList);
+
+    SchoolTime selectByUserIdAndGrade(@Param("userId") Integer userId,@Param("grade") String grade);
 }
