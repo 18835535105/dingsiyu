@@ -943,6 +943,16 @@ s.uuid,
           and (teacher_id = #{userId}
             OR teacher_id IN (SELECT teacher_id FROM teacher WHERE school_admin_id = #{userId}))
     </select>
+
+    <select id="selectByIds" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from student where id in (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
     <select id="selectStudentManageVO" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="more_table_List"/>

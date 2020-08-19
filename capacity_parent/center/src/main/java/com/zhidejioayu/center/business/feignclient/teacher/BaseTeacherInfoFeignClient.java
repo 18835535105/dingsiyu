@@ -65,4 +65,14 @@ public interface BaseTeacherInfoFeignClient {
      */
     @GetMapping("/student/createStudentCount/canCreateCount")
     Object canCreateCount(@RequestParam String openId);
+
+    /**
+     * 教师后台删除学员
+     *
+     * @param studentUuid
+     * @param userUuid
+     * @return
+     */
+    @GetMapping("/student/edit/deleteStudentByUuid")
+    ServerResponse<Object> deleteStudentByUuid(@RequestParam String studentUuid,@RequestParam String userUuid);
 }

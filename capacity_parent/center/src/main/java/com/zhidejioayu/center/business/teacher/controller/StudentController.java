@@ -67,6 +67,25 @@ public class StudentController {
     }
 
     /**
+     * 教师后台删除学员
+     *
+     * @param studentUuid
+     * @param userUuid
+     * @return
+     */
+    @GetMapping("/edit/deleteStudentByUuid")
+    public ServerResponse<Object> deleteStudentByUuid(@RequestParam String studentUuid, @RequestParam String userUuid) {
+        if (StringUtil.isEmpty(studentUuid)) {
+            return ServerResponse.createByError(400, "studentUuid can't be null!");
+        }
+        if (StringUtil.isEmpty(userUuid)) {
+            return ServerResponse.createByError(400, "userUuid can't be null!");
+        }
+        BaseTeacherInfoFeignClient baseTeacherInfoFeignClientByOpenId = FeignClientUtil.getBaseTeacherInfoFeignClient(userUuid);
+        return baseTeacherInfoFeignClientByOpenId.deleteStudentByUuid(studentUuid, userUuid);
+    }
+
+    /**
      * 保存编辑后的学生信息
      *
      * @param dto

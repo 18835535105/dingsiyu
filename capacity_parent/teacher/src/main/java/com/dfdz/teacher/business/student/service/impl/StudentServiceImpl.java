@@ -20,6 +20,7 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.support.StrKit;
 import com.zhidejiaoyu.common.utils.IdUtil;
 import com.zhidejiaoyu.common.utils.StringUtil;
@@ -92,6 +93,15 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
     @Resource
     private CourseFeignClient courseFeignClient;
+
+    @Resource
+    private RecycleBinMapper recycleBinMapper;
+
+    @Resource
+    private RankOpt rankOpt;
+
+    @Resource
+    private OperationLogMapper operationLogMapper;
 
     @Override
     public ServerResponse<PageVo<StudentManageVO>> listStudent(StudentListDto dto) {
@@ -225,7 +235,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 return course.getVersion();
             } else {
                 SchoolTime schoolTime1 = schoolTimeMapper.selectByUserIdAndGrade(1, student.getGrade() == null ? "三年级" : student.getGrade());
-                if(schoolTime1==null){
+                if (schoolTime1 == null) {
                     return "未找到版本";
                 }
                 CourseNew course = courseFeignClient.getById(schoolTime1.getCourseId());
@@ -258,9 +268,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             }
         }
         String phase = this.getPhase(student.getGrade());
-        StudentExpansion expansion = studentExpansionMapper.selectByStudentId(oldStudent.getId());
-        expansion.setPhase(phase);
-        studentExpansionMapper.updateById(expansion);
+
+        this.saveOrUpdateStudentExpansion(phase, student);
+
 
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
 
@@ -268,6 +278,50 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 + " 修改学生信息：原信息[" + oldStudent.toString() + "]，修改后信息[" + student.toString() + "]；");
 
         return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public ServerResponse<Object> deleteStudentByUuid(String studentUuid,  String userUuid) {
+        SysUser user = sysUserMapper.selectByUuid(userUuid);
+        Student student = studentMapper.selectByUuid(studentUuid);
+        RecycleBin recycleBin = new RecycleBin();
+        recycleBin.setCreateTime(new Date());
+        recycleBin.setOperateUserId((long) user.getId());
+        recycleBin.setOperateUserName(user.getName());
+        recycleBin.setStudentId(student.getId());
+        try {
+            studentMapper.deleteByStudentId(student.getId());
+            recycleBinMapper.insert(recycleBin);
+
+            this.saveDeleteStudentLog(new Long[]{student.getId()}, user);
+
+            rankOpt.deleteCaches(Collections.singletonList(student.getId()));
+        } catch (Exception e) {
+            log.error("{} -> {} 删除学生信息出错！", user.getAccount(), user.getName(), e);
+            throw new RuntimeException( "删除学生信息失败！",e);
+        }
+        return null;
+    }
+
+    /**
+     * 保存删除学生信息日志
+     *
+     * @param ids
+     */
+    private void saveDeleteStudentLog(Long[] ids, SysUser user) {
+        List<Student> students = studentMapper.selectByIds(Arrays.asList(ids));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(user.getAccount()).append(" -> ").append(user.getName()).append(" 删除了学生：");
+        students.forEach(student -> sb.append(student.getAccount()).append(" -> ").append(student.getStudentName()).append("，"));
+        OperationLog operationLog=new OperationLog();
+        operationLog.setLogname("删除学生");
+        operationLog.setUserid(user.getId());
+        operationLog.setCreatetime(new Date());
+        operationLog.setSucceed("成功");
+        operationLog.setMessage(sb.toString());
+        operationLog.setMessage("业务日志");
+        operationLogMapper.insert(operationLog);
     }
 
     private String getPhase(String grade) {
