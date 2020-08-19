@@ -36,10 +36,10 @@ public class RankOpt extends BaseRankOpt {
     @Autowired
     private WorshipMapper worshipMapper;
 
-    @Resource
+    @Autowired
     private StudentMapper studentMapper;
 
-    @Resource
+    @Autowired
     private TeacherMapper teacherMapper;
 
     /**
@@ -209,48 +209,6 @@ public class RankOpt extends BaseRankOpt {
         }
         return Math.round(score);
     }
-
-    /**
-     * 删除缓存中的排行榜数据
-     *
-     * @param studentIds
-     */
-    public void deleteCaches(List<Long> studentIds) {
-        try {
-            List<Student> students = studentMapper.selectByIds(studentIds);
-
-            students.forEach(student -> {
-                Long studentId = student.getId();
-                Long teacherId = student.getTeacherId();
-                Long classId = student.getClassId();
-
-                this.deleteMember(RankKeysConst.CLASS_CCIE_RANK + teacherId + ":" + classId, studentId);
-                this.deleteMember(RankKeysConst.CLASS_GOLD_RANK + teacherId + ":" + classId, studentId);
-                this.deleteMember(RankKeysConst.CLASS_MEDAL_RANK + teacherId + ":" + classId, studentId);
-                this.deleteMember(RankKeysConst.CLASS_WORSHIP_RANK + teacherId + ":" + classId, studentId);
-
-                Integer schoolAdminId = getSchoolAdminId(teacherId.intValue());
-                this.deleteMember(RankKeysConst.SCHOOL_CCIE_RANK + schoolAdminId, studentId);
-                this.deleteMember(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, studentId);
-                this.deleteMember(RankKeysConst.SCHOOL_MEDAL_RANK + schoolAdminId, studentId);
-                this.deleteMember(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, studentId);
-
-                this.deleteMember(RankKeysConst.COUNTRY_CCIE_RANK, studentId);
-                this.deleteMember(RankKeysConst.COUNTRY_GOLD_RANK, studentId);
-                this.deleteMember(RankKeysConst.COUNTRY_MEDAL_RANK, studentId);
-                this.deleteMember(RankKeysConst.COUNTRY_WORSHIP_RANK, studentId);
-            });
-        } catch (Exception e) {
-            log.warn("删除 redis 中排行数据失败！", e);
-        }
-    }
-
-    private Integer getSchoolAdminId(Integer teacherId) {
-        Integer schoolAdminId = teacherMapper.getSchoolAdminById(teacherId);
-        schoolAdminId = schoolAdminId == null ? teacherId : schoolAdminId;
-        return schoolAdminId;
-    }
-
 
     /**
      * 删除多余的排行信息

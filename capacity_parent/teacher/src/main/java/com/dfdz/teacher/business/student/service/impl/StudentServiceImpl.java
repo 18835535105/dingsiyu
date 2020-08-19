@@ -11,7 +11,6 @@ import com.dfdz.teacher.constant.LogNameConst;
 import com.dfdz.teacher.feignclient.CenterUserFeignClient;
 import com.dfdz.teacher.feignclient.CourseFeignClient;
 import com.dfdz.teacher.util.RedisOpt;
-import com.zhidejiaoyu.common.constant.ServerNoConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
 import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
@@ -21,7 +20,6 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 import com.zhidejiaoyu.common.rank.RankOpt;
-import com.zhidejiaoyu.common.support.StrKit;
 import com.zhidejiaoyu.common.utils.IdUtil;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -34,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,9 +95,6 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
     @Resource
     private RecycleBinMapper recycleBinMapper;
-
-    @Resource
-    private RankOpt rankOpt;
 
     @Resource
     private OperationLogMapper operationLogMapper;
@@ -295,7 +291,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
             this.saveDeleteStudentLog(new Long[]{student.getId()}, user);
 
-            rankOpt.deleteCaches(Collections.singletonList(student.getId()));
+            redisOpt.deleteCaches(Collections.singletonList(student.getId()));
         } catch (Exception e) {
             log.error("{} -> {} 删除学生信息出错！", user.getAccount(), user.getName(), e);
             throw new RuntimeException( "删除学生信息失败！",e);
