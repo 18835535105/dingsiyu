@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.test.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -260,6 +261,28 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
         httpSession.removeAttribute(TimeConstant.BEGIN_START_TIME);
         return ServerResponse.createBySuccess(vo);
+    }
+
+    @Override
+    public ServerResponse<Object> fix() {
+        List<StudentStudyPlanNew> studentStudyPlanNews = studentStudyPlanNewMapper.selectList(new LambdaQueryWrapper<StudentStudyPlanNew>().groupBy(StudentStudyPlanNew::getStudentId));
+        List<Long> studentIds = studentStudyPlanNews.stream().map(StudentStudyPlanNew::getStudentId).collect(Collectors.toList());
+
+        List<Student> students = studentMapper.selectBatchIds(studentIds);
+        students.forEach(student -> {
+            List<StudentStudyPlanNew> studentStudyPlanNews1 = studentStudyPlanNewMapper.selectList(new LambdaQueryWrapper<StudentStudyPlanNew>().eq(StudentStudyPlanNew::getStudentId, student.getId()));
+            List<StudentStudyPlanNew> collect = studentStudyPlanNews1.stream().peek(studentStudyPlanNew -> {
+                Integer basePriority = PriorityUtil.BASE_PRIORITY.get(student.getGrade());
+                if (studentStudyPlanNew.getErrorLevel() > basePriority) {
+                    studentStudyPlanNew.setErrorLevel(studentStudyPlanNew.getErrorLevel() - basePriority);
+                }
+                studentStudyPlanNew.setBaseLevel(basePriority);
+                studentStudyPlanNew.setFinalLevel(studentStudyPlanNew.getBaseLevel() + studentStudyPlanNew.getErrorLevel() + studentStudyPlanNew.getTimeLevel());
+            }).collect(Collectors.toList());
+            this.updateBatchById(collect);
+        });
+
+        return null;
     }
 
     /**

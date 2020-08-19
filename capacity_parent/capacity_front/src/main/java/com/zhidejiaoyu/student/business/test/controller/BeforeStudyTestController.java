@@ -38,6 +38,12 @@ public class BeforeStudyTestController extends BaseController {
         return beforeStudyTestService.getSubjects();
     }
 
+
+    @GetMapping("/fix")
+    public ServerResponse<Object> fix() {
+        return beforeStudyTestService.fix();
+    }
+
     /**
      * 保存摸底测试记录
      *
