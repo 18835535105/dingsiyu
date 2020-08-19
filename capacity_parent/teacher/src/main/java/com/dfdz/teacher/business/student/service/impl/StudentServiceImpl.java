@@ -225,6 +225,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 return course.getVersion();
             } else {
                 SchoolTime schoolTime1 = schoolTimeMapper.selectByUserIdAndGrade(1, student.getGrade() == null ? "三年级" : student.getGrade());
+                if(schoolTime1==null){
+                    return "未找到版本";
+                }
                 CourseNew course = courseFeignClient.getById(schoolTime1.getCourseId());
                 return course.getVersion();
             }
