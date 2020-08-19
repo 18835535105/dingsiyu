@@ -273,7 +273,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             List<StudentStudyPlanNew> studentStudyPlanNews1 = studentStudyPlanNewMapper.selectList(new LambdaQueryWrapper<StudentStudyPlanNew>().eq(StudentStudyPlanNew::getStudentId, student.getId()));
             List<StudentStudyPlanNew> collect = studentStudyPlanNews1.stream().peek(studentStudyPlanNew -> {
                 Integer basePriority = PriorityUtil.BASE_PRIORITY.get(student.getGrade());
-                if (studentStudyPlanNew.getErrorLevel() > basePriority) {
+                if (studentStudyPlanNew.getErrorLevel() > basePriority + 1000) {
                     studentStudyPlanNew.setErrorLevel(studentStudyPlanNew.getErrorLevel() - basePriority);
                 }
                 studentStudyPlanNew.setBaseLevel(basePriority);
