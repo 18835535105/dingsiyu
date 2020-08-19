@@ -60,7 +60,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Slf4j
@@ -1037,8 +1036,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             student.setPetName("大明白");
             student.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
         }
+        Integer classify1 = wordUnitTestDTO.getClassify();
         int easyOrHard;
-        @NotNull(message = "测试类型不能为空") Integer classify1 = wordUnitTestDTO.getClassify();
         if (classify1.equals(0) || classify1.equals(1) || classify1.equals(4) || classify1.equals(5)) {
             easyOrHard = 1;
         } else {
@@ -1454,7 +1453,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @param model           测试模块
      */
     private int saveLog(Student student, int goldCount, WordUnitTestDTO wordUnitTestDTO, String model) {
-        goldCount = GoldUtil.addStudentGold(student, goldCount);
+        Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount);
+        goldCount = GoldUtil.addStudentGold(student, doubleGoldCount);
         String msg;
         if (wordUnitTestDTO != null) {
             msg = "id为：" + student.getId() + "的学生在[" + commonMethod.getTestType(wordUnitTestDTO.getClassify())
@@ -1548,7 +1548,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      */
     private Integer saveGold(boolean isFirst, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord, boolean type) {
         int point = wordUnitTestDTO.getPoint();
-        int goldCount = 0;
+        int goldCount = GoldChange.getWordUnitTestGold(student, point);
         // 查询当前单元测试历史最高分数
         Integer betterPoint = null;
         if (type) {
@@ -1560,31 +1560,25 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             }
         }
         if (isFirst) {
-            goldCount = getGoldCount(wordUnitTestDTO, student, point);
-        } else {
-            if (type) {
-                if (betterPoint == null) {
-                    betterPoint = 0;
-                }
-                // 非首次测试成绩本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
-                if (betterPoint < point) {
-                    int betterCount = (testRecord.getBetterCount() == null ? 0 : testRecord.getBetterCount()) + 1;
-                    testRecord.setBetterCount(betterCount);
-                    goldCount = getGoldCount(wordUnitTestDTO, student, point);
-                }
-            } else {
+            return this.saveLog(student, goldCount, wordUnitTestDTO, null);
+        }
+
+        if (type) {
+            if (betterPoint == null) {
+                betterPoint = 0;
+            }
+            // 非首次测试成绩本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
+            if (betterPoint < point) {
                 int betterCount = (testRecord.getBetterCount() == null ? 0 : testRecord.getBetterCount()) + 1;
                 testRecord.setBetterCount(betterCount);
-                goldCount = getGoldCount(wordUnitTestDTO, student, point);
+                goldCount = this.saveLog(student, goldCount, wordUnitTestDTO, null);
             }
+        } else {
+            int betterCount = (testRecord.getBetterCount() == null ? 0 : testRecord.getBetterCount()) + 1;
+            testRecord.setBetterCount(betterCount);
+            goldCount = this.saveLog(student, goldCount, wordUnitTestDTO, null);
         }
-        Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount);
-        return GoldUtil.addStudentGold(student, doubleGoldCount);
-    }
 
-    private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point) {
-        int goldCount = GoldChange.getWordUnitTestGold(student, point);
-        this.saveLog(student, goldCount, wordUnitTestDTO, null);
         return goldCount;
     }
 

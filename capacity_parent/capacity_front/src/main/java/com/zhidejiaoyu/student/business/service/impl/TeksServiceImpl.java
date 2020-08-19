@@ -749,21 +749,23 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         wordUnitTestDTO.setCourseId(aLong);
         wordUnitTestDTO.setUnitId(new Long[]{testRecord.getUnitId()});
 
-        TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), model, model);
-
-        int goldCount = this.getGold(testRecord, student, testRecordOld, 7);
         testRecord.setGenre(model);
-        testRecord.setAwardGold(goldCount);
         testRecord.setStudentId(student.getId());
         testRecord.setCourseId(aLong);
         testRecord.setQuantity(testRecord.getErrorCount() + testRecord.getRightCount());
 
+        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
+                testRecord.getStudyModel(), model, group);
+        int energy = super.getEnergy(student, wordUnitTestDTO.getPoint(), number);
+
+        TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), model, model);
+        int goldCount = this.getGold(testRecord, student, testRecordOld);
+
+        testRecord.setAwardGold(goldCount);
+
         getLevel(session);
         // 封装响应数据
-        Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord, model, group);
-
-        double gold = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
-        GoldUtil.addStudentGold(student, gold);
+        Map<String, Object> map = packageResultMap(student, point, goldCount, testRecord, energy);
         int insert = testRecordMapper.insert(testRecord);
         if (insert > 0) {
             Learn learn = new Learn();
@@ -786,26 +788,26 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         return ServerResponse.createBySuccess(map);
     }
 
-    private int getGold(TestRecord testRecord, Student student, TestRecord testRecordOld, Integer classify) {
+    private int getGold(TestRecord testRecord, Student student, TestRecord testRecordOld) {
 
-        int goldCount = 0;
         if (testRecordOld == null) {
-            goldCount = getGoldCount(classify, student, testRecord.getPoint(), testRecord.getStudyModel());
-        } else {
-            // 查询当前单元测试历史最高分数
-            int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 7);
-
-            // 非首次测试成绩本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
-            if (betterPoint < testRecord.getPoint()) {
-                int betterCount = testRecordOld.getBetterCount() + 1;
-                testRecord.setBetterCount(betterCount);
-                goldCount = getGoldCount(classify, student, testRecord.getPoint(), testRecord.getStudyModel());
-            }
+            return getGoldCount(student, testRecord.getPoint(), testRecord.getStudyModel());
         }
-        return GoldUtil.canAddGold(student, goldCount);
+        int goldCount = 0;
+        // 查询当前单元测试历史最高分数
+        int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 7);
+
+        // 非首次测试成绩本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
+        if (betterPoint < testRecord.getPoint()) {
+            int betterCount = testRecordOld.getBetterCount() + 1;
+            testRecord.setBetterCount(betterCount);
+            goldCount = getGoldCount(student, testRecord.getPoint(), testRecord.getStudyModel());
+        }
+
+        return goldCount;
     }
 
-    private int getGoldCount(Integer classify, Student student, int point, String model) {
+    private int getGoldCount(Student student, int point, String model) {
         int goldCount;
         if (point < SIX) {
             goldCount = 0;
@@ -820,7 +822,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         } else {
             goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
         }
-        this.saveLog(student, goldCount, classify, model);
+
+        double gold = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
+        goldCount = GoldUtil.addStudentGold(student, gold);
+        this.saveLog(student, goldCount, 7, model);
+
         return goldCount;
     }
 
@@ -833,7 +839,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
      * @param model     测试模块
      */
     private void saveLog(Student student, int goldCount, Integer classify, String model) {
-        goldCount = GoldUtil.addStudentGold(student, goldCount);
         String msg;
         String reason;
         if (classify != null) {
@@ -853,12 +858,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
     }
 
-    private Map<String, Object> packageResultMap(Student student, WordUnitTestDTO wordUnitTestDTO, Integer point,
-                                                 Integer goldCount, TestRecord testRecord, String model, Integer group) {
+    private Map<String, Object> packageResultMap(Student student, Integer point, Integer goldCount, TestRecord testRecord, int energy) {
         Map<String, Object> map = new HashMap<>(16);
-        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
-                testRecord.getStudyModel(), model, group);
-        int energy = super.getEnergy(student, wordUnitTestDTO.getPoint(), number);
+
         map.put("energy", energy);
         map.put("gold", goldCount);
         if (point < PASS) {

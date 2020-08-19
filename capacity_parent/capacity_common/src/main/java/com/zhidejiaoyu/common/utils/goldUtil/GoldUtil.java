@@ -93,7 +93,7 @@ public class GoldUtil {
         if (gold == null) {
             return 0;
         }
-        return addStudentGold(student, Integer.parseInt(gold.toString()));
+        return addStudentGold(student, (int) Math.floor(gold));
     }
 
     /**
@@ -111,8 +111,7 @@ public class GoldUtil {
         Object o = redisTemplateStatic.opsForHash().get(RedisKeysConst.STUDENT_DAY_TOTAL_GOLD, student.getId());
         if (o == null) {
             int min = Math.min(MAX_GOLD, gold);
-            redisTemplateStatic.opsForHash().put(RedisKeysConst.STUDENT_DAY_TOTAL_GOLD, student.getId(), min);
-            redisTemplateStatic.expire(RedisKeysConst.STUDENT_DAY_TOTAL_GOLD, 1, TimeUnit.DAYS);
+            saveCacheGold(student, min, RedisKeysConst.STUDENT_DAY_TOTAL_GOLD);
             return min;
         }
 
@@ -122,7 +121,19 @@ public class GoldUtil {
             return 0;
         }
 
-        return Math.min(MAX_GOLD - todayTotalGold, gold);
+        int min = Math.abs(Math.min(MAX_GOLD - todayTotalGold, gold));
+        saveCacheGold(student, min + todayTotalGold, RedisKeysConst.STUDENT_DAY_TOTAL_GOLD);
+        return min;
+    }
+
+    /**
+     * @param student
+     * @param gold    可获得的金币数
+     * @param key
+     */
+    private static void saveCacheGold(Student student, int gold, String key) {
+        redisTemplateStatic.opsForHash().put(key, student.getId(), gold);
+        redisTemplateStatic.expire(key, 1, TimeUnit.DAYS);
     }
 
     /**
@@ -142,11 +153,11 @@ public class GoldUtil {
         int canAddGold;
         if (o == null) {
             canAddGold = Math.min(SMALL_APP_MAX_GOLD, gold);
-            redisTemplateStatic.opsForHash().put(RedisKeysConst.STUDENT_SMALL_APP_DAY_TOTAL_GOLD, student.getId(), canAddGold);
-            redisTemplateStatic.expire(RedisKeysConst.STUDENT_SMALL_APP_DAY_TOTAL_GOLD, 1, TimeUnit.DAYS);
+            saveCacheGold(student, canAddGold, RedisKeysConst.STUDENT_SMALL_APP_DAY_TOTAL_GOLD);
         } else {
             int todaySmallAppGold = (int) o;
-            canAddGold = Math.min(SMALL_APP_MAX_GOLD - todaySmallAppGold, gold);
+            canAddGold = Math.abs(Math.min(SMALL_APP_MAX_GOLD - todaySmallAppGold, gold));
+            saveCacheGold(student, canAddGold + todaySmallAppGold, RedisKeysConst.STUDENT_SMALL_APP_DAY_TOTAL_GOLD);
         }
 
         if (canAddGold == 0) {
