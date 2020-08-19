@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.dto.student.StudentStudyPlanListDto;
+import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -69,15 +70,21 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
         List<StudentStudyPlanListVo> list = new ArrayList<>();
         if (studentStudyPlanNews.size() > 0) {
             List<Long> unitIds = new ArrayList<>();
+            List<Long> courseIds=new ArrayList<>();
             studentStudyPlanNews.forEach(plan -> unitIds.add(plan.getUnitId()));
+            studentStudyPlanNews.forEach(plan -> courseIds.add(plan.getCourseId()));
             CourseNew course = courseFeignClient.getById(studentStudyPlanNews.get(0).getCourseId());
             Map<Long, Map<String, Object>> longMapMap = unitFeignClient.selectUnitNameByUnitIds(unitIds);
+            Map<Long, Map<String, Object>> courseMap = courseFeignClient.selectGradeAndLabelByCourseIds(courseIds);
             map.put("courseName", course.getVersion());
-            studentStudyPlanNews.forEach(plan -> list.add(StudentStudyPlanListVo.builder()
-                    .unitName(longMapMap.get(plan.getUnitId()).get("unitName").toString())
-                    .model(plan.getEasyOrHard() == 1 ? "正常" : "进阶")
-                    .finalLevel(plan.getFinalLevel().toString())
-                    .build()));
+            studentStudyPlanNews.forEach(plan -> {
+                Map<String, Object> couMap = courseMap.get(plan.getCourseId());
+                list.add(StudentStudyPlanListVo.builder()
+                        .unitName(couMap.get("grade")+"-"+couMap.get("label")+"-"+longMapMap.get(plan.getUnitId()).get("name").toString())
+                        .model(plan.getEasyOrHard() == 1 ? "正常" : "进阶")
+                        .finalLevel(plan.getFinalLevel().toString())
+                        .build());
+            });
             PageVo<StudentStudyPlanListVo> page = PageUtil.packagePage(list, pageInfo.getTotal());
             map.put("list", page);
         }

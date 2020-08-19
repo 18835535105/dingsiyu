@@ -157,7 +157,7 @@
         limit 1
     </select>
     <select id="selectUnitNameByUnitIds" resultType="java.util.Map" parameterType="map">
-        select id unitId, joint_name unitName
+        select id unitId, joint_name unitName ,unit_name `name`
         from unit_new
         where id in (
         <foreach collection="unitIds" separator="," item="unitId">

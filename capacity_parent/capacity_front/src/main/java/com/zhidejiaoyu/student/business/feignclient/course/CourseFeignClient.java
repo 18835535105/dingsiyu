@@ -157,4 +157,12 @@ public interface CourseFeignClient {
      */
     @GetMapping("/getIdsByPhasesAndIds")
     List<Long> getIdsByPhasesAndIds(@RequestParam List<String> phaseList, @RequestParam List<Long> courseIds);
+
+    /**
+     * 获取单元名称
+     * @param courseIds
+     * @return
+     */
+    @GetMapping("/selectGradeAndLabelByCourseIds")
+    Map<Long,Map<String,Object>> selectGradeAndLabelByCourseIds(@RequestParam List<Long> courseIds);
 }

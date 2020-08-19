@@ -108,6 +108,11 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
     }
 
     @Override
+    public Map<Long, Map<String, Object>> selectGradeAndLabelByCourseIds(List<Long> courseIds) {
+        return courseNewMapper.selectGradeAndLabelByCourseIds(courseIds);
+    }
+
+    @Override
     public CourseNew getByUnitId(Long unitId) {
         return courseNewMapper.selectByUnitId(unitId);
     }

@@ -109,6 +109,14 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
     Map<Long, Map<String, Object>> selectByCourseNews(@Param("courseNews") List<CourseNew> courseNews);
 
     /**
+     * 获取课程数据
+     * @param courseIds
+     * @return
+     */
+    @MapKey("id")
+    Map<Long, Map<String, Object>> selectGradeAndLabelByCourseIds(@Param("courseIds") List<Long> courseIds);
+
+    /**
      * 根据课程名查询课程id
      */
     @Select("select id from course_new where version = #{version} and grade = #{grade} and label = #{label} and delStatus = 1")
@@ -144,4 +152,6 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
      * @return
      */
     List<Long> selectIdsByPhasesAndIds(@Param("phaseArr") List<String> phaseArr, @Param("courseIds") List<Long> courseIds);
+
+
 }
