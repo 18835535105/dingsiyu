@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -26,18 +27,30 @@ public class GoldUtil {
      */
     private static final int MAX_GOLD = 500;
 
+    /**
+     * 小程序每天最多获取金币数
+     */
+    private static final int SMALL_APP_MAX_GOLD = 100;
+
     @Resource
     private StudentExpansionMapper studentExpansionMapper;
 
     @Resource
     private StudentMapper studentMapper;
 
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
     private static StudentExpansionMapper studentExpansionMapperStatic;
 
     private static StudentMapper studentMapperStatic;
 
+    private static RedisTemplate<String, Object> redisTemplateStatic;
+
+
     @PostConstruct
     public void init() {
+        redisTemplateStatic = this.redisTemplate;
         studentMapperStatic = this.studentMapper;
         studentExpansionMapperStatic = this.studentExpansionMapper;
     }
