@@ -300,7 +300,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             log.error("{} -> {} 删除学生信息出错！", user.getAccount(), user.getName(), e);
             throw new RuntimeException( "删除学生信息失败！",e);
         }
-        return null;
+        return ServerResponse.createBySuccess();
     }
 
     /**
