@@ -45,7 +45,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         //判断当前openId是否已经领取过今日的奖品
         Date date = new Date();
         Map<String, Object> returnMap = new HashMap<>();
-        Long payconfigId = 0L;
+        Long payconfigId;
         StudentPayConfig studentPayConfig = studentPayConfigMapper.selectByWenXiIdAndDate(openId, date);
         Student student = studentMapper.selectById(studentId);
         List<PrizeConfig> adminPrizeConfigs = prizeConfigMapper.selectByAdminId(1L);
@@ -68,7 +68,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
                     .setStudentId(studentId);
             studentPayConfigMapper.insert(studentPayConfig);
 
-            GoldUtil.addStudentGold(student, 5);
+            GoldUtil.addSmallAppGold(student, 5);
         } else {
             payconfigId = studentPayConfig.getPrizeConfigId();
         }

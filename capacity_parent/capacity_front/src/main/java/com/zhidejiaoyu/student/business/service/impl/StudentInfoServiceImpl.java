@@ -613,7 +613,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Transactional(rollbackFor = Exception.class)
     public void saveGold(String openId, Integer gold) {
         Student student = studentMapper.selectByOpenId(openId);
-        gold = GoldUtil.addStudentGold(student, gold);
+        gold = GoldUtil.addSmallAppGold(student, gold);
 
         GoldLogUtil.saveStudyGoldLog(student.getId(), "观看夺分队长每日复习学习视频", gold);
     }
