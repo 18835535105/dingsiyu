@@ -2,6 +2,7 @@ package com.dfdz.teacher.business.student.controller;
 
 import com.dfdz.teacher.business.student.service.StudentService;
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
+import com.zhidejiaoyu.common.dto.student.DeleteStudentDto;
 import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
@@ -54,13 +55,12 @@ public class StudentController {
     /**
      * 教师后台删除学员
      *
-     * @param studentUuid
-     * @param userUuid
+     * @param dto
      * @return
      */
-    @GetMapping("/edit/deleteStudentByUuid")
-    public ServerResponse<Object> deleteStudentByUuid(@RequestParam String studentUuid, @RequestParam String userUuid) {
-        return studentService.deleteStudentByUuid(studentUuid,userUuid);
+    @PostMapping("/edit/deleteStudentByUuid")
+    public ServerResponse<Object> deleteStudentByUuid(@RequestBody DeleteStudentDto dto) {
+        return studentService.deleteStudentByUuid(dto.getStudentUuid(),dto.getUserUuid());
     }
 
     /**

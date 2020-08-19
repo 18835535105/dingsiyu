@@ -1,6 +1,7 @@
 package com.zhidejioayu.center.business.teacher.controller;
 
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
+import com.zhidejiaoyu.common.dto.student.DeleteStudentDto;
 import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.mapper.center.BusinessUserInfoMapper;
@@ -70,21 +71,21 @@ public class StudentController {
     /**
      * 教师后台删除学员
      *
-     * @param studentUuid
-     * @param openId
+     * @param dto
      * @return
      */
-    @GetMapping("/edit/deleteStudentByUuid")
-    public ServerResponse<Object> deleteStudentByUuid(@RequestParam String studentUuid, @RequestParam String openId) {
-        if (StringUtil.isEmpty(studentUuid)) {
+    @PostMapping("/edit/deleteStudentByUuid")
+    public ServerResponse<Object> deleteStudentByUuid(@Valid DeleteStudentDto dto) {
+        if (StringUtil.isEmpty(dto.getStudentUuid())) {
             return ServerResponse.createByError(400, "studentUuid can't be null!");
         }
-        if (StringUtil.isEmpty(openId)) {
-            return ServerResponse.createByError(400, "userUuid can't be null!");
+        if (StringUtil.isEmpty(dto.getOpenId())) {
+            return ServerResponse.createByError(400, "openId can't be null!");
         }
-        BaseTeacherInfoFeignClient baseTeacherInfoFeignClientByOpenId = FeignClientUtil.getBaseTeacherInfoFeignClientByOpenId(openId);
-        BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectTeacherInfoByOpenid(openId);
-        return baseTeacherInfoFeignClientByOpenId.deleteStudentByUuid(studentUuid, businessUserInfo.getUserUuid());
+        BaseTeacherInfoFeignClient baseTeacherInfoFeignClientByOpenId = FeignClientUtil.getBaseTeacherInfoFeignClientByOpenId(dto.getOpenId());
+        BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectTeacherInfoByOpenid(dto.getOpenId());
+        dto.setUserUuid(businessUserInfo.getUserUuid());
+        return baseTeacherInfoFeignClientByOpenId.deleteStudentByUuid(dto);
     }
 
     /**
