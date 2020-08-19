@@ -185,6 +185,19 @@
         order by un.id
     </select>
 
+    <select id="selectGradeAndLabelByCourseIds" resultType="java.util.Map" parameterType="map">
+        select
+        grade grade , label label ,id id
+        from course_new
+        where
+        id in (
+        <foreach collection="courseIds" item="courseId" separator=",">
+            #{courseId}
+        </foreach>
+        )
+        group by id
+    </select>
+
     <select id="selectByExample" resultMap="BaseResultMap"
             parameterType="com.zhidejiaoyu.common.pojo.CourseExample">
         select
