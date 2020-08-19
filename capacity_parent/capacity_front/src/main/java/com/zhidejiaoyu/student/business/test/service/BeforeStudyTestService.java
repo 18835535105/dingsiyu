@@ -30,4 +30,6 @@ public interface BeforeStudyTestService extends BaseService<StudentStudyPlanNew>
      * @return
      */
     ServerResponse<Object> saveSubjects(SaveSubjectsDTO dto);
+
+    ServerResponse<Object> fix();
 }

@@ -101,4 +101,6 @@ public interface CourseService extends IService<CourseNew> {
     List<Long> getIdsByVersion(String version);
 
     List<Long> getIdsByPhaseAndIds(List<String> phase, List<Long> courseIds);
+
+    Map<Long, Map<String, Object>> selectGradeAndLabelByCourseIds(List<Long> courseIds);
 }

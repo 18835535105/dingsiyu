@@ -30,6 +30,9 @@ public class PrizeConfigController {
 
     @RequestMapping("/getAdmin")
     public ServerResponse<ReturnAdminVo> getAdmin(String openId) {
+        if (openId == null || openId.equals("")) {
+            return ServerResponse.createByError(400, "请传入openId");
+        }
         return prizeConfigService.getAdmin(openId);
     }
 

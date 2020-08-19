@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.test.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -262,6 +263,28 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         return ServerResponse.createBySuccess(vo);
     }
 
+    @Override
+    public ServerResponse<Object> fix() {
+        List<StudentStudyPlanNew> studentStudyPlanNews = studentStudyPlanNewMapper.selectList(new LambdaQueryWrapper<StudentStudyPlanNew>().groupBy(StudentStudyPlanNew::getStudentId));
+        List<Long> studentIds = studentStudyPlanNews.stream().map(StudentStudyPlanNew::getStudentId).collect(Collectors.toList());
+
+        List<Student> students = studentMapper.selectBatchIds(studentIds);
+        students.forEach(student -> {
+            List<StudentStudyPlanNew> studentStudyPlanNews1 = studentStudyPlanNewMapper.selectList(new LambdaQueryWrapper<StudentStudyPlanNew>().eq(StudentStudyPlanNew::getStudentId, student.getId()));
+            List<StudentStudyPlanNew> collect = studentStudyPlanNews1.stream().peek(studentStudyPlanNew -> {
+                Integer basePriority = PriorityUtil.BASE_PRIORITY.get(student.getGrade());
+                if (studentStudyPlanNew.getErrorLevel() > basePriority) {
+                    studentStudyPlanNew.setErrorLevel(studentStudyPlanNew.getErrorLevel() - basePriority);
+                }
+                studentStudyPlanNew.setBaseLevel(basePriority);
+                studentStudyPlanNew.setFinalLevel(studentStudyPlanNew.getBaseLevel() + studentStudyPlanNew.getErrorLevel() + studentStudyPlanNew.getTimeLevel());
+            }).collect(Collectors.toList());
+            this.updateBatchById(collect);
+        });
+
+        return null;
+    }
+
     /**
      * 保存测试记录
      *
@@ -335,8 +358,8 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             String unitGrade = unitIdAndGrade.get(unitId);
             String unitLabel = unitIdAndLabel.get(unitId);
             timePriority = this.getTimePriority(timePriority, phaseSet, unitGrade);
-            int basePriority = this.getBasePriority(unitIdMap, unitGrade, unitLabel, grade, unitId);
-            int errorPriority = this.getErrorPriority(unitIdMap, unitGrade, grade, unitId, basePriority);
+            int basePriority = PriorityUtil.getBasePriority(grade, unitGrade, unitLabel);
+            int errorPriority = this.getErrorPriority(unitIdMap, unitGrade, grade, unitId);
 
             StudentStudyPlanNew.StudentStudyPlanNewBuilder studentStudyPlanNewBuilder = StudentStudyPlanNew.builder()
                     .studentId(student.getId())
@@ -415,26 +438,15 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      *
      * @param timePriority
      * @param phaseSet
-     * @param unitGrade
+     * @param unitGrade    单元所在年级
      * @return
      */
     public int getTimePriority(int timePriority, Set<String> phaseSet, String unitGrade) {
         if (!phaseSet.contains(unitGrade)) {
             phaseSet.add(unitGrade);
-            return PriorityUtil.BASE_TIME_PRIORITY;
-        } else {
-            return timePriority + PriorityUtil.BASE_TIME_PRIORITY;
+            return 0;
         }
-    }
-
-    public int getBasePriority(Map<Long, List<SaveSubjectsDTO.Result>> unitIdMap, String unitGrade, String unitLabel,
-                               String grade, Long unitId) {
-        if (!unitIdMap.containsKey(unitId)) {
-            return PriorityUtil.getBasePriority(grade, unitGrade, unitLabel, 0);
-        }
-        // 答错个数
-        long errorCount = unitIdMap.get(unitId).get(0).getErrorCount();
-        return PriorityUtil.getBasePriority(grade, unitGrade, unitLabel, (int) errorCount);
+        return timePriority + PriorityUtil.BASE_TIME_PRIORITY;
     }
 
     /**
@@ -444,17 +456,16 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * @param unitGrade    测试题所在年级
      * @param grade        学生当前所在年级
      * @param unitId
-     * @param basePriority
      * @return
      */
     public int getErrorPriority(Map<Long, List<SaveSubjectsDTO.Result>> unitIdMap, String unitGrade,
-                                String grade, Long unitId, int basePriority) {
+                                String grade, Long unitId) {
         if (!unitIdMap.containsKey(unitId)) {
-            return PriorityUtil.getErrorPriority(0, basePriority, grade, unitGrade);
+            return PriorityUtil.getErrorPriority(3, grade, unitGrade);
         }
         // 答错个数
         long errorCount = unitIdMap.get(unitId).get(0).getErrorCount();
-        return PriorityUtil.getErrorPriority((int) errorCount, basePriority, grade, unitGrade);
+        return PriorityUtil.getErrorPriority((int) errorCount, grade, unitGrade);
     }
 
     /**

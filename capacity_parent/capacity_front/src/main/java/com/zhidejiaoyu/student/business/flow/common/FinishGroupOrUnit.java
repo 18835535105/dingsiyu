@@ -325,7 +325,7 @@ public class FinishGroupOrUnit {
             // 说明当前课程还没有优先级，初始化当前课程的优先级
             String grade = StringUtils.isNotEmpty(courseNew.getGrade()) ? courseNew.getGrade() : courseNew.getGradeExt();
             String label = StringUtils.isNotEmpty(courseNew.getLabel()) ? courseNew.getLabel() : courseNew.getLabelExt();
-            int basePriority = PriorityUtil.getBasePriority(student.getGrade(), grade, label, 0);
+            int basePriority = PriorityUtil.getBasePriority(student.getGrade(), grade, label);
             int timePriority = PriorityUtil.BASE_TIME_PRIORITY;
 
             boolean isEasy = easyOrHard == 1;

@@ -248,4 +248,14 @@ public class CourseController {
         }
         return courseService.getIdsByPhaseAndIds(phaseList, courseIds);
     }
+
+    /**
+     * 获取单元名称
+     * @param courseIds
+     * @return
+     */
+    @GetMapping("/selectGradeAndLabelByCourseIds")
+    public Map<Long,Map<String,Object>> selectGradeAndLabelByCourseIds(@RequestParam List<Long> courseIds){
+        return courseService.selectGradeAndLabelByCourseIds(courseIds);
+    }
 }

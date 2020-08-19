@@ -38,6 +38,16 @@ public class BeforeStudyTestController extends BaseController {
         return beforeStudyTestService.getSubjects();
     }
 
+
+    /**
+     * todo:该接口仅2020-08-19晚上使用一次，日后可删除
+     * @return
+     */
+    @GetMapping("/fix")
+    public ServerResponse<Object> fix() {
+        return beforeStudyTestService.fix();
+    }
+
     /**
      * 保存摸底测试记录
      *
