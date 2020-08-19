@@ -60,6 +60,12 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
     @Override
     public ServerResponse<Map<String, Object>> getStudentStudyPlan(StudentStudyPlanListDto dto) {
         Student student = studentMapper.selectByUuid(dto.getUuid());
+        if(dto.getPageNum()==null){
+            dto.setPageNum(1);
+        }
+        if(dto.getPageSize()==null){
+            dto.setPageSize(20);
+        }
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         List<StudentStudyPlanNew> studentStudyPlanNews = studentStudyPlanNewMapper.selectStudyPlanByStudentIdAndPage(student.getId());
         PageInfo<StudentStudyPlanNew> pageInfo = new PageInfo<>(studentStudyPlanNews);
