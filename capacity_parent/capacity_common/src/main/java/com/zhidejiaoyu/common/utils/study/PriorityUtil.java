@@ -59,10 +59,9 @@ public class PriorityUtil {
      * @param grade       学生当前所在年级
      * @param wordInGrade 测试的单词所在年级
      * @param wordInLabel 测试的单元所在上下册
-     * @param errorCount  当前单元答错个数
      * @return
      */
-    public static int getBasePriority(String grade, String wordInGrade, String wordInLabel, int errorCount) {
+    public static int getBasePriority(String grade, String wordInGrade, String wordInLabel) {
 
         // 非当前学年，六年级下册均为2200，高三下册为3400
         // 学生不是6年级，当前测试单元为6年级下册，基础优先级为2200
@@ -78,38 +77,27 @@ public class PriorityUtil {
             return 3400;
         }
 
-        int basePriority = BASE_PRIORITY.get(grade) == null ? 0 : BASE_PRIORITY.get(grade);
-        if (errorCount == 1) {
-            return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 197;
-        }
-        if (errorCount == 2) {
-            return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 200;
-        }
-        if (errorCount == 3) {
-            return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 203;
-        }
-        return basePriority;
+        return BASE_PRIORITY.get(grade) == null ? 0 : BASE_PRIORITY.get(grade);
     }
 
     /**
      * 获取变化优先级
      *
      * @param errorCount   错题数
-     * @param basePriority 基础优先级
      * @param grade        学生当前年级
      * @param wordInGrade  测试的单词所在年级
      * @return
      */
-    public static int getErrorPriority(int errorCount, int basePriority, String grade, String wordInGrade) {
+    public static int getErrorPriority(int errorCount, String grade, String wordInGrade) {
         switch (errorCount) {
             case 1:
-                return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 197;
+                return (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 197;
             case 2:
-                return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 200;
+                return (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 200;
             case 3:
-                return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 203;
+                return (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 203;
             default:
-                return basePriority;
+                return 0;
         }
     }
 

@@ -168,7 +168,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
             maps.forEach(map -> {
                 int basePriority = PriorityUtil.getBasePriority(student.getGrade(),
                         map.get("gradeStr") == null || map.get("gradeStr") == "" ? map.get("grade").toString() : map.get("gradeStr").toString(),
-                        map.get("labelStr") == null || map.get("labelStr") == "" ? map.get("label").toString() : map.get("labelStr").toString(), 0);
+                        map.get("labelStr") == null || map.get("labelStr") == "" ? map.get("label").toString() : map.get("labelStr").toString());
                 saveStudentStudyPlanNew(student, map, basePriority, FlowConstant.BEFORE_GROUP_GAME_EASY, 1);
                 saveStudentStudyPlanNew(student, map, basePriority - 100, FlowConstant.BEFORE_GROUP_GAME_HARD, 2);
                 saveStudentStudyPlanNew(student, map, basePriority - 150, FlowConstant.GOLD_TEST, 3);
