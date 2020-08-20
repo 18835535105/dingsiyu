@@ -225,15 +225,10 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
     public ServerResponse<Object> selDrawRecordByStudentId(HttpSession session, Integer page, Integer rows) {
         //获取学生信息
         Student student = getStudent(session);
-        //创建查询条件
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("studentId", student.getId());
-        map.put("start", (page - 1) > 0 ? (page - 1) * rows : 0);
-        map.put("end", rows);
         //获取抽奖数量
         Integer integer = simpleDrawRecordMapper.selNumber(student.getId().intValue());
         //获取抽奖信息
-        List<DrawRecord> drawRecords = simpleDrawRecordMapper.selByStudentId(map);
+        List<DrawRecord> drawRecords = simpleDrawRecordMapper.selByStudentId(student.getId());
         List<DrawRecord> resultRecords = new ArrayList<>();
         for (DrawRecord drawRecord : drawRecords) {
             if (drawRecord.getExplain().contains("惊喜奖励")) {

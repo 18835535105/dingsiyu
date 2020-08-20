@@ -22,10 +22,11 @@ public interface SimpleDrawRecordMapper extends BaseMapper<DrawRecord> {
 
     /**
      * 根据id查询抽奖数据
-     * @param map   studentId学生id start开始坐标 end结束坐标
+     * @param studentId   studentId学生id
      * @return
      */
-    List<DrawRecord> selByStudentId(HashMap<String, Object> map);
+    List<DrawRecord> selByStudentId(@Param("studentId") Long studentId);
+
 
 
     /**
