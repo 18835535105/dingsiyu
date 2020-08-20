@@ -113,13 +113,16 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         }
 
         List<StudentManageVO> collect = students.stream().map(s -> {
-
-            long countDown = (s.getAccountTime().getTime() - System.currentTimeMillis()) / 86400000;
-
+            long countDown;
+            if (s.getAccountTime() == null) {
+                countDown = s.getRank();
+            } else {
+                countDown = (s.getAccountTime().getTime() - System.currentTimeMillis()) / 86400000;
+            }
             StudentManageVO vo = new StudentManageVO();
             vo.setUuid(s.getUuid());
             vo.setAccount(s.getAccount());
-            vo.setStudentName(s.getStudentName());
+            vo.setStudentName(s.getStudentName() == null ? "学生账号" : s.getStudentName());
             vo.setCountDown(Math.max(0, countDown));
             vo.setCreateTime(DateUtil.formatDate(s.getRegisterDate(), DateUtil.YYYYMMDD));
             return vo;
@@ -277,7 +280,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     }
 
     @Override
-    public ServerResponse<Object> deleteStudentByUuid(String studentUuid,  String userUuid) {
+    public ServerResponse<Object> deleteStudentByUuid(String studentUuid, String userUuid) {
         SysUser user = sysUserMapper.selectByUuid(userUuid);
         Student student = studentMapper.selectByUuid(studentUuid);
         RecycleBin recycleBin = new RecycleBin();
@@ -294,7 +297,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             redisOpt.deleteCaches(Collections.singletonList(student.getId()));
         } catch (Exception e) {
             log.error("{} -> {} 删除学生信息出错！", user.getAccount(), user.getName(), e);
-            throw new RuntimeException( "删除学生信息失败！",e);
+            throw new RuntimeException("删除学生信息失败！", e);
         }
         return ServerResponse.createBySuccess();
     }
@@ -310,7 +313,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         StringBuilder sb = new StringBuilder();
         sb.append(user.getAccount()).append(" -> ").append(user.getName()).append(" 删除了学生：");
         students.forEach(student -> sb.append(student.getAccount()).append(" -> ").append(student.getStudentName()).append("，"));
-        OperationLog operationLog=new OperationLog();
+        OperationLog operationLog = new OperationLog();
         operationLog.setLogname("删除学生");
         operationLog.setUserid(user.getId());
         operationLog.setCreatetime(new Date());
