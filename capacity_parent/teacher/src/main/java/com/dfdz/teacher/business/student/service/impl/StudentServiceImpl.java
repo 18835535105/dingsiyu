@@ -122,7 +122,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             StudentManageVO vo = new StudentManageVO();
             vo.setUuid(s.getUuid());
             vo.setAccount(s.getAccount());
-            vo.setStudentName(s.getStudentName() == null ? "学生账号" : s.getStudentName());
+            vo.setStudentName(s.getStudentName() == null ? "默认姓名" : s.getStudentName());
             vo.setCountDown(Math.max(0, countDown));
             vo.setCreateTime(DateUtil.formatDate(s.getRegisterDate(), DateUtil.YYYYMMDD));
             return vo;
