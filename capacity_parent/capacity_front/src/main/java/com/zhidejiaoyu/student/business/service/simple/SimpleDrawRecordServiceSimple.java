@@ -32,7 +32,7 @@ public interface SimpleDrawRecordServiceSimple extends SimpleBaseService<DrawRec
      * @param session
      * @return
      */
-    ServerResponse<Object> selDrawRecordByStudentId(HttpSession session, Integer page, Integer rows);
+    ServerResponse<Object> selDrawRecordByStudentId(HttpSession session);
 
     /**
      * 查询所有抽奖及消费信息

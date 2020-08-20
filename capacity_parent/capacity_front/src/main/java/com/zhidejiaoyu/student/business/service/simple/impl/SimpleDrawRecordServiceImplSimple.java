@@ -217,12 +217,10 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
      * 查询抽奖记录
      *
      * @param session
-     * @param page
-     * @param rows
      * @return
      */
     @Override
-    public ServerResponse<Object> selDrawRecordByStudentId(HttpSession session, Integer page, Integer rows) {
+    public ServerResponse<Object> selDrawRecordByStudentId(HttpSession session) {
         //获取学生信息
         Student student = getStudent(session);
         //获取抽奖数量

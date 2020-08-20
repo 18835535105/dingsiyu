@@ -60,14 +60,12 @@ public class SimpleDrawRecordController {
      * 分页查询抽奖记录
      *
      * @param session
-     * @param page    页数
-     * @param rows    每页显示的个数
      * @return
      */
     @PostMapping("/selDrawRecord")
     @ResponseBody
-    public ServerResponse<Object> selDrawRecord(HttpSession session, Integer page, Integer rows) {
-        return drawRecordService.selDrawRecordByStudentId(session, page, rows);
+    public ServerResponse<Object> selDrawRecord(HttpSession session) {
+        return drawRecordService.selDrawRecordByStudentId(session);
     }
 
     /**

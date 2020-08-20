@@ -11,7 +11,7 @@
         <result column="explain" property="explain" />
     </resultMap>
     <sql id="select_list">
-        id,student_id,create_time,`name`,explain
+        id,student_id,create_time,`name`,`explain`
     </sql>
 
     <select id="selByStudentId" resultMap="BaseResultMap" parameterType="java.util.Map">
