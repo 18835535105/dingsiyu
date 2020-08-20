@@ -794,7 +794,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
         int goldCount = 0;
         if (testRecordOld == null) {
-            goldCount = getGoldCount(classify, student, testRecord.getPoint(), testRecord.getStudyModel());
+            goldCount = getGoldCount(classify, student, testRecord.getPoint());
         } else {
             // 查询当前单元测试历史最高分数
             int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 7);
@@ -803,13 +803,13 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             if (betterPoint < testRecord.getPoint()) {
                 int betterCount = testRecordOld.getBetterCount() + 1;
                 testRecord.setBetterCount(betterCount);
-                goldCount = getGoldCount(classify, student, testRecord.getPoint(), testRecord.getStudyModel());
+                goldCount = getGoldCount(classify, student, testRecord.getPoint());
             }
         }
         return testGoldUtil.addGold(student, goldCount);
     }
 
-    private int getGoldCount(Integer classify, Student student, int point, String model) {
+    private int getGoldCount(Integer classify, Student student, int point) {
         int goldCount;
         if (point < SIX) {
             goldCount = 0;
@@ -824,7 +824,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         } else {
             goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
         }
-        this.saveLog(student, goldCount, classify, model);
+        this.saveLog(student, goldCount, classify);
         return goldCount;
     }
 
@@ -834,21 +834,13 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
      * @param student
      * @param goldCount 奖励金币数
      * @param classify
-     * @param model     测试模块
      */
-    private void saveLog(Student student, int goldCount, Integer classify, String model) {
+    private void saveLog(Student student, int goldCount, Integer classify) {
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
         studentMapper.updateByPrimaryKeySelective(student);
-        String msg;
-        String reason;
-        if (classify != null) {
-            reason = GenreConstant.UNIT_TEST;
-            msg = "id为：" + student.getId() + "的学生在[" + commonMethod.getTestType(classify)
-                    + "]模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
-        } else {
-            reason = model;
-            msg = "id为：" + student.getId() + "的学生在[" + model + "]模块下，获得#" + goldCount + "#枚金币";
-        }
+        String msg = "id为：" + student.getId() + "的学生在[" + commonMethod.getTestType(classify)
+                + "]模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
+        String reason = GenreConstant.UNIT_TEST;
         if (goldCount > 0) {
             try {
                 GoldLogUtil.saveStudyGoldLog(student.getId(), reason, goldCount);
