@@ -252,6 +252,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
         Student oldStudent = studentMapper.selectByUuid(dto.getUuid());
         student.setUpdateTime(new Date());
+        if(student.getBirthDate().equals("")){
+            student.setBirthDate(null);
+        }
         student.setId(oldStudent.getId());
         int count = studentMapper.updateById(student);
 
