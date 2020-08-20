@@ -226,7 +226,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
         //获取学生信息
         Student student = getStudent(session);
         //获取抽奖数量
-        Integer integer = simpleDrawRecordMapper.selNumber(student.getId().intValue());
+        //Integer integer = simpleDrawRecordMapper.selNumber(student.getId().intValue());
         //获取抽奖信息
         List<DrawRecord> drawRecords = simpleDrawRecordMapper.selByStudentId(student.getId());
         List<DrawRecord> resultRecords = new ArrayList<>();
