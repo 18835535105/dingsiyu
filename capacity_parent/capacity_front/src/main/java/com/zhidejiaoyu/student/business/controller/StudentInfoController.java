@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -351,6 +352,21 @@ public class StudentInfoController extends BaseController {
     public String getStudentGradeByOpenId(@RequestParam String openId) {
         Student student = studentInfoService.getByOpenId(openId);
         return student.getGrade();
+    }
+
+    /**
+     * 判断学生今日金币获取是否已达到上限
+     *
+     * @return true:达到上限；false：还没有达到上限
+     */
+    @GetMapping("/goldCountLimit")
+    public ServerResponse<Object> goldCountLimit() {
+        Long studentId = super.getStudentId();
+        Map<String, Object> map = new HashMap<>(16);
+        boolean b = studentInfoService.goldCountLimit(studentId);
+        map.put("limit", b);
+
+        return ServerResponse.createBySuccess(map);
     }
 
 }

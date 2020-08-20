@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.constant.session.SessionConstant;
 import com.zhidejiaoyu.common.dto.EndValidTimeDto;
 import com.zhidejiaoyu.common.mapper.*;
@@ -32,6 +33,7 @@ import com.zhidejiaoyu.student.common.validTime.GetValidTimeTip;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,6 +94,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Resource
     private WeekActivityRankOpt weekActivityRankOpt;
 
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
     @Override
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
@@ -110,19 +115,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         // 首次修改密码奖励
         this.firstUpdatePasswordAward(studentInfo, oldPassword, newPassword);
 
-        try {
-            int count = studentMapper.updateById(studentInfo);
-            session.setAttribute(UserConstant.CURRENT_STUDENT, studentInfo);
-            return count > 0 ? ServerResponse.createBySuccessMessage(tip)
-                    : ServerResponse.createByErrorMessage("信息完善失败！");
-        } catch (Exception e) {
-            log.error("id为{}的学生{}完善个人信息失败！", studentInfo.getId(), studentInfo.getStudentName(), e);
-            RunLog runLog = new RunLog(3, "id为" + studentInfo.getId() + "的学生" + studentInfo.getStudentName()
-                    + "完善个人信息失败！",
-                    new Date());
-            runLogMapper.insert(runLog);
-        }
-        return ServerResponse.createByErrorMessage("信息完善失败！");
+        GoldUtil.addStudentGold(studentInfo, studentInfo.getSystemGold());
+        session.setAttribute(UserConstant.CURRENT_STUDENT, studentInfo);
+        return ServerResponse.createBySuccessMessage(tip);
     }
 
     /**
@@ -616,6 +611,23 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         gold = GoldUtil.addSmallAppGold(student, gold);
 
         GoldLogUtil.saveStudyGoldLog(student.getId(), "观看夺分队长每日复习学习视频", gold);
+    }
+
+    @Override
+    public boolean goldCountLimit(Long studentId) {
+        Object o = redisTemplate.opsForHash().get(RedisKeysConst.STUDENT_DAY_TOTAL_GOLD, studentId);
+        return o != null && (int) o >= GoldUtil.MAX_GOLD;
+    }
+
+    @Override
+    public boolean goldSmallAppCountLimit(String openId) {
+        Student student = studentMapper.selectByOpenId(openId);
+        Long studentId = student.getId();
+        Object o = redisTemplate.opsForHash().get(RedisKeysConst.STUDENT_SMALL_APP_DAY_TOTAL_GOLD, studentId);
+        if (o != null && (int) o >= GoldUtil.SMALL_APP_MAX_GOLD) {
+            return true;
+        }
+        return this.goldCountLimit(studentId);
     }
 
     /**

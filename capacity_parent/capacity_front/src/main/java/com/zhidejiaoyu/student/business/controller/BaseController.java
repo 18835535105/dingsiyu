@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.controller;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.student.business.service.StudentInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,11 @@ public class BaseController {
     }
 
     Long getStudentId(HttpSession session) {
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        return student.getId();
+    }
+    Long getStudentId() {
+        HttpSession session = HttpUtil.getHttpSession();
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         return student.getId();
     }

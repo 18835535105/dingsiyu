@@ -25,12 +25,12 @@ public class GoldUtil {
     /**
      * 学生每天最多可获取金币数
      */
-    private static final int MAX_GOLD = 400;
+    public static final int MAX_GOLD = 400;
 
     /**
      * 小程序每天最多获取金币数
      */
-    private static final int SMALL_APP_MAX_GOLD = 100;
+    public static final int SMALL_APP_MAX_GOLD = 100;
 
     @Resource
     private StudentMapper studentMapper;

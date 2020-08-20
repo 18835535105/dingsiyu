@@ -27,7 +27,7 @@ public interface BaseSmallAppFeignClient {
      * 通过扫码获取学生总学习信息
      *
      * @param openId
-     * @param num         二维码序号
+     * @param num    二维码序号
      * @return
      */
     @GetMapping("/smallApp/fly/getStudyInfo")
@@ -37,7 +37,7 @@ public interface BaseSmallAppFeignClient {
      * 获取学生上传你的图片信息
      *
      * @param openId
-     * @param num         二维码序号
+     * @param num    二维码序号
      * @return
      */
     @GetMapping("/smallApp/fly/getStudentInfo")
@@ -83,7 +83,7 @@ public interface BaseSmallAppFeignClient {
      * 飞行记录学习总览
      *
      * @param openId
-     * @param num 扫码编号 -1：总览；其他编号：查询指定日期学习情况
+     * @param num    扫码编号 -1：总览；其他编号：查询指定日期学习情况
      * @return
      */
     @GetMapping("/smallApp/index/recordOverview")
@@ -144,5 +144,14 @@ public interface BaseSmallAppFeignClient {
      */
     @GetMapping("/smallApp/prizeConfig/getPrizeConfig")
     Object getPrizeConfig(@SpringQueryMap PrizeConfigDTO dto);
+
+    /**
+     * 判断学生今日金币是否已达到上限
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/smallApp/index/goldCountLimit")
+    ServerResponse<Object> goldCountLimit(@RequestParam String openId);
 }
 
