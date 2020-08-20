@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.dto.EndValidTimeDto;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
@@ -16,9 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -43,6 +46,9 @@ public class StudentInfoController extends BaseController {
 
     @Autowired
     private SimpleStudentInfoService simpleStudentInfoService;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 完善学生信息、修改学生信息时获取学生信息
@@ -364,7 +370,9 @@ public class StudentInfoController extends BaseController {
         Long studentId = super.getStudentId();
         Map<String, Object> map = new HashMap<>(16);
         boolean b = studentInfoService.goldCountLimit(studentId);
+        Object o = redisTemplate.opsForHash().get(RedisKeysConst.STUDENT_DAY_TOTAL_GOLD, studentId);
         map.put("limit", b);
+        map.put("gold", o == null ? 0 : o);
 
         return ServerResponse.createBySuccess(map);
     }
