@@ -241,12 +241,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
             resultRecords.add(drawRecord);
         }
         Map<String, Object> maps = new HashMap<>();
-        if (integer == null) {
-            maps.put("countPage", 0);
-        } else {
-            maps.put("countPage", integer % rows > 0 ? (integer / rows) + 1 : (integer / rows));
-        }
-
+        maps.put("countPage", 0);
         maps.put("drawRecords", resultRecords);
         return ServerResponse.createBySuccess(maps);
     }
