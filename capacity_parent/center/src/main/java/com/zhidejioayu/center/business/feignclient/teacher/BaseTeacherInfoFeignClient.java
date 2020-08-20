@@ -1,6 +1,7 @@
 package com.zhidejioayu.center.business.feignclient.teacher;
 
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
+import com.zhidejiaoyu.common.dto.student.DeleteStudentDto;
 import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.pojo.SysUser;
@@ -65,4 +66,13 @@ public interface BaseTeacherInfoFeignClient {
      */
     @GetMapping("/student/createStudentCount/canCreateCount")
     Object canCreateCount(@RequestParam String openId);
+
+    /**
+     * 教师后台删除学员
+     *
+     * @param dto
+     * @return
+     */
+    @PostMapping("/student/edit/deleteStudentByUuid")
+    ServerResponse<Object> deleteStudentByUuid(@RequestBody DeleteStudentDto dto);
 }

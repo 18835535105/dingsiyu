@@ -2,6 +2,7 @@ package com.dfdz.teacher.business.student.controller;
 
 import com.dfdz.teacher.business.student.service.StudentService;
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
+import com.zhidejiaoyu.common.dto.student.DeleteStudentDto;
 import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
@@ -9,6 +10,7 @@ import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.manage.EditStudentVo;
 import com.zhidejiaoyu.common.vo.student.manage.StudentManageVO;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +50,17 @@ public class StudentController {
     @GetMapping("/edit/getEditStudentVoByUuid")
     public ServerResponse<EditStudentVo> getEditStudentVoByUuid(@RequestParam String uuid) {
         return studentService.getEditStudentVoByUuid(uuid);
+    }
+
+    /**
+     * 教师后台删除学员
+     *
+     * @param dto
+     * @return
+     */
+    @PostMapping("/edit/deleteStudentByUuid")
+    public ServerResponse<Object> deleteStudentByUuid(@RequestBody DeleteStudentDto dto) {
+        return studentService.deleteStudentByUuid(dto.getStudentUuid(),dto.getUserUuid());
     }
 
     /**

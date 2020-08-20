@@ -943,6 +943,16 @@ s.uuid,
           and (teacher_id = #{userId}
             OR teacher_id IN (SELECT teacher_id FROM teacher WHERE school_admin_id = #{userId}))
     </select>
+
+    <select id="selectByIds" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from student where id in (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
     <select id="selectStudentManageVO" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="more_table_List"/>
@@ -950,18 +960,20 @@ s.uuid,
         <where>
             and s.status &lt;&gt; 3 and s.status &lt;&gt; 4
             and s.school_name is not null
-            and s.account_time is not null
-            and s.sex is not null
             and s.role &lt;> 4
             and s.role &lt;> 5
             <if test="dto.type == 1">
                 and s.account_time >= now() and s.rank > 7
+                and s.account_time is not null
+                and s.sex is not null
             </if>
             <if test="dto.type == 2">
                 and s.account_time &lt; now()
+                and s.account_time is not null
+                and s.sex is not null
             </if>
-            <if test="dto.type == 2">
-                and s.account_time &lt; now() and s.rank &lt;= 7
+            <if test="dto.type == 3">
+                and (s.account_time &lt; now() or s.account_time is null) and s.rank &lt;= 7
             </if>
             <if test="dto.accountOrStudentName != null and dto.accountOrStudentName != ''">
                 and (s.account like concat('%', #{dto.accountOrStudentName}, '%')

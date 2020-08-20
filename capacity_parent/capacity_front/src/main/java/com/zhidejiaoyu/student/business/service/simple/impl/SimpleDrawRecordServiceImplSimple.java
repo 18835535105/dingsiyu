@@ -217,23 +217,16 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
      * 查询抽奖记录
      *
      * @param session
-     * @param page
-     * @param rows
      * @return
      */
     @Override
-    public ServerResponse<Object> selDrawRecordByStudentId(HttpSession session, Integer page, Integer rows) {
+    public ServerResponse<Object> selDrawRecordByStudentId(HttpSession session) {
         //获取学生信息
         Student student = getStudent(session);
-        //创建查询条件
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("studentId", student.getId());
-        map.put("start", (page - 1) > 0 ? (page - 1) * rows : 0);
-        map.put("end", rows);
         //获取抽奖数量
-        Integer integer = simpleDrawRecordMapper.selNumber(student.getId().intValue());
+        //Integer integer = simpleDrawRecordMapper.selNumber(student.getId().intValue());
         //获取抽奖信息
-        List<DrawRecord> drawRecords = simpleDrawRecordMapper.selByStudentId(map);
+        List<DrawRecord> drawRecords = simpleDrawRecordMapper.selByStudentId(student.getId());
         List<DrawRecord> resultRecords = new ArrayList<>();
         for (DrawRecord drawRecord : drawRecords) {
             if (drawRecord.getExplain().contains("惊喜奖励")) {
@@ -246,12 +239,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
             resultRecords.add(drawRecord);
         }
         Map<String, Object> maps = new HashMap<>();
-        if (integer == null) {
-            maps.put("countPage", 0);
-        } else {
-            maps.put("countPage", integer % rows > 0 ? (integer / rows) + 1 : (integer / rows));
-        }
-
+        maps.put("countPage", 0);
         maps.put("drawRecords", resultRecords);
         return ServerResponse.createBySuccess(maps);
     }

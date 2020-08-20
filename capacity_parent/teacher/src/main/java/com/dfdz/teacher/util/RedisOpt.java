@@ -1,9 +1,11 @@
 package com.dfdz.teacher.util;
 
+import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.RunLogMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.SysUserMapper;
+import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.SysUser;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +37,8 @@ public class RedisOpt {
     private StudentMapper studentMapper;
     @Resource
     private SysUserMapper userMapper;
+    @Resource
+    private TeacherMapper teacherMapper;
 
     public String getStudentFirstLoginTime(Student student) {
         Object obj = redisTemplate.opsForHash().get(RedisKeysConst.STUDENT_FIRST_LOGIN_TIME, student.getId());
@@ -146,5 +151,57 @@ public class RedisOpt {
          * 需要生成到最大的数字
          */
         Long max;
+    }
+
+    /**
+     * 删除缓存中的排行榜数据
+     *
+     * @param studentIds
+     */
+    public void deleteCaches(List<Long> studentIds) {
+        try {
+            List<Student> students = studentMapper.selectByIds(studentIds);
+
+            students.forEach(student -> {
+                Long studentId = student.getId();
+                Long teacherId = student.getTeacherId();
+                Long classId = student.getClassId();
+
+                this.deleteMember(RankKeysConst.CLASS_CCIE_RANK + teacherId + ":" + classId, studentId);
+                this.deleteMember(RankKeysConst.CLASS_GOLD_RANK + teacherId + ":" + classId, studentId);
+                this.deleteMember(RankKeysConst.CLASS_MEDAL_RANK + teacherId + ":" + classId, studentId);
+                this.deleteMember(RankKeysConst.CLASS_WORSHIP_RANK + teacherId + ":" + classId, studentId);
+
+                Integer schoolAdminId = getSchoolAdminId(teacherId.intValue());
+                this.deleteMember(RankKeysConst.SCHOOL_CCIE_RANK + schoolAdminId, studentId);
+                this.deleteMember(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, studentId);
+                this.deleteMember(RankKeysConst.SCHOOL_MEDAL_RANK + schoolAdminId, studentId);
+                this.deleteMember(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, studentId);
+
+                this.deleteMember(RankKeysConst.COUNTRY_CCIE_RANK, studentId);
+                this.deleteMember(RankKeysConst.COUNTRY_GOLD_RANK, studentId);
+                this.deleteMember(RankKeysConst.COUNTRY_MEDAL_RANK, studentId);
+                this.deleteMember(RankKeysConst.COUNTRY_WORSHIP_RANK, studentId);
+            });
+        } catch (Exception e) {
+            log.warn("删除 redis 中排行数据失败！", e);
+        }
+    }
+
+    private Integer getSchoolAdminId(Integer teacherId) {
+        Integer schoolAdminId = teacherMapper.getSchoolAdminById(teacherId);
+        schoolAdminId = schoolAdminId == null ? teacherId : schoolAdminId;
+        return schoolAdminId;
+    }
+
+
+    /**
+     * 删除多余的排行信息
+     *
+     * @param key
+     * @param studentId
+     */
+    public void deleteMember(String key, Long studentId) {
+        redisTemplate.opsForZSet().remove(key, studentId);
     }
 }

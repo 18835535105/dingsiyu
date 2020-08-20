@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,6 +92,12 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Resource
     private CourseFeignClient courseFeignClient;
 
+    @Resource
+    private RecycleBinMapper recycleBinMapper;
+
+    @Resource
+    private OperationLogMapper operationLogMapper;
+
     @Override
     public ServerResponse<PageVo<StudentManageVO>> listStudent(StudentListDto dto) {
 
@@ -105,13 +112,16 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         }
 
         List<StudentManageVO> collect = students.stream().map(s -> {
-
-            long countDown = (s.getAccountTime().getTime() - System.currentTimeMillis()) / 86400000;
-
+            long countDown;
+            if (s.getAccountTime() == null) {
+                countDown = s.getRank();
+            } else {
+                countDown = (s.getAccountTime().getTime() - System.currentTimeMillis()) / 86400000;
+            }
             StudentManageVO vo = new StudentManageVO();
             vo.setUuid(s.getUuid());
             vo.setAccount(s.getAccount());
-            vo.setStudentName(s.getStudentName());
+            vo.setStudentName(s.getStudentName() == null ? "默认姓名" : s.getStudentName());
             vo.setCountDown(Math.max(0, countDown));
             vo.setCreateTime(DateUtil.formatDate(s.getRegisterDate(), DateUtil.YYYYMMDD));
             return vo;
@@ -223,6 +233,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 return course.getVersion();
             } else {
                 SchoolTime schoolTime1 = schoolTimeMapper.selectByUserIdAndGrade(1, student.getGrade() == null ? "三年级" : student.getGrade());
+                if (schoolTime1 == null) {
+                    return "未找到版本";
+                }
                 CourseNew course = courseFeignClient.getById(schoolTime1.getCourseId());
                 return course.getVersion();
             }
@@ -238,6 +251,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
         Student oldStudent = studentMapper.selectByUuid(dto.getUuid());
         student.setUpdateTime(new Date());
+        if(student.getBirthDate().equals("")){
+            student.setBirthDate(null);
+        }
         student.setId(oldStudent.getId());
         int count = studentMapper.updateById(student);
 
@@ -253,9 +269,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             }
         }
         String phase = this.getPhase(student.getGrade());
-        StudentExpansion expansion = studentExpansionMapper.selectByStudentId(oldStudent.getId());
-        expansion.setPhase(phase);
-        studentExpansionMapper.updateById(expansion);
+
+        this.saveOrUpdateStudentExpansion(phase, student);
+
 
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
 
@@ -263,6 +279,50 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 + " 修改学生信息：原信息[" + oldStudent.toString() + "]，修改后信息[" + student.toString() + "]；");
 
         return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public ServerResponse<Object> deleteStudentByUuid(String studentUuid, String userUuid) {
+        SysUser user = sysUserMapper.selectByUuid(userUuid);
+        Student student = studentMapper.selectByUuid(studentUuid);
+        RecycleBin recycleBin = new RecycleBin();
+        recycleBin.setCreateTime(new Date());
+        recycleBin.setOperateUserId((long) user.getId());
+        recycleBin.setOperateUserName(user.getName());
+        recycleBin.setStudentId(student.getId());
+        try {
+            studentMapper.deleteByStudentId(student.getId());
+            recycleBinMapper.insert(recycleBin);
+
+            this.saveDeleteStudentLog(new Long[]{student.getId()}, user);
+
+            redisOpt.deleteCaches(Collections.singletonList(student.getId()));
+        } catch (Exception e) {
+            log.error("{} -> {} 删除学生信息出错！", user.getAccount(), user.getName(), e);
+            throw new RuntimeException("删除学生信息失败！", e);
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 保存删除学生信息日志
+     *
+     * @param ids
+     */
+    private void saveDeleteStudentLog(Long[] ids, SysUser user) {
+        List<Student> students = studentMapper.selectByIds(Arrays.asList(ids));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(user.getAccount()).append(" -> ").append(user.getName()).append(" 删除了学生：");
+        students.forEach(student -> sb.append(student.getAccount()).append(" -> ").append(student.getStudentName()).append("，"));
+        OperationLog operationLog = new OperationLog();
+        operationLog.setLogname("删除学生");
+        operationLog.setUserid(user.getId());
+        operationLog.setCreatetime(new Date());
+        operationLog.setSucceed("成功");
+        operationLog.setMessage(sb.toString());
+        operationLog.setMessage("业务日志");
+        operationLogMapper.insert(operationLog);
     }
 
     private String getPhase(String grade) {

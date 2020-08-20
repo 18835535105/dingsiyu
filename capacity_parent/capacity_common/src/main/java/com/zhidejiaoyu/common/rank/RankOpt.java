@@ -1,9 +1,7 @@
 package com.zhidejiaoyu.common.rank;
 
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
-import com.zhidejiaoyu.common.mapper.AwardMapper;
-import com.zhidejiaoyu.common.mapper.CcieMapper;
-import com.zhidejiaoyu.common.mapper.WorshipMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
@@ -13,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 排行操作类
@@ -36,6 +35,12 @@ public class RankOpt extends BaseRankOpt {
 
     @Autowired
     private WorshipMapper worshipMapper;
+
+    @Autowired
+    private StudentMapper studentMapper;
+
+    @Autowired
+    private TeacherMapper teacherMapper;
 
     /**
      * 新增或者更新指定数据
@@ -204,7 +209,6 @@ public class RankOpt extends BaseRankOpt {
         }
         return Math.round(score);
     }
-
 
     /**
      * 删除多余的排行信息

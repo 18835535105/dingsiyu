@@ -51,4 +51,5 @@ public interface StudentService extends IService<Student> {
     ServerResponse<Object> saveStudentInfoAfterEdit(SaveEditStudentInfoDTO dto);
 
 
+    ServerResponse<Object> deleteStudentByUuid(String studentUuid,String userUuid);
 }

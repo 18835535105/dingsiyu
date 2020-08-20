@@ -1,9 +1,11 @@
 package com.zhidejioayu.center.business.teacher.controller;
 
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
+import com.zhidejiaoyu.common.dto.student.DeleteStudentDto;
 import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.mapper.center.BusinessUserInfoMapper;
+import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
@@ -64,6 +66,26 @@ public class StudentController {
 
         BaseTeacherInfoFeignClient baseTeacherInfoFeignClientByOpenId = FeignClientUtil.getBaseTeacherInfoFeignClientByOpenId(openId);
         return baseTeacherInfoFeignClientByOpenId.getEditStudentVoByUuid(openId, uuid);
+    }
+
+    /**
+     * 教师后台删除学员
+     *
+     * @param dto
+     * @return
+     */
+    @PostMapping("/edit/deleteStudentByUuid")
+    public ServerResponse<Object> deleteStudentByUuid(@Valid DeleteStudentDto dto) {
+        if (StringUtil.isEmpty(dto.getStudentUuid())) {
+            return ServerResponse.createByError(400, "studentUuid can't be null!");
+        }
+        if (StringUtil.isEmpty(dto.getOpenId())) {
+            return ServerResponse.createByError(400, "openId can't be null!");
+        }
+        BaseTeacherInfoFeignClient baseTeacherInfoFeignClientByOpenId = FeignClientUtil.getBaseTeacherInfoFeignClientByOpenId(dto.getOpenId());
+        BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectTeacherInfoByOpenid(dto.getOpenId());
+        dto.setUserUuid(businessUserInfo.getUserUuid());
+        return baseTeacherInfoFeignClientByOpenId.deleteStudentByUuid(dto);
     }
 
     /**

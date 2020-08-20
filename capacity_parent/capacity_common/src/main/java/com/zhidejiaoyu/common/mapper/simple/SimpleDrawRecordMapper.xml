@@ -11,11 +11,15 @@
         <result column="explain" property="explain" />
     </resultMap>
     <sql id="select_list">
-        id,student_id,create_time,name,explain
+        id,student_id,create_time,`name`,`explain`
     </sql>
 
     <select id="selByStudentId" resultMap="BaseResultMap" parameterType="java.util.Map">
-        select * from draw_record where student_id=#{studentId} order by create_time desc limit #{start},#{end}
+        select
+        <include refid="select_list"/>
+        from draw_record
+        where student_id=#{studentId}
+        order by create_time desc
     </select>
 
     <select id="selAwardNow" parameterType="java.util.Map" resultType="java.lang.Integer">
