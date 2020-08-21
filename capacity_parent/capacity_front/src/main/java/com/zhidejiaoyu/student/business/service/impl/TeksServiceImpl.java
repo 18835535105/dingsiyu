@@ -791,7 +791,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private int getGold(TestRecord testRecord, Student student, TestRecord testRecordOld) {
 
         if (testRecordOld == null) {
-            return getGoldCount(student, testRecord.getPoint(), testRecord.getStudyModel());
+            return getGoldCount(student, testRecord.getPoint());
         }
         int goldCount = 0;
         // 查询当前单元测试历史最高分数
@@ -801,13 +801,13 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         if (betterPoint < testRecord.getPoint()) {
             int betterCount = testRecordOld.getBetterCount() + 1;
             testRecord.setBetterCount(betterCount);
-            goldCount = getGoldCount(student, testRecord.getPoint(), testRecord.getStudyModel());
+            goldCount = getGoldCount(student, testRecord.getPoint());
         }
 
         return goldCount;
     }
 
-    private int getGoldCount(Student student, int point, String model) {
+    private int getGoldCount(Student student, int point) {
         int goldCount;
         if (point < SIX) {
             goldCount = 0;
@@ -825,7 +825,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
         double gold = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
         goldCount = GoldUtil.addStudentGold(student, gold);
-        this.saveLog(student, goldCount, 7, model);
+        this.saveLog(student, goldCount, 7);
 
         return goldCount;
     }
@@ -836,19 +836,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
      * @param student
      * @param goldCount 奖励金币数
      * @param classify
-     * @param model     测试模块
      */
-    private void saveLog(Student student, int goldCount, Integer classify, String model) {
-        String msg;
-        String reason;
-        if (classify != null) {
-            reason = GenreConstant.UNIT_TEST;
-            msg = "id为：" + student.getId() + "的学生在[" + commonMethod.getTestType(classify)
-                    + "]模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
-        } else {
-            reason = model;
-            msg = "id为：" + student.getId() + "的学生在[" + model + "]模块下，获得#" + goldCount + "#枚金币";
-        }
+    private void saveLog(Student student, int goldCount, Integer classify) {
+        String msg = "id为：" + student.getId() + "的学生在[" + commonMethod.getTestType(classify)
+                + "]模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
+        String reason = GenreConstant.UNIT_TEST;
         if (goldCount > 0) {
             try {
                 GoldLogUtil.saveStudyGoldLog(student.getId(), reason, goldCount);

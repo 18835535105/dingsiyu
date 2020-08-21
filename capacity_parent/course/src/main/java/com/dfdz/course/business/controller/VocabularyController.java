@@ -259,4 +259,18 @@ public class VocabularyController {
         return vocabularyService.countAllCountWordByCourse(courseId);
     }
 
+    /**
+     * 从unitIds中过滤出含有单词的单元
+     *
+     * @param unitIds
+     * @return
+     */
+    @GetMapping("/getUnitIdsByUnitIds")
+    Map<Long, Long> getUnitIdsByUnitIds(@RequestParam List<Long> unitIds) {
+        if (CollectionUtils.isEmpty(unitIds)) {
+            return new HashMap<>(16);
+        }
+        return vocabularyService.getUnitIdsByUnitIds(unitIds);
+    }
+
 }
