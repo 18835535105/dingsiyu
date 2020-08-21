@@ -15,7 +15,6 @@ spring:
       discovery:
         server-addr: nacos.duizhang100.cn:8848
         namespace: a8dd697b-5d6d-4844-bcc7-54a7732644e8
-        group: wuchenxi
   application:
     name: course
   zipkin:
