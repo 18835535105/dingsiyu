@@ -947,7 +947,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 flag = false;
             }
 
-            if (str.contains("$") || str.contains("#")) {
+            if (str.contains("$") || str.contains("#")||str.contains("@")) {
                 flag = false;
             }
             if (flag) {

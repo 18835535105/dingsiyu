@@ -374,30 +374,38 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 }
                 starti++;
             }
-            Random random = new Random();
-            int size = letterList.size() / 2;
-            wordCompletionStudyVo.setSize(size);
-            Map<Integer, Integer> map = new HashMap<>();
-            while (map.size() < size) {
-                int i = random.nextInt(letterList.size());
-                Integer integer = letterList.get(i);
-                map.put(integer, integer);
-            }
-            Set<Integer> integers = map.keySet();
+            if(word.equals("3D")||word.equals("3d")){
+                allList.add("3");
+                allList.add("$&$");
+                returnList.add("3");
+                returnList.add("D");
+            }else{
+                Random random = new Random();
+                int size = letterList.size() / 2;
+                wordCompletionStudyVo.setSize(size);
+                Map<Integer, Integer> map = new HashMap<>();
+                while (map.size() < size) {
+                    int i = random.nextInt(letterList.size());
+                    Integer integer = letterList.get(i);
+                    map.put(integer, integer);
+                }
+                Set<Integer> integers = map.keySet();
 
-            // StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < strList.size(); i++) {
-                if (integers.contains(i)) {
-                    String letts = strList.get(i);
-                    returnList.add(letts);
-                    allList.add("$&$");
-                    //builder.append("$&$");
-                } else {
-                    allList.add(strList.get(i));
-                    returnList.add(strList.get(i));
-                    //builder.append(strList.get(i));
+                // StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < strList.size(); i++) {
+                    if (integers.contains(i)) {
+                        String letts = strList.get(i);
+                        returnList.add(letts);
+                        allList.add("$&$");
+                        //builder.append("$&$");
+                    } else {
+                        allList.add(strList.get(i));
+                        returnList.add(strList.get(i));
+                        //builder.append(strList.get(i));
+                    }
                 }
             }
+
         } else {
             allList.add("$&$");
             returnList.add(word);
