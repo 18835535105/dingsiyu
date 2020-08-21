@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.zhidejiaoyu.common.dto.student.SaveStudentInfoToCenterDTO;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 
+import java.util.List;
+
 /**
  * @author: wuchenxi
  * @date: 2020/6/28 16:34:34
@@ -27,4 +29,6 @@ public interface UserInfoService extends IService<BusinessUserInfo> {
      * @return
      */
     Boolean saveUserInfo(SaveStudentInfoToCenterDTO dto);
+
+    Boolean saveUserInfos(List<SaveStudentInfoToCenterDTO> dto);
 }

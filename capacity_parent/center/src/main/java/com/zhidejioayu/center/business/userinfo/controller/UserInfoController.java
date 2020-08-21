@@ -8,6 +8,7 @@ import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 用户信息相关接口（教师、学生）
@@ -56,6 +57,17 @@ public class UserInfoController {
     @PostMapping("/saveUserInfo")
     public Boolean saveUserInfo(@RequestBody SaveStudentInfoToCenterDTO dto) {
         return userInfoService.saveUserInfo(dto);
+    }
+
+    /**
+     * 批量保存用户信息
+     *
+     * @param dto
+     * @return
+     */
+    @PostMapping("/saveUserInfos")
+    public Boolean saveUserInfo(@RequestBody List<SaveStudentInfoToCenterDTO> dto) {
+        return userInfoService.saveUserInfos(dto);
     }
 
     @GetMapping("/user")

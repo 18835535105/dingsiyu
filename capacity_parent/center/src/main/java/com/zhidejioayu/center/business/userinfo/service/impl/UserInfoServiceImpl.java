@@ -13,7 +13,9 @@ import com.zhidejioayu.center.business.userinfo.service.UserInfoService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author: wuchenxi
@@ -62,9 +64,22 @@ public class UserInfoServiceImpl extends ServiceImpl<BusinessUserInfoMapper, Bus
             return false;
         }
 
+        BusinessUserInfo businessUserInfo = getBusinessUserInfo(dto, serverConfig);
+
+        if (businessUserInfo == null) {
+            return true;
+        }
+
+        boolean save = this.save(businessUserInfo);
+        userInfoRedisOpt.saveUserInfoToCenterServer(businessUserInfo.getUserUuid());
+        return save;
+    }
+
+    private BusinessUserInfo getBusinessUserInfo(SaveStudentInfoToCenterDTO dto, ServerConfig serverConfig) {
+
         Boolean exist = userInfoRedisOpt.userInfoIsExist(dto.getUuid());
         if (exist) {
-            return true;
+            return null;
         }
 
         BusinessUserInfo businessUserInfo = new BusinessUserInfo();
@@ -76,9 +91,31 @@ public class UserInfoServiceImpl extends ServiceImpl<BusinessUserInfoMapper, Bus
         businessUserInfo.setServerConfigId(serverConfig.getId());
         businessUserInfo.setUpdateTime(new Date());
         businessUserInfo.setUserUuid(dto.getUuid());
+        return businessUserInfo;
+    }
 
-        boolean save = this.save(businessUserInfo);
-        userInfoRedisOpt.saveUserInfoToCenterServer(businessUserInfo.getUserUuid());
-        return save;
+    @Override
+    public Boolean saveUserInfos(List<SaveStudentInfoToCenterDTO> dto) {
+        String serverNo = dto.get(0).getServerNo();
+        ServerConfig serverConfig = serverConfigMapper.selectByServerNo(serverNo);
+        if (serverConfig == null) {
+            log.error("server_config未配置server_no=" + serverNo + "的服务器信息！请联系管理员！");
+            return false;
+        }
+
+        List<BusinessUserInfo> businessUserInfos = new ArrayList<>(dto.size());
+        dto.forEach(d -> {
+            BusinessUserInfo businessUserInfo = this.getBusinessUserInfo(d, serverConfig);
+            if (businessUserInfo != null) {
+                businessUserInfos.add(businessUserInfo);
+            }
+        });
+
+        boolean b = this.saveBatch(businessUserInfos);
+        if (b) {
+            businessUserInfos.forEach(businessUserInfo -> userInfoRedisOpt.saveUserInfoToCenterServer(businessUserInfo.getUserUuid()));
+        }
+
+        return b;
     }
 }
