@@ -377,6 +377,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             if(word.equals("3D")||word.equals("3d")){
                 allList.add("3");
                 allList.add("$&$");
+                returnList.add("3");
                 returnList.add("D");
             }else{
                 Random random = new Random();
