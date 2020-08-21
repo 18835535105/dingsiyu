@@ -45,4 +45,9 @@ public class UploadFlyRecordDTO {
      * 座位号（在家填写0）
      */
     private Integer siteNo;
+
+    /**
+     * 课时
+     */
+    private Integer studyHour;
 }
