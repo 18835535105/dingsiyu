@@ -117,4 +117,9 @@ public class CurrentDayOfStudy implements Serializable {
      */
     private Date createTime;
 
+    /**
+     * 课时
+     */
+    private Integer studyHour;
+
 }

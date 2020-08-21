@@ -22,11 +22,12 @@
         <result column="show" property="show"/>
         <result column="comment" property="comment"/>
         <result column="site_no" property="siteNo"/>
+        <result column="study_hour" property="studyHour"/>
     </resultMap>
 
     <sql id="base_sql">
         id,student_id,qr_code_num,img_url,gold,valid_time,online_time,study_model,word,sentence,`text`,syntax,test,create_time,
-    evaluate, `show`, `comment`, site_no
+    evaluate, `show`, `comment`, site_no, study_hour
     </sql>
 
     <select id="selectByDate" parameterType="map" resultMap="BaseResultMap">

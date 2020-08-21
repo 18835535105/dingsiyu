@@ -52,6 +52,7 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
                 .show(uploadFlyRecordDTO.getShow())
                 .comment(uploadFlyRecordDTO.getComment())
                 .siteNo(uploadFlyRecordDTO.getSiteNo())
+                .studyHour(uploadFlyRecordDTO.getStudyHour())
                 .build());
         if (!b) {
             return ServerResponse.createByError(500, "系统繁忙，请重试！");
