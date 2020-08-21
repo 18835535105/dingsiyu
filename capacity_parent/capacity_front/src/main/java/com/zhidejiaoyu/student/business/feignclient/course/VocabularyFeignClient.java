@@ -211,4 +211,13 @@ public interface VocabularyFeignClient {
      */
     @RequestMapping(value = "/countAllCountWordByCourse", method = RequestMethod.GET)
     int countAllCountWordByCourse(@RequestParam Long courseId);
+
+    /**
+     * 从unitIds中过滤出含有单词的单元
+     *
+     * @param unitIds
+     * @return
+     */
+    @GetMapping("/getUnitIdsByUnitIds")
+    Map<Long, Long> getUnitIdsByUnitIds(@RequestParam List<Long> unitIds);
 }

@@ -347,6 +347,9 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         // 匹配单元对应的课程id
         Map<Long, Long> unitIdAndCourseId = this.getUnitIdAndCourseId(unitIds);
 
+        // 查询有单词的单元id
+        Map<Long, Long> unitIdsMap = vocabularyFeignClient.getUnitIdsByUnitIds(unitIds);
+
         List<StudentStudyPlanNew> studentStudyPlanNews = new ArrayList<>(resultList.size());
 
         String grade = student.getGrade();
@@ -373,21 +376,24 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                     .updateTime(updateTime)
                     .unitId(unitId);
 
-            StudentStudyPlanNew easyStudentStudyPlan = studentStudyPlanNewBuilder
-                    .easyOrHard(1)
-                    .baseLevel(basePriority)
-                    .flowId(FlowConstant.BEFORE_GROUP_GAME_EASY)
-                    .finalLevel(basePriority + errorPriority + timePriority)
-                    .build();
-            studentStudyPlanNews.add(easyStudentStudyPlan);
+            if (unitIdsMap.containsKey(unitId)) {
+                // 如果当前单元没有单词，不初始化该单元单词、句型、课文的学习计划
+                StudentStudyPlanNew easyStudentStudyPlan = studentStudyPlanNewBuilder
+                        .easyOrHard(1)
+                        .baseLevel(basePriority)
+                        .flowId(FlowConstant.BEFORE_GROUP_GAME_EASY)
+                        .finalLevel(basePriority + errorPriority + timePriority)
+                        .build();
+                studentStudyPlanNews.add(easyStudentStudyPlan);
 
-            StudentStudyPlanNew hardStudentStudyPlan = studentStudyPlanNewBuilder
-                    .easyOrHard(2)
-                    .baseLevel(basePriority - PriorityUtil.HARD_NUM)
-                    .flowId(FlowConstant.BEFORE_GROUP_GAME_HARD)
-                    .finalLevel(basePriority - PriorityUtil.HARD_NUM + errorPriority + timePriority)
-                    .build();
-            studentStudyPlanNews.add(hardStudentStudyPlan);
+                StudentStudyPlanNew hardStudentStudyPlan = studentStudyPlanNewBuilder
+                        .easyOrHard(2)
+                        .baseLevel(basePriority - PriorityUtil.HARD_NUM)
+                        .flowId(FlowConstant.BEFORE_GROUP_GAME_HARD)
+                        .finalLevel(basePriority - PriorityUtil.HARD_NUM + errorPriority + timePriority)
+                        .build();
+                studentStudyPlanNews.add(hardStudentStudyPlan);
+            }
 
             StudentStudyPlanNew goldTestStudyPlan = studentStudyPlanNewBuilder
                     .easyOrHard(3)

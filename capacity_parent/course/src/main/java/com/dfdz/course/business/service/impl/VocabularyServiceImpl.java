@@ -1,16 +1,20 @@
 package com.dfdz.course.business.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dfdz.course.business.service.VocabularyService;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.UnitVocabularyNewMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleVocabularyMapper;
+import com.zhidejiaoyu.common.pojo.UnitVocabularyNew;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -144,6 +148,17 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
     @Override
     public int countAllCountWordByCourse(Long courseId) {
         return unitVocabularyNewMapper.countAllCountWordByCourse(courseId);
+    }
+
+    @Override
+    public Map<Long, Long> getUnitIdsByUnitIds(List<Long> unitIds) {
+        List<UnitVocabularyNew> unitVocabularyNews = unitVocabularyNewMapper.selectList(new LambdaQueryWrapper<UnitVocabularyNew>().in(UnitVocabularyNew::getUnitId, unitIds));
+        if (CollectionUtils.isEmpty(unitVocabularyNews)) {
+            return new HashMap<>(16);
+        }
+        Map<Long, Long> map = new HashMap<>(16);
+        unitVocabularyNews.forEach(unitVocabularyNew -> map.put(unitVocabularyNew.getUnitId(), unitVocabularyNew.getUnitId()));
+        return map;
     }
 
 
