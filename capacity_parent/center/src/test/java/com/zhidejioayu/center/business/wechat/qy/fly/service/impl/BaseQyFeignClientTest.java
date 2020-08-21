@@ -3,13 +3,13 @@ package com.zhidejioayu.center.business.wechat.qy.fly.service.impl;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejioayu.center.CenterApplication;
 import com.zhidejioayu.center.business.feignclient.qy.BaseQyFeignClient;
+import com.zhidejioayu.center.business.feignclient.util.FeignClientUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.annotation.Resource;
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
@@ -60,5 +60,12 @@ public class BaseQyFeignClientTest {
         ZonedDateTime sdt = sunday.atZone(zoneId);
         System.out.println(Date.from(zdt.toInstant()));
         System.out.println(Date.from(sdt.toInstant()));
+    }
+
+    @Test
+    public void getTodayCurrentDayOfStudy() {
+        BaseQyFeignClient server_01 = FeignClientUtil.getQyFeignClient("server1");
+        CurrentDayOfStudy todayCurrentDayOfStudy = server_01.getTodayCurrentDayOfStudy("4a07bbf8c3754332a1130cd65bb7b20e1592804883249");
+        log.info("todayCurrentDayOfStudy={}", todayCurrentDayOfStudy.toString());
     }
 }
