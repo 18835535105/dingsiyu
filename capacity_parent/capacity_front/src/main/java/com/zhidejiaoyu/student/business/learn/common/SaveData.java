@@ -376,7 +376,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 starti++;
             }
             if (letterList.size() < 2) {
-                for (int i = 0; i < strList.size(); strList.size()) {
+                for (int i = 0; i < strList.size(); i++) {
                     String letts = strList.get(i);
                     if(Pattern.matches(END_MATCH, letts)){
                         returnList.add(letts);
