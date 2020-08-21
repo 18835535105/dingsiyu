@@ -66,4 +66,12 @@ public interface VocabularyService extends IService<Vocabulary> {
     long countByUnitId(Long unitId);
 
     int countAllCountWordByCourse(Long courseId);
+
+    /**
+     * 从unitIds中过滤出含有单词的单元
+     *
+     * @param unitIds
+     * @return
+     */
+    Map<Long, Long> getUnitIdsByUnitIds(List<Long> unitIds);
 }
