@@ -1,9 +1,9 @@
 package com.zhidejiaoyu.student.business.wechat.qy.fly.controller;
 
-import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.dto.student.StudentStudyPlanListDto;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -63,6 +63,20 @@ public class QyFlyController {
     @GetMapping("/checkScanQrCode")
     public ServerResponse<Object> checkScanQrCode(@RequestParam Long studentId, @RequestParam Integer num) {
         return qyFlyService.checkScanQrCode(studentId, num);
+    }
+
+    /**
+     * 获取学生当前日期的智慧笔记
+     *
+     * @param uuid
+     * @return
+     */
+    @GetMapping("/getTodayCurrentDayOfStudy")
+    public CurrentDayOfStudy getTodayCurrentDayOfStudy(@RequestParam String uuid) {
+        if (StringUtil.isEmpty(uuid)) {
+            return new CurrentDayOfStudy();
+        }
+        return qyFlyService.getTodayCurrentDayOfStudy(uuid);
     }
 
     /**

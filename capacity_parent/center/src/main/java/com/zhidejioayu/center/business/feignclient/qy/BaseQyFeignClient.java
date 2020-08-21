@@ -126,4 +126,13 @@ public interface BaseQyFeignClient {
      */
     @GetMapping("/qy/fly/checkScanQrCode")
     ServerResponse<Object> checkScanQrCode(@RequestParam Long studentId, @RequestParam Integer num);
+
+    /**
+     * 获取学生当前日期的智慧笔记
+     *
+     * @param uuid
+     * @return
+     */
+    @GetMapping("/qy/fly/getTodayCurrentDayOfStudy")
+    CurrentDayOfStudy getTodayCurrentDayOfStudy(@RequestParam String uuid);
 }
