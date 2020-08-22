@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.business.login.controller;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.currentdayofstudy.StudyTimeAndMileageVO;
 import com.zhidejiaoyu.student.business.controller.BaseController;
@@ -38,13 +37,12 @@ public class LoginController extends BaseController {
      */
     @PostMapping("/judge")
     public ServerResponse<Object> loginJudge(String account, String password) {
-        throw new ServiceException("123");
-//        if (StringUtils.isEmpty(account) || StringUtils.isEmpty(password)) {
-//            return ServerResponse.createByErrorMessage("用户名和密码不能为空！");
-//        }
-//        account = account.trim();
-//        password = password.trim();
-//        return newLoginService.loginJudge(account, password);
+        if (StringUtils.isEmpty(account) || StringUtils.isEmpty(password)) {
+            return ServerResponse.createByErrorMessage("用户名和密码不能为空！");
+        }
+        account = account.trim();
+        password = password.trim();
+        return newLoginService.loginJudge(account, password);
 
     }
 
