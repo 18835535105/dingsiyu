@@ -52,7 +52,7 @@ public class CatchException {
      * @param request
      */
     @ExceptionHandler(ServiceException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.GATEWAY_TIMEOUT)
     @ResponseBody
     public ServerResponse<Object> knownException(ServiceException e, HttpServletRequest request) {
         packageLogMsg(e, request);
