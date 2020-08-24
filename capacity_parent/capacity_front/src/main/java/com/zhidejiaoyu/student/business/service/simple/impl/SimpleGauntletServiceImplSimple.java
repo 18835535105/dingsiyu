@@ -112,7 +112,6 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         Student student = getStudent(session);
         //更改过时挑战
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
-        long startIndex = (page - 1) * rows;
         Map<String, Object> returnMap = new HashMap<>();
 
         List<Long> studentIds;
