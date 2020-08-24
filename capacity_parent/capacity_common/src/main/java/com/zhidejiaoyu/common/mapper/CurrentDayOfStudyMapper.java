@@ -78,4 +78,11 @@ public interface CurrentDayOfStudyMapper extends BaseMapper<CurrentDayOfStudy> {
      */
     @Select("select count(id) from current_day_of_study where student_id = #{studentId} and qr_code_num = #{num}")
     int countByStudentIdAndQrCodeNum(@Param("studentId") Long studentId, @Param("num") Integer num);
+
+    /**
+     * 查询学生今天的智慧笔记记录
+     * @param studentId
+     * @return
+     */
+    CurrentDayOfStudy selectTodayByStudentId(@Param("studentId") Long studentId);
 }

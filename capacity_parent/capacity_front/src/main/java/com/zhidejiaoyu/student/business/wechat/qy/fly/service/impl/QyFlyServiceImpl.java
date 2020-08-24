@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.dto.student.StudentStudyPlanListDto;
-import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -157,5 +156,11 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
             return ServerResponse.createByError(400, "已经上传，再上传将覆盖原有信息！是否继续上传？");
         }
         return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public CurrentDayOfStudy getTodayCurrentDayOfStudy(String uuid) {
+        Student student = studentMapper.selectByUuid(uuid);
+        return currentDayOfStudyMapper.selectTodayByStudentId(student.getId());
     }
 }

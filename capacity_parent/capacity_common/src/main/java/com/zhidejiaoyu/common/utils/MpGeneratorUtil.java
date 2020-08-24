@@ -24,7 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"student_wechat_video"};
+        String[] tableName = {"withdrawal_record","order_item_detail","order_item","heart_config","heart_opt_record","heart_account"};
 
         /*
          * 配置：
@@ -60,7 +60,7 @@ public class MpGeneratorUtil {
                 //设置数据库类型
                 .setDbType(DbType.MYSQL)
 //                .setUrl("jdbc:mysql://192.168.0.2:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false")
-                .setUrl("jdbc:mysql://123.56.142.84:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false")
+                .setUrl("jdbc:mysql://123.56.142.84:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false")
                 .setUsername("zdjy")
                 .setPassword("zdjy")
                 .setDriverName("com.mysql.cj.jdbc.Driver");

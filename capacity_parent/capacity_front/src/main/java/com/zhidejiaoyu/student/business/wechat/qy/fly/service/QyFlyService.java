@@ -1,12 +1,10 @@
 package com.zhidejiaoyu.student.business.wechat.qy.fly.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.dto.student.StudentStudyPlanListDto;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -45,7 +43,7 @@ public interface QyFlyService extends IService<CurrentDayOfStudy> {
      * 获取学生智慧飞行记录日历
      *
      * @param uuid
-     * @param month  指定月份
+     * @param month 指定月份
      * @return
      */
     List<String> getFlyCalendar(String uuid, String month);
@@ -58,4 +56,12 @@ public interface QyFlyService extends IService<CurrentDayOfStudy> {
      * @return
      */
     ServerResponse<Object> checkScanQrCode(Long studentId, Integer num);
+
+    /**
+     * 获取当天的智慧笔记记录
+     *
+     * @param uuid
+     * @return
+     */
+    CurrentDayOfStudy getTodayCurrentDayOfStudy(String uuid);
 }

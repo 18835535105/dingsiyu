@@ -357,6 +357,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         return wordCompletionStudyVo;
     }
 
+
     private void getStudyWordComplets(String word, Map<String, Object> returnMap, WordCompletionStudyVo wordCompletionStudyVo) {
         char[] chars = word.toCharArray();
         List<String> returnList = new ArrayList<>();
@@ -374,12 +375,18 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 }
                 starti++;
             }
-            if(word.equals("3D")||word.equals("3d")){
-                allList.add("3");
-                allList.add("$&$");
-                returnList.add("3");
-                returnList.add("D");
-            }else{
+            if (letterList.size() < 2) {
+                for (int i = 0; i < strList.size(); i++) {
+                    String letts = strList.get(i);
+                    if(Pattern.matches(END_MATCH, letts)){
+                        returnList.add(letts);
+                        allList.add("$&$");
+                    }else{
+                        allList.add(letts);
+                        returnList.add(letts);
+                    }
+                }
+            } else {
                 Random random = new Random();
                 int size = letterList.size() / 2;
                 wordCompletionStudyVo.setSize(size);
@@ -467,12 +474,12 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
      * @return 如果当前单词是本单元最后一个单词，返回 null
      */
     private Object getNextMemoryWord(HttpSession session, Long unitId, Student student, boolean firstStudy,
-                                                     Integer plan, Integer wordCount, Integer group, Integer type, String studyModel) {
+                                     Integer plan, Integer wordCount, Integer group, Integer type, String studyModel) {
         if (wordCount - 1 >= plan) {
             // 记录学生开始学习该单词的时间
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
             Vocabulary currentStudyWord = getVocabulary(unitId, student, group, studyModel);
-            if(currentStudyWord==null){
+            if (currentStudyWord == null) {
                 return super.toUnitTest();
             }
             // 查询单词释义
