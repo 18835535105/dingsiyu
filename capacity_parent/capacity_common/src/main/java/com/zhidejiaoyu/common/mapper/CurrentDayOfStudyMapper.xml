@@ -81,5 +81,13 @@
         </if>
         limit 1
     </select>
+    <select id="selectTodayByStudentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from current_day_of_study
+        where student_id = #{studentId}
+        and to_days(create_time) = to_days(now())
+        limit 1
+    </select>
 
 </mapper>
