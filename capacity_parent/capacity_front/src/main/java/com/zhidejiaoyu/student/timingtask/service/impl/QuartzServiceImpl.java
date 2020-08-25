@@ -433,7 +433,10 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 bin.setOperateUserId(student.getTeacherId());
                 bin.setOperateUserName("管理员");
                 bin.setStudentId(student.getId());
-                saveList.add(bin);
+                if (student.getTeacherId() != null) {
+                    saveList.add(bin);
+                }
+
                 // 清除学生排行缓存
                 rankOpt.deleteGoldRank(student);
                 rankOpt.deleteCcieRank(student);
@@ -441,7 +444,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 rankOpt.deleteWorshipRank(student);
                 builder.append("账号：").append(student.getAccount()).append(" 姓名：")
                         .append(student.getStudentName())
-                        .append(" 学校：").append(student.getSchoolName() + ",");
+                        .append(" 学校：").append(student.getSchoolName()).append(",");
             });
             RunLog runLog = new RunLog();
             runLog.setType(3);
