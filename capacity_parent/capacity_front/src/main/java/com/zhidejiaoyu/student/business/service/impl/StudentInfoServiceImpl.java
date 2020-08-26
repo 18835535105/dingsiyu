@@ -50,9 +50,6 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     private StudentMapper studentMapper;
 
     @Autowired
-    private RunLogMapper runLogMapper;
-
-    @Autowired
     private AwardMapper awardMapper;
 
     @Autowired
@@ -624,7 +621,8 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     public boolean goldSmallAppCountLimit(String openId) {
         Student student = studentMapper.selectByOpenId(openId);
         Long studentId = student.getId();
-        Object o = redisTemplate.opsForHash().get(RedisKeysConst.STUDENT_SMALL_APP_DAY_TOTAL_GOLD, studentId);
+        String key = RedisKeysConst.STUDENT_SMALL_APP_DAY_TOTAL_GOLD + ":" + DateUtil.formatYYYYMMDD(new Date());
+        Object o = redisTemplate.opsForHash().get(key, studentId);
         if (o != null && (int) o >= GoldUtil.SMALL_APP_MAX_GOLD) {
             return true;
         }

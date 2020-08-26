@@ -151,16 +151,17 @@ public class GoldUtil {
             return 0;
         }
 
-        Object o = redisTemplateStatic.opsForHash().get(RedisKeysConst.STUDENT_SMALL_APP_DAY_TOTAL_GOLD, student.getId());
+        String key = RedisKeysConst.STUDENT_SMALL_APP_DAY_TOTAL_GOLD+ ":" + DateUtil.formatYYYYMMDD(new Date());
+        Object o = redisTemplateStatic.opsForHash().get(key, student.getId());
 
         int canAddGold;
         if (o == null) {
             canAddGold = Math.min(SMALL_APP_MAX_GOLD, gold);
-            saveCacheGold(student, canAddGold, RedisKeysConst.STUDENT_SMALL_APP_DAY_TOTAL_GOLD);
+            saveCacheGold(student, canAddGold, key);
         } else {
             int todaySmallAppGold = (int) o;
             canAddGold = Math.abs(Math.min(SMALL_APP_MAX_GOLD - todaySmallAppGold, gold));
-            saveCacheGold(student, canAddGold + todaySmallAppGold, RedisKeysConst.STUDENT_SMALL_APP_DAY_TOTAL_GOLD);
+            saveCacheGold(student, canAddGold + todaySmallAppGold, key);
         }
 
         if (canAddGold == 0) {
