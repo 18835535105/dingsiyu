@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.dto.EndValidTimeDto;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.level.ChildMedalVo;
@@ -370,7 +371,8 @@ public class StudentInfoController extends BaseController {
         Long studentId = super.getStudentId();
         Map<String, Object> map = new HashMap<>(16);
         boolean b = studentInfoService.goldCountLimit(studentId);
-        Object o = redisTemplate.opsForHash().get(RedisKeysConst.STUDENT_DAY_TOTAL_GOLD, studentId);
+        String key = RedisKeysConst.STUDENT_DAY_TOTAL_GOLD + ":" + DateUtil.formatYYYYMMDD(new Date());
+        Object o = redisTemplate.opsForHash().get(key, studentId);
         map.put("limit", b);
         map.put("gold", o == null ? 0 : o);
 

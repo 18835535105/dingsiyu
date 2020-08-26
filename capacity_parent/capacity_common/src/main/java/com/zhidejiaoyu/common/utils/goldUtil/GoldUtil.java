@@ -4,12 +4,14 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -108,10 +110,11 @@ public class GoldUtil {
             return 0;
         }
 
-        Object o = redisTemplateStatic.opsForHash().get(RedisKeysConst.STUDENT_DAY_TOTAL_GOLD, student.getId());
+        String key = RedisKeysConst.STUDENT_DAY_TOTAL_GOLD + ":" + DateUtil.formatYYYYMMDD(new Date());
+        Object o = redisTemplateStatic.opsForHash().get(key, student.getId());
         if (o == null) {
             int min = Math.min(MAX_GOLD, gold);
-            saveCacheGold(student, min, RedisKeysConst.STUDENT_DAY_TOTAL_GOLD);
+            saveCacheGold(student, min, key);
             return min;
         }
 
@@ -122,7 +125,7 @@ public class GoldUtil {
         }
 
         int min = Math.abs(Math.min(MAX_GOLD - todayTotalGold, gold));
-        saveCacheGold(student, min + todayTotalGold, RedisKeysConst.STUDENT_DAY_TOTAL_GOLD);
+        saveCacheGold(student, min + todayTotalGold, key);
         return min;
     }
 

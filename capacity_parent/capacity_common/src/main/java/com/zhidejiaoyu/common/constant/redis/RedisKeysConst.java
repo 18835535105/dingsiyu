@@ -286,7 +286,7 @@ public interface RedisKeysConst {
     /**
      * 学生今天已经获取的总金币数
      */
-    String STUDENT_DAY_TOTAL_GOLD = "STUDENT_DAY_TOTAL_GOLD:" + ServerNoConstant.SERVER_NO + ":" + DateUtil.formatYYYYMMDD(new Date());
+    String STUDENT_DAY_TOTAL_GOLD = "STUDENT_DAY_TOTAL_GOLD:" + ServerNoConstant.SERVER_NO;
 
     /**
      * 学生今天微信小程序已经获取的金币总数

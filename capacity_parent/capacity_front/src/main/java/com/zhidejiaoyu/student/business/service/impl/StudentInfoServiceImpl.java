@@ -615,7 +615,8 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
     @Override
     public boolean goldCountLimit(Long studentId) {
-        Object o = redisTemplate.opsForHash().get(RedisKeysConst.STUDENT_DAY_TOTAL_GOLD, studentId);
+        String key = RedisKeysConst.STUDENT_DAY_TOTAL_GOLD + ":" + DateUtil.formatYYYYMMDD(new Date());
+        Object o = redisTemplate.opsForHash().get(key, studentId);
         return o != null && (int) o >= GoldUtil.MAX_GOLD;
     }
 
