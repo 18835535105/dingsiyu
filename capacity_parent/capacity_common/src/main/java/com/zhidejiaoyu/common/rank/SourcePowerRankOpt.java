@@ -9,6 +9,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 源分战力排行
@@ -51,6 +53,27 @@ public class SourcePowerRankOpt extends BaseRankOpt {
         } catch (Exception e) {
             log.error("修改学生[{} - {} - {}]源分战力排行出错！", studentId, student.getAccount(), student.getStudentName());
         }
+    }
+
+    /**
+     * 删除学生源分战力排行
+     *
+     * @param studentId
+     */
+    public void deleteSourcePower(Long studentId) {
+        this.deleteSourcePower(Collections.singletonList(studentId));
+    }
+
+    /**
+     * 删除学生源分战力排行
+     *
+     * @param studentIds
+     */
+    public void deleteSourcePower(List<Long> studentIds) {
+        redisTemplate.opsForZSet().remove(SourcePowerKeysConst.COUNTRY_RANK, studentIds);
+        redisTemplate.opsForZSet().remove(SourcePowerKeysConst.SCHOOL_RANK, studentIds);
+        redisTemplate.opsForZSet().remove(SourcePowerKeysConst.SERVER_RANK, studentIds);
+        log.info("学生id={}已被删除，其源分战力排行已被删除！", studentIds.toString());
     }
 
     /**
