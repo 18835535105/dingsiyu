@@ -386,6 +386,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
         Map<String, Object> sel = new HashMap<>();
         //获取能量数量
         sel.put("energy", student.getEnergy());
+        sel.put("sex",student.getSex());
         //判断是否为当天第一次抽奖
         if (integer > 0) {
             sel.put("first", false);
