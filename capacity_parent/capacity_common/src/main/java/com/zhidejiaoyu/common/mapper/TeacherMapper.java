@@ -82,4 +82,7 @@ public interface TeacherMapper extends BaseMapper<Teacher> {
      * @return
      */
     Teacher selectSchoolAdminById(@Param("schoolAdminId") Integer schoolAdminId);
+
+    @Select("select teacher_id from teacher where school_admin_id =#{adminId} and teacher_id is not null")
+    List<Long> selectTeacherIdsBySchoolAdminId(Integer adminId);
 }

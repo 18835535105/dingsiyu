@@ -74,6 +74,18 @@ public class PrizeExchangeList extends Model<PrizeExchangeList> {
     @TableField("describes")
     private String describes;
 
+    /**
+     * 教师id
+     */
+    @TableField("teacher_id")
+    private Long teacherId;
+
+    @TableField("type")
+    private Integer type;
+
+    @TableField(exist = false)
+    private String schoolName;
+
 
     public Long getId() {
         return id;
