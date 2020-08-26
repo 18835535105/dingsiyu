@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.pojo.WeekActivityConfig;
 import com.zhidejiaoyu.common.pojo.WeekActivityRank;
 import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.student.business.activity.service.WeekActivityRankService;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartWeekActivityService;
@@ -132,8 +133,8 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
                 for (int i = 0; i < size; i++) {
                     Student student = studentMapper.selectById(serverBetterTenStudentIds.get(i));
                     int awardGold = SERVER_AWARD_GOLD_MAP.get(i);
-                    student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
-                    studentMapper.updateById(student);
+
+                    awardGold = GoldUtil.addStudentGold(student, awardGold);
 
                     GoldLogUtil.saveStudyGoldLog(student.getId(), GoldLogReasonConstant.WEEK_ACTIVITY_SERVER_RANK, awardGold);
                 }
@@ -196,8 +197,8 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
                     for (int i = 0; i < size; i++) {
                         Student student = studentMapper.selectById(betterTenStudentIds.get(i));
                         int awardGold = SERVER_AWARD_GOLD_MAP.get(i) / 2;
-                        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
-                        studentMapper.updateById(student);
+
+                        awardGold = GoldUtil.addStudentGold(student, awardGold);
 
                         GoldLogUtil.saveStudyGoldLog(student.getId(), GoldLogReasonConstant.WEEK_ACTIVITY_RANK, awardGold);
                     }

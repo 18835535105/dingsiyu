@@ -279,4 +279,14 @@ public interface RedisKeysConst {
      * 记录teacher最大账号数值
      */
     String MAX_TEACHER_ACCOUNT = "MAX_TEACHER_ACCOUNT:";
+
+    /**
+     * 学生今天已经获取的总金币数
+     */
+    String STUDENT_DAY_TOTAL_GOLD = "STUDENT_DAY_TOTAL_GOLD:" + ServerNoConstant.SERVER_NO;
+
+    /**
+     * 学生今天微信小程序已经获取的金币总数
+     */
+    String STUDENT_SMALL_APP_DAY_TOTAL_GOLD = "STUDENT_SMALL_APP_DAY_TOTAL_GOLD:" + ServerNoConstant.SERVER_NO;
 }

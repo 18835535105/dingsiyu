@@ -11,6 +11,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.StringUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
@@ -203,9 +204,9 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
             } else {
                 awardEnergy = awardGold = 3;
             }
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
+
             student.setEnergy(awardEnergy);
-            studentMapper.updateById(student);
+            awardGold = GoldUtil.addStudentGold(student, awardGold);
             GoldLogUtil.saveStudyGoldLog(student.getId(), SyntaxModelNameConstant.GAME, awardGold);
         }
 

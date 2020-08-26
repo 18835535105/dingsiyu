@@ -13,8 +13,8 @@ import com.zhidejiaoyu.common.mapper.center.WeChatMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.pojo.center.WeChat;
 import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -34,6 +34,7 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 首页数据
@@ -63,13 +64,15 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     private ClockInMapper clockInMapper;
     @Resource
     private WeChatMapper weChatMapper;
-
     @Resource
     private WeekActivityRankOpt weekActivityRankOpt;
-
     private final CourseFeignClient courseFeignClient;
     @Resource
     private VocabularyFeignClient vocabularyFeignClient;
+    /**
+     * 以字母或数字结尾
+     */
+    final String MATCH = ".*[a-zA-Z]$";
 
     public SmallProgramTestServiceImpl(CourseFeignClient courseFeignClient) {
         this.courseFeignClient = courseFeignClient;
@@ -210,10 +213,9 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
         // 金币加成
         Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, awardGold);
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldAddition));
-        studentMapper.updateById(student);
+        int canAddGold = GoldUtil.addStudentGold(student, goldAddition);
 
-        GoldLogUtil.saveStudyGoldLog(studentId, GenreConstant.SMALLAPP_GENRE, (int) Math.floor(goldAddition));
+        GoldLogUtil.saveStudyGoldLog(studentId, GenreConstant.SMALLAPP_GENRE, canAddGold);
     }
 
     /**
@@ -301,10 +303,55 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             returnMap.put("answer", map.get("word"));
             returnMap.put("wordList", getWordList(map.get("word").toString()));
             returnMap.put("listenUtrl", map.get("listenUtrl"));
+            getWriteSpace(returnMap, map.get("word").toString());
             returnList.add(returnMap);
         });
 
         return returnList;
+    }
+
+    @Override
+    public void getWriteSpace(Map<String, Object> returnMap, String word) {
+        char[] chars = word.toCharArray();
+        //获取字母位置
+        List<Integer> inteList = new ArrayList<>();
+        for (int i = 0; i < chars.length; i++) {
+            if (Pattern.matches(MATCH, chars[i] + "")) {
+                inteList.add(i);
+            }
+        }
+        Random random = new Random();
+        //获取字母数量
+        Integer spaceSize = random.nextInt(inteList.size());
+        if (spaceSize >= 10) {
+            spaceSize = 10;
+        } else if (inteList.size() <= 2) {
+            spaceSize = inteList.size();
+        } else if (inteList.size() >= 2 && spaceSize < 2) {
+            spaceSize = 2;
+        }
+
+        //获取空格位置
+        Map<Integer, Integer> map = new HashMap<>();
+        while (!spaceSize.equals(map.size())) {
+            int space = random.nextInt(inteList.size());
+            Integer integer = inteList.get(space);
+            map.put(integer, integer);
+        }
+        Set<Integer> mapKey = map.keySet();
+        List<String> spaceList = new ArrayList<>();
+        List<String> letterList = new ArrayList<>();
+        for (Integer i = 0; i < chars.length; i++) {
+            if (mapKey.contains(i)) {
+                spaceList.add(null);
+                letterList.add(chars[i] + "");
+            } else {
+                spaceList.add(chars[i] + "");
+            }
+        }
+        Collections.sort(letterList, String.CASE_INSENSITIVE_ORDER);
+        returnMap.put("spaceList", spaceList);
+        returnMap.put("letterList", letterList);
     }
 
 

@@ -14,9 +14,9 @@ import com.zhidejiaoyu.common.dto.testbeforestudy.SaveSubjectsDTO;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.grade.GradeUtil;
 import com.zhidejiaoyu.common.utils.grade.LabelUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
@@ -240,21 +240,21 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
         // 奖励的金币数
         Integer point = dto.getPoint();
-        int awardGold = GoldChange.getWordUnitTestGold(student, point);
+
         // 奖励的能量数
         int energy = super.getEnergy(student, point, 0);
 
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
-        studentMapper.updateById(student);
+        int awardGold = GoldChange.getWordUnitTestGold(student, point);
+        int canAddGold = GoldUtil.addStudentGold(student, awardGold);
 
         TestResultVo vo = new TestResultVo();
 
-        TestRecord testRecord = this.saveTestRecord(student, dto, awardGold);
+        TestRecord testRecord = this.saveTestRecord(student, dto, canAddGold);
         String msg = TestServiceImpl.getTestMessage(student, vo, testRecord, PointConstant.FIFTY, petSayUtil);
 
         vo.setMsg(msg);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, GenreConstant.UNIT_TEST, null));
-        vo.setGold(awardGold);
+        vo.setGold(canAddGold);
         vo.setEnergy(energy);
 
         super.getLevel(httpSession);

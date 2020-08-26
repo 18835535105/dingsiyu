@@ -2,8 +2,6 @@ package com.zhidejiaoyu.student.business.service.simple.impl;
 
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.vo.simple.AwardVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
@@ -11,9 +9,11 @@ import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.simple.AwardVo;
 import com.zhidejiaoyu.student.business.service.simple.SimpleAwardServiceSimple;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -460,13 +460,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                     // 金币奖励
                     awardType = award.getType() == 1 ? "日奖励" : "任务奖励";
                     // 更新学生金币信息
-                    student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
-                    try {
-                        simpleStudentMapper.updateById(student);
-                    } catch (Exception e) {
-                        log.error("id为[{}]的学生在领取[{}]中[{}]奖励时更新学生金币信息出错", student.getId(), awardType, awardContent, e);
-                        return ServerResponse.createByErrorMessage("更新学生金币信息出错!");
-                    }
+                    awardGold = GoldUtil.addStudentGold(student, awardGold);
                     // 保存领取奖励日志
                     try {
                         GoldLogUtil.saveStudyGoldLog(student.getId(), awardType, awardGold);

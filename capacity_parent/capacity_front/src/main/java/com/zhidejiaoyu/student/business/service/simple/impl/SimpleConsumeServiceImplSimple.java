@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.mapper.simple.SimpleRunLogMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleStudentMapper;
 import com.zhidejiaoyu.common.pojo.Consume;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.student.business.service.simple.SimpleConsumeServiceSimple;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class SimpleConsumeServiceImplSimple extends SimpleBaseServiceImpl<Simple
         Student student = super.getStudent(session);
         if (type == 1) {
             Consume consume = getConsume("金币消耗", type, number, student.getId().intValue(), 2);
-            Integer result = simpleConsumeMapper.insert(consume);
+            int result = simpleConsumeMapper.insert(consume);
             if (result > 0) {
                 student.setSystemGold(student.getSystemGold() - number);
                 student.setOfflineGold(student.getOfflineGold() + number);
@@ -55,7 +56,7 @@ public class SimpleConsumeServiceImplSimple extends SimpleBaseServiceImpl<Simple
             }
         } else if (type == 2) {
             Consume consume = getConsume("钻石消耗", type, number, student.getId().intValue(), 2);
-            Integer result = simpleConsumeMapper.insert(consume);
+            int result = simpleConsumeMapper.insert(consume);
             if (result > 0) {
                 Integer diamond = student.getDiamond();
                 student.setDiamond(diamond - number);
@@ -76,15 +77,12 @@ public class SimpleConsumeServiceImplSimple extends SimpleBaseServiceImpl<Simple
         Student student = super.getStudent(session);
         if (type == 1) {
             Consume consume = getConsume("金币增加", type, number, student.getId().intValue(), 1);
-            Integer result = simpleConsumeMapper.insert(consume);
+            int result = simpleConsumeMapper.insert(consume);
             if (result > 0) {
-                student.setSystemGold(student.getSystemGold() + number);
-                int i = simpleStudentMapper.updateByPrimaryKey(student);
-                if (i > 0) {
-                    session.setAttribute(UserConstant.CURRENT_STUDENT, student);
-                    getLevel(session);
-                    return 1;
-                }
+                GoldUtil.addStudentGold(student, number);
+                session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+                getLevel(session);
+                return 1;
             }
         } else if (type == 2) {
             Consume consume = getConsume("钻石增加", type, number, student.getId().intValue(), 1);

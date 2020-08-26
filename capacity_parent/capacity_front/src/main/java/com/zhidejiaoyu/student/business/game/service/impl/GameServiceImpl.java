@@ -8,7 +8,7 @@ import com.zhidejiaoyu.common.constant.session.SessionConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -277,11 +277,10 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         saveGameScore(session, gameScore, student, gameStore);
 
         if (gameScore.getAwardGold() > 0) {
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gameScore.getAwardGold()));
-            studentMapper.updateById(student);
+            int canAddGold = GoldUtil.addStudentGold(student, gameScore.getAwardGold());
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
             try {
-                GoldLogUtil.saveStudyGoldLog(student.getId(), gameStore.getGameName(), gameScore.getAwardGold());
+                GoldLogUtil.saveStudyGoldLog(student.getId(), gameStore.getGameName(), canAddGold);
             } catch (Exception e) {
                 log.error("保存学生[{} - {} - {}]游戏[{}]结果出错！需要奖励[{}]枚金币！", student.getId(), student.getAccount(),
                         student.getStudentName(), gameStore.getGameName(), gameScore.getAwardGold(), e);
