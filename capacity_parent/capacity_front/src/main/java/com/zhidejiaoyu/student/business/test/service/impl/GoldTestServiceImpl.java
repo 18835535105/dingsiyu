@@ -17,6 +17,7 @@ import com.zhidejiaoyu.common.pojo.TestStore;
 import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.StringUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
@@ -233,6 +234,8 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
             goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, 10);
         }
 
+        goldAddition = GoldUtil.addStudentGold(student, (int) goldAddition);
+
         testResultVo.setMsg(testMessage);
         testResultVo.setGold(BigDecimalUtil.convertsToInt(goldAddition));
         testResultVo.setEnergy(0);
@@ -256,9 +259,6 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
         testRecord.setAwardGold(BigDecimalUtil.convertsToInt(goldAddition));
         testRecord.setExplain(testMessage);
         testRecordMapper.insert(testRecord);
-
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldAddition));
-        studentMapper.updateById(student);
 
         GoldLogUtil.saveStudyGoldLog(student.getId(), GenreConstant.GOLD_TEST, BigDecimalUtil.convertsToInt(goldAddition));
 

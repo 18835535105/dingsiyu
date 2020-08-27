@@ -17,52 +17,11 @@ public interface ConsumeService extends BaseService<Consume> {
 
     /**
      * 减少金币或钻石
+     *
      * @param type
      * @param number
      * @param session
      * @return
      */
     int reduceConsume(int type, int number, HttpSession session);
-
-    /**
-     * 增加金币或钻石
-     * @param type
-     * @param number
-     * @param session
-     * @return
-     */
-    int addConsume(int type, int number, HttpSession session);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

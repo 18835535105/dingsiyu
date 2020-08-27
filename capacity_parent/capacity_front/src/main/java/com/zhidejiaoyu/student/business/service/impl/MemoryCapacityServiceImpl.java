@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.service.impl;
 
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.constant.PetMP3Constant;
 import com.zhidejiaoyu.common.mapper.EegRecordingMapper;
 import com.zhidejiaoyu.common.mapper.MemoryCapacityMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
@@ -8,11 +9,11 @@ import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.EegRecording;
 import com.zhidejiaoyu.common.pojo.MemoryCapacity;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.constant.PetMP3Constant;
-import com.zhidejiaoyu.student.business.service.MemoryCapacityService;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.service.MemoryCapacityService;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -281,8 +282,7 @@ public class MemoryCapacityServiceImpl
         }
         //保存金币
         if (gold > 0) {
-            student.setSystemGold(student.getSystemGold() + gold);
-            studentMapper.updateById(student);
+            gold = GoldUtil.addStudentGold(student, gold);
             String model = null;
             if (eegRecording.getType() == 1) {
                 model = "记忆大挑战";
@@ -377,9 +377,9 @@ public class MemoryCapacityServiceImpl
         memoryCapacity.setType(type);
         memoryCapacityMapper.insert(memoryCapacity);
 
-        student.setSystemGold(student.getSystemGold() + gold);
         student.setEnergy(student.getEnergy() + energy);
-        studentMapper.updateById(student);
+        gold = GoldUtil.addStudentGold(student, gold);
+
         if (gold > 0) {
             GoldLogUtil.saveStudyGoldLog(student.getId(), model, gold);
         }

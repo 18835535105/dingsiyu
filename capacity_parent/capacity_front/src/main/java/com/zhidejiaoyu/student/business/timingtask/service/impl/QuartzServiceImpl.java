@@ -1,11 +1,13 @@
 package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.zhidejiaoyu.common.constant.GradeNameConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
+import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
@@ -16,7 +18,6 @@ import com.zhidejiaoyu.student.common.redis.AwardRedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -156,8 +157,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private UnitFeignClient unitFeignClient;
     @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
-    @Autowired
-    private CourseFeignClient courseFeignClient;
+    private final CourseFeignClient courseFeignClient;
     @Resource
     private SchoolTimeMapper schoolTimeMapper;
     @Resource
@@ -170,6 +170,13 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private TotalHistoryPlanMapper totalHistoryPlanMapper;
     @Resource
     private StudentEquipmentMapper studentEquipmentMapper;
+
+    @Resource
+    private SourcePowerRankOpt sourcePowerRankOpt;
+
+    public QuartzServiceImpl(CourseFeignClient courseFeignClient) {
+        this.courseFeignClient = courseFeignClient;
+    }
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
@@ -422,6 +429,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 learnHistoryMapper.deleteByStudentIds(studentIds);
                 studentEquipmentMapper.deleteByStudentIds(studentIds);
                 recycleBinMapper.deleteByStudentIds(studentIds);
+                sourcePowerRankOpt.deleteSourcePower(studentIds);
                 this.resetRecord(studentIds);
                 studentMapper.deleteByIds(studentIds);
                 RunLog runLog = new RunLog();
@@ -699,7 +707,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     for (Map<String, Object> returnMap : studyModelList) {
                         String garde = returnMap.get("grade").toString();
                         String timeGrade = returnMap.get("timeGrade").toString();
-                        if (garde.equals("高中")) {
+                        if (garde.equals(GradeNameConstant.HIGH)) {
                             if (timeGrade.equals(grade)) {
                                 studentMap = returnMap;
                             }

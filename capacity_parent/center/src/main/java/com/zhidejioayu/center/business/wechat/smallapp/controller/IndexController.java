@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.StudyOverviewVO;
 import com.zhidejioayu.center.business.feignclient.util.FeignClientUtil;
 import com.zhidejioayu.center.business.serverconfig.service.ServerConfigService;
 import com.zhidejioayu.center.business.feignclient.smallapp.BaseSmallAppFeignClient;
+import com.zhidejioayu.center.business.util.ServerConfigUtil;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeDTO;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.IndexService;
 import org.apache.commons.lang.StringUtils;
@@ -158,6 +159,20 @@ public class IndexController {
             dto.setOrderBy("asc");
         }
         return smallAppIndexService.prize(dto);
+    }
+
+    /**
+     * 判断学生今日金币获取是否已达到上限
+     *
+     * @return true:达到上限；false：还没有达到上限
+     */
+    @GetMapping("/goldCountLimit")
+    public ServerResponse<Object> goldCountLimit(String openId) {
+        if (StringUtil.isEmpty(openId)) {
+            throw new ServiceException("openId can't be null");
+        }
+        BaseSmallAppFeignClient baseSmallAppFeignClient = FeignClientUtil.getBaseSmallAppFeignClient(openId);
+        return baseSmallAppFeignClient.goldCountLimit(openId);
     }
 
 }
