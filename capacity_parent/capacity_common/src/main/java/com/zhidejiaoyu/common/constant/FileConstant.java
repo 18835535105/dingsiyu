@@ -83,6 +83,11 @@ public interface FileConstant {
      */
     String TEST_STORE_IMG = "imgs/testImg/";
 
+    /**
+     * 保存奖品封面路径
+     */
+     String PRIZE_IMG = "imgs/prizeImg/";
+
     interface PetNameConstant {
         String DAMINGBAI = "/static/img/edit-user-msg/tips1-1.png";
         //String LITANGXIN = "/static/img/edit-user-msg/tips-3.png";

@@ -19,7 +19,7 @@ import com.zhidejiaoyu.common.study.WordPictureUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.GoldResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -131,7 +131,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     private CcieUtil ccieUtil;
 
     @Autowired
-    private TestGoldUtil testGoldUtil;
+    private GoldUtil goldUtil;
 
     @Autowired
     private SentenceTranslateMapper sentenceTranslateMapper;
@@ -1567,7 +1567,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             }
         }
 
-        studentMapper.updateById(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         if (msg.length() > 0) {
             GoldLogUtil.saveStudyGoldLog(stuId, msg.toString(), gold);
@@ -1607,12 +1606,12 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         } else {
             testRecord.setAwardGold(0);
         }
-        int addGold = testGoldUtil.addGold(student, gold);
-        addGold = StudentGoldAdditionUtil.getGoldAddition(student, gold + 0.0).intValue();
 
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), addGold));
-        testRecord.setAwardGold(addGold);
-        return addGold;
+        int addGold = StudentGoldAdditionUtil.getGoldAddition(student, gold + 0.0).intValue();
+
+        int canAddGold = GoldUtil.addStudentGold(student, addGold);
+        testRecord.setAwardGold(canAddGold);
+        return canAddGold;
     }
 
     /**
@@ -1632,9 +1631,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             // 奖励20枚金币
             gold = testRecord.getBetterCount() * TestAwardGoldConstant.FIVE_TEST_NINETY_TO_FULL;
         }
-        testRecord.setAwardGold(gold);
-        int addGold = testGoldUtil.addGold(student, gold);
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), addGold));
+
+        int addGold = GoldUtil.addStudentGold(student, gold);
+        testRecord.setAwardGold(addGold);
         return addGold;
     }
 

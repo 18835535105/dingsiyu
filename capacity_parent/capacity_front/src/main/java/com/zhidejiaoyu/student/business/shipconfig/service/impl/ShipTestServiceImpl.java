@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -194,7 +195,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      */
     private PkInfoVO.Challenged getBossEquipment(PkCopyBase pkCopyBase) {
         return PkInfoVO.Challenged.builder()
-                .hardImg(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl().replace("png","jpg")))
+                .hardImg(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl().replace("png", "jpg")))
                 .nickName(pkCopyBase.getName())
                 .battle(IndexVO.BaseValue.builder()
                         .attack(pkCopyBase.getCommonAttack())
@@ -616,10 +617,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         }
 
         Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, pkCopyBase.getGold());
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldAddition));
-        studentMapper.updateById(student);
+        int canAddGold = GoldUtil.addStudentGold(student, goldAddition);
 
-        GoldLogUtil.saveStudyGoldLog(student.getId(), "参与校区副本挑战", (int) Math.floor(goldAddition));
+        GoldLogUtil.saveStudyGoldLog(student.getId(), "参与校区副本挑战", canAddGold);
 
         weekActivityRankOpt.updateWeekActivitySchoolRank(student);
 

@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.study.TestPointUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
@@ -129,7 +130,7 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
     @Override
     public Object saveStudy(HttpSession session, GetVo getVo) {
         Student student = getStudent(session);
-        Integer gold = 0;
+        int gold = 0;
         Integer enger = 0;
         if (getVo.getTotal() == 100) {
             gold = 5;
@@ -139,9 +140,8 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
             gold = 3;
             enger = 2;
         }
-        student.setSystemGold(student.getSystemGold() + gold);
         student.setEnergy(student.getEnergy() + enger);
-        studentMapper.updateById(student);
+        gold = GoldUtil.addStudentGold(student, gold);
         GoldLogUtil.saveStudyGoldLog(student.getId(), "句型游戏", gold);
         Map<String, Object> resultMap = new HashMap<>();
         if (getVo.getTotal() < PointConstant.EIGHTY) {

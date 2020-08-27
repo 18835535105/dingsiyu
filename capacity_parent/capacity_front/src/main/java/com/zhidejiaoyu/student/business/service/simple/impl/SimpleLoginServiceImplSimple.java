@@ -19,6 +19,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.DurationUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.simple.SimpleLoginServiceSimple;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
@@ -88,8 +89,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
             Award award = simpleAwardMapper.selectByAwardContentTypeAndType(studentId, 2, 12);
             if (award == null || award.getCanGet() == 2) {
                 // 首次修改密码
-                int gold = 10;
-                student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
+                int gold = GoldUtil.addStudentGold(student, 10);
                 GoldLogUtil.saveStudyGoldLog(student.getId(), "首次修改密码", gold);
 
                 // 首次修改密码奖励

@@ -15,6 +15,7 @@ import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.LevelUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.grade.GradeUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
@@ -112,7 +113,6 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         Student student = getStudent(session);
         //更改过时挑战
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
-        long startIndex = (page - 1) * rows;
         Map<String, Object> returnMap = new HashMap<>();
 
         List<Long> studentIds;
@@ -452,24 +452,23 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
                     gauntlet.setChallengeStudy(0);
                     gauntlet.setBeChallengeStudy(0);
                     Double level = map.get("level");
-                    Double levelGold = 0.0;
+                    double levelGold = 0.0;
                     if (level != null) {
                         levelGold = gauntlet.getBetGold() * level;
                     }
                     Double award = map.get("award");
-                    Double awardGold = 0.0;
+                    double awardGold = 0.0;
                     if (award != null) {
                         awardGold = gauntlet.getBetGold() * award;
                     }
-                    gauntlet.setGrade(levelGold.intValue());
-                    gauntlet.setAward(awardGold.intValue());
-                    Integer goldChallenge = gauntlet.getBetGold() + levelGold.intValue() + awardGold.intValue();
+                    gauntlet.setGrade((int) levelGold);
+                    gauntlet.setAward((int) awardGold);
+                    int goldChallenge = gauntlet.getBetGold() + (int) levelGold + (int) awardGold;
                     gauntlet.setChallengeGold(goldChallenge);
                     gauntlet.setBeChallengeGold(0);
                     if (goldChallenge > 0) {
                         Student winnerStudent = simpleStudentMapper.selectById(gauntlet.getChallengerStudentId());
-                        winnerStudent.setSystemGold(winnerStudent.getSystemGold() + goldChallenge);
-                        simpleStudentMapper.updateById(winnerStudent);
+                        goldChallenge = GoldUtil.addStudentGold(winnerStudent, goldChallenge);
 
                         GoldLogUtil.saveStudyGoldLog(gauntlet.getChallengerStudentId(), "pk对战", goldChallenge);
                     }
@@ -716,7 +715,10 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
             long memberSize = sourcePowerRankOpt.getMemberSize(key);
             map.put("total", memberSize % pageSize > 0 ? memberSize / pageSize + 1 : memberSize / pageSize);
         }
-        List<GauntletRankVo> studentRank = getStudentRank(studentIds);
+        List<GauntletRankVo> studentRank =new ArrayList<>();
+        if(studentIds!=null && studentIds.size()>0){
+            studentRank = getStudentRank(studentIds);
+        }
         map.put("list", studentRank);
         return ServerResponse.createBySuccess(map);
     }
@@ -846,19 +848,15 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         Student winnerStudent = simpleStudentMapper.selectById(winnerStudentId);
         if (winnerStudent.getSystemGold() == null) {
             winnerStudent.setSystemGold(winnerGold.doubleValue());
+            simpleStudentMapper.updateById(winnerStudent);
         } else {
-            winnerStudent.setSystemGold(winnerStudent.getSystemGold() + winnerGold);
+            winnerGold = GoldUtil.addStudentGold(winnerStudent, winnerGold);
         }
-        simpleStudentMapper.updateById(winnerStudent);
 
         GoldLogUtil.saveStudyGoldLog(winnerStudentId, "pk对战胜利", winnerGold);
         //失败人
         StudentExpansion beChallengeStudentExpansion = simpleStudentExpansionMapper.selectByStudentId(failStudentId);
-        if (challengeStudentExpansion.getStudyPower() - study < 0) {
-            challengeStudentExpansion.setStudyPower(0);
-        } else {
-            challengeStudentExpansion.setStudyPower(challengeStudentExpansion.getStudyPower() - study);
-        }
+        challengeStudentExpansion.setStudyPower(Math.max(challengeStudentExpansion.getStudyPower() - study, 0));
         simpleStudentExpansionMapper.updateById(beChallengeStudentExpansion);
         Student failStudent = simpleStudentMapper.selectById(failStudentId);
         if (failStudent.getSystemGold() - failGold < 0) {

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author: wuchenxi
@@ -33,8 +34,8 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
         ServerConfig serverInfoByStudentOpenid = ServerConfigUtil.getByUuid(uuid);
         BaseQyFeignClient baseQyFeignClient = FeignClientUtil.getQyFeignClient(serverInfoByStudentOpenid.getServerName());
 
-        boolean flag = baseQyFeignClient.checkUpload(uuid);
-        if (!flag) {
+        CurrentDayOfStudy currentDayOfStudy = baseQyFeignClient.getTodayCurrentDayOfStudy(uuid);
+        if (currentDayOfStudy != null && !Objects.equals(currentDayOfStudy.getQrCodeNum(), uploadFlyRecordDTO.getNum())) {
             return ServerResponse.createByError(400, "学生当天信息已经上传，不能再次上传！");
         }
 

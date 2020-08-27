@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.student.business.service.BaseService;
 
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 /**
  * 首页数据
@@ -19,4 +20,6 @@ public interface SmallProgramTestService extends BaseService<Student> {
     Object saveTest(Integer point, HttpSession session, String openId);
 
     Object getQRCode(String openId, String weChatName, String weChatImgUrl);
+
+    void getWriteSpace(Map<String, Object> returnMap, String word);
 }

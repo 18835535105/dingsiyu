@@ -10,8 +10,8 @@ import com.zhidejiaoyu.common.pojo.LearnExample;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -71,14 +71,12 @@ public class GetValidTimeTip {
         gold += saveSimpleNewLearnAward(classify, loginTime, learnType, student);
         gold += saveSimpleValidLearnAward(loginTime, learnType, student, second, classify);
         gold += saveSimpleKnownLearnAward(classify, loginTime, learnType, student);
+        int canAddGold = 0;
         if (gold > 0) {
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-            studentMapper.updateByPrimaryKeySelective(student);
-            student = studentMapper.selectById(student.getId());
-
+            canAddGold = GoldUtil.addStudentGold(student, (int) gold);
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         }
-        tip.append(Math.round(gold)).append(" 个");
+        tip.append(Math.round(canAddGold)).append(" 个");
         return tip.toString();
     }
 
@@ -183,14 +181,13 @@ public class GetValidTimeTip {
         gold += saveNewLearnAward(classify, loginTime, learnType, student);
         gold += saveValidLearnAward(loginTime, learnType, student, second, classify);
         gold += saveKnownLearnAward(classify, loginTime, learnType, student);
+        int canAddGold = 0;
         if (gold > 0) {
             gold = StudentGoldAdditionUtil.getGoldAddition(student, gold);
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-
-            studentMapper.updateByPrimaryKeySelective(student);
+            canAddGold = GoldUtil.addStudentGold(student, (int) gold);
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         }
-        tip.append(Math.round(gold)).append(" 个");
+        tip.append(Math.round(canAddGold)).append(" 个");
         return tip.toString();
     }
 

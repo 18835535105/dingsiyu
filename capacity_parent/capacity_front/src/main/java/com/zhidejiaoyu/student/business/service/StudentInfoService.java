@@ -131,4 +131,18 @@ public interface StudentInfoService extends BaseService<Student> {
      */
     void saveGold(String openId, Integer gold);
 
+    /**
+     * 判断学生今日金币总数是否已达上限
+     *
+     * @return
+     * @param studentId
+     */
+    boolean goldCountLimit(Long studentId);
+
+    /**
+     * 判断学生今日小程序金币总数是否已达上限
+     *
+     * @return
+     */
+    boolean goldSmallAppCountLimit(String openId);
 }

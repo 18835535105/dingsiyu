@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.PayCard;
 import com.zhidejiaoyu.common.pojo.PrizeExchangeList;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
@@ -14,7 +16,7 @@ import java.util.List;
  * @author stylefeng
  * @since 2019-02-21
  */
-public interface PrizeExchangeListMapper {
+public interface PrizeExchangeListMapper extends BaseMapper<PrizeExchangeList> {
 
     PrizeExchangeList selById(Long prizeId);
 

@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.PrizeConfigService;
@@ -44,7 +45,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         //判断当前openId是否已经领取过今日的奖品
         Date date = new Date();
         Map<String, Object> returnMap = new HashMap<>();
-        Long payconfigId = 0L;
+        Long payconfigId;
         StudentPayConfig studentPayConfig = studentPayConfigMapper.selectByWenXiIdAndDate(openId, date);
         Student student = studentMapper.selectById(studentId);
         List<PrizeConfig> adminPrizeConfigs = prizeConfigMapper.selectByAdminId(1L);
@@ -66,8 +67,8 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
                     .setWeChatName(weChatName)
                     .setStudentId(studentId);
             studentPayConfigMapper.insert(studentPayConfig);
-            student.setSystemGold(student.getSystemGold() + 5);
-            studentMapper.updateById(student);
+
+            GoldUtil.addSmallAppGold(student, 5);
         } else {
             payconfigId = studentPayConfig.getPrizeConfigId();
         }

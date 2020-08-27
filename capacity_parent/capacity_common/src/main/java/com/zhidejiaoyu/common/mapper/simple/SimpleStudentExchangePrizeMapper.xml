@@ -30,4 +30,32 @@
         </foreach>
         )
     </delete>
+    <select id="selectListByAccountAndName"
+            resultType="com.zhidejiaoyu.common.vo.studentExchangPrize.StudentExchangePrizeVo" parameterType="map">
+        select sep.id id ,
+            student.student_name studentName ,
+            sep.create_time createTimes ,
+            student.account account ,
+            sep.state state ,
+            prize.prize prize
+        from student_exchange_prize sep
+        join prize_exchange_list prize on sep.prize_id=prize.id
+        join student student on student.id=sep.student_id
+        where
+        <if test="type==1">
+            prize.school_id =#{adminId}
+        </if>
+        <if test="type==2">
+            student.teacher_id=#{adminId}
+        </if>
+        <if test="type==3">
+            sep.state=0
+        </if>
+        and sep.state &lt;> 6 and sep.state &lt;> 2
+        <if test="studentName!=null and studentName!=''">
+            and student.student_name like concat('%',#{studentName},'%')
+        </if>
+        order by sep.id desc
+    </select>
+
 </mapper>

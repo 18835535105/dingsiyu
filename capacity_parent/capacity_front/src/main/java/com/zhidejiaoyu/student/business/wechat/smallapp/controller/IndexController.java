@@ -2,9 +2,10 @@ package com.zhidejiaoyu.student.business.wechat.smallapp.controller;
 
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.controller.BaseController;
-import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.common.vo.wechat.smallapp.studyinfo.IndexVO;
+import com.zhidejiaoyu.student.business.controller.BaseController;
+import com.zhidejiaoyu.student.business.service.StudentInfoService;
+import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.dto.PrizeDTO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.IndexService;
 import org.apache.commons.lang.StringUtils;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,6 +35,9 @@ public class IndexController extends BaseController {
 
     @Resource
     private ShipIndexService shipIndexService;
+
+    @Resource
+    private StudentInfoService studentInfoService;
 
     /**
      * 首页数据
@@ -97,7 +103,7 @@ public class IndexController extends BaseController {
      * 飞行记录学习总览
      *
      * @param openId
-     * @param num 扫码编号 -1：总览；其他编号：查询指定日期学习情况
+     * @param num    扫码编号 -1：总览；其他编号：查询指定日期学习情况
      * @return
      */
     @GetMapping("/recordOverview")
@@ -121,6 +127,20 @@ public class IndexController extends BaseController {
         }
         IndexVO.MyState radar = shipIndexService.getBaseState(openId);
         return ServerResponse.createBySuccess(radar);
+    }
+
+    /**
+     * 判断学生今日金币是否已达到上限
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/goldCountLimit")
+    public ServerResponse<Object> goldCountLimit(@RequestParam String openId) {
+        Map<String, Object> map = new HashMap<>(16);
+        boolean b = studentInfoService.goldSmallAppCountLimit(openId);
+        map.put("limit", b);
+        return ServerResponse.createBySuccess(map);
     }
 
     /**

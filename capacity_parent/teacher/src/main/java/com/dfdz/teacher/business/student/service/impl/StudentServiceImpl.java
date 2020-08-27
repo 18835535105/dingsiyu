@@ -19,7 +19,6 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
-import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.IdUtil;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -215,7 +214,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         vo.setRank(student.getRank());
         vo.setSchoolName(student.getSchoolName());
         vo.setSex(student.getSex());
-        vo.setStudentName(student.getStudentName());
+        vo.setStudentName(student.getStudentName()==null||student.getStudentName().equals("")?"默认姓名":student.getStudentName());
         vo.setWish(student.getWish());
         vo.setVersion(getStudentVersion(student));
         return ServerResponse.createBySuccess(vo);
