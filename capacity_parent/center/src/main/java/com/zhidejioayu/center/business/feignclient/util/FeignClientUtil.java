@@ -6,6 +6,7 @@ import com.zhidejioayu.center.business.feignclient.smallapp.BaseSmallAppFeignCli
 import com.zhidejioayu.center.business.feignclient.student.BaseStudentFeignClient;
 import com.zhidejioayu.center.business.feignclient.teacher.BaseTeacherInfoFeignClient;
 import com.zhidejioayu.center.business.feignclient.teacher.BaseTeacherPayCardFeignClient;
+import com.zhidejioayu.center.business.feignclient.teacher.BaseTeacherPrizeExchangeListFeignClient;
 import com.zhidejioayu.center.business.feignclient.wxrobot.BaseWxRobotFeignClient;
 import com.zhidejioayu.center.business.util.ServerConfigUtil;
 import feign.Client;
@@ -95,13 +96,23 @@ public class FeignClientUtil {
     }
 
     /**
-     * 获取指定服务的学生feignClient
+     * 获取指定服务的教师feignClient
      *
      * @param serverName
      * @return
      */
     public static BaseTeacherPayCardFeignClient getPayCardFeignClient(String serverName) {
         return builder.target(BaseTeacherPayCardFeignClient.class, PREFIX + "teacher" + serverName.replace("server", "") + TEACHER_CONTEXT_PATH);
+    }
+
+    /**
+     * 获取指定服务的教师feignClient
+     *
+     * @param serverName
+     * @return
+     */
+    public static BaseTeacherPrizeExchangeListFeignClient getPrizeExchangListFeignClient(String serverName) {
+        return builder.target(BaseTeacherPrizeExchangeListFeignClient.class, PREFIX + "teacher" + serverName.replace("server", "") + TEACHER_CONTEXT_PATH);
     }
 
     /**
@@ -191,6 +202,18 @@ public class FeignClientUtil {
         ServerConfig serverConfig = ServerConfigUtil.getServerInfoByTeacherOpenid(openId);
         return getPayCardFeignClient(serverConfig.getServerName());
     }
+
+    /**
+     * 根据教师openId获取教师信息
+     *
+     * @param openId
+     * @return
+     */
+    public static BaseTeacherPrizeExchangeListFeignClient getBaseTeacherPrizeExchangeListFeignClientByOpenId(String openId) {
+        ServerConfig serverConfig = ServerConfigUtil.getServerInfoByTeacherOpenid(openId);
+        return getPrizeExchangListFeignClient(serverConfig.getServerName());
+    }
+
 
 
 

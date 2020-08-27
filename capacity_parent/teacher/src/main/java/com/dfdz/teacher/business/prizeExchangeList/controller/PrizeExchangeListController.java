@@ -22,7 +22,7 @@ public class PrizeExchangeListController {
      */
     @RequestMapping(value = "/list")
     @ResponseBody
-    public ServerResponse<Object> list(@RequestBody PrizeExchangeListDto prizeExchangeListDto) {
+    public ServerResponse<Object> list(@RequestParam PrizeExchangeListDto prizeExchangeListDto) {
         return prizeExchangeListService.getAllList(prizeExchangeListDto);
     }
 
@@ -30,7 +30,7 @@ public class PrizeExchangeListController {
     /**
      * 新增
      */
-    @RequestMapping(value = "/addPrizeExchangeList")
+    @PostMapping(value = "/addPrizeExchangeList")
     @ResponseBody
     public Object addPrizeExchangeList(@RequestBody AddPrizeExchangeListDto dto) {
         return prizeExchangeListService.addPrizeExchangeList(dto);
@@ -39,7 +39,7 @@ public class PrizeExchangeListController {
     /**
      * 修改
      */
-    @RequestMapping(value = "/updatePrizeExchangeList")
+    @PostMapping(value = "/updatePrizeExchangeList")
     @ResponseBody
     public Object updatePrizeExchangeList(@RequestBody AddPrizeExchangeListDto dto) {
         return prizeExchangeListService.updatePrizeExchangeList(dto);
@@ -50,23 +50,27 @@ public class PrizeExchangeListController {
      * @param dto
      * @return
      */
-    @RequestMapping("/selectOne")
+    @GetMapping("/selectOne")
     @ResponseBody
     public Object selectOne(@RequestBody AddPrizeExchangeListDto dto){
         return prizeExchangeListService.selectByPirzeId(dto);
     }
 
-
-    @RequestMapping("/getSchoolName")
+    /**
+     * 根据openId获取学校名称
+     * @param openId
+     * @return
+     */
+    @GetMapping("/getSchoolName")
     @ResponseBody
-    public Object getSchoolName(String openId){
+    public Object getSchoolName(@RequestParam String openId){
         return prizeExchangeListService.getSchoolName(openId);
     }
 
     /**
      * 批量删除
      */
-    @RequestMapping(value = "/deletes")
+    @PostMapping(value = "/deletes")
     @ResponseBody
     public Object deletes(@RequestBody String openId,@RequestBody List<Integer> prizeIds) {
         return prizeExchangeListService.deletePrizes(openId,prizeIds);
