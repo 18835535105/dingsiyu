@@ -125,7 +125,7 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
     @Override
     public Object deletePrizes(String openId, List<Integer> prizeIds) {
         List<PrizeExchangeList> prizeExchangeLists = prizeExchangeListMapper.selectBatchIds(prizeIds);
-        Integer integer = prizeExchangeListMapper.deleteBatchIds(prizeIds);
+        prizeExchangeListMapper.deleteBatchIds(prizeIds);
         if (prizeExchangeLists.size() > 0) {
             OssDelete.deleteObjects(prizeExchangeLists.stream().map(PrizeExchangeList::getPrizeUrl).collect(Collectors.toList()));
         }

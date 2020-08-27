@@ -2,6 +2,7 @@ package com.zhidejioayu.center.business.feignclient.teacher;
 
 import com.zhidejiaoyu.common.dto.prizeExchangeList.AddPrizeExchangeListDto;
 import com.zhidejiaoyu.common.dto.prizeExchangeList.PrizeExchangeListDto;
+import com.zhidejiaoyu.common.dto.studentExchangePrize.StudentExchangePrizeListDto;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,5 +52,31 @@ public interface BaseTeacherPrizeExchangeListFeignClient {
     @GetMapping("/prizeExchangeList/getSchoolName")
     Object getSchoolName(@RequestParam String openId);
 
+    /**
+     * 查看学生兑奖记录
+     * @param dto
+     * @return
+     */
+    @GetMapping(value = "/studentExchangePrize/getStudentExchangePrizeList")
+    Object getStudentExchangePrizeList(@RequestParam StudentExchangePrizeListDto dto);
+
+    /**
+     * 清楚学生兑奖记录
+     * @param prizeId    兑奖id
+     * @param openId
+     * @return
+     */
+    @PostMapping(value = "/studentExchangePrize/delete")
+    Object delete(@RequestBody Long prizeId, @RequestBody String openId);
+
+    /**
+     * 修改学生状态
+     * @param prizeId
+     * @param state    0，成功 3失败
+     * @param openId
+     * @return
+     */
+    @PostMapping(value = "/studentExchangePrize/updateStudent")
+    Object updateStudent(@RequestBody Long prizeId, @RequestBody Integer state, @RequestBody String openId);
 
 }
