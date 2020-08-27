@@ -214,7 +214,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         vo.setRank(student.getRank());
         vo.setSchoolName(student.getSchoolName());
         vo.setSex(student.getSex());
-        vo.setStudentName(student.getStudentName());
+        vo.setStudentName(student.getStudentName()==null||student.getStudentName().equals("")?"默认姓名":student.getStudentName());
         vo.setWish(student.getWish());
         vo.setVersion(getStudentVersion(student));
         return ServerResponse.createBySuccess(vo);

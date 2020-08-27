@@ -715,7 +715,10 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
             long memberSize = sourcePowerRankOpt.getMemberSize(key);
             map.put("total", memberSize % pageSize > 0 ? memberSize / pageSize + 1 : memberSize / pageSize);
         }
-        List<GauntletRankVo> studentRank = getStudentRank(studentIds);
+        List<GauntletRankVo> studentRank =new ArrayList<>();
+        if(studentIds!=null && studentIds.size()>0){
+            studentRank = getStudentRank(studentIds);
+        }
         map.put("list", studentRank);
         return ServerResponse.createBySuccess(map);
     }

@@ -14,11 +14,13 @@
         <result column="state" property="state"/>
         <result column="school_id" property="schoolId"/>
         <result column="describes" property="describes"/>
+        <result column="teacher_id" property="teacherId"/>
+        <result column="type" property="type"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, prize, exchange_prize, total_number, surplus_number, prize_url, create_time, state, school_id,describes
+        id, prize, exchange_prize, total_number, surplus_number, prize_url, create_time, state, school_id,describes, teacher_id ,`type`
     </sql>
 
     <select id="getAll" parameterType="map" resultMap="BaseResultMap">
@@ -79,8 +81,13 @@
         <if test="orderField == 2">
             create_time
         </if>
-        ${orderBy}
+        <if test="orderBy!=null">
+            ${orderBy}
+        </if>
+
     </select>
+
+
 
 
 </mapper>
