@@ -52,15 +52,10 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
     public Object addPrizeExchangeList(AddPrizeExchangeListDto dto) {
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
         Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(sysUser.getId().longValue());
-        String fileName = "";
         if (schoolAdminId == null) {
             return ServerResponse.createByError(300, "教师查询失败");
         }
-        fileName = getPrizeUrl(dto);
-        if (fileName == null) {
-            return ServerResponse.createByError(300, "添加失败,请重新添加商品");
-        }
-        PrizeExchangeList prize = savePrizeList(dto, schoolAdminId, fileName);
+        PrizeExchangeList prize = savePrizeList(dto, schoolAdminId);
         prizeExchangeListMapper.insert(prize);
         return ServerResponse.createBySuccess();
     }
@@ -70,20 +65,10 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
     public Object updatePrizeExchangeList(AddPrizeExchangeListDto dto) {
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
         Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(sysUser.getId().longValue());
-        String fileName = "";
         if (schoolAdminId == null) {
             return ServerResponse.createByError(300, "教师查询失败");
         }
-        if(dto.getFalg()){
-            fileName = getPrizeUrl(dto);
-        }else{
-            fileName=dto.getPrizeUrl();
-        }
-
-        if (fileName == null) {
-            return ServerResponse.createByError(300, "添加失败,请重新添加商品");
-        }
-        PrizeExchangeList prize = savePrizeList(dto, schoolAdminId, fileName);
+        PrizeExchangeList prize = savePrizeList(dto, schoolAdminId);
         prize.setId(dto.getId());
         prizeExchangeListMapper.updateById(prize);
         return ServerResponse.createBySuccess();
@@ -91,7 +76,7 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
 
     @Override
     public Object getSchoolName(String openId) {
-       SysUser user=sysUserMapper.selectByOpenId(openId);
+        SysUser user = sysUserMapper.selectByOpenId(openId);
         List<String> schoolName = new ArrayList<>();
         if (user.getAccount().contains("xg")) {
             List<Long> longs = teacherMapper.selectTeacherIdsBySchoolAdminId(user.getId());
@@ -127,31 +112,26 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
         List<PrizeExchangeList> prizeExchangeLists = prizeExchangeListMapper.selectBatchIds(prizeIds);
         prizeExchangeListMapper.deleteBatchIds(prizeIds);
         if (prizeExchangeLists.size() > 0) {
-            OssDelete.deleteObjects(prizeExchangeLists.stream().map(PrizeExchangeList::getPrizeUrl).collect(Collectors.toList()));
+            try {
+                prizeExchangeLists.forEach(list -> {
+                    OssDelete.deleteObject(list.getPrizeUrl());
+                });
+            } catch (Exception e) {
+                new RuntimeException(e);
+            }
         }
         return ServerResponse.createBySuccess();
     }
 
 
-    private String getPrizeUrl(AddPrizeExchangeListDto dto) {
-        if (dto.getFile() != null && dto.getFile().getSize() > 0) {
-            try {
-                return OssUpload.upload(dto.getFile(), FileConstant.PRIZE_IMG, null);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
-    private PrizeExchangeList savePrizeList(AddPrizeExchangeListDto dto, Integer schoolAdminId, String fileName) {
+    private PrizeExchangeList savePrizeList(AddPrizeExchangeListDto dto, Integer schoolAdminId) {
         PrizeExchangeList prize = new PrizeExchangeList();
         prize.setSchoolId(schoolAdminId.longValue());
         prize.setCreateTime(new Date());
         prize.setDescribes(dto.getDescribes());
         prize.setPrize(dto.getPrize());
         prize.setExchangePrize(dto.getExchangePrize());
-        prize.setPrizeUrl(fileName);
+        prize.setPrizeUrl(dto.getPrizeUrl());
         prize.setState(1);
         prize.setSurplusNumber(dto.getTotalNumber());
         prize.setTotalNumber(dto.getTotalNumber());

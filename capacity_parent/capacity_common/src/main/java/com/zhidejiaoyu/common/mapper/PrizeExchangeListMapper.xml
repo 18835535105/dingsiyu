@@ -74,7 +74,9 @@
         <include refid="Base_Column_List"/>
         from prize_exchange_list
         where school_id = #{schoolAdminId}
-        order by
+        <if test="orderField == 1 or orderField == 2 or orderBy!=null">
+            order by
+        </if>
         <if test="orderField == 1">
             exchange_prize
         </if>
