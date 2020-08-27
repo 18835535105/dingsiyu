@@ -213,7 +213,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
         // 金币加成
         Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, awardGold);
-        int canAddGold = GoldUtil.addStudentGold(student, goldAddition);
+        int canAddGold = GoldUtil.addSmallAppGold(student, goldAddition);
 
         GoldLogUtil.saveStudyGoldLog(studentId, GenreConstant.SMALLAPP_GENRE, canAddGold);
     }

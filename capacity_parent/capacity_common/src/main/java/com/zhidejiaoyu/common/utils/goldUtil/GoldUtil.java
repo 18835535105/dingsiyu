@@ -74,6 +74,20 @@ public class GoldUtil {
      * @param gold
      * @return 学生增加的金币数
      */
+    public static int addSmallAppGold(Student student, Double gold) {
+        if (gold == null) {
+            return 0;
+        }
+        return addSmallAppGold(student, (int) Math.floor(gold));
+    }
+
+    /**
+     * 学生微信小程序获取金币
+     *
+     * @param student
+     * @param gold
+     * @return 学生增加的金币数
+     */
     public static int addSmallAppGold(Student student, Integer gold) {
         if (gold == null) {
             return 0;
