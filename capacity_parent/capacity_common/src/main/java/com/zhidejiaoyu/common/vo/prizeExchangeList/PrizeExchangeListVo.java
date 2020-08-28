@@ -15,4 +15,5 @@ public class PrizeExchangeListVo {
     private String schoolName;
     private Long teacherId;
     private Integer index;
+    private boolean checked;
 }

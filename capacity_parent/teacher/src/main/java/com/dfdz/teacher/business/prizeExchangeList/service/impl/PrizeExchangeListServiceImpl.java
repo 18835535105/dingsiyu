@@ -153,6 +153,7 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
             prizeExchangeListVo.setPartUrl(GetOssFile.getPublicObjectUrl(prize.getPrizeUrl()));
             prizeExchangeListVo.setExchangePrize(prize.getExchangePrize());
             prizeExchangeListVo.setPrize(prize.getPrize());
+            prizeExchangeListVo.setChecked(false);
             if (prize.getState() == 2) {
                 prizeExchangeListVo.setState("已删除");
             } else {
