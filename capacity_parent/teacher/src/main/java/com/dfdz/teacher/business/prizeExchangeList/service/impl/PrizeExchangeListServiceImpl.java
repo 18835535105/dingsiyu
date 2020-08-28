@@ -96,7 +96,7 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
             String s = simpleCampusMapper.selSchoolName(user.getId().longValue());
             schoolName.add(s);
         }
-        return schoolName;
+        return ServerResponse.createBySuccess(schoolName);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
             prizeExchangeList.setSchoolName("直属学校");
         }
         prizeExchangeList.setPrizeUrl(GetOssFile.getPublicObjectUrl(prizeExchangeList.getPrizeUrl()));
-        return prizeExchangeList;
+        return ServerResponse.createBySuccess(prizeExchangeList);
     }
 
     @Override
@@ -191,7 +191,6 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
             pages = pages + 1;
             prizeExchangeListVo.setIndex(pages);
             prizeExchangeListVos.add(prizeExchangeListVo);
-
         }
     }
 }
