@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.zhidejiaoyu.common.pojo.PayCard;
 import com.zhidejiaoyu.common.pojo.PrizeExchangeList;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
@@ -38,5 +37,7 @@ public interface PrizeExchangeListMapper extends BaseMapper<PrizeExchangeList> {
      * @return
      */
     List<PrizeExchangeList> selectBySchoolId(@Param("schoolAdminId") Integer schoolAdminId, @Param("orderField") String orderField,
-                                             @Param("orderBy") String orderBy);
+                                               @Param("orderBy") String orderBy);
+
+    Integer countBySchoolId(@Param("schoolAdminId") Integer schoolAdminId);
 }

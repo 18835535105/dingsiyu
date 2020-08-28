@@ -10,10 +10,12 @@ public class PrizeExchangeListVo {
     private Integer totalNumber;
     private Integer surplusNumber;
     private String partUrl;
+    private String prizeUrl;
     private String createTime;
     private String state;
     private String schoolName;
     private Long teacherId;
     private Integer index;
     private boolean checked;
+    private Long schoolId;
 }

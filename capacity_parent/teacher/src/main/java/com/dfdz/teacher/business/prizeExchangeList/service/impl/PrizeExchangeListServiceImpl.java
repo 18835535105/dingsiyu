@@ -46,7 +46,9 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
         Page<PrizeExchangeListVo> page = new Page<>(dto.getPageNum(), dto.getPageSize());
         List<PrizeExchangeList> prizeExchangeLists = prizeExchangeListMapper.selectBySchoolId(schoolAdminId, "3", null);
         List<PrizeExchangeListVo> vos = new ArrayList<>();
-        getPrizeExchangeListVos(vos, prizeExchangeLists, (dto.getPageNum()-1) * dto.getPageSize());
+        getPrizeExchangeListVos(vos, prizeExchangeLists, (dto.getPageNum() - 1) * dto.getPageSize());
+        Integer count = prizeExchangeListMapper.countBySchoolId(schoolAdminId);
+        page.setTotal(count);
         PageVo<PrizeExchangeListVo> studentManageVOPageVo = PageUtil.packagePage(vos, page.getTotal());
         return ServerResponse.createBySuccess(studentManageVOPageVo);
     }
