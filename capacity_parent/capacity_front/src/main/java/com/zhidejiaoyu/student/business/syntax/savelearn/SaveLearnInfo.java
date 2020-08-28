@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.study.memorystrength.SyntaxMemoryStrength;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.CurrentDayOfStudyUtil;
+import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -42,6 +43,9 @@ public class SaveLearnInfo {
 
     @Resource
     private LearnNewMapper learnNewMapper;
+
+    @Resource
+    private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
 
     /**
      * 保存语法学习记录
@@ -113,6 +117,7 @@ public class SaveLearnInfo {
             this.initStudyCapacity(learnExtend, learnNew, type);
             learnExtend.setStatus(0);
             learnExtend.setFirstIsKnow(0);
+            currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SYNTAX,learnNew.getStudentId(), learnExtend.getWordId());
             CurrentDayOfStudyUtil.saveSessionCurrent(RedisKeysConst.ERROR_SYNTAX, learnExtend.getWordId());
         }
         learnExtendMapper.insert(learnExtend);
