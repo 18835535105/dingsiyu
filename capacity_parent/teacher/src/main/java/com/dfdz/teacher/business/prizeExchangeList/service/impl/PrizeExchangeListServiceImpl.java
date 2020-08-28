@@ -15,15 +15,16 @@ import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleCampusMapper;
 import com.zhidejiaoyu.common.pojo.PrizeExchangeList;
 import com.zhidejiaoyu.common.pojo.SysUser;
+import com.zhidejiaoyu.common.pojo.Teacher;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.prizeExchangeList.PrizeExchangeListVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,9 +43,11 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
     public ServerResponse<Object> getAllList(PrizeExchangeListDto dto) {
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
         Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(sysUser.getId().longValue());
-        Page<PrizeExchangeList> page = new Page<>(dto.getPageNum(), dto.getPageSize());
+        Page<PrizeExchangeListVo> page = new Page<>(dto.getPageNum(), dto.getPageSize());
         List<PrizeExchangeList> prizeExchangeLists = prizeExchangeListMapper.selectBySchoolId(schoolAdminId, "3", null);
-        PageVo<PrizeExchangeList> studentManageVOPageVo = PageUtil.packagePage(prizeExchangeLists, page.getTotal());
+        List<PrizeExchangeListVo> vos = new ArrayList<>();
+        getPrizeExchangeListVos(vos, prizeExchangeLists, (dto.getPageNum()-1) * dto.getPageSize());
+        PageVo<PrizeExchangeListVo> studentManageVOPageVo = PageUtil.packagePage(vos, page.getTotal());
         return ServerResponse.createBySuccess(studentManageVOPageVo);
     }
 
@@ -136,5 +139,56 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
         prize.setSurplusNumber(dto.getTotalNumber());
         prize.setTotalNumber(dto.getTotalNumber());
         return prize;
+    }
+
+    private void getPrizeExchangeListVos(List<PrizeExchangeListVo> prizeExchangeListVos,
+                                         List<PrizeExchangeList> prizeExchangeLists, Integer pages) {
+        Map<Long, String> map = new HashMap<>(16);
+        for (PrizeExchangeList prize : prizeExchangeLists) {
+            PrizeExchangeListVo prizeExchangeListVo = new PrizeExchangeListVo();
+            prizeExchangeListVo.setId(prize.getId());
+            prizeExchangeListVo.setCreateTime(DateUtil.DateTime(prize.getCreateTime()));
+            prizeExchangeListVo.setTotalNumber(prize.getTotalNumber());
+            prizeExchangeListVo.setSurplusNumber(prize.getSurplusNumber());
+            prizeExchangeListVo.setPartUrl(GetOssFile.getPublicObjectUrl(prize.getPrizeUrl()));
+            prizeExchangeListVo.setExchangePrize(prize.getExchangePrize());
+            prizeExchangeListVo.setPrize(prize.getPrize());
+            if (prize.getState() == 2) {
+                prizeExchangeListVo.setState("已删除");
+            } else {
+                if (prize.getSurplusNumber() != null) {
+                    if (prize.getSurplusNumber() == 0) {
+                        prizeExchangeListVo.setState("已兑空");
+                    } else {
+                        prizeExchangeListVo.setState("兑换中");
+                    }
+                } else {
+                    prizeExchangeListVo.setState("已兑空");
+                }
+            }
+            Long teacherId = prize.getTeacherId();
+            if (teacherId != null) {
+                String schoolNames = simpleCampusMapper.selSchoolName(teacherId);
+                if (schoolNames != null) {
+                    schoolNames = simpleCampusMapper.selSchoolName(teacherId);
+                    map.put(teacherId, schoolNames);
+                    prizeExchangeListVo.setSchoolName(schoolNames);
+                } else {
+                    Teacher teacher = teacherMapper.selectByTeacherId(teacherId);
+                    if (teacher != null) {
+                        prizeExchangeListVo.setSchoolName(teacher.getSchool());
+                        map.put(teacherId, teacher.getSchool());
+                    }
+                }
+            } else {
+                Long schoolId = prize.getSchoolId();
+                String bySchoolAdminId = teacherMapper.selectSchoolById(schoolId);
+                prizeExchangeListVo.setSchoolName(bySchoolAdminId);
+            }
+            pages = pages + 1;
+            prizeExchangeListVo.setIndex(pages);
+            prizeExchangeListVos.add(prizeExchangeListVo);
+
+        }
     }
 }
