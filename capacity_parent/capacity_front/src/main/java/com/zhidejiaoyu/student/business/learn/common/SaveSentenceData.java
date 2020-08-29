@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -132,11 +134,16 @@ public class SaveSentenceData {
     private ServerResponse<Object> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
                                                   Long sentenceCount, Integer type, String studyModel) {
         SentenceTranslateVo sentenceTranslateVo;
+        Double memoryStrength = studyCapacity.getMemoryStrength();
+        if (memoryStrength != null) {
+            memoryStrength = new BigDecimal(memoryStrength).setScale(2, RoundingMode.UP).doubleValue();
+        } else {
+            memoryStrength = 0.0;
+        }
         // 例句翻译
         if (STUDYMODEL1.equals(studyModel)) {
             Sentence sentence = sentenceFeignClient.selectSentenceById(studyCapacity.getWordId());
             // 计算当前例句的记忆强度
-            double memoryStrength = studyCapacity.getMemoryStrength();
             sentenceTranslateVo = getSentenceTranslateVo(plan, firstStudy, sentenceCount, type, sentence);
             sentenceTranslateVo.setStudyNew(false);
             sentenceTranslateVo.setMemoryStrength(memoryStrength);
@@ -147,7 +154,6 @@ public class SaveSentenceData {
             // 例句听力
             // 计算当前例句的记忆强度
             Sentence sentence = sentenceFeignClient.selectSentenceById(studyCapacity.getWordId());
-            double memoryStrength = studyCapacity.getMemoryStrength();
             sentenceTranslateVo = this.getListenSentenceVo(sentence, firstStudy, plan, memoryStrength, sentenceCount, type);
             sentenceTranslateVo.setCourseId(studyCapacity.getCourseId().intValue());
             sentenceTranslateVo.setUnitId(studyCapacity.getUnitId().intValue());
@@ -156,7 +162,6 @@ public class SaveSentenceData {
             // 例句默写
             // 计算当前例句的记忆强度
             Sentence sentence = sentenceFeignClient.selectSentenceById(studyCapacity.getWordId());
-            double memoryStrength = studyCapacity.getMemoryStrength();
             sentenceTranslateVo = this.getSentenceVo(sentence, firstStudy, plan, memoryStrength, sentenceCount, type);
             return ServerResponse.createBySuccess(sentenceTranslateVo);
         }
