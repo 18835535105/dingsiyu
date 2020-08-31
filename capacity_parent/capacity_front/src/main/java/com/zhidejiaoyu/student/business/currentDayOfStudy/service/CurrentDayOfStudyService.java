@@ -60,4 +60,6 @@ public interface CurrentDayOfStudyService extends IService<CurrentDayOfStudy> {
      * @return
      */
     List<String> getReturnList(String errorInfo);
+
+    List<Object> getErrorSyntaxList(String errorSyntax);
 }

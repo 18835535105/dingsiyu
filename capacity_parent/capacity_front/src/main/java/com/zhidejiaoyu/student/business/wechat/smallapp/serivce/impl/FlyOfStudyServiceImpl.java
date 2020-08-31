@@ -109,7 +109,7 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
                     .contents(currentDayOfStudyService.getReturnList(this.joinStr(vo.getStudyModel())))
                     .date(currentDayOfStudy.getCreateTime() == null ? "" : date)
                     .errorSentence(currentDayOfStudyService.getTestList(this.joinStr(vo.getSentence())))
-                    .errorSyntax(currentDayOfStudyService.getReturnList(this.joinStr(vo.getSyntax())))
+                    .errorSyntax(currentDayOfStudyService.getErrorSyntaxList(this.joinObject(vo.getSyntax())))
                     .errorTest(currentDayOfStudyService.getTestList(this.joinStr(vo.getTest())))
                     .errorText(currentDayOfStudyService.getReturnList(this.joinStr(vo.getText())))
                     .errorWord(currentDayOfStudyService.getTestList(this.joinStr(vo.getWord())))
@@ -126,7 +126,7 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
                 .contents(currentDayOfStudyService.getReturnList(currentDayOfStudy.getStudyModel()))
                 .date(currentDayOfStudy.getCreateTime() == null ? "" : date)
                 .errorSentence(currentDayOfStudyService.getTestList(currentDayOfStudy.getSentence()))
-                .errorSyntax(currentDayOfStudyService.getReturnList(currentDayOfStudy.getSyntax()))
+                .errorSyntax(currentDayOfStudyService.getErrorSyntaxList(currentDayOfStudy.getSyntax()))
                 .errorTest(currentDayOfStudyService.getTestList(currentDayOfStudy.getTest()))
                 .errorText(currentDayOfStudyService.getReturnList(currentDayOfStudy.getText()))
                 .errorWord(currentDayOfStudyService.getTestList(currentDayOfStudy.getWord()))
@@ -140,6 +140,12 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
 
     private String joinStr(List<String> list) {
         return list == null ? null : String.join("##", list);
+    }
+
+    private String joinObject(List<Object> list) {
+        List<String> strList=new ArrayList<>();
+        list.forEach(str->strList.add(str.toString()));
+        return list == null ? null : String.join("##", strList);
     }
 
     @Override

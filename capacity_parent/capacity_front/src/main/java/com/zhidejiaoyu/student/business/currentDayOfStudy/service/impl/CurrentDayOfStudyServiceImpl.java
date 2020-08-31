@@ -143,7 +143,8 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         return ServerResponse.createBySuccess(vo);
     }
 
-    private List<Object> getErrorSyntaxList(String errorSyntax) {
+    @Override
+    public List<Object> getErrorSyntaxList(String errorSyntax) {
         if (StringUtil.isEmpty(errorSyntax)) {
             return new ArrayList<>();
         }
