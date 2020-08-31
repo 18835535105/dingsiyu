@@ -2,9 +2,7 @@ package com.zhidejiaoyu.common.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * 数组工具类
@@ -25,7 +23,6 @@ public class ArrayUtil<T> {
         if (array == null || array.length == 0) {
             return array;
         }
-
         return Arrays.stream(array).filter(s -> StringUtils.isNotBlank(s) && StringUtils.isNotEmpty(s)).toArray(String[]::new);
     }
 
@@ -47,5 +44,22 @@ public class ArrayUtil<T> {
     }
 
     private ArrayUtil() {
+    }
+
+    public static List<Object> removeSyntaxConvertToList(String[] split) {
+        List<Object> returnList = new ArrayList<>();
+        if (split.length > 0) {
+            List<String> strings = Arrays.asList(split);
+            strings.forEach(str -> {
+                Map<String,Object> map=new HashMap<>();
+                String[] splits = str.split(":");
+                if(splits.length>1){
+                    map.put("subject",splits[0]);
+                    map.put("answer",splits[1]);
+                }
+                returnList.add(map);
+            });
+        }
+        return returnList;
     }
 }

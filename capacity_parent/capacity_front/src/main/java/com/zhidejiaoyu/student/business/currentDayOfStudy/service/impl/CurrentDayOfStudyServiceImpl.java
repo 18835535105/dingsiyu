@@ -128,7 +128,7 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         String sentence = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, 2);
         vo.setSentence(getReturnList(sentence));
         String errorSyntax = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SYNTAX, studentId, 3);
-        vo.setSyntax(getReturnList(errorSyntax));
+        vo.setSyntax(getErrorSyntaxList(errorSyntax));
         vo.setText(new ArrayList<>());
 
         CurrentDayOfStudy currentDayOfStudy = currentDayOfStudyMapper.selectByStudentIdAndCreateTime(studentId, DateUtil.formatDate(new Date(), DateUtil.YYYYMMDD));
@@ -141,6 +141,14 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         }
 
         return ServerResponse.createBySuccess(vo);
+    }
+
+    private List<Object> getErrorSyntaxList(String errorSyntax) {
+        if (StringUtil.isEmpty(errorSyntax)) {
+            return new ArrayList<>();
+        }
+        String[] split = errorSyntax.split("##");
+        return ArrayUtil.removeSyntaxConvertToList(split);
     }
 
     @Override
@@ -171,7 +179,7 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
                 .studyModel(currentDayOfStudy.getStudyModel() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList(currentDayOfStudy.getStudyModel().split("##")))
                 .time(currentDayOfStudy.getCreateTime() == null ? "" : DateUtil.formatYYYYMMDD(currentDayOfStudy.getCreateTime()))
                 .sentence(currentDayOfStudy.getSentence() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList((currentDayOfStudy.getSentence().split("##"))))
-                .syntax(currentDayOfStudy.getSyntax() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList((currentDayOfStudy.getSyntax().split("##"))))
+                .syntax(currentDayOfStudy.getSyntax() == null ? Collections.emptyList() : ArrayUtil.removeSyntaxConvertToList((currentDayOfStudy.getSyntax().split("##"))))
                 .test(currentDayOfStudy.getTest() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList((currentDayOfStudy.getTest().split("##"))))
                 .text(currentDayOfStudy.getText() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList((currentDayOfStudy.getText().split("##"))))
                 .word(currentDayOfStudy.getWord() == null ? Collections.emptyList() : ArrayUtil.removeBlankStringConvertToList((currentDayOfStudy.getWord().split("##"))))
