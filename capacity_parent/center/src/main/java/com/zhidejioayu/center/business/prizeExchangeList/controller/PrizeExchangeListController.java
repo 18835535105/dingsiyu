@@ -63,9 +63,10 @@ public class PrizeExchangeListController {
         if (StringUtil.isEmpty(dto.getOpenId())) {
             return ServerResponse.createByError(400, "openId can't be null!");
         }
-        if (dto.getFalg()) {
+        if (dto.getFlag()) {
             dto.setPrizeUrl(getPrizeUrl(dto));
         }
+        dto.setFile(null);
         if (dto.getPrizeUrl() == null) {
             return ServerResponse.createByError(300, "添加失败,请重新添加商品");
         }

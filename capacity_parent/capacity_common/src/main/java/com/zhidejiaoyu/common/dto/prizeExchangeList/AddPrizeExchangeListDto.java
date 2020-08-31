@@ -16,7 +16,7 @@ public class AddPrizeExchangeListDto extends PrizeExchangeList {
 
     private MultipartFile file;
 
-    private Boolean falg;
+    private Boolean flag;
 
 
 }
