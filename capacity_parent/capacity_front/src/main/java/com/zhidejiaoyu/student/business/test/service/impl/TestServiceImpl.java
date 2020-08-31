@@ -75,8 +75,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Resource
     private SentenceFeignClient sentenceFeignClient;
     @Autowired
-    private StudentMapper studentMapper;
-    @Autowired
     private TestResultUtil testResultUtil;
     @Autowired
     private TestRecordMapper testRecordMapper;
@@ -333,7 +331,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (point > integer) {
             goldCount = GoldChange.getWordUnitTestGold(student, point);
             Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
-            goldCount = this.saveLog(student, Integer.parseInt(doubleGoldCount.toString()), null, "字母单元闯关测试");
+            goldCount = this.saveLog(student, (int) Math.floor(doubleGoldCount), null, "字母单元闯关测试");
 
         }
 
