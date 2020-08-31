@@ -30,6 +30,8 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
     @Resource
     private CourseFeignClient courseFeignClient;
+    @Resource
+    private TeacherMapper teacherMapper;
 
     @Override
     public void deleteStudyUnit(Student student) {
@@ -67,7 +69,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseNewMapper, CourseNew> i
      */
     public List<Map<String, Long>> getSchoolPlanResult(Student student, int monthOfYear, int weekOfMonth) {
         SchoolTime schoolTime;
-        Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+        Integer schoolAdminId = teacherMapper.getSchoolAdminById(student.getTeacherId().intValue());
         List<String> list=new ArrayList<>();
         list.add(student.getGrade());
         if (schoolAdminId != null) {
