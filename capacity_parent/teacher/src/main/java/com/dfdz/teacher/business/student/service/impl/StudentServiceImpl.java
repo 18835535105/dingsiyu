@@ -3,6 +3,7 @@ package com.dfdz.teacher.business.student.service.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dfdz.teacher.business.course.service.CourseService;
+import com.dfdz.teacher.business.student.service.StudentExpansionService;
 import com.dfdz.teacher.business.student.service.StudentService;
 import com.dfdz.teacher.business.teacher.service.impl.TeacherServiceImpl;
 import com.dfdz.teacher.common.CommonMethod;
@@ -11,14 +12,15 @@ import com.dfdz.teacher.constant.LogNameConst;
 import com.dfdz.teacher.feignclient.CenterUserFeignClient;
 import com.dfdz.teacher.feignclient.CourseFeignClient;
 import com.dfdz.teacher.util.RedisOpt;
+import com.zhidejiaoyu.common.constant.ServerNoConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.dto.student.AddNewStudentDto;
 import com.zhidejiaoyu.common.dto.student.SaveEditStudentInfoDTO;
+import com.zhidejiaoyu.common.dto.student.SaveStudentInfoToCenterDTO;
 import com.zhidejiaoyu.common.dto.student.StudentListDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
 import com.zhidejiaoyu.common.utils.IdUtil;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -31,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,6 +99,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Resource
     private OperationLogMapper operationLogMapper;
 
+    @Resource
+    private StudentExpansionService studentExpansionService;
+
     @Override
     public ServerResponse<PageVo<StudentManageVO>> listStudent(StudentListDto dto) {
 
@@ -127,8 +131,8 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             return vo;
         }).collect(Collectors.toList());
 
-        PageVo<StudentManageVO> studentManageVOPageVo = PageUtil.packagePage(collect, page.getTotal());
-        return ServerResponse.createBySuccess(studentManageVOPageVo);
+        PageVo<StudentManageVO> manageVOPageVo = PageUtil.packagePage(collect, page.getTotal());
+        return ServerResponse.createBySuccess(manageVOPageVo);
     }
 
     @Override
@@ -163,6 +167,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         StringBuilder sb = new StringBuilder("生成账号数量：").append(count).append("；生成账号名称：");
 
         RedisOpt.AccountRange accountRange = redisOpt.getAccountRange(count);
+        List<Student> students = new ArrayList<>();
         for (long accountNum = accountRange.getCurrent() + 1; accountNum <= accountRange.getMax(); accountNum++) {
             student = this.packageNewStudent(day, schoolName, teacherId, accountNum);
             student.setRole(1);
@@ -170,22 +175,37 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             student.setGrade(dto.getGrade());
             student.setUuid(IdUtil.getId());
             sb.append(student.getAccount()).append("  ").append(day).append("天#");
-            try {
-                studentMapper.insert(student);
-                BusinessUserInfo businessUserInfo = new BusinessUserInfo();
-                businessUserInfo.setAccount(student.getAccount());
-                businessUserInfo.setPassword(student.getPassword());
-                businessUserInfo.setUserUuid(student.getUuid());
-                businessUserInfo.setNo(dto.getServerNo());
-                centerUserFeignClient.getUser(businessUserInfo);
-                this.saveOrUpdateStudentExpansion(phase, student);
-                this.pushExperienceCourses(student);
-            } catch (Exception e) {
-                log.error("批量生成学生信息失败!", e);
-                throw new ServiceException(500, "服务器异常");
-            }
+            students.add(student);
         }
-        //super.saveLog(LogNameConst.CREATE_ACCOUNT, sb.toString());
+
+        this.saveBatch(students);
+
+        List<SaveStudentInfoToCenterDTO> saveUserInfoDTOList = new ArrayList<>();
+        studentExpansionService.saveBatch(students.stream().map(student1 -> {
+            SaveStudentInfoToCenterDTO saveUserInfoDTO = new SaveStudentInfoToCenterDTO();
+            saveUserInfoDTO.setServerNo(ServerNoConstant.SERVER_NO);
+            saveUserInfoDTO.setAccount(student1.getAccount());
+            saveUserInfoDTO.setPassword(student1.getPassword());
+            saveUserInfoDTO.setUuid(student1.getUuid());
+            saveUserInfoDTOList.add(saveUserInfoDTO);
+
+            StudentExpansion studentExpansion = new StudentExpansion();
+            studentExpansion.setStudentId(student1.getId());
+            studentExpansion.setPhase(phase);
+            studentExpansion.setSourcePower(0);
+            return studentExpansion;
+        }).collect(Collectors.toList()));
+
+        // 获取所有体验版课程
+        List<CourseNew> experienceCourses = courseNewMapper.selectExperienceCourses();
+        // 推送体验版课程
+        commonMethod.initUnit(students, experienceCourses);
+
+        boolean b = centerUserFeignClient.saveUserInfos(saveUserInfoDTOList);
+        if (!b) {
+            throw new ServiceException("向中台服务器保存用户信息出错！");
+        }
+
         return ServerResponse.createBySuccess();
     }
 
@@ -214,7 +234,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         vo.setRank(student.getRank());
         vo.setSchoolName(student.getSchoolName());
         vo.setSex(student.getSex());
-        vo.setStudentName(student.getStudentName()==null||student.getStudentName().equals("")?"默认姓名":student.getStudentName());
+        vo.setStudentName(StringUtil.isEmpty(student.getStudentName()) ? "默认姓名" : student.getStudentName());
         vo.setWish(student.getWish());
         vo.setVersion(getStudentVersion(student));
         return ServerResponse.createBySuccess(vo);
@@ -251,7 +271,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
         Student oldStudent = studentMapper.selectByUuid(dto.getUuid());
         student.setUpdateTime(new Date());
-        if(student.getBirthDate().equals("")){
+        if ("".equals(student.getBirthDate())) {
             student.setBirthDate(null);
         }
         student.setId(oldStudent.getId());
@@ -338,21 +358,6 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             default:
                 return "小学";
         }
-    }
-
-    /**
-     * 推送体验版课程
-     *
-     * @param student
-     */
-    private void pushExperienceCourses(Student student) {
-        // 获取所有体验版课程
-        List<CourseNew> experienceCourses = courseNewMapper.selectExperienceCourses();
-        // 推送体验版课程
-        commonMethod.initUnit(student, experienceCourses, null, null);
-
-       /* // 推送体验版初始的智能版课程
-        this.pushEssenceCourse(student, phase, 1);*/
     }
 
     /**

@@ -27,7 +27,7 @@ public class ArrayUtil<T> {
     }
 
     /**
-     * 数组去除字符串中的空字符元素后，返回相应类型的集合
+     * 数组去除字符串中的空字符元素后，返回相应类型的集合（元素去重）
      *
      * @param array
      * @return
@@ -36,7 +36,9 @@ public class ArrayUtil<T> {
         if (array == null) {
             return Collections.emptyList();
         }
-        return Arrays.asList(removeBlankString(array));
+        List<String> strings = Arrays.asList(removeBlankString(array));
+        Set<String> set = new HashSet<>(strings);
+        return new ArrayList<>(set);
     }
 
     public static void main(String[] args) {
