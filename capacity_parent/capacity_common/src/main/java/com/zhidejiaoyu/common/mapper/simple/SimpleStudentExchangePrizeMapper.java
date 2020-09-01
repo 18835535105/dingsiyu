@@ -29,7 +29,7 @@ public interface SimpleStudentExchangePrizeMapper extends BaseMapper<StudentExch
 
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 
-    List<StudentExchangePrizeVo> selectListByAccountAndName(@Param("studentName") String name, @Param("adminId") Integer adminId,
+    List<StudentExchangePrizeVo> selectListByAccountAndName(@Param("page") Page<StudentExchangePrizeVo> page,@Param("studentName") String name, @Param("adminId") Integer adminId,
                                                             @Param("type")Integer type);
 
     @Update("update student_exchange_prize set state = #{state} where id = #{prizeId}")
