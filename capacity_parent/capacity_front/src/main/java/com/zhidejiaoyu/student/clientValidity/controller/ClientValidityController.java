@@ -1,8 +1,8 @@
 package com.zhidejiaoyu.student.clientValidity.controller;
 
 
+import com.zhidejiaoyu.student.business.controller.BaseController;
 import com.zhidejiaoyu.student.clientValidity.service.ClientValidityService;
-import com.zhidejiaoyu.student.controller.BaseController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
