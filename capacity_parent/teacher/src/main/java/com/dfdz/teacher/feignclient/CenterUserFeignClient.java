@@ -1,10 +1,11 @@
 package com.dfdz.teacher.feignclient;
 
-import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
+import com.zhidejiaoyu.common.dto.student.SaveStudentInfoToCenterDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.cloud.openfeign.SpringQueryMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
  * @author: wuchenxi
@@ -14,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface CenterUserFeignClient {
 
     /**
-     * 向中台服务器保存学生用户信息
-     * @param businessUserInfo
+     * 向中台服务器批量保存用户信息
+     *
+     * @param saveUserInfoDTOList
+     * @return
      */
-    @GetMapping("/userInfo/user")
-    void getUser(@SpringQueryMap BusinessUserInfo businessUserInfo);
+    @PostMapping("/userInfo/saveUserInfos")
+    boolean saveUserInfos(@RequestBody List<SaveStudentInfoToCenterDTO> saveUserInfoDTOList);
 }
