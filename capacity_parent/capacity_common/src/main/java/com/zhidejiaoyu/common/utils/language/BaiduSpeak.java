@@ -4,13 +4,11 @@ import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
-import com.zhidejiaoyu.common.utils.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,9 +57,19 @@ public class BaiduSpeak {
         if (vocabulary != null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
             return GetOssFile.getPublicObjectUrl(vocabulary.getReadUrl());
         }
-        if (text != null && text.contains("a/an")) {
+        if (text == null) {
+            return youdao + null;
+        }
+        if (text.contains("/")) {
             text = text.replace("/", ",");
         }
+        if (text.contains("sth")) {
+            text = text.replace("sth", "something");
+        }
+        if (text.contains("sb")) {
+            text = text.replace("sb", "somebody");
+        }
+
         return youdao + text;
     }
 
