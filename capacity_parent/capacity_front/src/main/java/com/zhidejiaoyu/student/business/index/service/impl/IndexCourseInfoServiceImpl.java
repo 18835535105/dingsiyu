@@ -244,20 +244,33 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
         List<SchoolTime> schoolTimes = schoolTimeMapper.selectAfterSixMonth(userId, grade, i >= 6 ? 12 : month);
 
-        SchoolTime schoolTime = schoolTimeMapper.selectNextByUserIdAndId(userId, schoolTimes.get(schoolTimes.size() - 1).getId());
+        List<SchoolTime> currentSchoolTimes;
+        // 如果当前时间是8月份之后，说明是第一学期，当前学习的是上册的课程
+        if (i > 8) {
+            List<SchoolTime> schoolTimes1 = Collections.singletonList(schoolTimes.stream()
+                    .filter(schoolTime -> Objects.equals(schoolTime.getGrade(), grade))
+                    .max((o1, o2) -> (int) (o2.getId() - o1.getId()))
+                    .orElse(new SchoolTime()));
+            currentSchoolTimes = new ArrayList<>(schoolTimes1);
+        } else {
+            currentSchoolTimes = new ArrayList<>(schoolTimes);
+        }
+
+        SchoolTime schoolTime = schoolTimeMapper.selectNextByUserIdAndId(userId, currentSchoolTimes.stream()
+                .max((o1, o2) -> (int) (o1.getId() - o2.getId()))
+                .orElse(new SchoolTime()).getId());
 
         List<String> gradeList = GradeUtil.smallThanCurrentGrade(grade);
         // 查询小于当前年级的所以课程计划
         List<SchoolTime> smallSchoolTimes = schoolTimeMapper.selectSmallThanCurrentGrade(userId, gradeList);
-        schoolTimes.addAll(smallSchoolTimes);
-        List<Long> courseIds = schoolTimes.stream().map(SchoolTime::getCourseId).distinct().collect(Collectors.toList());
+        currentSchoolTimes.addAll(smallSchoolTimes);
+        List<Long> courseIds = currentSchoolTimes.stream().map(SchoolTime::getCourseId).distinct().collect(Collectors.toList());
+
         if (schoolTime == null) {
             return courseIds;
         }
 
-        if (schoolTime.getMonth() <= i + 6) {
-            courseIds.add(schoolTime.getCourseId());
-        }
+        courseIds.add(schoolTime.getCourseId());
 
         return courseIds.stream().distinct().collect(Collectors.toList());
     }
