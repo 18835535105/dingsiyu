@@ -192,10 +192,15 @@ public class CurrentDayOfStudyRedisOpt {
                     }
                 }
                 if (type.equals(3)) {
-                    SyntaxTopic syntaxTopic = syntaxTopicFeignClient.selectSyntaxTopicById(integer.longValue());
-                    if (syntaxTopic != null) {
-                        stringBuilder.append(syntaxTopic.getTopic() + ":" + syntaxTopic.getAnswer()).append("##");
+                    try{
+                        SyntaxTopic syntaxTopic = syntaxTopicFeignClient.selectSyntaxTopicById(integer.longValue());
+                        if (syntaxTopic != null) {
+                            stringBuilder.append(syntaxTopic.getTopic() + ":" + syntaxTopic.getAnswer()).append("##");
+                        }
+                    }catch (Exception e){
+
                     }
+
                 }
             }
         });

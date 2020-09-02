@@ -109,7 +109,7 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
                     .contents(currentDayOfStudyService.getReturnList(this.joinStr(vo.getStudyModel())))
                     .date(currentDayOfStudy.getCreateTime() == null ? "" : date)
                     .errorSentence(currentDayOfStudyService.getTestList(this.joinStr(vo.getSentence())))
-                    .errorSyntax(currentDayOfStudyService.getErrorSyntaxList(this.joinObject(vo.getSyntax())))
+                    .errorSyntax(vo.getSyntax())
                     .errorTest(currentDayOfStudyService.getTestList(this.joinStr(vo.getTest())))
                     .errorText(currentDayOfStudyService.getReturnList(this.joinStr(vo.getText())))
                     .errorWord(currentDayOfStudyService.getTestList(this.joinStr(vo.getWord())))
