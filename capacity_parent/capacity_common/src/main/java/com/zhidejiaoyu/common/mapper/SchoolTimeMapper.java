@@ -53,7 +53,7 @@ public interface SchoolTimeMapper extends BaseMapper<SchoolTime> {
 
     Integer selectCountByStudentId(@Param("studentId") Long studentId);
 
-    int selectByGradeAndLabel(@Param("grade") String grade, @Param("label") String label, @Param("type") int type, @Param("userId") Long userId);
+    int countByGradeAndLabel(@Param("grade") String grade, @Param("label") String label, @Param("type") int type, @Param("userId") Long userId);
 
     /**
      * 查询半年后可以学习的所有课程
@@ -93,4 +93,13 @@ public interface SchoolTimeMapper extends BaseMapper<SchoolTime> {
     List<SchoolTime> selectSmallThanCurrentGrade(@Param("userId") Integer userId, @Param("gradeList") List<String> gradeList);
 
     SchoolTime selectByUserIdAndGrade(@Param("userId") Integer userId,@Param("grade") String grade);
+
+    /**
+     * 查询指定年级最小单元的学习计划
+     * @param userId
+     * @param type
+     * @param grade
+     * @return
+     */
+    SchoolTime selectMinUnitIdByUserIdAndTypeAndGrade(@Param("userId") Long userId, @Param("type") int type, @Param("grade") String grade);
 }

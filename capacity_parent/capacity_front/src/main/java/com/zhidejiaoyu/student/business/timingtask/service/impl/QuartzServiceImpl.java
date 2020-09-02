@@ -742,7 +742,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                         number = unitFeignClient.selectByUnitIdAndCourseId(unitId, courseId);
                     } else if (label.contains("下册")) {
                         //获取上册单元数量
-                        number = schoolTimeMapper.selectByGradeAndLabel(grade, "上册", type, userId);
+                        number = schoolTimeMapper.countByGradeAndLabel(grade, "上册", type, userId);
                         number += unitFeignClient.selectByUnitIdAndCourseId(unitId, courseId);
                     }
                     //获取数量

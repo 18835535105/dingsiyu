@@ -95,7 +95,7 @@
         where type = 2
           and user_id = #{studentId}
     </select>
-    <select id="selectByGradeAndLabel" parameterType="map" resultType="int">
+    <select id="countByGradeAndLabel" parameterType="map" resultType="int">
         select count(course.id)
         from school_time plan
                  join course_new course on plan.course_id = course.id
@@ -108,12 +108,13 @@
         select max(id) id, course_id, grade
         from school_time
         where id &lt;= (
-        select max(id)
-        from school_time
-        where user_id = #{userId}
-        and grade = #{grade}
-        and month &lt;= #{month}
-        ) and user_id = #{userId}
+            select max(id)
+            from school_time
+            where user_id = #{userId}
+              and grade = #{grade}
+              and month &lt;= #{month}
+        )
+          and user_id = #{userId}
         group by course_id
         order by id desc
 
@@ -136,6 +137,16 @@
             #{grade}
         </foreach>
         )
+    </select>
+    <select id="selectMinUnitIdByUserIdAndTypeAndGrade" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from school_time
+        where user_id = #{userId}
+        and type = #{type}
+        and grade = #{grade}
+        order by unit_id asc
+        limit 1
     </select>
 
 </mapper>

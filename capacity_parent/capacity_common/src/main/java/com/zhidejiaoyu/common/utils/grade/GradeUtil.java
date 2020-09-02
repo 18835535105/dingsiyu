@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.utils.grade;
 
 import com.zhidejiaoyu.common.constant.GradeNameConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import lombok.NonNull;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -279,14 +280,41 @@ public class GradeUtil {
         VERSION_GRADE.put("高三", HIGH_GRADE);
     }
 
+    /**
+     * 获取下一个年级
+     *
+     * @param grade
+     * @return
+     */
+    public static String getNextGrade(String grade) {
+        if (StringUtil.isEmpty(grade)) {
+            return grade;
+        }
+
+        if (Objects.equals(grade, GradeNameConstant.SENIOR_THREE)) {
+            return grade;
+        }
+        int length = NORMAL_GRADE.length;
+        for (int i = 0; i < length; i++) {
+            if (Objects.equals(grade, NORMAL_GRADE[i]) && i < length - 1) {
+                return NORMAL_GRADE[i + 1];
+            }
+        }
+        return grade;
+    }
+
     private GradeUtil() {
     }
 
     public static void main(String[] args) {
 //        System.out.println(GradeUtil.smallThanCurrentAllPhase("人教版", "高三"));
 //        System.out.println(GradeUtil.highThanCurrentAllPhase("人教版(PEP)", "七年级"));
-        System.out.println(GradeUtil.smallThanCurrentGrade("高三").toString());
-        System.out.println(GradeUtil.smallThanCurrentGrade("九年级").toString());
-        System.out.println(GradeUtil.smallThanCurrentGrade("六年级").toString());
+//        System.out.println(GradeUtil.smallThanCurrentGrade("高三").toString());
+//        System.out.println(GradeUtil.smallThanCurrentGrade("九年级").toString());
+//        System.out.println(GradeUtil.smallThanCurrentGrade("六年级").toString());
+        System.out.println(GradeUtil.getNextGrade("一年级"));
+        System.out.println(GradeUtil.getNextGrade("六年级"));
+        System.out.println(GradeUtil.getNextGrade("九年级"));
+        System.out.println(GradeUtil.getNextGrade("高三"));
     }
 }
