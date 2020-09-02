@@ -81,12 +81,14 @@ public class QuartzGradeServiceImpl extends ServiceImpl<StudentMapper, Student> 
         List<Student> students = studentMapper.selectList(new LambdaQueryWrapper<Student>()
                 // todo:临时去掉安仁的学生
                 .notLike(Student::getSchoolName, "安仁")
+                .isNotNull(Student::getGrade)
                 .in(Student::getId, studentStudyPlanNews.stream()
                         .map(StudentStudyPlanNew::getStudentId)
                         .collect(Collectors.toList())));
 
         List<Student> allStudents = studentMapper.selectList(new LambdaQueryWrapper<Student>()
                 // todo:临时去掉安仁的学生
+                .isNotNull(Student::getGrade)
                 .notLike(Student::getSchoolName, "安仁"));
 
         Map<Long, List<Student>> studentIdMap = students.stream().collect(Collectors.groupingBy(Student::getId));
@@ -100,16 +102,21 @@ public class QuartzGradeServiceImpl extends ServiceImpl<StudentMapper, Student> 
                 this.updateStudentStudyPlanNew(student, nextGrade);
             }
 
-            if (Objects.equals(nextGrade, GradeNameConstant.SENIOR_ONE)){
+            if (Objects.equals(nextGrade, GradeNameConstant.SENIOR_ONE)) {
                 StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
-                studentExpansion.setPhase("高中");
-                studentExpansions.add(studentExpansion);
+                if (studentExpansion != null) {
+                    studentExpansion.setPhase("高中");
+                    studentExpansions.add(studentExpansion);
+                }
+
             }
 
             if (Objects.equals(nextGrade, GradeNameConstant.SEVENTH_GRADE)) {
                 StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
-                studentExpansion.setPhase("初中");
-                studentExpansions.add(studentExpansion);
+                if (studentExpansion != null) {
+                    studentExpansion.setPhase("初中");
+                    studentExpansions.add(studentExpansion);
+                }
             }
 
             student.setGrade(nextGrade);
