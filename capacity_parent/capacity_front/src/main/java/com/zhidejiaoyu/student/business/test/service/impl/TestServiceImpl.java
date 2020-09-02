@@ -412,7 +412,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 testRecord.getStudyModel(), testRecord.getGenre(), null);
         int energy = getEnergy(student, testRecord.getPoint(), number);
         Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
-        int canAddGold = this.saveLog(student, Integer.parseInt(doubleGoldCount.toString()), null, "字母学后测试");
+        int canAddGold = this.saveLog(student, (int) Math.floor(doubleGoldCount), null, "字母学后测试");
 
         testRecord.setAwardGold(canAddGold);
 

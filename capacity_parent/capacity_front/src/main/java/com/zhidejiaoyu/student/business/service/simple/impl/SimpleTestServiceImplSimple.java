@@ -463,7 +463,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         // 获取当前单元下的所有单词
         List<Vocabulary> vocabularies = vocabularyFeignClient.selectByUnitId(unitId);
-        Integer subjectNum = vocabularies.size();
+        Integer subjectNum = Math.min(vocabularies.size(), 20);
         String[] type;
         if ("慧记忆".equals(studyModel)) {
             type = new String[]{"英译汉", "汉译英", "听力理解"};
