@@ -57,9 +57,19 @@ public class BaiduSpeak {
         if (vocabulary != null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
             return GetOssFile.getPublicObjectUrl(vocabulary.getReadUrl());
         }
-        if (text != null && text.contains("a/an")) {
+        if (text == null) {
+            return youdao + null;
+        }
+        if (text.contains("/")) {
             text = text.replace("/", ",");
         }
+        if (text.contains("sth")) {
+            text = text.replace("sth", "something");
+        }
+        if (text.contains("sb")) {
+            text = text.replace("sb", "somebody");
+        }
+
         return youdao + text;
     }
 

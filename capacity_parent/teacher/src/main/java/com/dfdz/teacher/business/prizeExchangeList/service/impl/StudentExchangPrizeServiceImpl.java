@@ -41,11 +41,11 @@ public class StudentExchangPrizeServiceImpl extends ServiceImpl<SimpleStudentExc
         List<StudentExchangePrizeVo> studentExchangePrizeVo;
         Page<StudentExchangePrizeVo> page = new Page<>(dto.getPageNum(), dto.getPageSize());
         if (user.getAccount().contains("xg")) {
-            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(dto.getStudentName(), user.getId(), 1);
+            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(page,dto.getStudentName(), user.getId(), 1);
         } else if (user.getAccount().contains("admin")) {
-            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(dto.getStudentName(), user.getId(), 3);
+            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(page,dto.getStudentName(), user.getId(), 3);
         } else {
-            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(dto.getStudentName(), user.getId(), 2);
+            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(page,dto.getStudentName(), user.getId(), 2);
         }
         List<StudentExchangePrizeVo> returnList = new ArrayList<>();
         for (StudentExchangePrizeVo vo : studentExchangePrizeVo) {

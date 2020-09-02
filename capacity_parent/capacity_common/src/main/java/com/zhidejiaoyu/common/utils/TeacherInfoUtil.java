@@ -51,7 +51,6 @@ public class TeacherInfoUtil {
      * @return
      */
     public static Integer getSchoolAdminId(Integer teacherId) {
-
         Integer schoolAdminId = teacherMapper.getSchoolAdminById(teacherId);
         if (schoolAdminId == null) {
             return teacherId;

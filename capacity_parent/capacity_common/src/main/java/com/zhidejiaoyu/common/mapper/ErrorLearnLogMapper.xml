@@ -56,6 +56,15 @@
           order by log.review_count asc
           limit 15
     </select>
+
+    <select id="selectUnitIdByStudentId" parameterType="long" resultType="long">
+       select distinct unit_id
+       from error_learn_log log
+        where log.type=1
+          and log.student_id=#{studentId}
+          limit 1
+    </select>
+
     <select id="selectVocabularyByStudentIdAndVocabularyIds" parameterType="map" resultMap="BaseResultMap">
         select <include refid="base_sql"></include>
         from error_learn_log where student_id =#{studentId}

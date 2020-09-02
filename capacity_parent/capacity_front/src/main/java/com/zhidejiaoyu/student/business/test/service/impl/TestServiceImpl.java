@@ -75,8 +75,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Resource
     private SentenceFeignClient sentenceFeignClient;
     @Autowired
-    private StudentMapper studentMapper;
-    @Autowired
     private TestResultUtil testResultUtil;
     @Autowired
     private TestRecordMapper testRecordMapper;

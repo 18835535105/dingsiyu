@@ -70,7 +70,7 @@ public class StudentController {
      * @return
      */
     @PostMapping("/edit/saveStudentInfo")
-    ServerResponse<Object> saveStudentInfo(@RequestBody SaveEditStudentInfoDTO dto) {
+    public ServerResponse<Object> saveStudentInfo(@RequestBody SaveEditStudentInfoDTO dto) {
         return studentService.saveStudentInfoAfterEdit(dto);
     }
 

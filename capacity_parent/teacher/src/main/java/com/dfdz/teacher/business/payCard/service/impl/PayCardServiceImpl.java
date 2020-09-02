@@ -286,13 +286,16 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
         Map<String, Object> map = new HashMap<>();
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(studentId);
         Integer useCaptainCoin = 0;
-        if (expansion == null || expansion.getPhase().equals("小学")) {
-            useCaptainCoin = 300 * months;
+        map.put("index", 1);
+        map.put("useCaptainCoin", useCaptainCoin);
+        if (expansion == null || expansion.getPhase() == null || expansion.getPhase().equals("小学")) {
+            useCaptainCoin = 400 * months;
             if (captainCoin < useCaptainCoin) {
                 map.put("index", 2);
                 map.put("message", "队长币数量不足");
                 return map;
             }
+            return map;
         }
         if (expansion.getPhase().equals("初中")) {
             useCaptainCoin = 400 * months;
@@ -301,6 +304,7 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
                 map.put("message", "队长币数量不足");
                 return map;
             }
+            return map;
         }
         if (expansion.getPhase().equals("高中")) {
             useCaptainCoin = 500 * months;
@@ -309,9 +313,8 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
                 map.put("message", "队长币数量不足");
                 return map;
             }
+            return map;
         }
-        map.put("index", 1);
-        map.put("useCaptainCoin", useCaptainCoin);
         return map;
     }
 

@@ -94,6 +94,11 @@
         where school_id = #{schoolAdminId}
     </select>
 
-
+    <select id="selectListBySchoolId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from prize_exchange_list
+        where school_id = #{schoolAdminId}
+    </select>
 
 </mapper>

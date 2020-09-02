@@ -37,7 +37,7 @@ public class StudyInfoVO implements Serializable {
 
     private List<Map<String,String>> errorSentence;
 
-    private List<String> errorSyntax;
+    private List<Object> errorSyntax;
 
     private List<String> errorText;
 

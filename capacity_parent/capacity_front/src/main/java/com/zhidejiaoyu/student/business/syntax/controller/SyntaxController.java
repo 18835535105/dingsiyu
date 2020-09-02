@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.controller.BaseController;
 import com.zhidejiaoyu.student.business.syntax.service.LearnSyntaxService;
+import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +35,9 @@ public class SyntaxController extends BaseController {
     @Resource(name = "writeSyntaxService")
     private LearnSyntaxService writeSyntaxService;
 
+    @Resource
+    private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
+
     /**
      * 获取当前单元的学语法数据
      *
@@ -42,11 +46,12 @@ public class SyntaxController extends BaseController {
      */
     @GetMapping("/getLearnSyntax")
     public ServerResponse<Object> getLearnSyntax(Long unitId) {
+        Student student = super.getStudent(HttpUtil.getHttpSession());
         if (unitId == null) {
-            Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在获取学语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
             throw new RuntimeException("参数错误");
         }
+        currentDayOfStudyRedisOpt.saveStudyModel(student.getId(),"学语法",unitId);
         return learnSyntaxService.getLearnSyntax(unitId);
     }
 
@@ -74,11 +79,12 @@ public class SyntaxController extends BaseController {
      */
     @GetMapping("/getSelectSyntax")
     public ServerResponse<Object> getSelectSyntax(Long unitId) {
+        Student student = super.getStudent(HttpUtil.getHttpSession());
         if (unitId == null) {
-            Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在获取选语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
             throw new RuntimeException("参数错误");
         }
+        currentDayOfStudyRedisOpt.saveStudyModel(student.getId(),"选语法",unitId);
         return selectSyntaxService.getLearnSyntax(unitId);
     }
 
@@ -106,11 +112,12 @@ public class SyntaxController extends BaseController {
      */
     @GetMapping("/getWriteSyntax")
     public ServerResponse<Object> getWriteSyntax(Long unitId) {
+        Student student = super.getStudent(HttpUtil.getHttpSession());
         if (unitId == null) {
-            Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在获取写语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
             throw new RuntimeException("参数错误");
         }
+        currentDayOfStudyRedisOpt.saveStudyModel(student.getId(),"写语法",unitId);
         return writeSyntaxService.getLearnSyntax(unitId);
     }
 

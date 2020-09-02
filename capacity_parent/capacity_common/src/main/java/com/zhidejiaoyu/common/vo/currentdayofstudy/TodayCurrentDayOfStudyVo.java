@@ -51,7 +51,7 @@ public class TodayCurrentDayOfStudyVo {
     /**
      * 错误语法，多个语法间用##隔开
      */
-    private List<String> syntax;
+    private List<Object> syntax;
 
     /**
      * 错误的考题，多个考题间用##隔开，只统计选择和填空的答错试题

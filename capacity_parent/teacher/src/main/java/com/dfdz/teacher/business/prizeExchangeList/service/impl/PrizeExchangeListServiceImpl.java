@@ -43,13 +43,14 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
     public ServerResponse<Object> getAllList(PrizeExchangeListDto dto) {
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
         Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(sysUser.getId().longValue());
-        Page<PrizeExchangeListVo> page = new Page<>(dto.getPageNum(), dto.getPageSize());
-        List<PrizeExchangeList> prizeExchangeLists = prizeExchangeListMapper.selectBySchoolId(schoolAdminId, "3", null);
+        Page<PrizeExchangeList> page = new Page<>(dto.getPageNum(), dto.getPageSize());
+        List<PrizeExchangeList> prizeExchangeLists = prizeExchangeListMapper.selectListBySchoolId(page,schoolAdminId);
         List<PrizeExchangeListVo> vos = new ArrayList<>();
         getPrizeExchangeListVos(vos, prizeExchangeLists, (dto.getPageNum() - 1) * dto.getPageSize());
         Integer count = prizeExchangeListMapper.countBySchoolId(schoolAdminId);
-        page.setTotal(count);
-        PageVo<PrizeExchangeListVo> studentManageVOPageVo = PageUtil.packagePage(vos, page.getTotal());
+        Page<PrizeExchangeListVo> pages = new Page<>(dto.getPageNum(), dto.getPageSize());
+        pages.setTotal(count);
+        PageVo<PrizeExchangeListVo> studentManageVOPageVo = PageUtil.packagePage(vos, pages.getTotal());
         return ServerResponse.createBySuccess(studentManageVOPageVo);
     }
 
