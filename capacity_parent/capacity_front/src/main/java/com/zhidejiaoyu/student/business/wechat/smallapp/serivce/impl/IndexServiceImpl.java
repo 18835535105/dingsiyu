@@ -193,11 +193,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     public ServerResponse<Object> cardInfo(String openId) {
         Student student = studentMapper.selectByOpenId(openId);
 
-        // 判断学生是否进行过摸底测试，如果没有摸底测试记录不允许打卡
-        TestRecord testRecord = testRecordMapper.selectByGenre(student.getId(), GenreConstant.TEST_BEFORE_STUDY);
-        if (testRecord == null) {
-            return ServerResponse.createBySuccess(400, "请先去摸底测试！");
-        }
+
 
         // 10天前的日期，10天内学生没有登陆过系统不允许打卡
         Date date = new Date();
@@ -213,6 +209,13 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         if (loginCount == 0 || todayCardCount > 0) {
             canCard = false;
             msg = todayCardCount == 0 ? "您已经10天未进行学习，请登陆夺分系统学习才可以继续打卡。" : "您今天已经打卡，无需再次打卡！";
+        }
+
+        // 判断学生是否进行过摸底测试，如果没有摸底测试记录不允许打卡
+        TestRecord testRecord = testRecordMapper.selectByGenre(student.getId(), GenreConstant.TEST_BEFORE_STUDY);
+        if (testRecord == null) {
+            canCard = false;
+            msg = "请先去摸底测试！";
         }
 
         List<ClockIn> clockIns = clockInMapper.selectByStudentId(studentId);
