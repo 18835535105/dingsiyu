@@ -3,6 +3,7 @@ package com.dfdz.teacher.business.payCard.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dfdz.teacher.business.course.service.CourseService;
 import com.dfdz.teacher.business.payCard.service.PayCardService;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.dto.wechat.qy.teacher.PayStudentsDTO;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -33,6 +34,8 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
     private PayLogMapper payLogMapper;
     @Resource
     private CourseService courseService;
+    @Resource
+    private TestRecordMapper testRecordMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -46,9 +49,7 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
         if (!user.getAccount().contains("admin")) {
             flag = getType(months, Integer.parseInt(schoolHours.getCaptainCoin()), student.getId());
         }
-
-        //判断是否需要添加课程
-        getStudentUnit(student);
+        addCourse(student);
         Date now = new Date();
         Integer studentTime = getStudentTime(student, months);
         Map<String, String> map = new HashMap<>();
@@ -78,6 +79,14 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
         }
     }
 
+    private void addCourse(Student student) {
+        //判断是否需要添加课程
+        TestRecord testRecord = testRecordMapper.selectByGenre(student.getId(), GenreConstant.TEST_BEFORE_STUDY);
+        if (testRecord != null) {
+            getStudentUnit(student);
+        }
+    }
+
     @Override
     public Object addAllStudent(PayStudentsDTO dto) {
         String openId = dto.getOpenId();
@@ -95,7 +104,7 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
                 flag = getType(months, Integer.parseInt(schoolHours.getCaptainCoin()), student.getId());
             }
             //判断是否需要添加课程
-            getStudentUnit(student);
+            addCourse(student);
             Date now = new Date();
             Integer studentTime = getStudentTime(student, months);
             Map<String, String> map = new HashMap<>();
