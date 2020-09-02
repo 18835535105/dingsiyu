@@ -119,7 +119,7 @@ public class AuthorizationServiceImpl extends BaseServiceImpl<StudentMapper, Stu
     }
 
     @Override
-    public ServerResponse unbundling(String openId) {
+    public ServerResponse<Object> unbundling(String openId) {
         Student student = studentMapper.selectByOpenId(openId);
         String openid = student.getOpenid();
         String[] split = openid.split(",");

@@ -66,7 +66,7 @@ public class AuthorizationController {
     }
 
     @PostMapping("/unbundling")
-    public ServerResponse Unbundling(@RequestBody  String openId){
+    public ServerResponse<Object> unbundling(@RequestBody String openId){
         return authorizationService.unbundling(openId);
     }
 }

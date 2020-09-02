@@ -106,7 +106,7 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
     }
 
     @Override
-    public ServerResponse unbundling(String openId) {
+    public ServerResponse<Object> unbundling(String openId) {
         BusinessUserInfo businessUserInfo1 = businessUserInfoMapper.selectStudentInfoByOpenId(openId);
         ServerConfig serverConfig = serverConfigMapper.selectByAccount(businessUserInfo1.getAccount());
         if (serverConfig == null) {
