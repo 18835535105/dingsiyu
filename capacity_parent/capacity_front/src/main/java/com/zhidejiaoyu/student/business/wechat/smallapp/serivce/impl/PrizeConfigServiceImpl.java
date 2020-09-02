@@ -87,7 +87,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         StringBuilder sb = new StringBuilder().append(sysUser.getPhone()).append("（").append(sysUser.getName(), 0, 1).append("老师）").append("-");
         SysUser teacherUser = sysUserMapper.selectById(student.getTeacherId());
         if (teacherUser.getAccount().contains("js")) {
-            sb.append(sysUser.getPhone()).append("（").append(sysUser.getName(), 0, 1).append("老师）");
+            sb.append(teacherUser.getPhone()).append("（").append(teacherUser.getName(), 0, 1).append("老师）");
         }
         Teacher teacher = teacherMapper.selectTeacherBySchoolAdminId(adminId.intValue());
         returnMap.put("adminPhone", sb.toString());
