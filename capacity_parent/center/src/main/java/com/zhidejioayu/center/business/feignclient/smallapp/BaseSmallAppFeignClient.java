@@ -153,5 +153,8 @@ public interface BaseSmallAppFeignClient {
      */
     @GetMapping("/smallApp/index/goldCountLimit")
     ServerResponse<Object> goldCountLimit(@RequestParam String openId);
+
+    @GetMapping("/smallApp/authorization/unbundling")
+    ServerResponse<Object> unbundling(@RequestBody String openId);
 }
 

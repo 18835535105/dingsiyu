@@ -28,4 +28,6 @@ public interface AuthorizationService extends BaseService<Student> {
      * @param request
      */
     ServerResponse<Object> authorization(HttpServletRequest request);
+
+    ServerResponse unbundling(String openId);
 }

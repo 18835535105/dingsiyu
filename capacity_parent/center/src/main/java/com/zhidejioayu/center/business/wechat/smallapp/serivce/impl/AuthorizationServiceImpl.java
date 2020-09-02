@@ -105,6 +105,26 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
         return ServerResponse.createBySuccess(authorizationVoBuilder.build());
     }
 
+    @Override
+    public ServerResponse unbundling(String openId) {
+        BaseSmallAppFeignClient smallAppFeignClient = FeignClientUtil.getBaseSmallAppFeignClient(openId);
+        ServerResponse<Object> response = smallAppFeignClient.unbundling(openId);
+        if (Objects.equals(response.getStatus(), ResponseCode.SUCCESS.getCode())) {
+            BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectStudentInfoByOpenId(openId);
+            String openid = businessUserInfo.getOpenid();
+            String[] split = openid.split(",");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < split.length; i++) {
+                if(!split[i].contains(openId)){
+                    sb.append(split[i]).append(",");
+                }
+            }
+            businessUserInfo.setOpenid(sb.toString());
+            businessUserInfoMapper.updateById(businessUserInfo);
+        }
+        return ServerResponse.createBySuccess();
+    }
+
     /**
      * 请求微信授权接口，获取授权响应数据
      *

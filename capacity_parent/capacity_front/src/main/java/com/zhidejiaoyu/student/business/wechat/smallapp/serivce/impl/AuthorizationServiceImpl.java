@@ -118,6 +118,22 @@ public class AuthorizationServiceImpl extends BaseServiceImpl<StudentMapper, Stu
         return ServerResponse.createBySuccess(authorizationVo);
     }
 
+    @Override
+    public ServerResponse unbundling(String openId) {
+        Student student = studentMapper.selectByOpenId(openId);
+        String openid = student.getOpenid();
+        String[] split = openid.split(",");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < split.length; i++) {
+            if(!split[i].contains(openId)){
+                sb.append(split[i]).append(",");
+            }
+        }
+        student.setOpenid(sb.toString());
+        studentMapper.updateById(student);
+        return ServerResponse.createBySuccess();
+    }
+
     /**
      * 请求微信授权接口，获取授权响应数据
      *
