@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.wechat.smallapp.serivce.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -66,6 +67,9 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private CurrentDayOfStudyMapper currentDayOfStudyMapper;
+
+    @Resource
+    private TestRecordMapper testRecordMapper;
 
     @Override
     public ServerResponse<Object> index(String openId) {
@@ -188,6 +192,12 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     public ServerResponse<Object> cardInfo(String openId) {
         Student student = studentMapper.selectByOpenId(openId);
+
+        // 判断学生是否进行过摸底测试，如果没有摸底测试记录不允许打卡
+        TestRecord testRecord = testRecordMapper.selectByGenre(student.getId(), GenreConstant.TEST_BEFORE_STUDY);
+        if (testRecord == null) {
+            return ServerResponse.createBySuccess(400, "请先去摸底测试！");
+        }
 
         // 10天前的日期，10天内学生没有登陆过系统不允许打卡
         Date date = new Date();
