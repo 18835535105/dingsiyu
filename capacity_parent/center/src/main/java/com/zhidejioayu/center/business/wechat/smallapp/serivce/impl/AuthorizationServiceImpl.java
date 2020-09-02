@@ -107,7 +107,12 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
 
     @Override
     public ServerResponse unbundling(String openId) {
-        BaseSmallAppFeignClient smallAppFeignClient = FeignClientUtil.getBaseSmallAppFeignClient(openId);
+        BusinessUserInfo businessUserInfo1 = businessUserInfoMapper.selectStudentInfoByOpenId(openId);
+        ServerConfig serverConfig = serverConfigMapper.selectByAccount(businessUserInfo1.getAccount());
+        if (serverConfig == null) {
+            return ServerResponse.createByError(400, "账号或密码输入错误！");
+        }
+        BaseSmallAppFeignClient smallAppFeignClient = FeignClientUtil.getSmallAppFeignClient(serverConfig.getServerName());
         ServerResponse<Object> response = smallAppFeignClient.unbundling(openId);
         if (Objects.equals(response.getStatus(), ResponseCode.SUCCESS.getCode())) {
             BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectStudentInfoByOpenId(openId);
