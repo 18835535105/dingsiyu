@@ -183,7 +183,14 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("studentName", student.getNickname());
         returnMap.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
-        CourseNew course = courseFeignClient.getById(studentStudyPlanNew.getCourseId());
+        CourseNew course ;
+        if(studentStudyPlanNew==null){
+            Long unitId = errorLearnLogMapper.selectUnitIdByStudentId(student.getId());
+            UnitNew unit = courseFeignClient.getUnitNewById(unitId);
+            course = courseFeignClient.getById(unit.getCourseId());
+        }else{
+            course = courseFeignClient.getById(studentStudyPlanNew.getCourseId());
+        }
         returnMap.put("courseName", course.getCourseName());
         // 打卡天数（非连续打卡天数）
         int cardDays = clockInMapper.countByStudentId(student.getId());
