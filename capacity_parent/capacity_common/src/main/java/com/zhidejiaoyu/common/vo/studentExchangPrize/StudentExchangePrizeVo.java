@@ -13,5 +13,6 @@ public class StudentExchangePrizeVo {
     private String createTime;
     private Integer state;
     private Date createTimes;
+    private Integer index;
 
 }
