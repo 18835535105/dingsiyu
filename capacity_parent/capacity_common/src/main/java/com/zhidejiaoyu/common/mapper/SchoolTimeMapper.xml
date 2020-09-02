@@ -105,8 +105,7 @@
           and user_id = #{userId}
     </select>
     <select id="selectAfterSixMonth" resultMap="BaseResultMap" parameterType="map">
-        select
-        <include refid="base_sql"/>
+        select max(id) id, course_id, grade
         from school_time
         where id &lt;= (
         select max(id)
@@ -115,7 +114,8 @@
         and grade = #{grade}
         and month &lt;= #{month}
         ) and user_id = #{userId}
-        order by id
+        group by course_id
+        order by id desc
 
     </select>
     <select id="selectNextByUserIdAndId" resultMap="BaseResultMap" parameterType="map">

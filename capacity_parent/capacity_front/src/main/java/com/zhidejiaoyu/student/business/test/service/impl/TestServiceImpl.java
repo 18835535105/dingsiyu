@@ -846,13 +846,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             isFirst = true;
         }
 
-
-        Integer group = getGroup(unitId, student.getId(), 1, 3);
-        // 获取测试有效次数
-        int number = testRecordMapper.selCount(student.getId(), courseId, unitId, studyModelAndGenre, studyModelAndGenre, group);
-        int energy = getEnergy(wordUnitTestDTO, student, number);
-        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld, true);
-
         TestRecord testRecord = new TestRecord();
         if (testRecordOld == null) {
             // 首次测试大于或等于80分，超过历史最高分次数 +1
@@ -885,6 +878,13 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (wordUnitTestDTO.getErrorCount() != null && wordUnitTestDTO.getRightCount() != null) {
             testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
         }
+
+        Integer group = getGroup(unitId, student.getId(), 1, 3);
+        // 获取测试有效次数
+        int number = testRecordMapper.selCount(student.getId(), courseId, unitId, studyModelAndGenre, studyModelAndGenre, group);
+        int energy = getEnergy(wordUnitTestDTO, student, number);
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld, true);
+
         testRecord.setAwardGold(goldCount);
         testRecord.setStudyModel(studyModelAndGenre);
 
@@ -1058,6 +1058,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 wordUnitTestDTO.getUnitId()[0], "单元闯关测试", type);
         if (testRecord == null) {
             isFirst = true;
+            testRecord = new TestRecord();
         }
 
         int model = 1;
@@ -1259,6 +1260,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
                 wordUnitTestDTO.getUnitId()[0], "句子测试", type);
         if (testRecord == null) {
+            testRecord = new TestRecord();
             isFirst = true;
         }
         saveError(unitId[0], errorWordId, student, classify, 2);
@@ -1494,12 +1496,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 StudyModelConstant.PHONETIC_SYMBOL_TEST, GenreConstant.UNIT_TEST, null);
         int energy = super.getEnergy(student, point, number);
 
-        WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
-        wordUnitTestDTO.setClassify(11);
-        wordUnitTestDTO.setUnitId(new Long[]{dto.getUnitId()});
-        wordUnitTestDTO.setPoint(point);
-        Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, true);
-
         testRecord = new TestRecord();
         testRecord.setStudentId(student.getId());
         testRecord.setUnitId(dto.getUnitId());
@@ -1513,6 +1509,13 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setErrorCount(dto.getErrorCount());
         testRecord.setRightCount(dto.getRightCount());
         testRecord.setStudyModel(StudyModelConstant.PHONETIC_SYMBOL_TEST);
+
+        WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
+        wordUnitTestDTO.setClassify(11);
+        wordUnitTestDTO.setUnitId(new Long[]{dto.getUnitId()});
+        wordUnitTestDTO.setPoint(point);
+        Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, true);
+
         testRecord.setAwardGold(goldCount);
         TestResultVo vo = new TestResultVo();
         String message = getMessage(student, vo, testRecord, point, PointConstant.EIGHTY);
