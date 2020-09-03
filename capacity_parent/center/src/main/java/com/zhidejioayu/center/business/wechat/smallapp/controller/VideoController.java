@@ -80,4 +80,16 @@ public class VideoController {
     public List<VideoUnitVO> getVideoUnitInfo(@RequestParam String uuid, @RequestParam String videoId) {
         return videoService.getVideoUnitInfo(uuid, videoId);
     }
+
+    /**
+     * 保存观看的视频
+     *
+     * @param uuid
+     * @param videoId
+     * @return
+     */
+    @PostMapping("/savePCVideo")
+    public ServerResponse<Object> saveVideo(@RequestParam String uuid, @RequestParam String videoId) {
+        return videoService.saveVideo(uuid, videoId);
+    }
 }

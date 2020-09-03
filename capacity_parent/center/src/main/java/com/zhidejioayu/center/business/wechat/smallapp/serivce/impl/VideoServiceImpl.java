@@ -134,5 +134,17 @@ public class VideoServiceImpl implements VideoService {
         return videoUnitVos;
     }
 
+    @Override
+    public ServerResponse<Object> saveVideo(String uuid, String videoId) {
+        studentWechatVideoMapper.insert(StudentWechatVideo.builder()
+                .studentUuid(uuid)
+                .createTime(new Date())
+                .id(IdUtil.getId())
+                .wechatVideoId(videoId)
+                .state(1)
+                .build());
+        return ServerResponse.createBySuccess();
+    }
+
 
 }

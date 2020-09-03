@@ -1,9 +1,11 @@
 package com.zhidejiaoyu.student.business.feignclient.center;
 
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.study.video.VideoCourseVO;
 import com.zhidejiaoyu.common.vo.study.video.VideoUnitVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -30,11 +32,20 @@ public interface VideoFeignClient {
     /**
      * 查询视频的单元信息
      *
-     *
      * @param uuid
      * @param videoId
      * @return
      */
     @GetMapping("/getVideoUnitInfo")
     List<VideoUnitVO> getVideoUnitInfo(@RequestParam String uuid, @RequestParam String videoId);
+
+    /**
+     * 保存观看的视频
+     *
+     * @param uuid
+     * @param videoId
+     * @return
+     */
+    @PostMapping("/savePCVideo")
+    ServerResponse<Object> saveVideo(@RequestParam String uuid, @RequestParam String videoId);
 }

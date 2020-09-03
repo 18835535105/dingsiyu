@@ -29,6 +29,10 @@ public class BaseController {
         return studentInfoService.getById(this.getStudentId(session));
     }
 
+    public Student getStudent() {
+        return studentInfoService.getById(this.getStudentId());
+    }
+
     Long getStudentId(HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         return student.getId();

@@ -44,10 +44,18 @@ public interface VideoService {
     /**
      * 查询视频的单元信息
      *
-     *
      * @param uuid
      * @param videoId
      * @return
      */
     List<VideoUnitVO> getVideoUnitInfo(String uuid, String videoId);
+
+    /**
+     * 保存观看的视频
+     *
+     * @param uuid
+     * @param videoId
+     * @return
+     */
+    ServerResponse<Object> saveVideo(String uuid, String videoId);
 }
