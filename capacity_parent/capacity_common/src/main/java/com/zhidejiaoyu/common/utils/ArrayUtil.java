@@ -56,7 +56,7 @@ public class ArrayUtil<T> {
                 Map<String,Object> map=new HashMap<>();
                 String[] splits = str.split(":");
                 if(splits.length>1){
-                    map.put("subject",splits[0]);
+                    map.put("subject",splits[0].replace("/n"," "));
                     map.put("answer",splits[1]);
                 }
                 returnList.add(map);
