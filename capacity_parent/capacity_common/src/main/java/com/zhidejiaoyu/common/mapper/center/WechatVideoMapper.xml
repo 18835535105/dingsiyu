@@ -8,10 +8,12 @@
         <result column="grade" property="grade"/>
         <result column="name" property="name"/>
         <result column="url" property="url"/>
+        <result column="label" property="label"/>
+        <result column="unit" property="unit"/>
         <result column="create_time" property="createTime"/>
     </resultMap>
     <sql id="base_sql">
-        id, grade, `name`, url, create_time
+        id, grade, `name`, url, create_time, label, unit
     </sql>
     <select id="selectNextVideo" resultMap="BaseResultMap" parameterType="map">
         select
@@ -21,10 +23,36 @@
         select wechat_video_id
         from student_wechat_video
         where student_uuid = #{userUuid}
+        and state = 1
         )
         and grade = #{grade}
         order by create_time
         limit 1
+    </select>
+    <select id="selectByGradesAndNextGrade"
+            resultType="com.zhidejiaoyu.common.vo.study.video.VideoCourseVO" parameterType="map">
+        select id, grade, label from wechat_video
+        <where>
+            <if test="grades != null and grades.size > 0">
+                grade in (
+                <foreach collection="grades" item="grade" separator=",">
+                    #{grade}
+                </foreach>
+                )
+            </if>
+            <if test="nextGrade != null and nextGrade != ''">
+                or grade = #{nextGrade}
+            </if>
+        </where>
+        order by create_time, name
+    </select>
+    <select id="selectByGradeAndLabel"
+            resultType="com.zhidejiaoyu.common.vo.study.video.VideoListVO" parameterType="map">
+        select id, url, unit
+        from wechat_video
+        where grade = #{grade}
+          and label = #{label}
+        order by create_time, name
     </select>
 
 </mapper>

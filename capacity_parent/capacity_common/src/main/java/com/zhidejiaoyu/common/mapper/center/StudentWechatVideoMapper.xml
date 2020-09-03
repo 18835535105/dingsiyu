@@ -4,10 +4,21 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.center.StudentWechatVideo">
-        <id column="id" property="id" />
-        <result column="wechat_video_id" property="wechatVideoId" />
-        <result column="student_uuid" property="studentUuid" />
-        <result column="create_time" property="createTime" />
+        <id column="id" property="id"/>
+        <result column="wechat_video_id" property="wechatVideoId"/>
+        <result column="student_uuid" property="studentUuid"/>
+        <result column="create_time" property="createTime"/>
+        <result column="state" property="state"/>
     </resultMap>
+    <sql id="base_sql">
+        id, wechat_video_id, student_uuid, create_time, state
+    </sql>
+    <select id="selectByUuid" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from student_wechat_video
+        where student_uuid = #{uuid}
+        group by wechat_video_id;
+    </select>
 
 </mapper>

@@ -25,6 +25,11 @@ public class CourseVO implements Serializable {
     private Long courseId;
 
     /**
+     * 视频id
+     */
+    private String videoId;
+
+    /**
      * 英文上下册  one-up
      */
     private String englishGrade;

@@ -10,17 +10,20 @@ import com.zhidejiaoyu.common.pojo.center.StudentWechatVideo;
 import com.zhidejiaoyu.common.pojo.center.WechatVideo;
 import com.zhidejiaoyu.common.utils.IdUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.study.video.VideoCourseVO;
+import com.zhidejiaoyu.common.vo.study.video.VideoListVO;
+import com.zhidejiaoyu.common.vo.study.video.VideoUnitVO;
 import com.zhidejiaoyu.common.vo.wechat.smallapp.video.VideoVO;
 import com.zhidejioayu.center.business.feignclient.student.BaseStudentFeignClient;
 import com.zhidejioayu.center.business.feignclient.util.FeignClientUtil;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.VideoService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author: wuchenxi
@@ -53,6 +56,7 @@ public class VideoServiceImpl implements VideoService {
                 .createTime(new Date())
                 .id(IdUtil.getId())
                 .wechatVideoId(videoId)
+                .state(1)
                 .build());
 
         return ServerResponse.createBySuccess();
@@ -86,11 +90,49 @@ public class VideoServiceImpl implements VideoService {
                     .build());
         }
 
-        studentWechatVideoMapper.deleteByStudentUuid(userUuid);
+        studentWechatVideoMapper.updateStateByUuid(userUuid, 2);
+
         wechatVideo = wechatVideoMapper.selectNextVideo(userUuid, grade);
         return ServerResponse.createBySuccess(VideoVO.builder()
                 .id(wechatVideo.getId())
                 .url(wechatVideo.getUrl())
                 .build());
     }
+
+    @Override
+    public List<VideoCourseVO> getVideoCourse(List<String> grades, String nextGrade) {
+        return wechatVideoMapper.selectByGradesAndNextGrade(grades, nextGrade);
+    }
+
+    @Override
+    public List<VideoUnitVO> getVideoUnitInfo(String uuid, String videoId) {
+        WechatVideo wechatVideo = wechatVideoMapper.selectById(videoId);
+        List<VideoListVO> videoListVOS = wechatVideoMapper.selectByGradeAndLabel(wechatVideo.getGrade(), wechatVideo.getLabel());
+
+        List<StudentWechatVideo> studentWechatVideos = studentWechatVideoMapper.selectByUuid(uuid);
+        Map<String, String> map = new HashMap<>(16);
+        if (CollectionUtils.isNotEmpty(studentWechatVideos)) {
+            studentWechatVideos.forEach(studentWechatVideo -> map.put(studentWechatVideo.getWechatVideoId(), studentWechatVideo.getWechatVideoId()));
+        }
+
+        Map<String, List<VideoListVO>> collect = videoListVOS.stream().collect(Collectors.groupingBy(VideoListVO::getUnit));
+
+        List<VideoUnitVO> videoUnitVos = new ArrayList<>();
+        collect.forEach((unitName, videoList) -> {
+            VideoUnitVO videoUnitVO = new VideoUnitVO();
+            videoUnitVO.setUnitName(unitName);
+            videoUnitVO.setVoList(videoList.stream().peek(videoListVO -> {
+                if (map.containsKey(videoListVO.getId())) {
+                    videoListVO.setState(1);
+                } else {
+                    videoListVO.setState(2);
+                }
+            }).collect(Collectors.toList()));
+            videoUnitVos.add(videoUnitVO);
+        });
+
+        return videoUnitVos;
+    }
+
+
 }

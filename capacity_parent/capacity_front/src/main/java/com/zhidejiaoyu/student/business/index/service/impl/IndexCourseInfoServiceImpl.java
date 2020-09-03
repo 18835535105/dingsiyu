@@ -12,6 +12,9 @@ import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.course.UnitStudyStateVO;
+import com.zhidejiaoyu.common.vo.study.video.VideoCourseVO;
+import com.zhidejiaoyu.common.vo.study.video.VideoUnitVO;
+import com.zhidejiaoyu.student.business.feignclient.center.VideoFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.index.dto.UnitInfoDTO;
@@ -53,6 +56,11 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     private static final int SYNTAX_MODEL_TYPE = 3;
 
     /**
+     * 视频
+     */
+    private static final int VIDEO_MODEL_TYPE = 7;
+
+    /**
      * 金币试卷type值
      */
     private static final int GOLD_TEST = 5;
@@ -82,6 +90,9 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     @Resource
     private StudentExpansionMapper studentExpansionMapper;
+
+    @Resource
+    private VideoFeignClient videoFeignClient;
 
     static {
         MAPPING.put(GradeNameConstant.FIRST_GRADE, "one");
@@ -122,6 +133,10 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     public ServerResponse<Object> getStudyCourse(Integer type, Long courseId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
+        if (type == VIDEO_MODEL_TYPE) {
+            return this.packageVideoCourse(student);
+        }
+
         List<Long> courseIds = this.getCourseIds(type, student);
 
         if (CollectionUtils.isNotEmpty(courseIds)) {
@@ -136,6 +151,69 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         }
 
         throw new ServiceException("未查询到学生的自由学习课程！");
+    }
+
+    /**
+     * 封装视频课程数据
+     *
+     * @param student
+     * @return
+     */
+    private ServerResponse<Object> packageVideoCourse(Student student) {
+
+        List<String> grades = GradeUtil.smallThanCurrentGrade(student.getGrade());
+
+        int month = new DateTime().monthOfYear().get();
+        List<CourseVO> currentGrade;
+        List<CourseVO> previousGrade;
+
+        if (month < 9) {
+            // 显示到下一个年级的上册
+            String nextGrade = GradeUtil.getNextGrade(student.getGrade());
+            List<VideoCourseVO> videoVos = videoFeignClient.getVideoCourse(grades, nextGrade);
+            currentGrade = getCurrentGrade(student, videoVos);
+
+            previousGrade = getPreviousGrade(student, videoVos);
+        } else {
+            // 显示到当前年级的下册
+            List<VideoCourseVO> videoVos = videoFeignClient.getVideoCourse(grades, null);
+            currentGrade = getCurrentGrade(student, videoVos);
+
+            previousGrade = getPreviousGrade(student, videoVos);
+        }
+
+        return ServerResponse.createBySuccess(CourseInfoVO.builder()
+                .currentGrade(currentGrade)
+                .previousGrade(previousGrade)
+                .versions(null)
+                .InGrade(student.getGrade())
+                .build());
+    }
+
+    private List<CourseVO> getPreviousGrade(Student student, List<VideoCourseVO> videoVos) {
+        List<CourseVO> previousGrade;
+        previousGrade = videoVos.stream()
+                .filter(videoCourseVO -> !Objects.equals(videoCourseVO.getGrade(), student.getGrade()))
+                .map(this::packageCourseVO).collect(Collectors.toList());
+        return previousGrade;
+    }
+
+    private CourseVO packageCourseVO(VideoCourseVO videoCourseVO) {
+        CourseVO courseVO = new CourseVO();
+        courseVO.setBattle(0);
+        courseVO.setCombatProgress(0);
+        courseVO.setVideoId(videoCourseVO.getId());
+        courseVO.setEnglishGrade(getGradeAndLabelEnglishName(videoCourseVO.getGrade(), videoCourseVO.getLabel()));
+        courseVO.setGrade(videoCourseVO.getGrade());
+        return courseVO;
+    }
+
+    private List<CourseVO> getCurrentGrade(Student student, List<VideoCourseVO> videoVos) {
+        List<CourseVO> currentGrade;
+        currentGrade = videoVos.stream()
+                .filter(videoCourseVO -> Objects.equals(videoCourseVO.getGrade(), student.getGrade()))
+                .map(this::packageCourseVO).collect(Collectors.toList());
+        return currentGrade;
     }
 
     private List<Long> getCourseIds(Integer type, Student student) {
@@ -280,7 +358,13 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     public ServerResponse<Object> getUnitInfo(UnitInfoDTO dto) {
         Long studentId = super.getStudentId();
         Integer type = dto.getType();
-        List<UnitStudyStateVO> vos = unitNewMapper.selectIdAndNameByCourseId(dto.getCourseId(), type);
+
+        if (type == VIDEO_MODEL_TYPE) {
+            return this.getVideoUnitInfo(dto);
+        }
+
+        Long courseId = Long.parseLong(dto.getCourseId());
+        List<UnitStudyStateVO> vos = unitNewMapper.selectIdAndNameByCourseId(courseId, type);
         List<Long> unitIds = vos.stream().map(UnitStudyStateVO::getUnitId).collect(Collectors.toList());
 
         if (goldTestUnitStudyState(studentId, type, vos, unitIds)) {
@@ -333,6 +417,19 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             }
         });
         return ServerResponse.createBySuccess(vos);
+    }
+
+    /**
+     * 获取语法单元数据
+     *
+     * @param dto
+     * @return
+     */
+    private ServerResponse<Object> getVideoUnitInfo(UnitInfoDTO dto) {
+        Student student = super.getStudent();
+
+        List<VideoUnitVO> videoUnitVos = videoFeignClient.getVideoUnitInfo(student.getUuid(), dto.getCourseId());
+        return ServerResponse.createBySuccess(videoUnitVos);
     }
 
     private void packageHardSate(Map<Long, Integer> maxGroup, UnitStudyStateVO vo, List<LearnHistory> histories1) {
