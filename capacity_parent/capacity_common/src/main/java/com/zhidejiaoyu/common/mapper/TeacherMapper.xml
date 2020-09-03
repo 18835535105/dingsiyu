@@ -75,6 +75,16 @@
         from teacher where school_admin_id = #{schoolAdminId} and teacher_id is null limit 1
     </select>
 
+    <select id="selectByNameAndPhone" parameterType="map" resultType="map">
+        select
+        `name` sysName,phone phone
+         from sys_user
+        where
+        id in
+        (select teacher_id from teacher  where school_admin_id=#{adminId} )
+        and phone is not null
+    </select>
+
 
 
 </mapper>

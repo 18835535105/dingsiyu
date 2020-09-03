@@ -120,16 +120,15 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
                     .studentName(student.getStudentName())
                     .build());
         }
-
         // 非当天，指定日期的学习记录
         return ServerResponse.createBySuccess(StudyInfoVO.builder()
                 .contents(currentDayOfStudyService.getReturnList(currentDayOfStudy.getStudyModel()))
                 .date(currentDayOfStudy.getCreateTime() == null ? "" : date)
                 .errorSentence(currentDayOfStudyService.getTestList(currentDayOfStudy.getSentence()))
-                .errorSyntax(currentDayOfStudyService.getErrorSyntaxList(currentDayOfStudy.getSyntax()))
                 .errorTest(currentDayOfStudyService.getTestList(currentDayOfStudy.getTest()))
                 .errorText(currentDayOfStudyService.getReturnList(currentDayOfStudy.getText()))
                 .errorWord(currentDayOfStudyService.getTestList(currentDayOfStudy.getWord()))
+                .errorSyntax(currentDayOfStudyService.getErrorSyntaxList(currentDayOfStudy.getSyntax()))
                 .comment(currentDayOfStudy.getComment())
                 .evaluate(currentDayOfStudy.getEvaluate())
                 .siteNo(currentDayOfStudy.getSiteNo())
