@@ -973,7 +973,7 @@ s.uuid,
                 and s.sex is not null
             </if>
             <if test="dto.type == 3">
-                and (s.account_time &lt; now() or s.account_time is null) and s.rank &lt;= 7
+                and (s.account_time > now() or s.account_time is null) and s.rank &lt;= 7
             </if>
             <if test="dto.accountOrStudentName != null and dto.accountOrStudentName != ''">
                 and (s.account like concat('%', #{dto.accountOrStudentName}, '%')
