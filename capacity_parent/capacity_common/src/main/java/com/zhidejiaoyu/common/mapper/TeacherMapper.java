@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -88,4 +89,6 @@ public interface TeacherMapper extends BaseMapper<Teacher> {
 
     @Select("select school from teacher where school_admin_id =#{adminId} or teacher_id =#{adminId} limit 1")
     String selectSchoolById(@Param("adminId") Long schoolId);
+
+    List<Map<String,Object>> selectByNameAndPhone(@Param("adminId") Integer adminId);
 }
