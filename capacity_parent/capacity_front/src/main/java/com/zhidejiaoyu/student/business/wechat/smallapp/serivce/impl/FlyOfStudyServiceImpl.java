@@ -105,11 +105,11 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
                 return response;
             }
             CurrentDayOfStudyVo vo = (CurrentDayOfStudyVo) response.getData();
+            //  .errorSyntax(vo.getSyntax())
             return ServerResponse.createBySuccess(StudyInfoVO.builder()
                     .contents(currentDayOfStudyService.getReturnList(this.joinStr(vo.getStudyModel())))
                     .date(currentDayOfStudy.getCreateTime() == null ? "" : date)
                     .errorSentence(currentDayOfStudyService.getTestList(this.joinStr(vo.getSentence())))
-                    .errorSyntax(vo.getSyntax())
                     .errorTest(currentDayOfStudyService.getTestList(this.joinStr(vo.getTest())))
                     .errorText(currentDayOfStudyService.getReturnList(this.joinStr(vo.getText())))
                     .errorWord(currentDayOfStudyService.getTestList(this.joinStr(vo.getWord())))
@@ -120,13 +120,12 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
                     .studentName(student.getStudentName())
                     .build());
         }
-
+//  .errorSyntax(currentDayOfStudyService.getErrorSyntaxList(currentDayOfStudy.getSyntax()))
         // 非当天，指定日期的学习记录
         return ServerResponse.createBySuccess(StudyInfoVO.builder()
                 .contents(currentDayOfStudyService.getReturnList(currentDayOfStudy.getStudyModel()))
                 .date(currentDayOfStudy.getCreateTime() == null ? "" : date)
                 .errorSentence(currentDayOfStudyService.getTestList(currentDayOfStudy.getSentence()))
-                .errorSyntax(currentDayOfStudyService.getErrorSyntaxList(currentDayOfStudy.getSyntax()))
                 .errorTest(currentDayOfStudyService.getTestList(currentDayOfStudy.getTest()))
                 .errorText(currentDayOfStudyService.getReturnList(currentDayOfStudy.getText()))
                 .errorWord(currentDayOfStudyService.getTestList(currentDayOfStudy.getWord()))
