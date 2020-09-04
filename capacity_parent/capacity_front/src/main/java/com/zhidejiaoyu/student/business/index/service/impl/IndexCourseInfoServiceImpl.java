@@ -58,7 +58,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     /**
      * 视频
      */
-    private static final int VIDEO_MODEL_TYPE = 7;
+    private static final int VIDEO_MODEL_TYPE = 6;
 
     /**
      * 金币试卷type值
