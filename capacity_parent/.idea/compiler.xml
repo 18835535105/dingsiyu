@@ -7,17 +7,17 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="center" />
+        <module name="teacher" />
         <module name="capacity_common" />
         <module name="aliyun-oss" />
         <module name="aliyun-translate" />
         <module name="capacity_front" />
+        <module name="mail" />
         <module name="course" />
         <module name="aliyun-vod" />
         <module name="spring-boot-admin" />
+        <module name="center" />
         <module name="aliyun-common" />
-        <module name="mail" />
-        <module name="teacher" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

@@ -19,8 +19,11 @@
     <file url="file://$PROJECT_DIR$/course" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/course/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mail" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mail/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring-boot-admin" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/spring-boot-admin/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/teacher" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/teacher/src/main/java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>
