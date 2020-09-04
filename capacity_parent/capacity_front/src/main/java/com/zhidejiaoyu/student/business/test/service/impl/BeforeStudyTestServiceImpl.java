@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.business.test.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -34,6 +33,7 @@ import com.zhidejiaoyu.student.business.test.constant.TestConstant;
 import com.zhidejiaoyu.student.business.test.service.BeforeStudyTestService;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -265,24 +265,58 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
     @Override
     public ServerResponse<Object> fix() {
-        List<StudentStudyPlanNew> studentStudyPlanNews = studentStudyPlanNewMapper.selectList(new LambdaQueryWrapper<StudentStudyPlanNew>().groupBy(StudentStudyPlanNew::getStudentId));
-        List<Long> studentIds = studentStudyPlanNews.stream().map(StudentStudyPlanNew::getStudentId).collect(Collectors.toList());
 
-        List<Student> students = studentMapper.selectBatchIds(studentIds);
-        students.forEach(student -> {
-            List<StudentStudyPlanNew> studentStudyPlanNews1 = studentStudyPlanNewMapper.selectList(new LambdaQueryWrapper<StudentStudyPlanNew>().eq(StudentStudyPlanNew::getStudentId, student.getId()));
-            List<StudentStudyPlanNew> collect = studentStudyPlanNews1.stream().peek(studentStudyPlanNew -> {
-                Integer basePriority = PriorityUtil.BASE_PRIORITY.get(student.getGrade());
-                if (studentStudyPlanNew.getErrorLevel() > basePriority + 1000) {
-                    studentStudyPlanNew.setErrorLevel(studentStudyPlanNew.getErrorLevel() - basePriority);
-                }
-                studentStudyPlanNew.setBaseLevel(basePriority);
-                studentStudyPlanNew.setFinalLevel(studentStudyPlanNew.getBaseLevel() + studentStudyPlanNew.getErrorLevel() + studentStudyPlanNew.getTimeLevel());
-            }).collect(Collectors.toList());
-            this.updateBatchById(collect);
+        List<StudentStudyPlanNew> studentStudyPlanNews = studentStudyPlanNewMapper.selectList(null);
+        List<Long> unitIds = studentStudyPlanNews.stream().map(StudentStudyPlanNew::getUnitId).collect(Collectors.toList());
+
+        Set<Long> set = new HashSet<>(unitIds);
+        unitIds = new ArrayList<>(set);
+
+        List<GradeAndUnitIdDTO> gradeAndLabelByUnitIds = courseFeignClient.getGradeAndLabelByUnitIds(unitIds);
+        Map<Long, String> map = new HashMap<>(16);
+        gradeAndLabelByUnitIds.forEach(gradeAndUnitIdDTO -> map.put(gradeAndUnitIdDTO.getUnitId(), StringUtils.isEmpty(gradeAndUnitIdDTO.getGrade()) ? gradeAndUnitIdDTO.getGradeExt() : gradeAndUnitIdDTO.getGrade()));
+
+        List<StudentStudyPlanNew> updatePlan = new ArrayList<>();
+        studentStudyPlanNews.forEach(plan -> {
+            if (!map.containsKey(plan.getUnitId())) {
+                return;
+            }
+
+            Integer baseLevel = PriorityUtil.BASE_PRIORITY.get(map.get(plan.getUnitId()));
+            if (baseLevel == null) {
+                return;
+            }
+            Integer timeLevel = plan.getTimeLevel() == null ? 0 : plan.getTimeLevel();
+            Integer errorLevel = plan.getErrorLevel() == null ? 0 : plan.getErrorLevel();
+
+            if (plan.getEasyOrHard() == 1 && !plan.getBaseLevel().equals(baseLevel)) {
+                plan.setBaseLevel(baseLevel);
+                plan.setUpdateTime(new Date());
+                plan.setFinalLevel(baseLevel + timeLevel + errorLevel);
+            }
+
+            baseLevel = baseLevel - PriorityUtil.HARD_NUM;
+            if (plan.getEasyOrHard() == 2 && !plan.getBaseLevel().equals(baseLevel)) {
+                plan.setBaseLevel(baseLevel);
+                plan.setUpdateTime(new Date());
+                plan.setFinalLevel(baseLevel + timeLevel + errorLevel);
+            }
+
+            baseLevel = baseLevel - PriorityUtil.HARD_NUM - PriorityUtil.GOLD_TEST_NUM;
+            if (plan.getEasyOrHard() == 3 && !plan.getBaseLevel().equals(baseLevel)) {
+                plan.setBaseLevel(baseLevel);
+                plan.setUpdateTime(new Date());
+                plan.setFinalLevel(baseLevel + timeLevel + errorLevel);
+            }
+
+            updatePlan.add(plan);
         });
 
-        return null;
+        if (CollectionUtils.isNotEmpty(updatePlan)) {
+            this.updateBatchById(updatePlan);
+        }
+
+        return ServerResponse.createBySuccess();
     }
 
     /**
@@ -459,8 +493,8 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * 获取变化优先级
      *
      * @param unitIdMap
-     * @param unitGrade    测试题所在年级
-     * @param grade        学生当前所在年级
+     * @param unitGrade 测试题所在年级
+     * @param grade     学生当前所在年级
      * @param unitId
      * @return
      */
