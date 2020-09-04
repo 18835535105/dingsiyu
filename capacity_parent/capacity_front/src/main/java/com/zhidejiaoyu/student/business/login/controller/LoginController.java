@@ -86,8 +86,8 @@ public class LoginController extends BaseController {
         Object attribute = session.getAttribute(UserConstant.CURRENT_STUDENT);
         if (attribute != null) {
             StudyTimeAndMileageVO todayInfo = currentDayOfStudyService.getTodayInfo();
-            if (todayInfo.getMileage() < 4 || todayInfo.getTime() / 60 < 45) {
-                // 小于4个里程或者在线时长小于45分钟不让退出
+            if (todayInfo.getMileage() < 3 || todayInfo.getTime() / 60 < 45) {
+                // 小于3个里程或者在线时长小于45分钟不让退出
                 return ServerResponse.createByError(406, "飞行任务还没有完成，请集中注意力，继续飞行！");
             }
         }
