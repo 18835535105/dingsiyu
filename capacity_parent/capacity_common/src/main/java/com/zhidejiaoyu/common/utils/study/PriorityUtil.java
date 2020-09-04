@@ -77,7 +77,7 @@ public class PriorityUtil {
             return 3400;
         }
 
-        return BASE_PRIORITY.get(grade) == null ? 0 : BASE_PRIORITY.get(grade);
+        return BASE_PRIORITY.get(wordInGrade) == null ? 0 : BASE_PRIORITY.get(wordInGrade);
     }
 
     /**
