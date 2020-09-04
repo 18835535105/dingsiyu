@@ -44,6 +44,7 @@
                 or grade = #{nextGrade}
             </if>
         </where>
+        group by label
         order by create_time, name
     </select>
     <select id="selectByGradeAndLabel"

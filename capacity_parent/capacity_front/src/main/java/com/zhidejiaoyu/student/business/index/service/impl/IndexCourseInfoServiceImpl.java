@@ -162,6 +162,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     private ServerResponse<Object> packageVideoCourse(Student student) {
 
         List<String> grades = GradeUtil.smallThanCurrentGrade(student.getGrade());
+        grades.add(student.getGrade());
 
         int month = new DateTime().monthOfYear().get();
         List<CourseVO> currentGrade;
@@ -204,7 +205,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         courseVO.setCombatProgress(0);
         courseVO.setVideoId(videoCourseVO.getId());
         courseVO.setEnglishGrade(getGradeAndLabelEnglishName(videoCourseVO.getGrade(), videoCourseVO.getLabel()));
-        courseVO.setGrade(videoCourseVO.getGrade());
+        courseVO.setGrade(videoCourseVO.getGrade() + "（" + videoCourseVO.getLabel() + "）");
         return courseVO;
     }
 
