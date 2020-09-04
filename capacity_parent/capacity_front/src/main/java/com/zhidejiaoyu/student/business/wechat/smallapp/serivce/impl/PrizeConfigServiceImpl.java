@@ -86,17 +86,14 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         returnMap.put("adress", joinSchool == null ? "北京市海淀区上地国际创业园" : joinSchool.getAddress());
         SysUser sysUser = sysUserMapper.selectById(adminId);
         StringBuilder sb = new StringBuilder().append(sysUser.getPhone()).append("（").append(sysUser.getName(), 0, 1).append("老师）").append("-");
-        SysUser teacherUser = sysUserMapper.selectById(student.getTeacherId());
-        if (teacherUser.getAccount().contains("js")) {
-            //获取所有本校教师姓名 电话
-            List<Map<String, Object>> maps = teacherMapper.selectByNameAndPhone(sysUser.getId());
-            if (maps != null && maps.size() > 0) {
-                Collections.shuffle(maps);
-                Map<String, Object> map = maps.get(0);
-                sb.append(map.get("phone")).append("（").append(map.get("sysName").toString(), 0, 1).append("老师）");
-            }
-
+        //获取所有本校教师姓名 电话
+        List<Map<String, Object>> maps = teacherMapper.selectByNameAndPhone(sysUser.getId());
+        if (maps != null && maps.size() > 0) {
+            Collections.shuffle(maps);
+            Map<String, Object> map = maps.get(0);
+            sb.append(map.get("phone")).append("（").append(map.get("sysName").toString(), 0, 1).append("老师）");
         }
+
         Teacher teacher = teacherMapper.selectTeacherBySchoolAdminId(adminId.intValue());
         returnMap.put("adminPhone", sb.toString());
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(1);
