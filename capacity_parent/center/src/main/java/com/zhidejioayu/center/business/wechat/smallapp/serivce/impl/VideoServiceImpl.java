@@ -130,7 +130,7 @@ public class VideoServiceImpl implements VideoService {
             }).collect(Collectors.toList()));
             videoUnitVos.add(videoUnitVO);
         });
-
+        Collections.reverse(videoUnitVos);
         return videoUnitVos;
     }
 
