@@ -58,13 +58,13 @@ public class ArrayUtil<T> {
             });
             strings=new ArrayList<>(strMap.keySet());
             strings.forEach(str -> {
-                Map<String,Object> map=new HashMap<>();
+                Map<String, Object> map = new HashMap<>(16);
                 String[] splits = str.split(":");
-                if(splits.length>1){
-                    map.put("subject",splits[0].replace("\\n"," "));
-                    map.put("answer",splits[1]);
+                if (splits.length > 1) {
+                    map.put("subject", splits[0].replace("\\n", " "));
+                    map.put("answer", splits[1]);
+                    returnList.add(map);
                 }
-                returnList.add(map);
             });
         }
         return returnList;
