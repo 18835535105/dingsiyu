@@ -52,6 +52,11 @@ public class ArrayUtil<T> {
         List<Object> returnList = new ArrayList<>();
         if (split.length > 0) {
             List<String> strings = Arrays.asList(split);
+            Map<String,String> strMap=new HashMap<>();
+            strings.forEach(str->{
+                strMap.put(str,str);
+            });
+            strings=new ArrayList<>(strMap.keySet());
             strings.forEach(str -> {
                 Map<String,Object> map=new HashMap<>();
                 String[] splits = str.split(":");
