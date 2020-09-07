@@ -92,6 +92,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         // 判断学生是否在本系统首次学习，如果是记录首次学习时间
         this.judgeIsFirstStudy(session, student);
         boolean firstStudy = redisOpt.getGuideModel(studentId, studyModel);
+        redisOpt.getStudentStudyModel(studentId);
         //获取当前单元下的learnId
         LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard, modelType);
         // 查询学生当前单元下已学习单词的个数，即学习进度
