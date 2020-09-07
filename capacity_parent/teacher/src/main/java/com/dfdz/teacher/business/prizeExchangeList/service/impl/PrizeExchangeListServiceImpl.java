@@ -133,6 +133,7 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
         prize.setCreateTime(new Date());
         prize.setDescribes(dto.getDescribes());
         prize.setPrize(dto.getPrize());
+        prize.setType(dto.getType());
         prize.setExchangePrize(dto.getExchangePrize());
         prize.setPrizeUrl(dto.getPrizeUrl());
         prize.setState(1);

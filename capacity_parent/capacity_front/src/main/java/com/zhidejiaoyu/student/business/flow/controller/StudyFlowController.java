@@ -48,9 +48,32 @@ public class StudyFlowController {
         } else {
             // 自由学习流程
             session.setAttribute(SessionConstant.STUDY_FLAG, 2);
+            freeFlowService.getModel(session,2);
             node = freeFlowService.getNode(dto, isTrueFlow, session);
         }
         log.info("getNode response={}", node.toString());
         return node;
     }
+
+    /**
+     * 判断是学渣流程还是学霸流程
+     */
+    @RequestMapping("getModel")
+    public ServerResponse<Object> getModel(HttpSession session,Integer type){
+        return freeFlowService.getModel(session,type);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -368,6 +368,13 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         return finishGroupOrUnit.finishFreeGroup(dto);
     }
 
+    @Override
+    public ServerResponse<Object> getModel(HttpSession session, Integer type) {
+        Student student = getStudent(session);
+        redisOpt.saveStudentStudyModel(student.getId(),type);
+        return ServerResponse.createBySuccess();
+    }
+
     public ServerResponse<Object> getFlowVoServerResponse(LearnNew learnNew, Integer modelType, Student student) {
         Long studentId = student.getId();
 

@@ -52,14 +52,17 @@ public class ArrayUtil<T> {
         List<Object> returnList = new ArrayList<>();
         if (split.length > 0) {
             List<String> strings = Arrays.asList(split);
+            Map<String, String> strMap = new HashMap<>(16);
+            strings.forEach(str -> strMap.put(str, str));
+            strings = new ArrayList<>(strMap.keySet());
             strings.forEach(str -> {
-                Map<String,Object> map=new HashMap<>();
+                Map<String, Object> map = new HashMap<>(16);
                 String[] splits = str.split(":");
-                if(splits.length>1){
-                    map.put("subject",splits[0].replace("\\n"," "));
-                    map.put("answer",splits[1]);
+                if (splits.length > 1) {
+                    map.put("subject", splits[0].replace("$&$", "$&$ ").replace("\\n", " "));
+                    map.put("answer", splits[1]);
+                    returnList.add(map);
                 }
-                returnList.add(map);
             });
         }
         return returnList;

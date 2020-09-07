@@ -355,6 +355,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         return ServerResponse.createBySuccess(flowVO);
     }
 
+    @Override
+    public ServerResponse<Object> getModel(HttpSession session, Integer type) {
+        Student student = getStudent(session);
+        redisOpt.saveStudentStudyModel(student.getId(),type);
+        return ServerResponse.createBySuccess();
+    }
+
     /**
      * 验证当前单元中的group是否包含当前学习模块，如果不包含，学习下个学习模块
      *

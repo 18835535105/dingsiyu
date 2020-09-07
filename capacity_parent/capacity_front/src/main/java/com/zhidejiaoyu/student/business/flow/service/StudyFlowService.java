@@ -46,4 +46,5 @@ public interface StudyFlowService extends BaseService<StudyFlowNew> {
                 || (dto.getGrade() != null && dto.getGrade() >= studyFlowNew.getType());
     }
 
+    ServerResponse<Object> getModel(HttpSession session, Integer type);
 }
