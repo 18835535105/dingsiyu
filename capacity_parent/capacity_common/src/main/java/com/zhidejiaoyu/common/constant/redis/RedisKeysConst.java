@@ -111,6 +111,11 @@ public interface RedisKeysConst {
     String FIRST_FALSE_ADD = "FIRST_FALSE_ADD:" + ServerNoConstant.SERVER_NO;
 
     /**
+     * 判断是学渣数据还是学霸数据
+     */
+    String STUDENT_STUDY_MODEL = "STUDENT_STUDY_MODEL:" + ServerNoConstant.SERVER_NO;
+
+    /**
      * 微信小程序 access_token key 值
      */
     String SMALL_APP_WECHAT_ACCESS_TOKEN = "SMALL_APP_WECHAT_ACCESS_TOKEN";

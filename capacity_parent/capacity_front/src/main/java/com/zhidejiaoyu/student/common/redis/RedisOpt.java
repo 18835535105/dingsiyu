@@ -187,7 +187,7 @@ public class RedisOpt {
         } else {
             try {
                 //unitWordSum =
-                unitWordSum =   (Map<Long, Map<String, Object>>) object;
+                unitWordSum = (Map<Long, Map<String, Object>>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], courseId=[{}], error=[{}]", object, courseId, e.getMessage());
                 unitWordSum = courseFeignClient.selectUnitsWordSum(courseId);
@@ -522,5 +522,10 @@ public class RedisOpt {
             redisTemplate.opsForValue().set(key, true);
             redisTemplate.expire(key, 15, TimeUnit.DAYS);
         }
+    }
+
+    public void saveStudentStudyModel(Long studentId, Integer type) {
+        String key = RedisKeysConst.STUDENT_STUDY_MODEL + studentId;
+        redisTemplate.opsForValue().set(key, type);
     }
 }
