@@ -35,6 +35,11 @@ public class DurationStudyModelUtil {
     private static final Integer[] LETTER = {30, 21, 32, 33, 34};
 
     /**
+     * 金币试卷
+     */
+    private static final Integer[] GOLD_TEST = {41};
+
+    /**
      * 音标模块
      */
     private static final Integer[] PHONETIC_SYMBOL = {31, 34};
@@ -48,6 +53,7 @@ public class DurationStudyModelUtil {
         MODEL_TYPE.put(SYNTAX, "语法");
         MODEL_TYPE.put(LETTER, "字母");
         MODEL_TYPE.put(PHONETIC_SYMBOL, "音标");
+        MODEL_TYPE.put(GOLD_TEST, "金币测试");
     }
 
     /**
