@@ -19,10 +19,13 @@ import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.prizeExchangeList.PrizeExchangeListVo;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListMapper, PrizeExchangeList> implements PrizeExchangeListService {
@@ -114,16 +117,16 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object deletePrizes(String openId, List<Integer> prizeIds) {
         List<PrizeExchangeList> prizeExchangeLists = prizeExchangeListMapper.selectBatchIds(prizeIds);
+        List<String> prizeUrls = prizeExchangeLists.stream().map(PrizeExchangeList::getPrizeUrl).collect(Collectors.toList());
         prizeExchangeListMapper.deleteBatchIds(prizeIds);
-        if (prizeExchangeLists.size() > 0) {
-            try {
-                prizeExchangeLists.forEach(list -> OssDelete.deleteObject(list.getPrizeUrl()));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+
+        if (CollectionUtils.isNotEmpty(prizeUrls)) {
+            OssDelete.deleteObjects(prizeUrls);
         }
+
         return ServerResponse.createBySuccess();
     }
 
