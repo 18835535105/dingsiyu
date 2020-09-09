@@ -71,13 +71,22 @@ public interface LearnHistoryMapper extends BaseMapper<LearnHistory> {
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIds);
 
     /**
-     * 查询学生今天学习group个数
+     * 查询学生今天学习简单group个数
      *
      * @param studentId
      * @return
      */
-    @Select("select count(id) from learn_history WHERE student_id = #{studentId} and TO_DAYS(update_time) = TO_DAYS(now())")
-    int countByStudentIdToDay(@Param("studentId") Long studentId);
+    @Select("select count(id) from learn_history WHERE student_id = #{studentId} and easy_or_hard = 1 and TO_DAYS(update_time) = TO_DAYS(now())")
+    int countEasyGroupByStudentIdToday(@Param("studentId") Long studentId);
+
+    /**
+     * 查询学生今天学习进阶group个数
+     *
+     * @param studentId
+     * @return
+     */
+    @Select("select count(id) from learn_history WHERE student_id = #{studentId} and easy_or_hard = 2 and TO_DAYS(update_time) = TO_DAYS(now())")
+    int countHardGroupByStudentIdToday(Long studentId);
 
     /**
      * 查询指定单元及学习模块历史记录
@@ -88,4 +97,5 @@ public interface LearnHistoryMapper extends BaseMapper<LearnHistory> {
      * @return
      */
     List<LearnHistory> selectByStudentAndUnitIdsAndType(@Param("studentId") Long studentId, @Param("unitIds") List<Long> unitIds, @Param("type") Integer type);
+
 }

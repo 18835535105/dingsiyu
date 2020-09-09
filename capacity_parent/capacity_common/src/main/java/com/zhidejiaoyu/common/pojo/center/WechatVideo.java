@@ -1,17 +1,13 @@
 package com.zhidejiaoyu.common.pojo.center;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-
-import java.time.LocalDateTime;
-
 import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.io.Serializable;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.*;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -38,6 +34,10 @@ public class WechatVideo extends Model<WechatVideo> implements Serializable {
      * 年级
      */
     private String grade;
+
+    private String label;
+
+    private String unit;
 
     /**
      * 文件名

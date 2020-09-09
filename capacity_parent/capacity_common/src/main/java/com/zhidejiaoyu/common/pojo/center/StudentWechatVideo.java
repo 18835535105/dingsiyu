@@ -40,6 +40,11 @@ public class StudentWechatVideo extends Model<StudentWechatVideo> implements Ser
      */
     private String studentUuid;
 
+    /**
+     * 1：本轮观看的视频；2：上一轮观看的视频，视频观看完之后会将之前看的视频状态置为2
+     */
+    private Integer state;
+
     private Date createTime;
 
     @Override

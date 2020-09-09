@@ -12,10 +12,10 @@ import javax.validation.constraints.NotNull;
 public class UnitInfoDTO {
 
     @NotNull(message = "courseId can't be null!")
-    private Long courseId;
+    private String courseId;
 
     /**
-     * 1：单词；2：句型；3：语法；4：课文；5：金币试卷
+     * 1：单词；2：句型；3：语法；4：课文；5：金币试卷；6：视频课程
      */
     @NotNull(message = "type can't be null!")
     private Integer type;

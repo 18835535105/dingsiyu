@@ -2,13 +2,13 @@ package com.zhidejioayu.center.business.wechat.smallapp.controller;
 
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.study.video.VideoCourseVO;
+import com.zhidejiaoyu.common.vo.study.video.VideoUnitVO;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.VideoService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 小程序视频接口
@@ -55,5 +55,41 @@ public class VideoController {
             return ServerResponse.createBySuccess(400, "gold can't be null!");
         }
         return videoService.saveVideo(openId, gold, videoId);
+    }
+
+    /**
+     * 查询指定年级的视频数据
+     *
+     * @param grades    小于或者等于当前年级的所有年级
+     * @param nextGrade 当前年级的下个年级数据
+     * @return
+     */
+    @GetMapping("/getVideoCourse")
+    List<VideoCourseVO> getVideoCourse(@RequestParam List<String> grades, @RequestParam(required = false) String nextGrade) {
+        return videoService.getVideoCourse(grades, nextGrade);
+    }
+
+    /**
+     * 查询视频的单元信息
+     *
+     * @param uuid    学生uuid
+     * @param videoId
+     * @return
+     */
+    @GetMapping("/getVideoUnitInfo")
+    public List<VideoUnitVO> getVideoUnitInfo(@RequestParam String uuid, @RequestParam String videoId) {
+        return videoService.getVideoUnitInfo(uuid, videoId);
+    }
+
+    /**
+     * 保存观看的视频
+     *
+     * @param uuid
+     * @param videoId
+     * @return
+     */
+    @PostMapping("/savePCVideo")
+    public ServerResponse<Object> saveVideo(@RequestParam String uuid, @RequestParam String videoId) {
+        return videoService.saveVideo(uuid, videoId);
     }
 }

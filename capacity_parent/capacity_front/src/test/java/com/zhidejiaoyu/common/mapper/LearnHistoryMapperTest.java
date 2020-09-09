@@ -36,4 +36,11 @@ public class LearnHistoryMapperTest {
         Map<Long, Map<Long, Object>> longMapMap = learnHistoryMapper.countUnitByStudentIdAndCourseIds(student.getId(), courseIds, 1);
         log.info("longMapMap={}", longMapMap);
     }
+
+    @Test
+    public void countEasyGroupByStudentIdToday() {
+        int i = learnHistoryMapper.countEasyGroupByStudentIdToday(13365L);
+        int j = learnHistoryMapper.countHardGroupByStudentIdToday(13365L);
+        log.info("i={},j={}", i, j);
+    }
 }

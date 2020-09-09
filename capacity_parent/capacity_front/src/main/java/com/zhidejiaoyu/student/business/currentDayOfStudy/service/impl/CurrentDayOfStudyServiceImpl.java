@@ -157,10 +157,11 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         Long studentId = super.getStudentId();
         Long onlineTime = durationMapper.countTodayOnlineTimeByStudentId(studentId);
 
-        int groupCount = learnHistoryMapper.countByStudentIdToDay(studentId);
+        int easyGroupCount = learnHistoryMapper.countEasyGroupByStudentIdToday(studentId);
+        int hardGroupCount = learnHistoryMapper.countHardGroupByStudentIdToday(studentId);
         int testCount = testRecordMapper.countGoldTestByStudentIdToday(studentId);
 
-        int mileage = groupCount + testCount * 3;
+        int mileage = easyGroupCount + hardGroupCount * 2 + testCount * 3;
 
         StudyTimeAndMileageVO studyTimeAndMileageVO = new StudyTimeAndMileageVO();
         studyTimeAndMileageVO.setMileage(mileage);
@@ -214,11 +215,11 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         String[] split = errorInfo.split("##");
         if (split.length > 0) {
             List<String> strings = Arrays.asList(split);
-            Map<String,String> strMap=new HashMap<>();
-            strings.forEach(str->{
-                strMap.put(str,str);
+            Map<String, String> strMap = new HashMap<>();
+            strings.forEach(str -> {
+                strMap.put(str, str);
             });
-            strings=new ArrayList<>(strMap.keySet());
+            strings = new ArrayList<>(strMap.keySet());
             strings.forEach(str -> {
                 Map<String, String> map = new HashMap<>();
                 String voc = vocabularyFeignClient.getVocabularyChinsesByWordId(str);

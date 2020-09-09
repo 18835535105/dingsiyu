@@ -5,8 +5,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dfdz.teacher.business.prizeExchangeList.service.PrizeExchangeListService;
 import com.zhidejiaoyu.aliyunoss.deleteobject.OssDelete;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
-import com.zhidejiaoyu.common.constant.FileConstant;
 import com.zhidejiaoyu.common.dto.prizeExchangeList.AddPrizeExchangeListDto;
 import com.zhidejiaoyu.common.dto.prizeExchangeList.PrizeExchangeListDto;
 import com.zhidejiaoyu.common.mapper.PrizeExchangeListMapper;
@@ -25,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListMapper, PrizeExchangeList> implements PrizeExchangeListService {
