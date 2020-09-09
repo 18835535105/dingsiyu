@@ -86,7 +86,11 @@ public interface FileConstant {
     /**
      * 保存奖品封面路径
      */
-     String PRIZE_IMG = "imgs/prizeImg/";
+    String PRIZE_IMG = "imgs/prizeImg/";
+    /**
+     * 保存飞行测试结果页路径
+     */
+    String CODE_IMG = "imgs/codeImg";
 
     interface PetNameConstant {
         String DAMINGBAI = "/static/img/edit-user-msg/tips1-1.png";
