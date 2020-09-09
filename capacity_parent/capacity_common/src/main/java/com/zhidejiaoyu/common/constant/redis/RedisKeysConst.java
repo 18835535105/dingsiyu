@@ -294,5 +294,9 @@ public interface RedisKeysConst {
      * 学生今天微信小程序已经获取的金币总数
      */
     String STUDENT_SMALL_APP_DAY_TOTAL_GOLD = "STUDENT_SMALL_APP_DAY_TOTAL_GOLD:" + ServerNoConstant.SERVER_NO;
-    String CODE_IMG = "CODE_IMG:";
+
+    /**
+     * 小程序打卡后海报图片在缓存中的key
+     */
+    String CODE_IMG = "CODE_IMG:" + ServerNoConstant.SERVER_NO;
 }
