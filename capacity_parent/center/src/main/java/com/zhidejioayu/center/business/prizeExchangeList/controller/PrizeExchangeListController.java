@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.dto.prizeExchangeList.AddPrizeExchangeListDto;
 import com.zhidejiaoyu.common.dto.prizeExchangeList.DeletePrizeExchangeList;
 import com.zhidejiaoyu.common.dto.prizeExchangeList.PrizeExchangeListDto;
 import com.zhidejiaoyu.common.utils.StringUtil;
+import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.feignclient.teacher.BaseTeacherPrizeExchangeListFeignClient;
 import com.zhidejioayu.center.business.feignclient.util.FeignClientUtil;
@@ -13,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Validated
 @RestController
@@ -29,12 +29,9 @@ public class PrizeExchangeListController {
         if (StringUtil.isEmpty(prizeExchangeListDto.getOpenId())) {
             return ServerResponse.createByError(400, "openId can't be null!");
         }
-        if (prizeExchangeListDto.getPageNum() == null || prizeExchangeListDto.getPageNum().equals(0)) {
-            prizeExchangeListDto.setPageNum(1);
-        }
-        if (prizeExchangeListDto.getPageSize() == null || prizeExchangeListDto.getPageNum().equals(0)) {
-            prizeExchangeListDto.setPageSize(20);
-        }
+
+        prizeExchangeListDto.setPageNum(PageUtil.getPageNum());
+        prizeExchangeListDto.setPageSize(PageUtil.getPageSize());
         BaseTeacherPrizeExchangeListFeignClient prizeExchangListFeignClient = FeignClientUtil.getBaseTeacherPrizeExchangeListFeignClientByOpenId(prizeExchangeListDto.getOpenId());
         return prizeExchangListFeignClient.list(prizeExchangeListDto);
     }
@@ -47,13 +44,13 @@ public class PrizeExchangeListController {
         if (StringUtil.isEmpty(dto.getOpenId())) {
             return ServerResponse.createByError(400, "openId can't be null!");
         }
-        if(StringUtil.isEmpty(dto.getPrize())){
+        if (StringUtil.isEmpty(dto.getPrize())) {
             return ServerResponse.createByError(400, "商品名称不能为空");
         }
-        if(dto.getExchangePrize()==null){
+        if (dto.getExchangePrize() == null) {
             return ServerResponse.createByError(400, "商品价格不能为空");
         }
-        if(dto.getTotalNumber()==null){
+        if (dto.getTotalNumber() == null) {
             return ServerResponse.createByError(400, "商品数量不能为空");
         }
         dto.setPrizeUrl(getPrizeUrl(dto));
@@ -72,13 +69,13 @@ public class PrizeExchangeListController {
         if (StringUtil.isEmpty(dto.getOpenId())) {
             return ServerResponse.createByError(400, "openId can't be null!");
         }
-        if(StringUtil.isEmpty(dto.getPrize())){
+        if (StringUtil.isEmpty(dto.getPrize())) {
             return ServerResponse.createByError(400, "商品名称不能为空");
         }
-        if(dto.getExchangePrize()==null){
+        if (dto.getExchangePrize() == null) {
             return ServerResponse.createByError(400, "商品价格不能为空");
         }
-        if(dto.getTotalNumber()==null){
+        if (dto.getTotalNumber() == null) {
             return ServerResponse.createByError(400, "商品数量不能为空");
         }
         if (dto.getFlag()) {

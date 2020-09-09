@@ -88,8 +88,7 @@
         </if>
     </select>
     <select id="countBySchoolId" resultType="int" parameterType="map">
-        select
-        count(id)
+        select count(id)
         from prize_exchange_list
         where school_id = #{schoolAdminId}
     </select>
@@ -99,6 +98,7 @@
         <include refid="Base_Column_List"/>
         from prize_exchange_list
         where school_id = #{schoolAdminId}
+        order by exchange_prize desc
     </select>
 
 </mapper>

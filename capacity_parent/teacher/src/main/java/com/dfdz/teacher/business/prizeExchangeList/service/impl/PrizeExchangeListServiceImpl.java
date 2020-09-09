@@ -40,13 +40,16 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
     public ServerResponse<Object> getAllList(PrizeExchangeListDto dto) {
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
         Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(sysUser.getId().longValue());
+
         Page<PrizeExchangeList> page = new Page<>(dto.getPageNum(), dto.getPageSize());
-        List<PrizeExchangeList> prizeExchangeLists = prizeExchangeListMapper.selectListBySchoolId(page,schoolAdminId);
-        List<PrizeExchangeListVo> vos = new ArrayList<>();
-        getPrizeExchangeListVos(vos, prizeExchangeLists, (dto.getPageNum() - 1) * dto.getPageSize());
+        List<PrizeExchangeList> prizeExchangeLists = prizeExchangeListMapper.selectListBySchoolId(page, schoolAdminId);
+
+        List<PrizeExchangeListVo> vos = getPrizeExchangeListVos(prizeExchangeLists, (dto.getPageNum() - 1) * dto.getPageSize());
+
         Integer count = prizeExchangeListMapper.countBySchoolId(schoolAdminId);
         Page<PrizeExchangeListVo> pages = new Page<>(dto.getPageNum(), dto.getPageSize());
         pages.setTotal(count);
+
         PageVo<PrizeExchangeListVo> studentManageVOPageVo = PageUtil.packagePage(vos, pages.getTotal());
         return ServerResponse.createBySuccess(studentManageVOPageVo);
     }
@@ -116,11 +119,9 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
         prizeExchangeListMapper.deleteBatchIds(prizeIds);
         if (prizeExchangeLists.size() > 0) {
             try {
-                prizeExchangeLists.forEach(list -> {
-                    OssDelete.deleteObject(list.getPrizeUrl());
-                });
+                prizeExchangeLists.forEach(list -> OssDelete.deleteObject(list.getPrizeUrl()));
             } catch (Exception e) {
-                new RuntimeException(e);
+                throw new RuntimeException(e);
             }
         }
         return ServerResponse.createBySuccess();
@@ -142,8 +143,8 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
         return prize;
     }
 
-    private void getPrizeExchangeListVos(List<PrizeExchangeListVo> prizeExchangeListVos,
-                                         List<PrizeExchangeList> prizeExchangeLists, Integer pages) {
+    private List<PrizeExchangeListVo> getPrizeExchangeListVos(List<PrizeExchangeList> prizeExchangeLists, Integer pages) {
+        List<PrizeExchangeListVo> prizeExchangeListVos = new ArrayList<>(prizeExchangeLists.size());
         Map<Long, String> map = new HashMap<>(16);
         for (PrizeExchangeList prize : prizeExchangeLists) {
             PrizeExchangeListVo prizeExchangeListVo = new PrizeExchangeListVo();
@@ -155,19 +156,8 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
             prizeExchangeListVo.setExchangePrize(prize.getExchangePrize());
             prizeExchangeListVo.setPrize(prize.getPrize());
             prizeExchangeListVo.setChecked(false);
-            if (prize.getState() == 2) {
-                prizeExchangeListVo.setState("已删除");
-            } else {
-                if (prize.getSurplusNumber() != null) {
-                    if (prize.getSurplusNumber() == 0) {
-                        prizeExchangeListVo.setState("已兑空");
-                    } else {
-                        prizeExchangeListVo.setState("兑换中");
-                    }
-                } else {
-                    prizeExchangeListVo.setState("已兑空");
-                }
-            }
+            String state = getState(prize);
+            prizeExchangeListVo.setState(state);
             Long teacherId = prize.getTeacherId();
             if (teacherId != null) {
                 String schoolNames = simpleCampusMapper.selSchoolName(teacherId);
@@ -191,5 +181,22 @@ public class PrizeExchangeListServiceImpl extends ServiceImpl<PrizeExchangeListM
             prizeExchangeListVo.setIndex(pages);
             prizeExchangeListVos.add(prizeExchangeListVo);
         }
+        return prizeExchangeListVos;
+    }
+
+    private String getState(PrizeExchangeList prize) {
+        if (prize.getState() == 2) {
+            return "已删除";
+        }
+
+        if (prize.getSurplusNumber() == null) {
+            return "已兑空";
+        }
+
+        if (prize.getSurplusNumber() == 0) {
+            return "已兑空";
+        }
+        return "兑换中";
+
     }
 }
