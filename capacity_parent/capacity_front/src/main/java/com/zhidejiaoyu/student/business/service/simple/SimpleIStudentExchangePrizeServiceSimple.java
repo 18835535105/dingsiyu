@@ -22,4 +22,6 @@ public interface SimpleIStudentExchangePrizeServiceSimple extends SimpleBaseServ
     ServerResponse<Object> addExchangePrize(HttpSession session, Long prizeId);
 
     ServerResponse<Object> getAllList(HttpSession session);
+
+    void exportData();
 }

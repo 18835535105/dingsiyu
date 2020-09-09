@@ -5,18 +5,21 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author stylefeng
  * @since 2019-02-25
  */
+@EqualsAndHashCode(callSuper = true)
+@Data
 @TableName("student_exchange_prize")
 public class StudentExchangePrize extends Model<StudentExchangePrize> {
 
@@ -47,60 +50,6 @@ public class StudentExchangePrize extends Model<StudentExchangePrize> {
      */
     private Integer state;
 
+    private Date updateTime;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getPrizeId() {
-        return prizeId;
-    }
-
-    public void setPrizeId(Long prizeId) {
-        this.prizeId = prizeId;
-    }
-
-    public Long getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(Long studentId) {
-        this.studentId = studentId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Integer getState() {
-        return state;
-    }
-
-    public void setState(Integer state) {
-        this.state = state;
-    }
-
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
-
-    @Override
-    public String toString() {
-        return "StudentExchangePrize{" +
-        "id=" + id +
-        ", prizeId=" + prizeId +
-        ", studentId=" + studentId +
-        ", createTime=" + createTime +
-        ", state=" + state +
-        "}";
-    }
 }

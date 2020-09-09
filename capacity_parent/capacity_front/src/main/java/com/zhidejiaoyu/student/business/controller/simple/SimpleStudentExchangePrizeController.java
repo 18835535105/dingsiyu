@@ -79,6 +79,17 @@ public class SimpleStudentExchangePrizeController {
         return studentExchangePrizeService.addExchangePrize(session, prizeId);
     }
 
+    /**
+     * 迁移数据时，迁移学生兑奖记录，该接口并非项目中使用的接口，仅在迁移数据时使用
+     *
+     * @return
+     */
+    @GetMapping("exportData")
+    public ServerResponse<Object> exportData() {
+        studentExchangePrizeService.exportData();
+        return ServerResponse.createBySuccess();
+    }
+
 
 }
 

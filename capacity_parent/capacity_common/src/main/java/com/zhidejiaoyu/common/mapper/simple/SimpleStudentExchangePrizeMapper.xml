@@ -8,6 +8,7 @@
         <result column="prize_id" property="prizeId" />
         <result column="student_id" property="studentId" />
         <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
         <result column="state" property="state" />
     </resultMap>
 

@@ -24,7 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"withdrawal_record","order_item_detail","order_item","heart_config","heart_opt_record","heart_account"};
+        String[] tableName = {"student_exchange_prize_tmp"};
 
         /*
          * 配置：

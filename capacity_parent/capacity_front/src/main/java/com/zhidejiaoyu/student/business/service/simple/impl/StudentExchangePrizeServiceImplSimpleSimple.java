@@ -1,19 +1,23 @@
 package com.zhidejiaoyu.student.business.service.simple.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.mapper.GoldLogMapper;
-import com.zhidejiaoyu.common.mapper.PrizeExchangeListMapper;
-import com.zhidejiaoyu.common.vo.prize.GetPrizeVO;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.mapper.PrizeExchangeListMapper;
+import com.zhidejiaoyu.common.mapper.StudentExchangePrizeTmpMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.prize.GetPrizeVO;
+import com.zhidejiaoyu.student.business.service.simple.SimpleIStudentExchangePrizeServiceSimple;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.PayLogRedisOpt;
-import com.zhidejiaoyu.student.business.service.simple.SimpleIStudentExchangePrizeServiceSimple;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,8 +44,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
     private SimpleStudentMapper simpleStudentMapper;
     @Autowired
     private SimpleStudentExchangePrizeMapper simpleStudentExchangePrizeMapper;
-    @Autowired
-    private GoldLogMapper GoldLogMapper;
+
     @Autowired
     private SimpleCampusMapper simpleCampusMapper;
     @Autowired
@@ -51,6 +54,12 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
 
     @Resource
     private PayLogRedisOpt payLogRedisOpt;
+
+    @Resource
+    private StudentExchangePrizeTmpMapper studentExchangePrizeTmpMapper;
+
+    @Resource
+    private StudentMapper studentMapper;
 
 
     @Override
@@ -186,7 +195,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
     }
 
     @Override
-    public ServerResponse<Object> getExchangePrize( HttpSession session) {
+    public ServerResponse<Object> getExchangePrize(HttpSession session) {
         Student student = getStudent(session);
         Long studentId = student.getId();
         //List<Map<String, Object>> all = simpleStudentExchangePrizeMapper.getAll((page - 1) * row, row, studentId);
@@ -314,5 +323,47 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         map.put("type", type);
         map.put("more", more);
     }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void exportData() {
+        List<StudentExchangePrizeTmp> studentExchangePrizeTmps = studentExchangePrizeTmpMapper.selectList(null);
+        if (CollectionUtils.isEmpty(studentExchangePrizeTmps)) {
+            return;
+        }
+        List<StudentExchangePrize> studentExchangePrizes = new ArrayList<>();
+        studentExchangePrizeTmps.forEach(studentExchangePrizeTmp -> {
+            if (studentExchangePrizeTmp.getStudentId() == null) {
+                return;
+            }
+            Student student = studentMapper.selectById(studentExchangePrizeTmp.getStudentId());
+            if (student == null || student.getTeacherId() == null) {
+                return;
+            }
+            Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+            if (schoolAdminId == null) {
+                return;
+            }
+
+            PrizeExchangeList prizeExchangeList = prizeExchangeListMapper.selectOne(new LambdaQueryWrapper<PrizeExchangeList>()
+                    .eq(PrizeExchangeList::getSchoolId, schoolAdminId)
+                    .eq(PrizeExchangeList::getPrize, studentExchangePrizeTmp.getPrizeName()));
+            if (prizeExchangeList == null) {
+                return;
+            }
+
+            StudentExchangePrize studentExchangePrize = new StudentExchangePrize();
+            studentExchangePrize.setCreateTime(studentExchangePrizeTmp.getCreateTime());
+            studentExchangePrize.setPrizeId(prizeExchangeList.getId());
+            studentExchangePrize.setState(studentExchangePrizeTmp.getState());
+            studentExchangePrize.setStudentId(studentExchangePrizeTmp.getStudentId());
+            studentExchangePrize.setUpdateTime(new Date());
+            studentExchangePrizes.add(studentExchangePrize);
+        });
+
+        this.saveBatch(studentExchangePrizes);
+    }
+
 
 }
