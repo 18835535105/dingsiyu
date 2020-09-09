@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/wechat/smallApp/test")
@@ -51,11 +52,9 @@ public class AppletTestController {
     @PostMapping("/saveCodeImg")
     public Object getCodeImg(String openId, MultipartFile file) {
         String upload = OssUpload.upload(file, FileConstant.CODE_IMG, null);
-
         if (upload == null) {
             return ServerResponse.createByError(400, "图片保存失败");
         }
-
         redisTemplate.opsForHash().put(RedisKeysConst.CODE_IMG, openId, upload);
         redisTemplate.expire(RedisKeysConst.CODE_IMG, 1, TimeUnit.DAYS);
         return ServerResponse.createBySuccess();
