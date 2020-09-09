@@ -66,6 +66,9 @@ public class AppletTestController {
     @PostMapping("/getCodeImg")
     public Object getCodeImg(String openId){
         Object o = redisTemplate.opsForHash().get(RedisKeysConst.CODE_IMG, openId);
+        if(o==null){
+            return ServerResponse.createBySuccess();
+        }
         String img= GetOssFile.getPublicObjectUrl(o.toString());
         return ServerResponse.createBySuccess(img);
     }
