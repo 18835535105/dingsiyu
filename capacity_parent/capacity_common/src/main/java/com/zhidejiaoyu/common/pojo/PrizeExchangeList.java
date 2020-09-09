@@ -1,14 +1,16 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -35,15 +37,20 @@ public class PrizeExchangeList extends Model<PrizeExchangeList> {
     /**
      * 奖品名称
      */
+    @NotEmpty(message = "奖品名称不能为空！")
     private String prize;
     /**
      * 奖品价格
      */
+    @NotNull(message = "兑换价格不能为空！")
+    @Min(value = 1, message = "兑换价格不能小于1！")
     @TableField("exchange_prize")
     private Integer exchangePrize;
     /**
      * 奖品数量
      */
+    @NotNull(message = "奖品数量不能为空！")
+    @Min(value = 1, message = "奖品数量不能小于1！")
     @TableField("total_number")
     private Integer totalNumber;
     /**
