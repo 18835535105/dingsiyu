@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.SysUserMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleStudentExchangePrizeMapper;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
@@ -40,15 +41,16 @@ public class StudentExchangPrizeServiceImpl extends ServiceImpl<SimpleStudentExc
         SysUser user = sysUserMapper.selectByOpenId(dto.getOpenId());
         List<StudentExchangePrizeVo> studentExchangePrizeVo;
         Page<StudentExchangePrizeVo> page = new Page<>(dto.getPageNum(), dto.getPageSize());
+        String studentName = StringUtil.trim(dto.getStudentName());
         if (user.getAccount().contains("xg")) {
-            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(page,dto.getStudentName(), user.getId(), 1);
+            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(page, studentName, user.getId(), 1);
         } else if (user.getAccount().contains("admin")) {
-            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(page,dto.getStudentName(), user.getId(), 3);
+            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(page, studentName, user.getId(), 3);
         } else {
-            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(page,dto.getStudentName(), user.getId(), 2);
+            studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(page, studentName, user.getId(), 2);
         }
         List<StudentExchangePrizeVo> returnList = new ArrayList<>();
-        int index=(dto.getPageNum()-1)*dto.getPageSize();
+        int index = (dto.getPageNum() - 1) * dto.getPageSize();
         for (StudentExchangePrizeVo vo : studentExchangePrizeVo) {
             index++;
             vo.setIndex(index);
@@ -72,12 +74,12 @@ public class StudentExchangPrizeServiceImpl extends ServiceImpl<SimpleStudentExc
         SysUser sysUser = sysUserMapper.selectByOpenId(openId);
         Integer integer = studentExchangePrizeMapper.updateByPrizeId(prizeId, state);
         if (state != 0) {
-            updStudent(prizeId, integer,sysUser.getId());
+            updStudent(prizeId, integer, sysUser.getId());
         }
         if (integer > 0) {
-           return ServerResponse.createBySuccess();
+            return ServerResponse.createBySuccess();
         }
-        return ServerResponse.createByError(300,"删除失败");
+        return ServerResponse.createByError(300, "删除失败");
     }
 
     private void updStudent(Long prizeId, Integer integer, Integer userId) {
