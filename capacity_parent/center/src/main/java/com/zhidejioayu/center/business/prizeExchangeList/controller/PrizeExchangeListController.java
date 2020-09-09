@@ -69,14 +69,21 @@ public class PrizeExchangeListController {
     /**
      * 使用id查询物品详情
      *
-     * @param dto
+     * @param openId
+     * @param id
      * @return
      */
     @GetMapping("/selectOne")
-    public Object selectOne(@Valid AddPrizeExchangeListDto dto) {
-        if (StringUtil.isEmpty(dto.getOpenId())) {
+    public Object selectOne(String openId, Long id) {
+        if (StringUtil.isEmpty(openId)) {
             return ServerResponse.createByError(400, "openId can't be null!");
         }
+        if (id == null) {
+            return ServerResponse.createByError(400, "id can't be null!");
+        }
+        AddPrizeExchangeListDto dto = new AddPrizeExchangeListDto();
+        dto.setOpenId(openId);
+        dto.setId(id);
         BaseTeacherPrizeExchangeListFeignClient prizeExchangListFeignClient = FeignClientUtil.getBaseTeacherPrizeExchangeListFeignClientByOpenId(dto.getOpenId());
         return prizeExchangListFeignClient.selectOne(dto);
     }
