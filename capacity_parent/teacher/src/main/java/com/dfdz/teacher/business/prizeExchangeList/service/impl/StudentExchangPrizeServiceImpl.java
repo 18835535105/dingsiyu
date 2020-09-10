@@ -55,13 +55,11 @@ public class StudentExchangPrizeServiceImpl extends ServiceImpl<SimpleStudentExc
         } else {
             studentExchangePrizeVo = studentExchangePrizeMapper.selectListByAccountAndName(page, studentName, user.getId(), 2);
         }
-        List<StudentExchangePrizeVo> returnList = new ArrayList<>();
         int index = (dto.getPageNum() - 1) * dto.getPageSize();
         for (StudentExchangePrizeVo vo : studentExchangePrizeVo) {
             index++;
             vo.setIndex(index);
             vo.setCreateTime(DateUtil.formatDate(vo.getCreateTimes(), "yyyy-MM-dd HH:mm:ss"));
-            returnList.add(vo);
         }
         PageVo<StudentExchangePrizeVo> studentManageVOPageVo = PageUtil.packagePage(studentExchangePrizeVo, page.getTotal());
         return ServerResponse.createBySuccess(studentManageVOPageVo);
