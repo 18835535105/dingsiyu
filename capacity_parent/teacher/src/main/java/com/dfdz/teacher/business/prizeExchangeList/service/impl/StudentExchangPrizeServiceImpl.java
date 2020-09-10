@@ -16,23 +16,29 @@ import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.studentExchangPrize.StudentExchangePrizeVo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class StudentExchangPrizeServiceImpl extends ServiceImpl<SimpleStudentExchangePrizeMapper, StudentExchangePrize> implements StudentExchangePrizeService {
 
-    @Autowired
+    @Resource
     private SimpleStudentExchangePrizeMapper studentExchangePrizeMapper;
+
     @Resource
     private SysUserMapper sysUserMapper;
+
     @Resource
     private PrizeExchangeListMapper prizeExchangeListMapper;
+
     @Resource
     private StudentMapper studentMapper;
+
     @Resource
     private GoldLogMapper goldLogMapper;
 
@@ -62,19 +68,23 @@ public class StudentExchangPrizeServiceImpl extends ServiceImpl<SimpleStudentExc
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object updateByPrizeId(Long prizeId, String openId) {
         SysUser sysUser = sysUserMapper.selectByOpenId(openId);
         Integer integer = studentExchangePrizeMapper.updateByPrizeId(prizeId, 2);
-        updStudent(prizeId, integer, sysUser.getId());
+        if (integer > 0) {
+            updStudent(prizeId, sysUser.getId());
+        }
         return ServerResponse.createBySuccess();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object updateByPrizeIdAndState(Long prizeId, Integer state, String openId) {
         SysUser sysUser = sysUserMapper.selectByOpenId(openId);
         Integer integer = studentExchangePrizeMapper.updateByPrizeId(prizeId, state);
-        if (state != 0) {
-            updStudent(prizeId, integer, sysUser.getId());
+        if (state != 0 && integer > 0) {
+            updStudent(prizeId, sysUser.getId());
         }
         if (integer > 0) {
             return ServerResponse.createBySuccess();
@@ -82,28 +92,31 @@ public class StudentExchangPrizeServiceImpl extends ServiceImpl<SimpleStudentExc
         return ServerResponse.createByError(300, "删除失败");
     }
 
-    private void updStudent(Long prizeId, Integer integer, Integer userId) {
+    private void updStudent(Long prizeId, Integer userId) {
         StudentExchangePrize studentExchangePrize = studentExchangePrizeMapper.selectById(prizeId);
         PrizeExchangeList prizeExchangeList = prizeExchangeListMapper.selectById(studentExchangePrize.getPrizeId().intValue());
-        if (integer > 0) {
-            this.saveGoldLog(studentExchangePrize.getStudentId(), userId, "教师取消订购商品，金币返还", -prizeExchangeList.getExchangePrize(), 2);
-            Student student = studentMapper.selectById(studentExchangePrize.getStudentId());
-            student.setOfflineGold(student.getOfflineGold() - prizeExchangeList.getExchangePrize());
-            student.setSystemGold(student.getSystemGold() + prizeExchangeList.getExchangePrize());
-            studentMapper.updateById(student);
-        }
+
+        prizeExchangeList.setSurplusNumber(prizeExchangeList.getSurplusNumber() + 1);
+        prizeExchangeListMapper.updateById(prizeExchangeList);
+
+        this.saveGoldLog(studentExchangePrize.getStudentId(), userId, -prizeExchangeList.getExchangePrize());
+
+        Student student = studentMapper.selectById(studentExchangePrize.getStudentId());
+        student.setOfflineGold(student.getOfflineGold() - prizeExchangeList.getExchangePrize());
+        student.setSystemGold(student.getSystemGold() + prizeExchangeList.getExchangePrize());
+        studentMapper.updateById(student);
     }
 
-    private void saveGoldLog(Long studentId, Integer operatorId, String reason, int gold, int type) {
+    private void saveGoldLog(Long studentId, Integer operatorId, int gold) {
         goldLogMapper.insert(GoldLog.builder()
                 .studentId(studentId)
                 .operatorId(operatorId)
-                .reason(reason)
+                .reason("教师取消订购商品，金币返还")
                 .readFlag(2)
                 .goldReduce(gold >= 0 ? 0 : Math.abs(gold))
                 .goldAdd(Math.max(gold, 0))
                 .createTime(new Date())
-                .type(type)
+                .type(2)
                 .build());
     }
 }
