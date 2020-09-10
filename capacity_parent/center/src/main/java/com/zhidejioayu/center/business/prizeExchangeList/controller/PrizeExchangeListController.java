@@ -59,9 +59,6 @@ public class PrizeExchangeListController {
             dto.setPrizeUrl(getPrizeUrl(dto));
         }
         dto.setFile(null);
-        if (dto.getPrizeUrl() == null) {
-            return ServerResponse.createByError(300, "添加失败,请重新添加商品");
-        }
         BaseTeacherPrizeExchangeListFeignClient prizeExchangListFeignClient = FeignClientUtil.getBaseTeacherPrizeExchangeListFeignClientByOpenId(dto.getOpenId());
         return prizeExchangListFeignClient.updatePrizeExchangeList(dto);
     }
@@ -116,15 +113,8 @@ public class PrizeExchangeListController {
     }
 
     private String getPrizeUrl(AddPrizeExchangeListDto dto) {
-
         if (dto.getFile() != null && dto.getFile().getSize() > 0) {
-            try {
-                String upload = OssUpload.upload(dto.getFile(), FileConstant.PRIZE_IMG, null);
-                dto.setFile(null);
-                return upload;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            return OssUpload.upload(dto.getFile(), FileConstant.PRIZE_IMG, null);
         }
         return null;
     }
