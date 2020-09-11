@@ -532,6 +532,7 @@ public class FinishGroupOrUnit {
                 .learnNew(learnNew)
                 .build());
 
+        StudyFlowServiceImpl.setOneKeyGroup(learnNew);
         return packageFlowVO.packageFlowVO(studyFlowNew, student, nodeDto.getUnitId());
     }
 
