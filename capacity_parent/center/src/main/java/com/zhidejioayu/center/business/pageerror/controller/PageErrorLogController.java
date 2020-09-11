@@ -49,8 +49,7 @@ public class PageErrorLogController {
             pageErrorLog.setErrTime(new Date());
             pageErrorLogService.updateById(pageErrorLog);
         }
-throw new RuntimeException("报错啦");
-//        return ServerResponse.createBySuccess();
+        return ServerResponse.createBySuccess();
     }
 }
 
