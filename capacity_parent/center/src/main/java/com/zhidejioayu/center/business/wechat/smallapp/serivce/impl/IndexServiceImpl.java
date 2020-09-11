@@ -53,7 +53,7 @@ public class IndexServiceImpl extends ServiceImpl<StudentMapper, Student> implem
                 .totalData(TotalDataVO.builder()
                         .headImg(GetOssFile.getPublicObjectUrl(PetImageConstant.VISITOR))
                         .say(this.getSay())
-                        .studentName("默认昵称")
+                        .studentName("未登录")
                         .systemGold("0")
                         .build())
                 .build());
