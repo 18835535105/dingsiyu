@@ -49,8 +49,8 @@ public class PageErrorLogController {
             pageErrorLog.setErrTime(new Date());
             pageErrorLogService.updateById(pageErrorLog);
         }
-
-        return ServerResponse.createBySuccess();
+throw new RuntimeException("报错啦");
+//        return ServerResponse.createBySuccess();
     }
 }
 
