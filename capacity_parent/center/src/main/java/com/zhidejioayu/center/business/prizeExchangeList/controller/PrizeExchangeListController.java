@@ -58,7 +58,6 @@ public class PrizeExchangeListController {
         if (dto.getFlag()) {
             dto.setPrizeUrl(getPrizeUrl(dto));
         }
-        dto.setFile(null);
         BaseTeacherPrizeExchangeListFeignClient prizeExchangListFeignClient = FeignClientUtil.getBaseTeacherPrizeExchangeListFeignClientByOpenId(dto.getOpenId());
         return prizeExchangListFeignClient.updatePrizeExchangeList(dto);
     }
@@ -113,9 +112,11 @@ public class PrizeExchangeListController {
     }
 
     private String getPrizeUrl(AddPrizeExchangeListDto dto) {
+        String upload = null;
         if (dto.getFile() != null && dto.getFile().getSize() > 0) {
-            return OssUpload.upload(dto.getFile(), FileConstant.PRIZE_IMG, null);
+            upload = OssUpload.upload(dto.getFile(), FileConstant.PRIZE_IMG, null);
         }
-        return null;
+        dto.setFile(null);
+        return upload;
     }
 }
