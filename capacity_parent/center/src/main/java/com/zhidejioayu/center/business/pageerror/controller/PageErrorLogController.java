@@ -3,6 +3,7 @@ package com.zhidejioayu.center.business.pageerror.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zhidejiaoyu.common.pojo.center.PageErrorLog;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.pageerror.service.PageErrorLogService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +40,8 @@ public class PageErrorLogController {
         PageErrorLog pageErrorLog = pageErrorLogService.getOne(new LambdaQueryWrapper<PageErrorLog>()
                 .eq(PageErrorLog::getAppName, log.getAppName())
                 .eq(PageErrorLog::getUserInfo, log.getUserInfo())
-                .eq(PageErrorLog::getErrDetail, log.getErrDetail()));
+                .eq(PageErrorLog::getErrMsg, log.getErrMsg())
+                .likeRight(PageErrorLog::getErrTime, DateUtil.formatDate(new Date(), DateUtil.YYYYMMDD)));
 
         if (pageErrorLog == null) {
             pageErrorLogService.save(log);
