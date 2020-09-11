@@ -98,6 +98,9 @@
         <include refid="Base_Column_List"/>
         from prize_exchange_list
         where school_id = #{schoolAdminId}
+        <if test="prizeName!=null and prizeName!=''">
+            and prize like concat("%",#{prizeName},"%")
+        </if>
         order by exchange_prize desc
     </select>
 

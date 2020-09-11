@@ -39,9 +39,9 @@ public interface PrizeExchangeListMapper extends BaseMapper<PrizeExchangeList> {
      * @return
      */
     List<PrizeExchangeList> selectBySchoolId(@Param("schoolAdminId") Integer schoolAdminId, @Param("orderField") String orderField,
-                                               @Param("orderBy") String orderBy);
+                                             @Param("orderBy") String orderBy);
 
     Integer countBySchoolId(@Param("schoolAdminId") Integer schoolAdminId);
 
-    List<PrizeExchangeList> selectListBySchoolId(@Param("page") Page<PrizeExchangeList> page, @Param("schoolAdminId") Integer schoolAdminId);
+    List<PrizeExchangeList> selectListBySchoolId(@Param("page") Page<PrizeExchangeList> page, @Param("schoolAdminId") Integer schoolAdminId, @Param("prizeName") String prizeName);
 }

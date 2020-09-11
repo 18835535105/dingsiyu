@@ -13,6 +13,8 @@ public class PrizeExchangeListDto {
     @NotNull(message = "openId can't be null!")
     private String openId;
 
+    private String prizeName;
+
     private Integer pageNum;
 
     private Integer pageSize;
