@@ -261,7 +261,7 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
             set.forEach(str->{
                 reuturnList.add(str.replace("语法-人教版（PEP）","语法-通用版"));
             });
-            return new ArrayList<>(set);
+            return new ArrayList<>(reuturnList);
         }
         return new ArrayList<>();
     }
