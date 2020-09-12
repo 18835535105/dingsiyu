@@ -271,6 +271,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
         Student oldStudent = studentMapper.selectByUuid(dto.getUuid());
         student.setUpdateTime(new Date());
+        student.setTeacherId(oldStudent.getTeacherId());
         if ("".equals(student.getBirthDate())) {
             student.setBirthDate(null);
         }
@@ -280,7 +281,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         if (count == 0) {
             return ServerResponse.createByError();
         }
+        String phase = this.getPhase(student.getGrade());
 
+        this.saveOrUpdateStudentExpansion(phase, student);
         // 判断学生年级是否修改
         if (!oldStudent.getGrade().equals(student.getGrade()) || (StringUtil.isNotEmpty(oldStudent.getVersion()) && !oldStudent.getVersion().equals(student.getVersion()))) {
             Integer integer = testRecordMapper.countByGenreAndStudentId(GenreConstant.TEST_BEFORE_STUDY, student.getId());
@@ -288,9 +291,6 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
                 courseService.deleteStudyUnit(student);
             }
         }
-        String phase = this.getPhase(student.getGrade());
-
-        this.saveOrUpdateStudentExpansion(phase, student);
 
 
         SysUser sysUser = sysUserMapper.selectByOpenId(dto.getOpenId());
