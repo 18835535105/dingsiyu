@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 排行操作类
@@ -218,5 +219,67 @@ public class RankOpt extends BaseRankOpt {
      */
     public void deleteMember(String key, Long studentId) {
         redisTemplate.opsForZSet().remove(key, studentId);
+    }
+
+    /**
+     * 从回收站恢复学生信息
+     *
+     * @param studentIds
+     */
+    public void recoverFormRecycle(List<Long> studentIds) {
+        try {
+            List<Student> students = studentMapper.selectByIds(studentIds);
+            students.stream().filter(student -> student.getAccountTime() != null).forEach(student -> {
+                // 各个学生被膜拜的次数
+                Map<Long, Map<Long, Long>> byWorshipCount = worshipMapper.countWorshipWithStudents(students);
+                // 各个学生获取的勋章个数
+                Map<Long, Map<Long, Long>> medalCount = awardMapper.countGetModelByStudents(students);
+                // 各个学生获取的证书个数
+                Map<Long, Map<Long, Long>> ccieCount = ccieMapper.countCcieByStudents(students);
+                Long schoolAdminId = getSchoolAdminId(student.getTeacherId().intValue());
+
+                double goldCount = BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold());
+                this.addOrUpdate(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), goldCount);
+                this.addOrUpdate(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, student.getId(), goldCount);
+                this.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), goldCount);
+                log.info("学生[{} - {} - {}] 金币数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), goldCount);
+
+                Long count = 0L;
+                if (ccieCount.get(student.getId()) != null && ccieCount.get(student.getId()).get("count") != null) {
+                    count = ccieCount.get(student.getId()).get("count");
+                }
+                this.addOrUpdate(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
+                this.addOrUpdate(RankKeysConst.SCHOOL_CCIE_RANK + schoolAdminId, student.getId(), count * 1.0);
+                this.addOrUpdate(RankKeysConst.COUNTRY_CCIE_RANK, student.getId(), count * 1.0);
+                log.info("学生[{} - {} - {}] 证书个数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
+
+                count = 0L;
+                if (medalCount.get(student.getId()) != null && medalCount.get(student.getId()).get("count") != null) {
+                    count = medalCount.get(student.getId()).get("count");
+                }
+                this.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
+                this.addOrUpdate(RankKeysConst.SCHOOL_MEDAL_RANK + schoolAdminId, student.getId(), count * 1.0);
+                this.addOrUpdate(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId(), count * 1.0);
+                log.info("学生[{} - {} - {}] 勋章个数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
+
+                count = 0L;
+                if (byWorshipCount.get(student.getId()) != null && byWorshipCount.get(student.getId()).get("count") != null) {
+                    count = byWorshipCount.get(student.getId()).get("count");
+                }
+                this.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
+                this.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, student.getId(), count * 1.0);
+                this.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId(), count * 1.0);
+                log.info("学生[{} - {} - {}] 被膜拜次数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
+
+            });
+        } catch (Exception e) {
+            log.error("恢复 redis 中排行数据失败！", e);
+        }
+    }
+
+    private Long getSchoolAdminId(Integer teacherId) {
+        Integer schoolAdminId = teacherMapper.getSchoolAdminById(teacherId);
+        schoolAdminId = schoolAdminId == null ? teacherId : schoolAdminId;
+        return schoolAdminId.longValue();
     }
 }

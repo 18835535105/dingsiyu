@@ -87,4 +87,13 @@ public interface WorshipMapper {
 
     @MapKey("studentId")
     Map<Long, Map<String, Object>> selectByStudentIdsAndDate(@Param("studentIds") List<Long> studentIds, @Param("date") Date beforeDaysDate);
+
+    /**
+     * 查看指定学生被膜拜的次数
+     *
+     * @param students
+     * @return
+     */
+    @MapKey("studentId")
+    Map<Long, Map<Long, Long>> countWorshipWithStudents(@Param("students") List<Student> students);
 }

@@ -49,4 +49,6 @@ public interface RecycleBinMapper extends BaseMapper<RecycleBin> {
     List<Long> selectDeleteStudentIdByDate(@Param("date") Date date);
 
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIds);
+
+    RecycleBin selectByStudentId(@Param("studentId") Long studentId);
 }

@@ -7,15 +7,13 @@ import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.dto.wechat.qy.teacher.PayStudentsDTO;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> implements PayCardService {
@@ -36,6 +34,10 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
     private CourseService courseService;
     @Resource
     private TestRecordMapper testRecordMapper;
+    @Resource
+    private RecycleBinMapper recycleBinMapper;
+    @Resource
+    private RankOpt rankOpt;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -257,6 +259,20 @@ public class PayCardServiceImpl extends ServiceImpl<PayCardMapper, PayCard> impl
         int rank = student.getRank() + time;
         student.setRank(rank);
         studentMapper.updateById(student);
+        updateRecycleBin(student.getId());
+    }
+
+
+    private void updateRecycleBin(Long studentId) {
+        RecycleBin recycleBin = recycleBinMapper.selectByStudentId(studentId);
+        if (recycleBin != null) {
+            recycleBin.setDelStatus(2);
+            recycleBin.setUpdateTime(new Date());
+            recycleBinMapper.updateById(recycleBin);
+            List<Long> stuIds = new ArrayList<>();
+            stuIds.add(studentId);
+            rankOpt.recoverFormRecycle(stuIds);
+        }
     }
 
     /**

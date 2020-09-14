@@ -88,4 +88,14 @@
         </foreach>
         )
     </delete>
+
+    <select id="selectByStudentId" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Sql"></include>
+        from recycle_bin
+        where
+        student_id =#{studentId}
+        and del_status=1
+        order by id desc limit 1
+    </select>
 </mapper>
