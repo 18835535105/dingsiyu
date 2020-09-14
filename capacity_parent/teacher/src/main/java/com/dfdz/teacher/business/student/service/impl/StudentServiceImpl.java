@@ -6,7 +6,7 @@ import com.dfdz.teacher.business.course.service.CourseService;
 import com.dfdz.teacher.business.student.service.StudentExpansionService;
 import com.dfdz.teacher.business.student.service.StudentService;
 import com.dfdz.teacher.business.teacher.service.impl.TeacherServiceImpl;
-import com.dfdz.teacher.common.CommonMethod;
+import com.dfdz.teacher.common.TeacherCommonMethod;
 import com.dfdz.teacher.common.log.factory.LogFactory;
 import com.dfdz.teacher.constant.LogNameConst;
 import com.dfdz.teacher.feignclient.CenterUserFeignClient;
@@ -64,7 +64,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private GradeMapper gradeMapper;
 
     @Resource
-    private CommonMethod commonMethod;
+    private TeacherCommonMethod teacherCommonMethod;
 
     @Resource
     private CourseNewMapper courseNewMapper;
@@ -199,7 +199,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         // 获取所有体验版课程
         List<CourseNew> experienceCourses = courseNewMapper.selectExperienceCourses();
         // 推送体验版课程
-        commonMethod.initUnit(students, experienceCourses);
+        teacherCommonMethod.initUnit(students, experienceCourses);
 
         boolean b = centerUserFeignClient.saveUserInfos(saveUserInfoDTOList);
         if (!b) {

@@ -32,7 +32,7 @@ import java.util.Date;
 @ServletComponentScan
 @MapperScan(basePackages = {"com.zhidejiaoyu.common.mapper"})
 @EnableRedisHttpSession(redisNamespace = "spring:session:teacher")
-@ComponentScan(basePackages = {"com.zhidejiaoyu"})
+@ComponentScan(basePackages = {"com.zhidejiaoyu", "com.dfdz"})
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class})
 public class TeacherApplication {
 
