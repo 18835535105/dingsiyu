@@ -64,4 +64,12 @@ public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNe
     List<StudentStudyPlanNew> selectStudyPlanByStudentIdAndPage(@Param("studentId") Long studentId);
 
     StudentStudyPlanNew selectByStudentIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("easyOrHard") int easyOrHard);
+
+    /**
+     * 获取学生最高优先级
+     *
+     * @param studentId
+     * @return
+     */
+    List<StudentStudyPlanNew> selectMaxFinalLevelByStudentId(@Param("studentId") Long studentId);
 }

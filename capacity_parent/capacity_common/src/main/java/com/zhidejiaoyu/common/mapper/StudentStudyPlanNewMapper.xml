@@ -117,6 +117,18 @@
         and easy_or_hard = #{easyOrHard}
         limit 1
     </select>
+    <select id="selectMaxFinalLevelByStudentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from student_study_plan_new
+        where final_level =
+        (select final_level
+        from student_study_plan_new
+        where student_id = #{studentId}
+        order by final_level desc
+        limit 1)
+        and student_id = #{studentId}
+    </select>
 
 
 </mapper>

@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
+import com.zhidejiaoyu.student.business.flow.common.FinishGroupOrUnit;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzService;
 import com.zhidejiaoyu.student.common.redis.AwardRedisOpt;
@@ -173,6 +174,9 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
     @Resource
     private SourcePowerRankOpt sourcePowerRankOpt;
+
+    @Resource
+    private FinishGroupOrUnit finishGroupOrUnit;
 
     public QuartzServiceImpl(CourseFeignClient courseFeignClient) {
         this.courseFeignClient = courseFeignClient;
@@ -605,7 +609,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 }
 
                 //获取学生优先级最大的课程
-                StudentStudyPlanNew plan = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+                StudentStudyPlanNew plan = finishGroupOrUnit.getMaxFinalLeve(studentId);
                 LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, plan.getUnitId(), plan.getEasyOrHard());
                 //查看是否有当前learnNew数据
                 if (learnNew == null) {

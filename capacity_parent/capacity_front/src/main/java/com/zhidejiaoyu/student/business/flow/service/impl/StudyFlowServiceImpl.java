@@ -55,9 +55,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     private LearnExtendMapper learnExtendMapper;
 
     @Resource
-    private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
-
-    @Resource
     private JudgeNextNode judgeNextNode;
 
     @Resource
@@ -224,7 +221,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         StudentStudyPlanNew maxFinalLevelStudentStudyPlanNew = null;
         if (studentFlowNew == null) {
             // 查询学生最高优先级数据
-            maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+            maxFinalLevelStudentStudyPlanNew = finishGroupOrUnit.getMaxFinalLeve(studentId);
 
             maxFinalLevelStudentStudyPlanNew = finishGroupOrUnit.judgeHasGoldTest(dto, maxFinalLevelStudentStudyPlanNew);
 
@@ -358,7 +355,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     @Override
     public ServerResponse<Object> getModel(HttpSession session, Integer type) {
         Student student = getStudent(session);
-        redisOpt.saveStudentStudyModel(student.getId(),type);
+        redisOpt.saveStudentStudyModel(student.getId(), type);
         return ServerResponse.createBySuccess();
     }
 

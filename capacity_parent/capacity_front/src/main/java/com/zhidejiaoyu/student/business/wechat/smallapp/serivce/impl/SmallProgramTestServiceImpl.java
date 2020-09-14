@@ -20,6 +20,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
+import com.zhidejiaoyu.student.business.flow.common.FinishGroupOrUnit;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.dto.GetLimitQRCodeDTO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.SmallProgramTestService;
@@ -50,8 +51,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     private StudentMapper studentMapper;
     @Resource
     private ErrorLearnLogMapper errorLearnLogMapper;
-    @Resource
-    private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
+
     @Resource
     private TeacherMapper teacherMapper;
     @Resource
@@ -69,6 +69,10 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     private final CourseFeignClient courseFeignClient;
     @Resource
     private VocabularyFeignClient vocabularyFeignClient;
+
+    @Resource
+    private FinishGroupOrUnit finishGroupOrUnit;
+
     /**
      * 以字母或数字结尾
      */
@@ -99,7 +103,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         Map<String, Object> returnMap = new HashMap<>();
         if (maps.size() == 0) {
             //获取优先级最大的单元
-            StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(student.getId());
+            StudentStudyPlanNew studentStudyPlanNew = finishGroupOrUnit.getMaxFinalLeve(student.getId());
             //获取当前单元的单词
             List<Vocabulary> vocabularies = vocabularyFeignClient.getVocabularyByUnitId(studentStudyPlanNew.getUnitId());
             vocabularies.forEach(vocabulary -> {
@@ -182,7 +186,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("studentId", studentId);
         returnMap.put("studentName", student.getNickname());
         returnMap.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
-        StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+        StudentStudyPlanNew studentStudyPlanNew = finishGroupOrUnit.getMaxFinalLeve(studentId);
         CourseNew course ;
         if(studentStudyPlanNew==null){
             Long unitId = errorLearnLogMapper.selectUnitIdByStudentId(student.getId());

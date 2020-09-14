@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -63,17 +64,21 @@ public class PriorityUtil {
      */
     public static int getBasePriority(String grade, String wordInGrade, String wordInLabel) {
 
+        int month = new DateTime().monthOfYear().get();
+
         // 非当前学年，六年级下册均为2200，高三下册为3400
         // 学生不是6年级，当前测试单元为6年级下册，基础优先级为2200
         if (!Objects.equals(grade, GradeNameConstant.SIXTH_GRADE)
                 && Objects.equals(wordInGrade, GradeNameConstant.SIXTH_GRADE)
-                && Objects.equals(GradeNameConstant.VOLUME_2, wordInLabel)) {
+                && Objects.equals(GradeNameConstant.VOLUME_2, wordInLabel)
+                && month < 9) {
             return 2200;
         }
         // 学生年级不是高三，当前测试单元为高三下册单元，基础优先级为3400
         if (!Objects.equals(grade, GradeNameConstant.SENIOR_THREE)
                 && Objects.equals(wordInGrade, GradeNameConstant.SENIOR_THREE)
-                && Objects.equals(GradeNameConstant.VOLUME_2, wordInLabel)) {
+                && Objects.equals(GradeNameConstant.VOLUME_2, wordInLabel)
+                && month < 9) {
             return 3400;
         }
 
@@ -83,19 +88,21 @@ public class PriorityUtil {
     /**
      * 获取变化优先级
      *
-     * @param errorCount   错题数
-     * @param grade        学生当前年级
-     * @param wordInGrade  测试的单词所在年级
+     * @param errorCount  错题数
+     * @param grade       学生当前年级
+     * @param wordInGrade 测试的单词所在年级
      * @return
      */
     public static int getErrorPriority(int errorCount, String grade, String wordInGrade) {
         switch (errorCount) {
             case 1:
-                return (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 197;
+                return (GRADE_TO_NUM.get(grade) - GRADE_TO_NUM.get(wordInGrade)) * 200
+                        + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * -3;
             case 2:
-                return (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 200;
+                return (GRADE_TO_NUM.get(grade) - GRADE_TO_NUM.get(wordInGrade)) * 200;
             case 3:
-                return (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 203;
+                return (GRADE_TO_NUM.get(grade) - GRADE_TO_NUM.get(wordInGrade)) * 200
+                        + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 3;
             default:
                 return 0;
         }

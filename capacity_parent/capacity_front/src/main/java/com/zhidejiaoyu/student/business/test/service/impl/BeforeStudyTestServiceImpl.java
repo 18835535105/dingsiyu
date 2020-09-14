@@ -28,6 +28,7 @@ import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import com.zhidejiaoyu.student.business.feignclient.course.CourseFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.UnitFeignClient;
 import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient;
+import com.zhidejiaoyu.student.business.flow.common.FinishGroupOrUnit;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.test.constant.TestConstant;
 import com.zhidejiaoyu.student.business.test.service.BeforeStudyTestService;
@@ -57,7 +58,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
     private SchoolTimeMapper schoolTimeMapper;
 
     @Resource
-    private StudentMapper studentMapper;
+    private FinishGroupOrUnit finishGroupOrUnit;
 
     @Resource
     private PetSayUtil petSayUtil;
@@ -394,7 +395,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
             String unitGrade = unitIdAndGrade.get(unitId);
             String unitLabel = unitIdAndLabel.get(unitId);
-            timePriority = this.getTimePriority(timePriority, phaseSet, unitGrade);
+            timePriority = this.getTimePriority(timePriority, phaseSet, unitGrade, grade);
             int basePriority = PriorityUtil.getBasePriority(grade, unitGrade, unitLabel);
             int errorPriority = this.getErrorPriority(unitIdMap, unitGrade, grade, unitId);
 
@@ -441,7 +442,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         this.saveBatch(studentStudyPlanNews);
 
         // 初始化学生学习流程
-        StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(student.getId(), 1).get(0);
+        StudentStudyPlanNew maxStudentStudyPlanNew = finishGroupOrUnit.getMaxFinalLeve(student.getId());
 
         // 初始化学习内容
         LearnNew learnNew = this.initLearn(student, maxStudentStudyPlanNew);
@@ -475,16 +476,21 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
     /**
      * 获取时间优先级
+     * 只有单元所在年级=学生所在年级，才会计算单元的时间优先级，否则单元时间优先级为0
      *
      * @param timePriority
      * @param phaseSet
      * @param unitGrade    单元所在年级
+     * @param grade        学生所在年级
      * @return
      */
-    public int getTimePriority(int timePriority, Set<String> phaseSet, String unitGrade) {
+    public int getTimePriority(int timePriority, Set<String> phaseSet, String unitGrade, String grade) {
+        if (!Objects.equals(grade, unitGrade)) {
+            return 0;
+        }
         if (!phaseSet.contains(unitGrade)) {
             phaseSet.add(unitGrade);
-            return 0;
+            return 25;
         }
         return timePriority + PriorityUtil.BASE_TIME_PRIORITY;
     }

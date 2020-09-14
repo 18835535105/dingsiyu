@@ -22,9 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -470,13 +468,13 @@ public class FinishGroupOrUnit {
      */
     public NodeDto getNextFlowInfo(NodeDto dto) {
         // 更新优先级表中的变化优先级
-        StudentStudyPlanNew oldMaxFinalLevel = this.getMaxFinalLevelStudentStudyPlanNew(dto);
+        StudentStudyPlanNew oldMaxFinalLevel = this.getMaxFinalLeve(dto.getStudent().getId());
         this.updateLevel(dto, oldMaxFinalLevel);
 
         Student student = dto.getStudent();
         Long studentId = student.getId();
 
-        StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+        StudentStudyPlanNew maxStudentStudyPlanNew = this.getMaxFinalLeve(studentId);
         maxStudentStudyPlanNew = this.judgeHasGoldTest(dto, maxStudentStudyPlanNew);
 
         Long flowId = maxStudentStudyPlanNew.getFlowId();
@@ -501,7 +499,7 @@ public class FinishGroupOrUnit {
             int count = unitTestStoreMapper.countByUnitId(maxStudentStudyPlanNew.getUnitId());
             if (count == 0) {
                 this.updateLevel(dto, maxStudentStudyPlanNew);
-                maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(dto.getStudent().getId());
+                maxStudentStudyPlanNew = this.getMaxFinalLeve(dto.getStudent().getId());
                 this.judgeHasGoldTest(dto, maxStudentStudyPlanNew);
             }
         }
@@ -551,37 +549,6 @@ public class FinishGroupOrUnit {
     }
 
     /**
-     * 获取最终优先级最高的数据
-     *
-     * @param dto
-     * @return
-     */
-    private StudentStudyPlanNew getMaxFinalLevelStudentStudyPlanNew(NodeDto dto) {
-        List<StudentStudyPlanNew> studentStudyPlanNews = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(dto.getStudent().getId(), 5);
-        StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNews.get(0);
-        StudentStudyPlanNew finalMaxStudentStudyPlanNew = maxStudentStudyPlanNew;
-        List<StudentStudyPlanNew> collect = studentStudyPlanNews.stream()
-                .filter(studentStudyPlanNew -> Objects.equals(studentStudyPlanNew.getFinalLevel(), finalMaxStudentStudyPlanNew.getFinalLevel()))
-                .collect(Collectors.toList());
-        if (collect.size() > 1) {
-            // 说明有相同优先级的数据，取最接近当前单元的一个
-            // 与当前单元的差值
-            int difference = -1;
-            // 最接近当前单元的记录
-            for (StudentStudyPlanNew studentStudyPlanNew : collect) {
-                Long unitId = studentStudyPlanNew.getUnitId();
-                long abs = Math.abs(unitId - dto.getUnitId());
-                if (difference == -1 || abs < difference) {
-                    difference = (int) abs;
-                    maxStudentStudyPlanNew = studentStudyPlanNew;
-                }
-            }
-        }
-        return maxStudentStudyPlanNew;
-    }
-
-
-    /**
      * 判断哪些模块有当前group，并更新或新增当前group的学习已完成表
      *
      * @param dto
@@ -603,4 +570,44 @@ public class FinishGroupOrUnit {
     }
 
 
+    /**
+     * 获取学生最高优先级，如果有多个优先级相同的记录，取年级小的
+     *
+     * @param studentId
+     * @return
+     */
+    public StudentStudyPlanNew getMaxFinalLeve(Long studentId) {
+        List<StudentStudyPlanNew> studentStudyPlanNews = studentStudyPlanNewMapper.selectMaxFinalLevelByStudentId(studentId);
+        if (studentStudyPlanNews.size() == 0) {
+            return new StudentStudyPlanNew();
+        }
+        if (studentStudyPlanNews.size() == 1) {
+            return studentStudyPlanNews.get(0);
+        }
+
+        Set<Long> courseSet = new HashSet<>();
+        studentStudyPlanNews.parallelStream().forEach(studentStudyPlanNew -> courseSet.add(studentStudyPlanNew.getCourseId()));
+        if (courseSet.size() > 1) {
+            // 说明有多个课程
+            List<CourseNew> courseNews = courseFeignClient.getByIds(new ArrayList<>(courseSet));
+            Map<Integer, Long> sortMap = new HashMap<>(16);
+            List<Integer> sortList = new ArrayList<>();
+            courseNews.forEach(courseNew -> {
+                String grade = StringUtils.isEmpty(courseNew.getGradeExt()) ? courseNew.getGrade() : courseNew.getGradeExt();
+                sortMap.put(PriorityUtil.GRADE_TO_NUM.get(grade), courseNew.getId());
+                sortList.add(PriorityUtil.GRADE_TO_NUM.get(grade));
+            });
+            List<Integer> collect = sortList.stream().sorted(Comparator.comparingInt(o -> o)).collect(Collectors.toList());
+            return studentStudyPlanNews.stream()
+                    .filter(studentStudyPlanNew -> Objects.equals(studentStudyPlanNew.getCourseId(), sortMap.get(collect.get(0))))
+                    .limit(1)
+                    .findFirst()
+                    .orElse(studentStudyPlanNews.get(0));
+        }
+
+        return studentStudyPlanNews.stream()
+                .sorted((o1, o2) -> (int) (o1.getUnitId() - o2.getUnitId())).limit(1)
+                .findFirst().orElse(studentStudyPlanNews.get(0));
+
+    }
 }
