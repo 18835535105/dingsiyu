@@ -3,7 +3,6 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zhidejiaoyu.common.pojo.PrizeExchangeList;
-import com.zhidejiaoyu.common.pojo.Student;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 
@@ -44,4 +43,6 @@ public interface PrizeExchangeListMapper extends BaseMapper<PrizeExchangeList> {
     Integer countBySchoolId(@Param("schoolAdminId") Integer schoolAdminId);
 
     List<PrizeExchangeList> selectListBySchoolId(@Param("page") Page<PrizeExchangeList> page, @Param("schoolAdminId") Integer schoolAdminId, @Param("prizeName") String prizeName);
+
+    PrizeExchangeList selectBySchoolIdAndPrize(@Param("schoolAdminId") Integer schoolAdminId, @Param("prizeName") String prizeName);
 }

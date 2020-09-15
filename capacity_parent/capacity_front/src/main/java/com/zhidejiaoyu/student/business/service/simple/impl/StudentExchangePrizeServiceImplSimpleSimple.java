@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.business.service.simple.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
@@ -346,9 +345,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
                 return;
             }
 
-            PrizeExchangeList prizeExchangeList = prizeExchangeListMapper.selectOne(new LambdaQueryWrapper<PrizeExchangeList>()
-                    .eq(PrizeExchangeList::getSchoolId, schoolAdminId)
-                    .eq(PrizeExchangeList::getPrize, studentExchangePrizeTmp.getPrizeName()));
+            PrizeExchangeList prizeExchangeList = prizeExchangeListMapper.selectBySchoolIdAndPrize(schoolAdminId, studentExchangePrizeTmp.getPrizeName());
             if (prizeExchangeList == null) {
                 return;
             }
