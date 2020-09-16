@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.syntax.needview;
 
 import com.github.pagehelper.util.StringUtil;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.vo.syntax.SelectSyntaxVO;
 import com.zhidejiaoyu.common.vo.syntax.game.GameSelect;
@@ -44,6 +45,10 @@ public class SelectNeedView implements INeedView {
 
     @Resource
     private SyntaxMemoryDifficulty syntaxMemoryDifficulty;
+
+    @Resource
+    private BaiduSpeak baiduSpeak;
+
 
     @Override
     public ServerResponse<Object> getNeedView(NeedViewDTO dto) {
@@ -104,7 +109,7 @@ public class SelectNeedView implements INeedView {
      * @return
      */
     public GameVO getSelections(SyntaxTopic syntaxTopic) {
-        return new GameVO(SyntaxGameServiceImpl.replace(syntaxTopic), this.packageSelectAnswer(syntaxTopic));
+        return new GameVO(SyntaxGameServiceImpl.replace(syntaxTopic), this.packageSelectAnswer(syntaxTopic),baiduSpeak.getLanguagePath(SyntaxGameServiceImpl.replace(syntaxTopic)));
     }
 
     /**

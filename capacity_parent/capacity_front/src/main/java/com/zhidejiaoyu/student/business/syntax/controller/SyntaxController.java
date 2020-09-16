@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.syntax.controller;
 import com.zhidejiaoyu.common.dto.syntax.SaveSyntaxDTO;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.controller.BaseController;
 import com.zhidejiaoyu.student.business.syntax.service.LearnSyntaxService;

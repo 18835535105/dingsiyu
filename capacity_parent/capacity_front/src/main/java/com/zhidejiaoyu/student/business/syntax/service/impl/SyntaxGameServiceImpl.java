@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.GoldUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -68,6 +69,9 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     @Resource
     private StudentStudyPlanMapper studentStudyPlanMapper;
 
+    @Resource
+    private BaiduSpeak baiduSpeak;
+
     @Override
     public ServerResponse<Object> getSyntaxGame(Long unitId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
@@ -82,7 +86,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
             return ServerResponse.createByError(500, "未查询到数据！");
         }
         List<GameVO> returnList = this.packageSyntaxTopics(syntaxTopics).parallelStream().limit(GAME_COUNT)
-                .map(syntaxTopic -> new GameVO(replace(syntaxTopic), this.getSelect(syntaxTopic)))
+                .map(syntaxTopic -> new GameVO(replace(syntaxTopic), this.getSelect(syntaxTopic),baiduSpeak.getLanguagePath(replace(syntaxTopic))))
                 .collect(Collectors.toList());
 
         return ServerResponse.createBySuccess(returnList);
