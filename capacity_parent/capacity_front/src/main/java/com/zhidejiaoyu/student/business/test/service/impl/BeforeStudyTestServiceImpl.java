@@ -579,13 +579,20 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
         // 每个单元出题数量
         final int maxSize = 3;
+        // 去掉重复的单词
+        Map<String, String> wordMap = new HashMap<>(16);
         collect.forEach((unitId, subjectVos) -> {
             Collections.shuffle(subjectVos);
             List<SubjectsVO> voList = subjectVos.stream()
                     // 去除题目中包含答案的数据
-                    .filter(vo -> StringUtil.isNotEmpty(vo.getWordChinese()) && !vo.getWordChinese().contains(vo.getWord()))
+                    .filter(vo -> StringUtil.isNotEmpty(vo.getWordChinese())
+                            && !wordMap.containsKey(vo.getWord())
+                            && !vo.getWordChinese().contains(vo.getWord()))
                     .limit(maxSize).collect(Collectors.toList());
-            voList.forEach(vo -> vo.setReadUrl(GetOssFile.getPublicObjectUrl(vo.getReadUrl())));
+            voList.forEach(vo -> {
+                wordMap.put(vo.getWord(), vo.getWord());
+                vo.setReadUrl(GetOssFile.getPublicObjectUrl(vo.getReadUrl()));
+            });
             result.addAll(voList);
         });
         return ServerResponse.createBySuccess(result);

@@ -10,8 +10,6 @@ import com.zhidejiaoyu.student.business.feignclient.course.VocabularyFeignClient
 import com.zhidejiaoyu.student.business.shipconfig.service.impl.ShipAddEquipmentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -31,10 +29,10 @@ import java.util.concurrent.TimeUnit;
 public class RedisOpt {
 
 
-    @Autowired
+    @Resource
     private LevelMapper levelMapper;
 
-    @Autowired
+    @Resource
     private PhoneticSymbolMapper phoneticSymbolMapper;
 
     @Resource
@@ -72,32 +70,21 @@ public class RedisOpt {
      * 获取摸底测试测试记录
      */
     public boolean getTestBeforeStudy(Long studentId) {
-        StudentExpansion expansion = studentExpansionMapper.selectByStudentId(studentId);
-        String phase;
-        if (StringUtils.isEmpty(expansion.getPhase())) {
-            expansion.setPhase("小学");
-            studentExpansionMapper.updateById(expansion);
-            phase = "小学";
-        } else {
-            phase = expansion.getPhase();
-        }
 
-        Object o = redisTemplate.opsForHash().get(RedisKeysConst.TEST_BEFORE_STUDY + studentId, phase);
+        String key = RedisKeysConst.TEST_BEFORE_STUDY + studentId;
+        Object o = redisTemplate.opsForHash().get(key, studentId);
 
         if (o != null) {
             return true;
         }
 
-        List<TestRecord> testRecords =
-                testRecordMapper.selectListByGenre(studentId, GenreConstant.TEST_BEFORE_STUDY);
-        for (TestRecord testRecord : testRecords) {
-            String explain = testRecord.getExplain();
-            if (phase.equals(explain)) {
-                redisTemplate.opsForHash().put(RedisKeysConst.TEST_BEFORE_STUDY + studentId, phase, true);
-                redisTemplate.expire(RedisKeysConst.TEST_BEFORE_STUDY + studentId, 30, TimeUnit.DAYS);
-                return true;
-            }
+        TestRecord testRecord = testRecordMapper.selectByGenre(studentId, GenreConstant.TEST_BEFORE_STUDY);
+        if (testRecord != null) {
+            redisTemplate.opsForHash().put(key, studentId, true);
+            redisTemplate.expire(key, 30, TimeUnit.DAYS);
+            return true;
         }
+
         return false;
 
     }
@@ -526,8 +513,9 @@ public class RedisOpt {
 
     /**
      * 保存学渣学霸流程数据
+     *
      * @param studentId
-     * @param type  1，学渣 2学霸
+     * @param type      1，学渣 2学霸
      */
     public void saveStudentStudyModel(Long studentId, Integer type) {
         String key = RedisKeysConst.STUDENT_STUDY_MODEL + studentId;
@@ -536,13 +524,14 @@ public class RedisOpt {
 
     /**
      * 查询学渣学霸流程
+     *
      * @param studentId
-     * @return  1，学渣 2，学霸
+     * @return 1，学渣 2，学霸
      */
     public Integer getStudentStudyModel(Long studentId) {
         String key = RedisKeysConst.STUDENT_STUDY_MODEL + studentId;
         Object o = redisTemplate.opsForValue().get(key);
-        if(o==null){
+        if (o == null) {
             return 2;
         }
         int model = Integer.parseInt(o.toString());

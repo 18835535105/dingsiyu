@@ -103,5 +103,13 @@
         </if>
         order by exchange_prize desc
     </select>
+    <select id="selectBySchoolIdAndPrize" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from prize_exchange_list
+        where school_id = #{schoolAdminId}
+        and prize = #{prizeName}
+        limit 1
+    </select>
 
 </mapper>
