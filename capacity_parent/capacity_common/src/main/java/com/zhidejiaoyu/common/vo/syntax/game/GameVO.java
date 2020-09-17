@@ -21,12 +21,18 @@ public class GameVO implements Serializable {
     private String topic;
 
     /**
+     * 读音
+     */
+    private String readUrl;
+
+    /**
      * 选项
      */
     private List<GameSelect> select;
 
-    public GameVO(String topic, List<GameSelect> list) {
+    public GameVO(String topic, List<GameSelect> list,String readUrl) {
         this.topic = topic;
+        this.readUrl = readUrl;
         this.select = list;
     }
 }
