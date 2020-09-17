@@ -86,7 +86,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
             return ServerResponse.createByError(500, "未查询到数据！");
         }
         List<GameVO> returnList = this.packageSyntaxTopics(syntaxTopics).parallelStream().limit(GAME_COUNT)
-                .map(syntaxTopic -> new GameVO(replace(syntaxTopic), this.getSelect(syntaxTopic),baiduSpeak.getLanguagePath(replace(syntaxTopic))))
+                .map(syntaxTopic -> new GameVO(replace(syntaxTopic), this.getSelect(syntaxTopic),baiduSpeak.getLanguagePath(replace2(syntaxTopic))))
                 .collect(Collectors.toList());
 
         return ServerResponse.createBySuccess(returnList);
@@ -103,6 +103,21 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
         return topic.startsWith("$")
                 ? topic.replace("$&$", "___ ")
                 : topic.replace("$&$", " ___ ");
+    }
+
+    /**
+     * 替换题目读音
+     * @param syntaxTopic
+     * @return
+     */
+    public static String replace2(SyntaxTopic syntaxTopic) {
+        String topic = StringUtil.replaceSpecialSpaceToNormalSpace(syntaxTopic.getTopic());
+        String string = syntaxTopic.getAnswer().trim();//选项
+        String[] sourceStrArray = string.split(",|;");
+        return  String.format(
+                    topic.replace("$&$", "_").trim().replace("_", "%s"),
+                    sourceStrArray
+                );
     }
 
     private void updateStudentStudyPlanToUnComplete(Long unitId, Student student) {

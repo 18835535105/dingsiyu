@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.controller.BaseController;
 import com.zhidejiaoyu.student.business.syntax.service.LearnSyntaxService;
+import com.zhidejiaoyu.student.business.syntax.service.impl.SyntaxGameServiceImpl;
 import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -78,6 +79,8 @@ public class SyntaxController extends BaseController {
      * @param unitId
      * @return
      */
+    @Resource
+    private SyntaxGameServiceImpl syntaxGameService;
     @GetMapping("/getSelectSyntax")
     public ServerResponse<Object> getSelectSyntax(Long unitId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());

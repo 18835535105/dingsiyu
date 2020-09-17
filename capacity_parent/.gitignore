@@ -22,7 +22,7 @@
 *.classpath
 *.project
 *.factorypath
-
+*.iml
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 /capacity_front/capacity_front.iml
@@ -40,3 +40,9 @@ hs_err_pid*
 /aliyun-common/aliyun-common.iml
 /aliyun-translate/aliyun-translate.iml
 /aliyun-vod/aliyun-vod.iml
+aliyun-common/target/generated-sources/
+aliyun-oss/target/generated-sources/
+aliyun-translate/target/generated-sources/
+capacity_common/target/generated-sources/
+capacity_front/target/generated-sources/
+capacity_front/target/generated-test-sources/
