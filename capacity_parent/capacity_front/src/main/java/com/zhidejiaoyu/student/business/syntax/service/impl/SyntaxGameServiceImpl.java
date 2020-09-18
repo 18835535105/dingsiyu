@@ -25,7 +25,9 @@ import com.zhidejiaoyu.student.business.test.service.impl.TestServiceImpl;
 import com.zhidejiaoyu.student.business.syntax.service.SyntaxGameService;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.StringEncoder;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,7 +101,9 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      * @return
      */
     public static String replace(SyntaxTopic syntaxTopic) {
-        String topic = StringUtil.replaceSpecialSpaceToNormalSpace(syntaxTopic.getTopic());
+        String topic = StringUtil.replaceSpecialSpaceToNormalSpace(syntaxTopic.getTopic()).replaceAll("\\\\n","").
+                replaceAll("\\n","");
+
         return topic.startsWith("$")
                 ? topic.replace("$&$", "___ ")
                 : topic.replace("$&$", " ___ ");
@@ -111,9 +115,10 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      * @return
      */
     public static String replace2(SyntaxTopic syntaxTopic) {
-        String topic = StringUtil.replaceSpecialSpaceToNormalSpace(syntaxTopic.getTopic());
-        String string = syntaxTopic.getAnswer().trim();//选项
-        String[] sourceStrArray = string.split(",|;");
+        String topic = StringUtil.replaceSpecialSpaceToNormalSpace(syntaxTopic.getTopic()).replaceAll("\\\\n","").
+                       replaceAll("\\n","");
+        String answer = syntaxTopic.getAnswer().trim();
+        String[] sourceStrArray = answer.split(",|;");
         return  String.format(
                     topic.replace("$&$", "_").trim().replace("_", "%s"),
                     sourceStrArray

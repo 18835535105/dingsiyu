@@ -79,8 +79,6 @@ public class SyntaxController extends BaseController {
      * @param unitId
      * @return
      */
-    @Resource
-    private SyntaxGameServiceImpl syntaxGameService;
     @GetMapping("/getSelectSyntax")
     public ServerResponse<Object> getSelectSyntax(Long unitId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
